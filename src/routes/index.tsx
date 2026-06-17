@@ -123,28 +123,32 @@ function Index() {
 
       {/* Hero */}
       <header className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <img
-            src={heroVillage}
-            alt="Village paddy fields at sunrise"
-            width={1920}
-            height={1280}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/0 to-background/0" />
-        </div>
+        {/* Decorative kolam dot pattern */}
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-primary/15"
+        >
+          <defs>
+            <pattern id="kolam" width="28" height="28" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.2" fill="currentColor" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#kolam)" />
+        </svg>
+        <div className="pointer-events-none absolute -right-32 -top-32 -z-10 size-[28rem] rounded-full bg-accent/25 blur-3xl" />
+        <div className="pointer-events-none absolute -left-32 top-40 -z-10 size-[28rem] rounded-full bg-secondary/15 blur-3xl" />
 
-        <div className="mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 sm:pt-24 md:pb-28 md:pt-32">
-          <div className="max-w-2xl">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:pb-28 lg:pt-20">
+          {/* Left: copy */}
+          <div>
             <span className="animate-fade-in inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
               <Sparkles className="size-3.5" />
               Digital Village Initiative
             </span>
-            <h1 className="animate-fade-up mt-6 text-balance font-display text-5xl font-semibold leading-[1.05] text-clay sm:text-6xl md:text-7xl">
+            <h1 className="animate-fade-up mt-5 text-balance font-display text-[2.75rem] font-semibold leading-[1.02] text-clay sm:text-6xl md:text-7xl">
               Everything for your <em className="italic text-primary">village</em>, in one place.
             </h1>
-            <p className="animate-fade-up mt-6 max-w-xl text-pretty text-lg text-muted-foreground [animation-delay:120ms]">
+            <p className="animate-fade-up mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg [animation-delay:120ms]">
               Find workers, lease farmland, sell produce, hire local services, and never
               miss a village notice — all from one simple app.
             </p>
@@ -153,23 +157,23 @@ function Index() {
             </p>
 
             {/* Search */}
-            <div className="animate-fade-up mt-8 [animation-delay:240ms]">
+            <div className="animate-fade-up mt-7 [animation-delay:240ms]">
               <div className="group flex items-center gap-2 rounded-2xl border border-border/60 bg-card p-2 shadow-[var(--shadow-soft)] focus-within:ring-2 focus-within:ring-primary/20">
-                <div className="grid size-12 place-items-center rounded-xl bg-muted text-muted-foreground">
+                <div className="grid size-11 place-items-center rounded-xl bg-muted text-muted-foreground sm:size-12">
                   <Search className="size-5" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Search workers, seeds, tractors, services…"
-                  className="flex-1 bg-transparent px-1 text-base text-foreground outline-none placeholder:text-muted-foreground/70"
+                  placeholder="Search workers, seeds, tractors…"
+                  className="min-w-0 flex-1 bg-transparent px-1 text-base text-foreground outline-none placeholder:text-muted-foreground/70"
                 />
                 <button className="hidden rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110 sm:block">
                   Search
                 </button>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="opacity-70">Popular:</span>
-                {["Electrician", "Paddy seeds", "Tractor on rent", "Plumber", "Dairy"].map((t) => (
+                {["Electrician", "Paddy seeds", "Tractor", "Plumber", "Dairy"].map((t) => (
                   <button
                     key={t}
                     className="rounded-full border border-border/60 bg-card px-3 py-1 transition hover:border-primary hover:text-primary"
@@ -180,17 +184,65 @@ function Index() {
               </div>
             </div>
 
-            <div className="animate-fade-up mt-10 grid max-w-md grid-cols-3 gap-4 [animation-delay:320ms]">
+            <div className="animate-fade-up mt-8 grid max-w-md grid-cols-3 gap-4 [animation-delay:320ms]">
               {[
                 { k: "1,200+", v: "Villagers" },
                 { k: "340+", v: "Workers" },
                 { k: "85+", v: "Acres listed" },
               ].map((s) => (
-                <div key={s.v}>
-                  <p className="font-display text-2xl font-semibold text-clay">{s.k}</p>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground">{s.v}</p>
+                <div key={s.v} className="border-l-2 border-primary/40 pl-3">
+                  <p className="font-display text-2xl font-semibold text-clay sm:text-3xl">{s.k}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground sm:text-xs">{s.v}</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Right: image collage */}
+          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+            <div className="animate-fade-up relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-border bg-muted shadow-[var(--shadow-lift)] [animation-delay:200ms]">
+              <img
+                src={heroVillage}
+                alt="Village paddy fields at sunrise"
+                width={1024}
+                height={1280}
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-clay/40 via-transparent to-transparent" />
+              {/* Weather chip */}
+              <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-white/30 bg-white/85 px-3 py-1.5 backdrop-blur-md">
+                <Sun className="size-4 text-accent-foreground" />
+                <span className="text-xs font-semibold text-clay">28° · Clear sky</span>
+              </div>
+              {/* Location badge */}
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl bg-background/90 px-4 py-3 backdrop-blur-md">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Today in</p>
+                  <p className="font-display text-base font-semibold text-clay">Kothur Village</p>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Droplets className="size-3.5 text-secondary" />64%</span>
+                  <span className="flex items-center gap-1"><Wind className="size-3.5 text-secondary" />8 km/h</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating hands card */}
+            <div className="absolute -bottom-6 -left-4 hidden w-44 rotate-[-6deg] overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-lift)] animate-float-slow sm:block">
+              <img src={handsPaddy} alt="Paddy seedlings" loading="lazy" className="aspect-square w-full object-cover" />
+              <div className="p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">Crop watch</p>
+                <p className="text-xs font-medium text-clay">Paddy · ready in 14 days</p>
+              </div>
+            </div>
+
+            {/* Floating stat pill */}
+            <div className="absolute -right-2 top-6 hidden items-center gap-2 rounded-full bg-clay px-4 py-2 text-background shadow-[var(--shadow-lift)] animate-float-slow [animation-delay:-2s] sm:flex">
+              <span className="relative grid size-2.5 place-items-center">
+                <span className="absolute inset-0 animate-ping rounded-full bg-accent/70" />
+                <span className="size-2 rounded-full bg-accent" />
+              </span>
+              <span className="text-xs font-semibold">12 villagers active now</span>
             </div>
           </div>
         </div>
