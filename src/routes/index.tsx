@@ -263,8 +263,9 @@ function Index() {
       <section id="actions" className="relative mx-auto -mt-10 max-w-7xl px-4 sm:px-6">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
           {quickActions.map((a, i) => (
-            <button
+            <Link
               key={a.label}
+              to={a.to}
               className="hover-lift animate-fade-up group flex flex-col items-start gap-4 rounded-2xl border border-border/60 bg-card p-5 text-left shadow-sm"
               style={{ animationDelay: `${i * 60}ms` }}
             >
@@ -275,7 +276,7 @@ function Index() {
                 <p className="font-semibold text-foreground">{a.label}</p>
                 <p className="text-xs text-muted-foreground">{a.te}</p>
               </div>
-            </button>
+            </Link>
           ))}
         </div>
       </section>
