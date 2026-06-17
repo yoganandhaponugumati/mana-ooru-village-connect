@@ -2,12 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   Search, Users, Briefcase, Wheat, ShoppingBasket, Wrench, Megaphone,
   Tractor, Sprout, Beef, Hammer, Bike, Phone, Siren, MapPin, ArrowRight,
-  Sparkles,
+  Sparkles, Sun, Droplets, Wind, Star, Quote, CheckCircle2, Zap, Building2,
+  HandHeart, ShieldCheck, Activity,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village.jpg";
 import marketplaceImg from "@/assets/marketplace.jpg";
 import farmlandImg from "@/assets/farmland.jpg";
 import workersImg from "@/assets/workers.jpg";
+import handsPaddy from "@/assets/hands-paddy.jpg";
+import tractorImg from "@/assets/tractor.jpg";
+import voice1 from "@/assets/voice-1.jpg";
+import voice2 from "@/assets/voice-2.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
