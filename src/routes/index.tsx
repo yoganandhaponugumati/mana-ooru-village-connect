@@ -6,6 +6,7 @@ import {
   HandHeart, ShieldCheck, Activity,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village.jpg";
+import heroVideo from "@/assets/hero-village.mp4.asset.json";
 import marketplaceImg from "@/assets/marketplace.jpg";
 import farmlandImg from "@/assets/farmland.jpg";
 import workersImg from "@/assets/workers.jpg";
