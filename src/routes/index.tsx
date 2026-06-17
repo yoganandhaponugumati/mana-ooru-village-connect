@@ -36,14 +36,44 @@ const quickActions = [
 ];
 
 const categories = [
-  { icon: Tractor, label: "Tractors & Machinery" },
-  { icon: Sprout, label: "Seeds & Fertilisers" },
-  { icon: Beef, label: "Livestock" },
-  { icon: Wheat, label: "Crops & Grain" },
-  { icon: Hammer, label: "Tools" },
-  { icon: Bike, label: "Transport" },
-  { icon: Wrench, label: "Repairs" },
-  { icon: ShoppingBasket, label: "Daily Goods" },
+  { icon: Tractor, label: "Tractors", count: "24 listings" },
+  { icon: Sprout, label: "Seeds", count: "61 listings" },
+  { icon: Beef, label: "Livestock", count: "18 listings" },
+  { icon: Wheat, label: "Grain", count: "42 listings" },
+  { icon: Hammer, label: "Tools", count: "29 listings" },
+  { icon: Bike, label: "Transport", count: "12 listings" },
+  { icon: Wrench, label: "Repairs", count: "33 services" },
+  { icon: ShoppingBasket, label: "Daily Goods", count: "57 items" },
+];
+
+const steps = [
+  { n: "01", icon: HandHeart, title: "Join your village", body: "Sign up in seconds with your phone number. Pick your village and role." },
+  { n: "02", icon: Search, title: "Post or search", body: "Need workers? Have land? Selling produce? Post once, reach the whole village." },
+  { n: "03", icon: ShieldCheck, title: "Connect & verify", body: "Call directly or chat in-app. Every member is vouched for by neighbours." },
+];
+
+const voices = [
+  {
+    img: voice1,
+    name: "Lakshmi Devi",
+    role: "Dairy farmer · Kothur",
+    quote: "I leased two acres in one week. Earlier this would have taken a whole season of asking around.",
+    rating: 5,
+  },
+  {
+    img: voice2,
+    name: "Suresh Reddy",
+    role: "Farmer · Pedda Kallepalli",
+    quote: "I sold 400 kg of paddy directly to my neighbour. No middleman, fair price.",
+    rating: 5,
+  },
+];
+
+const liveActivity = [
+  { icon: Briefcase, text: "Ramesh posted 5 workers needed for paddy harvest", time: "Just now", tint: "text-primary" },
+  { icon: ShoppingBasket, text: "Padma listed 30kg of fresh tomatoes — ₹25/kg", time: "12 min", tint: "text-secondary" },
+  { icon: Tractor, text: "Tractor available for ploughing tomorrow", time: "1 hr", tint: "text-accent-foreground" },
+  { icon: Megaphone, text: "New panchayat notice posted about water supply", time: "2 hr", tint: "text-primary" },
 ];
 
 const services = [
