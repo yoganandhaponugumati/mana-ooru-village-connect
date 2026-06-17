@@ -108,23 +108,23 @@ function Index() {
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <a href="#" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground font-display text-lg font-semibold italic shadow-sm">
               M
             </div>
             <span className="font-display text-xl font-semibold tracking-tight text-clay">
               ManaOoru
             </span>
-          </a>
+          </Link>
           <div className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex">
-            <a href="#actions" className="hover:text-primary transition-colors">Services</a>
-            <a href="#marketplace" className="hover:text-primary transition-colors">Marketplace</a>
-            <a href="#announcements" className="hover:text-primary transition-colors">Announcements</a>
-            <a href="#contacts" className="hover:text-primary transition-colors">Contacts</a>
+            <Link to="/workers" className="hover:text-primary transition-colors">Workers</Link>
+            <Link to="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link>
+            <Link to="/services" className="hover:text-primary transition-colors">Services</Link>
+            <Link to="/announcements" className="hover:text-primary transition-colors">Notices</Link>
           </div>
-          <button className="rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90">
-            Join Village
-          </button>
+          <Link to="/post-work" className="rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90">
+            + Post
+          </Link>
         </div>
       </nav>
 
