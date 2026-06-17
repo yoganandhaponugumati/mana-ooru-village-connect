@@ -6,6 +6,7 @@ import {
   HandHeart, ShieldCheck, Activity,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village.jpg";
+import heroVideo from "@/assets/hero-village.mp4.asset.json";
 import marketplaceImg from "@/assets/marketplace.jpg";
 import farmlandImg from "@/assets/farmland.jpg";
 import workersImg from "@/assets/workers.jpg";
@@ -201,11 +202,15 @@ function Index() {
           {/* Right: image collage */}
           <div className="relative mx-auto w-full max-w-md lg:max-w-none">
             <div className="animate-fade-up relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-border bg-muted shadow-[var(--shadow-lift)] [animation-delay:200ms]">
-              <img
-                src={heroVillage}
-                alt="Village paddy fields at sunrise"
-                width={1024}
-                height={1280}
+              <video
+                src={heroVideo.url}
+                poster={heroVillage}
+                autoPlay
+                loop
+                muted
+                playsInline
+                preload="auto"
+                aria-label="Village paddy fields at sunrise"
                 className="h-full w-full object-cover"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-clay/40 via-transparent to-transparent" />
