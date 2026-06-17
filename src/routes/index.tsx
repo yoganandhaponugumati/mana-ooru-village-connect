@@ -269,6 +269,35 @@ function Index() {
         </div>
       </section>
 
+      {/* How it works */}
+      <section className="mx-auto mt-20 max-w-7xl px-4 sm:mt-28 sm:px-6">
+        <div className="mb-10 max-w-2xl">
+          <span className="text-xs font-bold uppercase tracking-widest text-secondary">How ManaOoru works</span>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+            Three simple steps. No paperwork, no middlemen.
+          </h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {steps.map((s, i) => (
+            <div
+              key={s.n}
+              className="hover-lift animate-fade-up relative overflow-hidden rounded-3xl border border-border/60 bg-card p-7 shadow-sm"
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              <span className="absolute right-5 top-5 font-display text-5xl font-semibold text-primary/15">{s.n}</span>
+              <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
+                <s.icon className="size-6" strokeWidth={1.75} />
+              </div>
+              <h3 className="mt-5 font-display text-xl font-semibold text-clay">{s.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>
+              <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-secondary">
+                <CheckCircle2 className="size-4" /> Takes less than a minute
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Marketplace Category Marquee */}
       <section id="marketplace" className="mt-24 overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
