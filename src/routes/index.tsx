@@ -354,6 +354,10 @@ function Index() {
 
         {/* Featured listings */}
         <div className="mx-auto mt-12 max-w-7xl px-4 sm:px-6">
+          <div className="mb-6 flex items-end justify-between">
+            <h3 className="font-display text-2xl font-semibold text-clay">Featured this week</h3>
+            <a href="#" className="text-sm font-semibold text-primary hover:underline">View all listings →</a>
+          </div>
           <div className="grid gap-6 md:grid-cols-3">
             {services.map((s, i) => (
               <article
@@ -361,13 +365,19 @@ function Index() {
                 className="hover-lift animate-fade-up group overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm"
                 style={{ animationDelay: `${i * 100}ms` }}
               >
-                <div className="aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                   <img
                     src={s.img}
                     alt={s.title}
                     loading="lazy"
+                    width={800}
+                    height={600}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-clay shadow-sm">
+                    <Star className="size-3 fill-accent text-accent" /> Verified
+                  </span>
                 </div>
                 <div className="p-6">
                   <span className="inline-block rounded-full bg-secondary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">
@@ -377,9 +387,94 @@ function Index() {
                   <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                     <MapPin className="size-3.5" /> {s.who}
                   </p>
+                  <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4">
+                    <div className="flex -space-x-2">
+                      {[0,1,2].map(n => (
+                        <div key={n} className="size-7 rounded-full border-2 border-card bg-gradient-to-br from-primary/40 to-accent/60" />
+                      ))}
+                    </div>
+                    <button className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground">
+                      <Phone className="size-3" /> Contact
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Voices from the village + Live activity */}
+      <section className="mx-auto mt-24 max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+          {/* Voices */}
+          <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-secondary">Voices from the village</span>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+              Real neighbours. Real results.
+            </h2>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2">
+              {voices.map((v, i) => (
+                <figure
+                  key={v.name}
+                  className="hover-lift animate-fade-up relative flex flex-col gap-5 overflow-hidden rounded-3xl border border-border/60 bg-card p-6 shadow-sm"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                >
+                  <Quote className="absolute right-4 top-4 size-10 rotate-180 text-primary/15" />
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: v.rating }).map((_, k) => (
+                      <Star key={k} className="size-4 fill-accent text-accent" />
+                    ))}
+                  </div>
+                  <blockquote className="font-display text-lg italic leading-snug text-clay">
+                    “{v.quote}”
+                  </blockquote>
+                  <figcaption className="mt-auto flex items-center gap-3">
+                    <img src={v.img} alt={v.name} loading="lazy" className="size-12 rounded-full object-cover ring-2 ring-accent/40" />
+                    <div>
+                      <p className="font-semibold text-foreground">{v.name}</p>
+                      <p className="text-xs text-muted-foreground">{v.role}</p>
+                    </div>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+
+          {/* Live activity */}
+          <div>
+            <div className="sticky top-24 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card to-muted/60 p-6 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="relative grid size-2.5 place-items-center">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-primary/60" />
+                    <span className="size-2 rounded-full bg-primary" />
+                  </span>
+                  <h3 className="font-display text-xl font-semibold text-clay">Live in your village</h3>
+                </div>
+                <Activity className="size-4 text-muted-foreground" />
+              </div>
+              <ul className="space-y-4">
+                {liveActivity.map((a, i) => (
+                  <li
+                    key={i}
+                    className="animate-fade-up flex gap-3 border-l-2 border-border pl-4"
+                    style={{ animationDelay: `${i * 80}ms` }}
+                  >
+                    <div className={`mt-0.5 grid size-8 flex-none place-items-center rounded-lg bg-background ${a.tint}`}>
+                      <a.icon className="size-4" strokeWidth={2} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm leading-snug text-foreground">{a.text}</p>
+                      <p className="mt-0.5 text-[11px] uppercase tracking-wider text-muted-foreground">{a.time}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary">
+                <Zap className="size-4" /> See full activity feed
+              </button>
+            </div>
           </div>
         </div>
       </section>
