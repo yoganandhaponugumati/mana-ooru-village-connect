@@ -321,9 +321,9 @@ function Index() {
               </h2>
               <p className="mt-2 text-muted-foreground">From fresh produce to farm equipment — direct from neighbours.</p>
             </div>
-            <a href="#" className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex">
+            <Link to="/marketplace" className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex">
               See all <ArrowRight className="size-4" />
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -369,7 +369,7 @@ function Index() {
         <div className="mx-auto mt-12 max-w-7xl px-4 sm:px-6">
           <div className="mb-6 flex items-end justify-between">
             <h3 className="font-display text-2xl font-semibold text-clay">Featured this week</h3>
-            <a href="#" className="text-sm font-semibold text-primary hover:underline">View all listings →</a>
+            <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">View all listings →</Link>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {services.map((s, i) => (
@@ -484,9 +484,9 @@ function Index() {
                   </li>
                 ))}
               </ul>
-              <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary">
+              <Link to="/announcements" className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary">
                 <Zap className="size-4" /> See full activity feed
-              </button>
+              </Link>
             </div>
           </div>
         </div>
