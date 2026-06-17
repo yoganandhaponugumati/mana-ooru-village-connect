@@ -331,8 +331,9 @@ function Index() {
         <div className="mx-auto mt-8 max-w-7xl px-4 sm:px-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
             {categories.map((c, i) => (
-              <button
+              <Link
                 key={c.label}
+                to={categoryRoutes[c.label] || "/marketplace"}
                 className="hover-lift animate-fade-up group flex aspect-square flex-col items-start justify-between rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
@@ -343,7 +344,7 @@ function Index() {
                   <p className="text-sm font-semibold text-foreground">{c.label}</p>
                   <p className="text-[10px] text-muted-foreground">{c.count}</p>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
         </div>
