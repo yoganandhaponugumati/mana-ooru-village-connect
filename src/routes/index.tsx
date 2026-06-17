@@ -2,12 +2,17 @@ import { createFileRoute } from "@tanstack/react-router";
 import {
   Search, Users, Briefcase, Wheat, ShoppingBasket, Wrench, Megaphone,
   Tractor, Sprout, Beef, Hammer, Bike, Phone, Siren, MapPin, ArrowRight,
-  Sparkles,
+  Sparkles, Sun, Droplets, Wind, Star, Quote, CheckCircle2, Zap, Building2,
+  HandHeart, ShieldCheck, Activity,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village.jpg";
 import marketplaceImg from "@/assets/marketplace.jpg";
 import farmlandImg from "@/assets/farmland.jpg";
 import workersImg from "@/assets/workers.jpg";
+import handsPaddy from "@/assets/hands-paddy.jpg";
+import tractorImg from "@/assets/tractor.jpg";
+import voice1 from "@/assets/voice-1.jpg";
+import voice2 from "@/assets/voice-2.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -31,14 +36,44 @@ const quickActions = [
 ];
 
 const categories = [
-  { icon: Tractor, label: "Tractors & Machinery" },
-  { icon: Sprout, label: "Seeds & Fertilisers" },
-  { icon: Beef, label: "Livestock" },
-  { icon: Wheat, label: "Crops & Grain" },
-  { icon: Hammer, label: "Tools" },
-  { icon: Bike, label: "Transport" },
-  { icon: Wrench, label: "Repairs" },
-  { icon: ShoppingBasket, label: "Daily Goods" },
+  { icon: Tractor, label: "Tractors", count: "24 listings" },
+  { icon: Sprout, label: "Seeds", count: "61 listings" },
+  { icon: Beef, label: "Livestock", count: "18 listings" },
+  { icon: Wheat, label: "Grain", count: "42 listings" },
+  { icon: Hammer, label: "Tools", count: "29 listings" },
+  { icon: Bike, label: "Transport", count: "12 listings" },
+  { icon: Wrench, label: "Repairs", count: "33 services" },
+  { icon: ShoppingBasket, label: "Daily Goods", count: "57 items" },
+];
+
+const steps = [
+  { n: "01", icon: HandHeart, title: "Join your village", body: "Sign up in seconds with your phone number. Pick your village and role." },
+  { n: "02", icon: Search, title: "Post or search", body: "Need workers? Have land? Selling produce? Post once, reach the whole village." },
+  { n: "03", icon: ShieldCheck, title: "Connect & verify", body: "Call directly or chat in-app. Every member is vouched for by neighbours." },
+];
+
+const voices = [
+  {
+    img: voice1,
+    name: "Lakshmi Devi",
+    role: "Dairy farmer · Kothur",
+    quote: "I leased two acres in one week. Earlier this would have taken a whole season of asking around.",
+    rating: 5,
+  },
+  {
+    img: voice2,
+    name: "Suresh Reddy",
+    role: "Farmer · Pedda Kallepalli",
+    quote: "I sold 400 kg of paddy directly to my neighbour. No middleman, fair price.",
+    rating: 5,
+  },
+];
+
+const liveActivity = [
+  { icon: Briefcase, text: "Ramesh posted 5 workers needed for paddy harvest", time: "Just now", tint: "text-primary" },
+  { icon: ShoppingBasket, text: "Padma listed 30kg of fresh tomatoes — ₹25/kg", time: "12 min", tint: "text-secondary" },
+  { icon: Tractor, text: "Tractor available for ploughing tomorrow", time: "1 hr", tint: "text-accent-foreground" },
+  { icon: Megaphone, text: "New panchayat notice posted about water supply", time: "2 hr", tint: "text-primary" },
 ];
 
 const services = [
@@ -88,28 +123,32 @@ function Index() {
 
       {/* Hero */}
       <header className="relative overflow-hidden">
-        <div className="absolute inset-0 -z-10">
-          <img
-            src={heroVillage}
-            alt="Village paddy fields at sunrise"
-            width={1920}
-            height={1280}
-            className="h-full w-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/0 to-background/0" />
-        </div>
+        {/* Decorative kolam dot pattern */}
+        <svg
+          aria-hidden
+          className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-primary/15"
+        >
+          <defs>
+            <pattern id="kolam" width="28" height="28" patternUnits="userSpaceOnUse">
+              <circle cx="2" cy="2" r="1.2" fill="currentColor" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#kolam)" />
+        </svg>
+        <div className="pointer-events-none absolute -right-32 -top-32 -z-10 size-[28rem] rounded-full bg-accent/25 blur-3xl" />
+        <div className="pointer-events-none absolute -left-32 top-40 -z-10 size-[28rem] rounded-full bg-secondary/15 blur-3xl" />
 
-        <div className="mx-auto max-w-7xl px-4 pb-20 pt-16 sm:px-6 sm:pt-24 md:pb-28 md:pt-32">
-          <div className="max-w-2xl">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:pb-28 lg:pt-20">
+          {/* Left: copy */}
+          <div>
             <span className="animate-fade-in inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
               <Sparkles className="size-3.5" />
               Digital Village Initiative
             </span>
-            <h1 className="animate-fade-up mt-6 text-balance font-display text-5xl font-semibold leading-[1.05] text-clay sm:text-6xl md:text-7xl">
+            <h1 className="animate-fade-up mt-5 text-balance font-display text-[2.75rem] font-semibold leading-[1.02] text-clay sm:text-6xl md:text-7xl">
               Everything for your <em className="italic text-primary">village</em>, in one place.
             </h1>
-            <p className="animate-fade-up mt-6 max-w-xl text-pretty text-lg text-muted-foreground [animation-delay:120ms]">
+            <p className="animate-fade-up mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg [animation-delay:120ms]">
               Find workers, lease farmland, sell produce, hire local services, and never
               miss a village notice — all from one simple app.
             </p>
@@ -118,23 +157,23 @@ function Index() {
             </p>
 
             {/* Search */}
-            <div className="animate-fade-up mt-8 [animation-delay:240ms]">
+            <div className="animate-fade-up mt-7 [animation-delay:240ms]">
               <div className="group flex items-center gap-2 rounded-2xl border border-border/60 bg-card p-2 shadow-[var(--shadow-soft)] focus-within:ring-2 focus-within:ring-primary/20">
-                <div className="grid size-12 place-items-center rounded-xl bg-muted text-muted-foreground">
+                <div className="grid size-11 place-items-center rounded-xl bg-muted text-muted-foreground sm:size-12">
                   <Search className="size-5" />
                 </div>
                 <input
                   type="text"
-                  placeholder="Search workers, seeds, tractors, services…"
-                  className="flex-1 bg-transparent px-1 text-base text-foreground outline-none placeholder:text-muted-foreground/70"
+                  placeholder="Search workers, seeds, tractors…"
+                  className="min-w-0 flex-1 bg-transparent px-1 text-base text-foreground outline-none placeholder:text-muted-foreground/70"
                 />
                 <button className="hidden rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110 sm:block">
                   Search
                 </button>
               </div>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
                 <span className="opacity-70">Popular:</span>
-                {["Electrician", "Paddy seeds", "Tractor on rent", "Plumber", "Dairy"].map((t) => (
+                {["Electrician", "Paddy seeds", "Tractor", "Plumber", "Dairy"].map((t) => (
                   <button
                     key={t}
                     className="rounded-full border border-border/60 bg-card px-3 py-1 transition hover:border-primary hover:text-primary"
@@ -145,17 +184,65 @@ function Index() {
               </div>
             </div>
 
-            <div className="animate-fade-up mt-10 grid max-w-md grid-cols-3 gap-4 [animation-delay:320ms]">
+            <div className="animate-fade-up mt-8 grid max-w-md grid-cols-3 gap-4 [animation-delay:320ms]">
               {[
                 { k: "1,200+", v: "Villagers" },
                 { k: "340+", v: "Workers" },
                 { k: "85+", v: "Acres listed" },
               ].map((s) => (
-                <div key={s.v}>
-                  <p className="font-display text-2xl font-semibold text-clay">{s.k}</p>
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground">{s.v}</p>
+                <div key={s.v} className="border-l-2 border-primary/40 pl-3">
+                  <p className="font-display text-2xl font-semibold text-clay sm:text-3xl">{s.k}</p>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground sm:text-xs">{s.v}</p>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Right: image collage */}
+          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
+            <div className="animate-fade-up relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-border bg-muted shadow-[var(--shadow-lift)] [animation-delay:200ms]">
+              <img
+                src={heroVillage}
+                alt="Village paddy fields at sunrise"
+                width={1024}
+                height={1280}
+                className="h-full w-full object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-clay/40 via-transparent to-transparent" />
+              {/* Weather chip */}
+              <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-white/30 bg-white/85 px-3 py-1.5 backdrop-blur-md">
+                <Sun className="size-4 text-accent-foreground" />
+                <span className="text-xs font-semibold text-clay">28° · Clear sky</span>
+              </div>
+              {/* Location badge */}
+              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl bg-background/90 px-4 py-3 backdrop-blur-md">
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Today in</p>
+                  <p className="font-display text-base font-semibold text-clay">Kothur Village</p>
+                </div>
+                <div className="flex items-center gap-3 text-xs text-muted-foreground">
+                  <span className="flex items-center gap-1"><Droplets className="size-3.5 text-secondary" />64%</span>
+                  <span className="flex items-center gap-1"><Wind className="size-3.5 text-secondary" />8 km/h</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Floating hands card */}
+            <div className="absolute -bottom-6 -left-4 hidden w-44 rotate-[-6deg] overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-lift)] animate-float-slow sm:block">
+              <img src={handsPaddy} alt="Paddy seedlings" loading="lazy" className="aspect-square w-full object-cover" />
+              <div className="p-3">
+                <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">Crop watch</p>
+                <p className="text-xs font-medium text-clay">Paddy · ready in 14 days</p>
+              </div>
+            </div>
+
+            {/* Floating stat pill */}
+            <div className="absolute -right-2 top-6 hidden items-center gap-2 rounded-full bg-clay px-4 py-2 text-background shadow-[var(--shadow-lift)] animate-float-slow [animation-delay:-2s] sm:flex">
+              <span className="relative grid size-2.5 place-items-center">
+                <span className="absolute inset-0 animate-ping rounded-full bg-accent/70" />
+                <span className="size-2 rounded-full bg-accent" />
+              </span>
+              <span className="text-xs font-semibold">12 villagers active now</span>
             </div>
           </div>
         </div>
@@ -182,11 +269,41 @@ function Index() {
         </div>
       </section>
 
+      {/* How it works */}
+      <section className="mx-auto mt-20 max-w-7xl px-4 sm:mt-28 sm:px-6">
+        <div className="mb-10 max-w-2xl">
+          <span className="text-xs font-bold uppercase tracking-widest text-secondary">How ManaOoru works</span>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+            Three simple steps. No paperwork, no middlemen.
+          </h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {steps.map((s, i) => (
+            <div
+              key={s.n}
+              className="hover-lift animate-fade-up relative overflow-hidden rounded-3xl border border-border/60 bg-card p-7 shadow-sm"
+              style={{ animationDelay: `${i * 80}ms` }}
+            >
+              <span className="absolute right-5 top-5 font-display text-5xl font-semibold text-primary/15">{s.n}</span>
+              <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
+                <s.icon className="size-6" strokeWidth={1.75} />
+              </div>
+              <h3 className="mt-5 font-display text-xl font-semibold text-clay">{s.title}</h3>
+              <p className="mt-2 text-sm text-muted-foreground">{s.body}</p>
+              <div className="mt-6 flex items-center gap-2 text-xs font-semibold text-secondary">
+                <CheckCircle2 className="size-4" /> Takes less than a minute
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
       {/* Marketplace Category Marquee */}
       <section id="marketplace" className="mt-24 overflow-hidden">
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-end justify-between">
             <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-secondary">Village marketplace</span>
               <h2 className="font-display text-3xl font-semibold text-clay sm:text-4xl">
                 Browse the village market
               </h2>
@@ -198,22 +315,49 @@ function Index() {
           </div>
         </div>
 
-        <div className="relative mt-8 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-          <div className="flex w-max animate-marquee gap-3 px-4">
-            {[...categories, ...categories].map((c, i) => (
-              <div
-                key={i}
-                className="flex flex-none items-center gap-3 rounded-full border border-border/60 bg-card px-5 py-3 shadow-sm"
+        {/* Category visual grid */}
+        <div className="mx-auto mt-8 max-w-7xl px-4 sm:px-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+            {categories.map((c, i) => (
+              <button
+                key={c.label}
+                className="hover-lift animate-fade-up group flex aspect-square flex-col items-start justify-between rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm"
+                style={{ animationDelay: `${i * 40}ms` }}
               >
-                <c.icon className="size-5 text-primary" strokeWidth={1.75} />
-                <span className="text-sm font-medium">{c.label}</span>
-              </div>
+                <div className="grid size-10 place-items-center rounded-lg bg-gradient-to-br from-primary/15 to-accent/25 text-primary transition-transform group-hover:rotate-[-6deg]">
+                  <c.icon className="size-5" strokeWidth={1.75} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{c.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{c.count}</p>
+                </div>
+              </button>
             ))}
+          </div>
+        </div>
+
+        {/* Subtle marquee strip for variety */}
+        <div className="relative mt-10 border-y border-border/60 bg-clay py-4 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
+          <div className="flex w-max animate-marquee gap-10 text-background/80">
+            {[...Array(2)].flatMap((_, k) => [
+              "🌾 Fresh harvest daily",
+              "🤝 Verified neighbours only",
+              "📞 Direct phone connect",
+              "💸 No commission, ever",
+              "🚜 Same-day equipment rental",
+              "🌱 Seeds from local farmers",
+            ].map((t, i) => (
+              <span key={`${k}-${i}`} className="flex-none text-sm font-medium tracking-wide">{t}</span>
+            )))}
           </div>
         </div>
 
         {/* Featured listings */}
         <div className="mx-auto mt-12 max-w-7xl px-4 sm:px-6">
+          <div className="mb-6 flex items-end justify-between">
+            <h3 className="font-display text-2xl font-semibold text-clay">Featured this week</h3>
+            <a href="#" className="text-sm font-semibold text-primary hover:underline">View all listings →</a>
+          </div>
           <div className="grid gap-6 md:grid-cols-3">
             {services.map((s, i) => (
               <article
@@ -221,13 +365,19 @@ function Index() {
                 className="hover-lift animate-fade-up group overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm"
                 style={{ animationDelay: `${i * 100}ms` }}
               >
-                <div className="aspect-[4/3] overflow-hidden">
+                <div className="relative aspect-[4/3] overflow-hidden bg-muted">
                   <img
                     src={s.img}
                     alt={s.title}
                     loading="lazy"
+                    width={800}
+                    height={600}
                     className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                   />
+                  <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
+                  <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-clay shadow-sm">
+                    <Star className="size-3 fill-accent text-accent" /> Verified
+                  </span>
                 </div>
                 <div className="p-6">
                   <span className="inline-block rounded-full bg-secondary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">
@@ -237,9 +387,94 @@ function Index() {
                   <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
                     <MapPin className="size-3.5" /> {s.who}
                   </p>
+                  <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4">
+                    <div className="flex -space-x-2">
+                      {[0,1,2].map(n => (
+                        <div key={n} className="size-7 rounded-full border-2 border-card bg-gradient-to-br from-primary/40 to-accent/60" />
+                      ))}
+                    </div>
+                    <button className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground">
+                      <Phone className="size-3" /> Contact
+                    </button>
+                  </div>
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Voices from the village + Live activity */}
+      <section className="mx-auto mt-24 max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+          {/* Voices */}
+          <div>
+            <span className="text-xs font-bold uppercase tracking-widest text-secondary">Voices from the village</span>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+              Real neighbours. Real results.
+            </h2>
+            <div className="mt-8 grid gap-5 sm:grid-cols-2">
+              {voices.map((v, i) => (
+                <figure
+                  key={v.name}
+                  className="hover-lift animate-fade-up relative flex flex-col gap-5 overflow-hidden rounded-3xl border border-border/60 bg-card p-6 shadow-sm"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                >
+                  <Quote className="absolute right-4 top-4 size-10 rotate-180 text-primary/15" />
+                  <div className="flex items-center gap-1">
+                    {Array.from({ length: v.rating }).map((_, k) => (
+                      <Star key={k} className="size-4 fill-accent text-accent" />
+                    ))}
+                  </div>
+                  <blockquote className="font-display text-lg italic leading-snug text-clay">
+                    “{v.quote}”
+                  </blockquote>
+                  <figcaption className="mt-auto flex items-center gap-3">
+                    <img src={v.img} alt={v.name} loading="lazy" className="size-12 rounded-full object-cover ring-2 ring-accent/40" />
+                    <div>
+                      <p className="font-semibold text-foreground">{v.name}</p>
+                      <p className="text-xs text-muted-foreground">{v.role}</p>
+                    </div>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+
+          {/* Live activity */}
+          <div>
+            <div className="sticky top-24 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card to-muted/60 p-6 shadow-sm">
+              <div className="mb-5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="relative grid size-2.5 place-items-center">
+                    <span className="absolute inset-0 animate-ping rounded-full bg-primary/60" />
+                    <span className="size-2 rounded-full bg-primary" />
+                  </span>
+                  <h3 className="font-display text-xl font-semibold text-clay">Live in your village</h3>
+                </div>
+                <Activity className="size-4 text-muted-foreground" />
+              </div>
+              <ul className="space-y-4">
+                {liveActivity.map((a, i) => (
+                  <li
+                    key={i}
+                    className="animate-fade-up flex gap-3 border-l-2 border-border pl-4"
+                    style={{ animationDelay: `${i * 80}ms` }}
+                  >
+                    <div className={`mt-0.5 grid size-8 flex-none place-items-center rounded-lg bg-background ${a.tint}`}>
+                      <a.icon className="size-4" strokeWidth={2} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-sm leading-snug text-foreground">{a.text}</p>
+                      <p className="mt-0.5 text-[11px] uppercase tracking-wider text-muted-foreground">{a.time}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+              <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary">
+                <Zap className="size-4" /> See full activity feed
+              </button>
+            </div>
           </div>
         </div>
       </section>
