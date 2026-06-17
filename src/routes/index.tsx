@@ -303,6 +303,7 @@ function Index() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-end justify-between">
             <div>
+              <span className="text-xs font-bold uppercase tracking-widest text-secondary">Village marketplace</span>
               <h2 className="font-display text-3xl font-semibold text-clay sm:text-4xl">
                 Browse the village market
               </h2>
@@ -314,17 +315,40 @@ function Index() {
           </div>
         </div>
 
-        <div className="relative mt-8 [mask-image:linear-gradient(to_right,transparent,black_8%,black_92%,transparent)]">
-          <div className="flex w-max animate-marquee gap-3 px-4">
-            {[...categories, ...categories].map((c, i) => (
-              <div
-                key={i}
-                className="flex flex-none items-center gap-3 rounded-full border border-border/60 bg-card px-5 py-3 shadow-sm"
+        {/* Category visual grid */}
+        <div className="mx-auto mt-8 max-w-7xl px-4 sm:px-6">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
+            {categories.map((c, i) => (
+              <button
+                key={c.label}
+                className="hover-lift animate-fade-up group flex aspect-square flex-col items-start justify-between rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm"
+                style={{ animationDelay: `${i * 40}ms` }}
               >
-                <c.icon className="size-5 text-primary" strokeWidth={1.75} />
-                <span className="text-sm font-medium">{c.label}</span>
-              </div>
+                <div className="grid size-10 place-items-center rounded-lg bg-gradient-to-br from-primary/15 to-accent/25 text-primary transition-transform group-hover:rotate-[-6deg]">
+                  <c.icon className="size-5" strokeWidth={1.75} />
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-foreground">{c.label}</p>
+                  <p className="text-[10px] text-muted-foreground">{c.count}</p>
+                </div>
+              </button>
             ))}
+          </div>
+        </div>
+
+        {/* Subtle marquee strip for variety */}
+        <div className="relative mt-10 border-y border-border/60 bg-clay py-4 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
+          <div className="flex w-max animate-marquee gap-10 text-background/80">
+            {[...Array(2)].flatMap((_, k) => [
+              "🌾 Fresh harvest daily",
+              "🤝 Verified neighbours only",
+              "📞 Direct phone connect",
+              "💸 No commission, ever",
+              "🚜 Same-day equipment rental",
+              "🌱 Seeds from local farmers",
+            ].map((t, i) => (
+              <span key={`${k}-${i}`} className="flex-none text-sm font-medium tracking-wide">{t}</span>
+            )))}
           </div>
         </div>
 
