@@ -570,12 +570,12 @@ function Index() {
               a place for you on ManaOoru. Free for every villager, forever.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <button className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110">
+              <Link to="/post-worker" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110">
                 Create your profile
-              </button>
-              <button className="rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary hover:text-primary">
-                Watch how it works
-              </button>
+              </Link>
+              <Link to="/marketplace" className="rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary hover:text-primary">
+                Browse the village
+              </Link>
             </div>
           </div>
         </div>
