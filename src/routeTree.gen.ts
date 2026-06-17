@@ -9,8 +9,56 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WorkersRouteImport } from './routes/workers'
+import { Route as WorkRouteImport } from './routes/work'
+import { Route as ServicesRouteImport } from './routes/services'
+import { Route as PostWorkerRouteImport } from './routes/post-worker'
+import { Route as PostWorkRouteImport } from './routes/post-work'
+import { Route as MarketplaceRouteImport } from './routes/marketplace'
+import { Route as LandRouteImport } from './routes/land'
+import { Route as AnnouncementsRouteImport } from './routes/announcements'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WorkersRoute = WorkersRouteImport.update({
+  id: '/workers',
+  path: '/workers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkRoute = WorkRouteImport.update({
+  id: '/work',
+  path: '/work',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ServicesRoute = ServicesRouteImport.update({
+  id: '/services',
+  path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostWorkerRoute = PostWorkerRouteImport.update({
+  id: '/post-worker',
+  path: '/post-worker',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PostWorkRoute = PostWorkRouteImport.update({
+  id: '/post-work',
+  path: '/post-work',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MarketplaceRoute = MarketplaceRouteImport.update({
+  id: '/marketplace',
+  path: '/marketplace',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LandRoute = LandRouteImport.update({
+  id: '/land',
+  path: '/land',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AnnouncementsRoute = AnnouncementsRouteImport.update({
+  id: '/announcements',
+  path: '/announcements',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -19,28 +67,144 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/land': typeof LandRoute
+  '/marketplace': typeof MarketplaceRoute
+  '/post-work': typeof PostWorkRoute
+  '/post-worker': typeof PostWorkerRoute
+  '/services': typeof ServicesRoute
+  '/work': typeof WorkRoute
+  '/workers': typeof WorkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/land': typeof LandRoute
+  '/marketplace': typeof MarketplaceRoute
+  '/post-work': typeof PostWorkRoute
+  '/post-worker': typeof PostWorkerRoute
+  '/services': typeof ServicesRoute
+  '/work': typeof WorkRoute
+  '/workers': typeof WorkersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/announcements': typeof AnnouncementsRoute
+  '/land': typeof LandRoute
+  '/marketplace': typeof MarketplaceRoute
+  '/post-work': typeof PostWorkRoute
+  '/post-worker': typeof PostWorkerRoute
+  '/services': typeof ServicesRoute
+  '/work': typeof WorkRoute
+  '/workers': typeof WorkersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/announcements'
+    | '/land'
+    | '/marketplace'
+    | '/post-work'
+    | '/post-worker'
+    | '/services'
+    | '/work'
+    | '/workers'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/announcements'
+    | '/land'
+    | '/marketplace'
+    | '/post-work'
+    | '/post-worker'
+    | '/services'
+    | '/work'
+    | '/workers'
+  id:
+    | '__root__'
+    | '/'
+    | '/announcements'
+    | '/land'
+    | '/marketplace'
+    | '/post-work'
+    | '/post-worker'
+    | '/services'
+    | '/work'
+    | '/workers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AnnouncementsRoute: typeof AnnouncementsRoute
+  LandRoute: typeof LandRoute
+  MarketplaceRoute: typeof MarketplaceRoute
+  PostWorkRoute: typeof PostWorkRoute
+  PostWorkerRoute: typeof PostWorkerRoute
+  ServicesRoute: typeof ServicesRoute
+  WorkRoute: typeof WorkRoute
+  WorkersRoute: typeof WorkersRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/workers': {
+      id: '/workers'
+      path: '/workers'
+      fullPath: '/workers'
+      preLoaderRoute: typeof WorkersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/work': {
+      id: '/work'
+      path: '/work'
+      fullPath: '/work'
+      preLoaderRoute: typeof WorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/services': {
+      id: '/services'
+      path: '/services'
+      fullPath: '/services'
+      preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/post-worker': {
+      id: '/post-worker'
+      path: '/post-worker'
+      fullPath: '/post-worker'
+      preLoaderRoute: typeof PostWorkerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/post-work': {
+      id: '/post-work'
+      path: '/post-work'
+      fullPath: '/post-work'
+      preLoaderRoute: typeof PostWorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/marketplace': {
+      id: '/marketplace'
+      path: '/marketplace'
+      fullPath: '/marketplace'
+      preLoaderRoute: typeof MarketplaceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/land': {
+      id: '/land'
+      path: '/land'
+      fullPath: '/land'
+      preLoaderRoute: typeof LandRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/announcements': {
+      id: '/announcements'
+      path: '/announcements'
+      fullPath: '/announcements'
+      preLoaderRoute: typeof AnnouncementsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -53,6 +217,14 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AnnouncementsRoute: AnnouncementsRoute,
+  LandRoute: LandRoute,
+  MarketplaceRoute: MarketplaceRoute,
+  PostWorkRoute: PostWorkRoute,
+  PostWorkerRoute: PostWorkerRoute,
+  ServicesRoute: ServicesRoute,
+  WorkRoute: WorkRoute,
+  WorkersRoute: WorkersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

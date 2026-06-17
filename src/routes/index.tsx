@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   Search, Users, Briefcase, Wheat, ShoppingBasket, Wrench, Megaphone,
   Tractor, Sprout, Beef, Hammer, Bike, Phone, Siren, MapPin, ArrowRight,
@@ -28,13 +29,18 @@ export const Route = createFileRoute("/")({
 });
 
 const quickActions = [
-  { icon: Users, label: "Find Workers", te: "పనివారు", tint: "bg-primary/10 text-primary" },
-  { icon: Briefcase, label: "Post Work", te: "పని ఇవ్వండి", tint: "bg-secondary/10 text-secondary" },
-  { icon: Wheat, label: "Lease Land", te: "భూమి కౌలు", tint: "bg-accent/20 text-clay" },
-  { icon: ShoppingBasket, label: "Marketplace", te: "సంత", tint: "bg-primary/10 text-primary" },
-  { icon: Wrench, label: "Local Services", te: "స్థానిక సేవలు", tint: "bg-secondary/10 text-secondary" },
-  { icon: Megaphone, label: "Announcements", te: "ప్రకటనలు", tint: "bg-accent/20 text-clay" },
+  { icon: Users, label: "Find Workers", te: "పనివారు", tint: "bg-primary/10 text-primary", to: "/workers" as const },
+  { icon: Briefcase, label: "Post Work", te: "పని ఇవ్వండి", tint: "bg-secondary/10 text-secondary", to: "/post-work" as const },
+  { icon: Wheat, label: "Lease Land", te: "భూమి కౌలు", tint: "bg-accent/20 text-clay", to: "/land" as const },
+  { icon: ShoppingBasket, label: "Marketplace", te: "సంత", tint: "bg-primary/10 text-primary", to: "/marketplace" as const },
+  { icon: Wrench, label: "Local Services", te: "స్థానిక సేవలు", tint: "bg-secondary/10 text-secondary", to: "/services" as const },
+  { icon: Megaphone, label: "Announcements", te: "ప్రకటనలు", tint: "bg-accent/20 text-clay", to: "/announcements" as const },
 ];
+
+const categoryRoutes: Record<string, "/marketplace" | "/services"> = {
+  Tractors: "/services", Seeds: "/marketplace", Livestock: "/marketplace", Grain: "/marketplace",
+  Tools: "/marketplace", Transport: "/services", Repairs: "/services", "Daily Goods": "/marketplace",
+};
 
 const categories = [
   { icon: Tractor, label: "Tractors", count: "24 listings" },
@@ -102,23 +108,23 @@ function Index() {
       {/* Nav */}
       <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <a href="#" className="flex items-center gap-2">
+          <Link to="/" className="flex items-center gap-2">
             <div className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground font-display text-lg font-semibold italic shadow-sm">
               M
             </div>
             <span className="font-display text-xl font-semibold tracking-tight text-clay">
               ManaOoru
             </span>
-          </a>
+          </Link>
           <div className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex">
-            <a href="#actions" className="hover:text-primary transition-colors">Services</a>
-            <a href="#marketplace" className="hover:text-primary transition-colors">Marketplace</a>
-            <a href="#announcements" className="hover:text-primary transition-colors">Announcements</a>
-            <a href="#contacts" className="hover:text-primary transition-colors">Contacts</a>
+            <Link to="/workers" className="hover:text-primary transition-colors">Workers</Link>
+            <Link to="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link>
+            <Link to="/services" className="hover:text-primary transition-colors">Services</Link>
+            <Link to="/announcements" className="hover:text-primary transition-colors">Notices</Link>
           </div>
-          <button className="rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90">
-            Join Village
-          </button>
+          <Link to="/post-work" className="rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90">
+            + Post
+          </Link>
         </div>
       </nav>
 
@@ -257,8 +263,9 @@ function Index() {
       <section id="actions" className="relative mx-auto -mt-10 max-w-7xl px-4 sm:px-6">
         <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
           {quickActions.map((a, i) => (
-            <button
+            <Link
               key={a.label}
+              to={a.to}
               className="hover-lift animate-fade-up group flex flex-col items-start gap-4 rounded-2xl border border-border/60 bg-card p-5 text-left shadow-sm"
               style={{ animationDelay: `${i * 60}ms` }}
             >
@@ -269,7 +276,7 @@ function Index() {
                 <p className="font-semibold text-foreground">{a.label}</p>
                 <p className="text-xs text-muted-foreground">{a.te}</p>
               </div>
-            </button>
+            </Link>
           ))}
         </div>
       </section>
@@ -314,9 +321,9 @@ function Index() {
               </h2>
               <p className="mt-2 text-muted-foreground">From fresh produce to farm equipment — direct from neighbours.</p>
             </div>
-            <a href="#" className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex">
+            <Link to="/marketplace" className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex">
               See all <ArrowRight className="size-4" />
-            </a>
+            </Link>
           </div>
         </div>
 
@@ -324,8 +331,9 @@ function Index() {
         <div className="mx-auto mt-8 max-w-7xl px-4 sm:px-6">
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
             {categories.map((c, i) => (
-              <button
+              <Link
                 key={c.label}
+                to={categoryRoutes[c.label] || "/marketplace"}
                 className="hover-lift animate-fade-up group flex aspect-square flex-col items-start justify-between rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
@@ -336,7 +344,7 @@ function Index() {
                   <p className="text-sm font-semibold text-foreground">{c.label}</p>
                   <p className="text-[10px] text-muted-foreground">{c.count}</p>
                 </div>
-              </button>
+              </Link>
             ))}
           </div>
         </div>
@@ -361,7 +369,7 @@ function Index() {
         <div className="mx-auto mt-12 max-w-7xl px-4 sm:px-6">
           <div className="mb-6 flex items-end justify-between">
             <h3 className="font-display text-2xl font-semibold text-clay">Featured this week</h3>
-            <a href="#" className="text-sm font-semibold text-primary hover:underline">View all listings →</a>
+            <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">View all listings →</Link>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
             {services.map((s, i) => (
@@ -476,9 +484,9 @@ function Index() {
                   </li>
                 ))}
               </ul>
-              <button className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary">
+              <Link to="/announcements" className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary">
                 <Zap className="size-4" /> See full activity feed
-              </button>
+              </Link>
             </div>
           </div>
         </div>
@@ -562,12 +570,12 @@ function Index() {
               a place for you on ManaOoru. Free for every villager, forever.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <button className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110">
+              <Link to="/post-worker" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110">
                 Create your profile
-              </button>
-              <button className="rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary hover:text-primary">
-                Watch how it works
-              </button>
+              </Link>
+              <Link to="/marketplace" className="rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary hover:text-primary">
+                Browse the village
+              </Link>
             </div>
           </div>
         </div>
