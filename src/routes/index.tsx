@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   Search, Users, Briefcase, Wheat, ShoppingBasket, Wrench, Megaphone,
   Tractor, Sprout, Beef, Hammer, Bike, Phone, Siren, MapPin, ArrowRight,
@@ -28,13 +29,18 @@ export const Route = createFileRoute("/")({
 });
 
 const quickActions = [
-  { icon: Users, label: "Find Workers", te: "పనివారు", tint: "bg-primary/10 text-primary" },
-  { icon: Briefcase, label: "Post Work", te: "పని ఇవ్వండి", tint: "bg-secondary/10 text-secondary" },
-  { icon: Wheat, label: "Lease Land", te: "భూమి కౌలు", tint: "bg-accent/20 text-clay" },
-  { icon: ShoppingBasket, label: "Marketplace", te: "సంత", tint: "bg-primary/10 text-primary" },
-  { icon: Wrench, label: "Local Services", te: "స్థానిక సేవలు", tint: "bg-secondary/10 text-secondary" },
-  { icon: Megaphone, label: "Announcements", te: "ప్రకటనలు", tint: "bg-accent/20 text-clay" },
+  { icon: Users, label: "Find Workers", te: "పనివారు", tint: "bg-primary/10 text-primary", to: "/workers" as const },
+  { icon: Briefcase, label: "Post Work", te: "పని ఇవ్వండి", tint: "bg-secondary/10 text-secondary", to: "/post-work" as const },
+  { icon: Wheat, label: "Lease Land", te: "భూమి కౌలు", tint: "bg-accent/20 text-clay", to: "/land" as const },
+  { icon: ShoppingBasket, label: "Marketplace", te: "సంత", tint: "bg-primary/10 text-primary", to: "/marketplace" as const },
+  { icon: Wrench, label: "Local Services", te: "స్థానిక సేవలు", tint: "bg-secondary/10 text-secondary", to: "/services" as const },
+  { icon: Megaphone, label: "Announcements", te: "ప్రకటనలు", tint: "bg-accent/20 text-clay", to: "/announcements" as const },
 ];
+
+const categoryRoutes: Record<string, "/marketplace" | "/services"> = {
+  Tractors: "/services", Seeds: "/marketplace", Livestock: "/marketplace", Grain: "/marketplace",
+  Tools: "/marketplace", Transport: "/services", Repairs: "/services", "Daily Goods": "/marketplace",
+};
 
 const categories = [
   { icon: Tractor, label: "Tractors", count: "24 listings" },
