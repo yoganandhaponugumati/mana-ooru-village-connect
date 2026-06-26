@@ -1,8 +1,14 @@
-import { useEffect, useState, useCallback } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useCallback } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "./auth";
+import { toast } from "sonner";
+
+export type ListingType = "worker" | "work" | "land" | "market" | "service" | "announcement";
 
 export type Listing = {
   id: string;
-  type: "worker" | "work" | "land" | "market" | "service" | "announcement";
+  type: ListingType;
   title: string;
   description: string;
   contact: string;
@@ -10,72 +16,127 @@ export type Listing = {
   price?: string;
   category?: string;
   createdAt: number;
+  owner_id?: string;
 };
 
-const KEY = "manaooru:listings:v1";
+type Row = {
+  id: string;
+  owner_id: string;
+  type: ListingType;
+  title: string;
+  description: string | null;
+  contact: string;
+  location: string | null;
+  price: string | null;
+  category: string | null;
+  created_at: string;
+};
 
-const seedData: Listing[] = [
-  { id: "s1", type: "worker", title: "Babu Rao — Master Electrician", description: "15 years of experience. Wiring, motor repair, solar installation.", contact: "98481 22334", location: "Kothur", category: "Electrician", price: "₹500/day", createdAt: Date.now() - 86400000 },
-  { id: "s2", type: "worker", title: "Lakshmi & team — Paddy harvesters", description: "Team of 6 available for harvest season. Own sickles.", contact: "90004 11223", location: "Pedda Kallepalli", category: "Farm Labour", price: "₹450/day", createdAt: Date.now() - 172800000 },
-  { id: "s3", type: "work", title: "5 workers needed — paddy harvest", description: "Need 5 workers for 3 days starting next Monday. Lunch provided.", contact: "98765 43210", location: "Kothur East", price: "₹500/day", createdAt: Date.now() - 3600000 },
-  { id: "s4", type: "land", title: "2 Acres fertile land — East Canal", description: "Black soil, canal irrigation, suitable for paddy & vegetables.", contact: "94400 55667", location: "East Canal Road", price: "₹12,000/season", createdAt: Date.now() - 200000000 },
-  { id: "s5", type: "land", title: "5 Acres dry land for groundnut", description: "Bore well available. 1 km from main road.", contact: "94400 88990", location: "North Fields", price: "₹8,000/acre/season", createdAt: Date.now() - 500000000 },
-  { id: "s6", type: "market", title: "Fresh Tomatoes — 30 kg", description: "Harvested this morning. Organic, no pesticides.", contact: "99887 66554", location: "Padma's Farm", price: "₹25/kg", category: "Vegetables", createdAt: Date.now() - 7200000 },
-  { id: "s7", type: "market", title: "Paddy 400 kg — premium grade", description: "Sona Masoori. Cleaned and ready.", contact: "98765 11223", location: "Kothur", price: "₹2,200/quintal", category: "Grain", createdAt: Date.now() - 10000000 },
-  { id: "s8", type: "market", title: "Buffalo milk — 10 L daily", description: "Fresh cow & buffalo milk available for regular delivery.", contact: "98480 33445", location: "Dairy Lane", price: "₹60/L", category: "Dairy", createdAt: Date.now() - 60000000 },
-  { id: "s9", type: "service", title: "Tractor for ploughing", description: "Mahindra 575. Available with driver. Same-day booking.", contact: "98481 99887", location: "Kothur", price: "₹800/hr", category: "Tractor", createdAt: Date.now() - 4000000 },
-  { id: "s10", type: "service", title: "Plumber — pipe & motor repair", description: "Submersible motor experts. 24x7 emergency available.", contact: "90008 77665", location: "Main Road", price: "₹300 visit", category: "Plumber", createdAt: Date.now() - 30000000 },
-  { id: "s11", type: "announcement", title: "Livestock vaccination drive — Saturday", description: "Free vaccination for cows, buffaloes & goats at the panchayat office, 9 AM onwards.", contact: "Panchayat Office", location: "Kothur Village", category: "Panchayat", createdAt: Date.now() - 7200000 },
-  { id: "s12", type: "announcement", title: "New micro-irrigation subsidy", description: "70% subsidy on drip & sprinkler systems for small farmers. Apply at the Agri office.", contact: "Agri Officer — 98481 12443", location: "Mandal Office", category: "Agriculture", createdAt: Date.now() - 86400000 },
-  { id: "s13", type: "announcement", title: "Scheduled power maintenance", description: "Power supply will be off from 10 AM to 4 PM on Thursday for line maintenance.", contact: "TSSPDCL", location: "All sectors", category: "Notice", createdAt: Date.now() - 172800000 },
-];
-
-function read(): Listing[] {
-  if (typeof window === "undefined") return seedData;
-  try {
-    const raw = window.localStorage.getItem(KEY);
-    if (!raw) {
-      window.localStorage.setItem(KEY, JSON.stringify(seedData));
-      return seedData;
-    }
-    return JSON.parse(raw) as Listing[];
-  } catch {
-    return seedData;
-  }
+function toListing(r: Row): Listing {
+  return {
+    id: r.id,
+    type: r.type,
+    title: r.title,
+    description: r.description ?? "",
+    contact: r.contact,
+    location: r.location ?? "",
+    price: r.price ?? undefined,
+    category: r.category ?? undefined,
+    createdAt: new Date(r.created_at).getTime(),
+    owner_id: r.owner_id,
+  };
 }
 
-function write(items: Listing[]) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(KEY, JSON.stringify(items));
-  window.dispatchEvent(new CustomEvent("manaooru:update"));
+export function useListings(type?: ListingType) {
+  const qc = useQueryClient();
+  const { user } = useAuth();
+
+  const query = useQuery({
+    queryKey: ["listings", type ?? "all"],
+    queryFn: async () => {
+      let q = supabase.from("listings").select("*").order("created_at", { ascending: false });
+      if (type) q = q.eq("type", type);
+      const { data, error } = await q;
+      if (error) throw error;
+      return (data as Row[]).map(toListing);
+    },
+  });
+
+  const add = useCallback(
+    async (item: Omit<Listing, "id" | "createdAt" | "owner_id">) => {
+      if (!user) {
+        toast.error("Please sign in to post");
+        throw new Error("not authenticated");
+      }
+      const { data, error } = await supabase
+        .from("listings")
+        .insert({
+          owner_id: user.id,
+          type: item.type,
+          title: item.title,
+          description: item.description || null,
+          contact: item.contact,
+          location: item.location || null,
+          price: item.price || null,
+          category: item.category || null,
+        })
+        .select()
+        .single();
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      qc.invalidateQueries({ queryKey: ["listings"] });
+      qc.invalidateQueries({ queryKey: ["listing-stats"] });
+      return toListing(data as Row);
+    },
+    [user, qc],
+  );
+
+  const remove = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from("listings").delete().eq("id", id);
+      if (error) {
+        toast.error(error.message);
+        return;
+      }
+      qc.invalidateQueries({ queryKey: ["listings"] });
+      qc.invalidateQueries({ queryKey: ["listing-stats"] });
+      toast.success("Removed");
+    },
+    [qc],
+  );
+
+  const items = query.data ?? [];
+  return { items, add, remove, total: items.length, loading: query.isLoading };
 }
 
-export function useListings(type?: Listing["type"]) {
-  const [items, setItems] = useState<Listing[]>([]);
-  useEffect(() => {
-    setItems(read());
-    const handler = () => setItems(read());
-    window.addEventListener("manaooru:update", handler);
-    window.addEventListener("storage", handler);
-    return () => {
-      window.removeEventListener("manaooru:update", handler);
-      window.removeEventListener("storage", handler);
-    };
-  }, []);
-
-  const add = useCallback((item: Omit<Listing, "id" | "createdAt">) => {
-    const next: Listing = { ...item, id: crypto.randomUUID(), createdAt: Date.now() };
-    const all = read();
-    write([next, ...all]);
-    return next;
-  }, []);
-
-  const remove = useCallback((id: string) => {
-    write(read().filter((i) => i.id !== id));
-  }, []);
-
-  const filtered = type ? items.filter((i) => i.type === type) : items;
-  return { items: filtered.sort((a, b) => b.createdAt - a.createdAt), add, remove, total: items.length };
+export function useListingStats() {
+  return useQuery({
+    queryKey: ["listing-stats"],
+    queryFn: async () => {
+      const [listings, profiles, workers, land, recent] = await Promise.all([
+        supabase.from("listings").select("type", { count: "exact", head: false }),
+        supabase.from("profiles").select("id", { count: "exact", head: true }),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("type", "worker"),
+        supabase.from("listings").select("id", { count: "exact", head: true }).eq("type", "land"),
+        supabase.from("listings").select("*").order("created_at", { ascending: false }).limit(6),
+      ]);
+      const all = (listings.data as { type: ListingType }[] | null) ?? [];
+      const byType = all.reduce<Record<string, number>>((acc, r) => {
+        acc[r.type] = (acc[r.type] ?? 0) + 1;
+        return acc;
+      }, {});
+      return {
+        villagers: profiles.count ?? 0,
+        workers: workers.count ?? 0,
+        land: land.count ?? 0,
+        total: listings.count ?? all.length,
+        byType,
+        recent: ((recent.data as Row[] | null) ?? []).map(toListing),
+      };
+    },
+  });
 }
 
 export function timeAgo(t: number) {
@@ -85,3 +146,6 @@ export function timeAgo(t: number) {
   if (s < 86400) return `${Math.floor(s / 3600)} hr ago`;
   return `${Math.floor(s / 86400)} days ago`;
 }
+
+// keep referenced for backwards compat
+export const __unused__ = useMutation;
