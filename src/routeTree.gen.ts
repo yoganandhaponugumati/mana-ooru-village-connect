@@ -16,6 +16,7 @@ import { Route as PostWorkerRouteImport } from './routes/post-worker'
 import { Route as PostWorkRouteImport } from './routes/post-work'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LandRouteImport } from './routes/land'
+import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnnouncementsRouteImport } from './routes/announcements'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -54,6 +55,11 @@ const LandRoute = LandRouteImport.update({
   path: '/land',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AnnouncementsRoute = AnnouncementsRouteImport.update({
   id: '/announcements',
   path: '/announcements',
@@ -68,6 +74,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/post-work': typeof PostWorkRoute
@@ -79,6 +86,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/post-work': typeof PostWorkRoute
@@ -91,6 +99,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/announcements': typeof AnnouncementsRoute
+  '/auth': typeof AuthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/post-work': typeof PostWorkRoute
@@ -104,6 +113,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/announcements'
+    | '/auth'
     | '/land'
     | '/marketplace'
     | '/post-work'
@@ -115,6 +125,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/announcements'
+    | '/auth'
     | '/land'
     | '/marketplace'
     | '/post-work'
@@ -126,6 +137,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/announcements'
+    | '/auth'
     | '/land'
     | '/marketplace'
     | '/post-work'
@@ -138,6 +150,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AnnouncementsRoute: typeof AnnouncementsRoute
+  AuthRoute: typeof AuthRoute
   LandRoute: typeof LandRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PostWorkRoute: typeof PostWorkRoute
@@ -198,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/announcements': {
       id: '/announcements'
       path: '/announcements'
@@ -218,6 +238,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AnnouncementsRoute: AnnouncementsRoute,
+  AuthRoute: AuthRoute,
   LandRoute: LandRoute,
   MarketplaceRoute: MarketplaceRoute,
   PostWorkRoute: PostWorkRoute,

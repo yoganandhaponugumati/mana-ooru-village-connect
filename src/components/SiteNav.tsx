@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { Menu, X } from "lucide-react";
+import { Menu, X, LogOut, User as UserIcon } from "lucide-react";
 import { useState } from "react";
+import { useAuth } from "@/lib/auth";
 
 const links = [
   { to: "/workers", label: "Workers" },
@@ -13,6 +14,7 @@ const links = [
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
+  const { user, signOut } = useAuth();
   return (
     <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/85 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
@@ -33,12 +35,20 @@ export function SiteNav() {
           ))}
         </div>
         <div className="flex items-center gap-2">
-          <Link
-            to="/post-work"
-            className="hidden rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90 sm:inline-block"
-          >
-            + Post
-          </Link>
+          {user ? (
+            <div className="hidden items-center gap-2 sm:flex">
+              <span className="flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground">
+                <UserIcon className="size-3.5" /> {user.email?.split("@")[0]}
+              </span>
+              <button onClick={() => signOut()} className="rounded-full border border-border bg-card px-3 py-1.5 text-xs font-semibold text-muted-foreground hover:border-primary hover:text-primary">
+                <LogOut className="size-3.5" />
+              </button>
+            </div>
+          ) : (
+            <Link to="/auth" className="hidden rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90 sm:inline-block">
+              Sign in
+            </Link>
+          )}
           <button
             className="grid size-10 place-items-center rounded-full border border-border md:hidden"
             onClick={() => setOpen((v) => !v)}
@@ -61,13 +71,15 @@ export function SiteNav() {
                 {l.label}
               </Link>
             ))}
-            <Link
-              to="/post-work"
-              onClick={() => setOpen(false)}
-              className="mt-2 rounded-lg bg-clay px-3 py-2.5 text-center text-sm font-semibold text-background"
-            >
-              + Post something
-            </Link>
+            {user ? (
+              <button onClick={() => { signOut(); setOpen(false); }} className="mt-2 rounded-lg border border-border px-3 py-2.5 text-center text-sm font-semibold text-foreground">
+                Sign out ({user.email?.split("@")[0]})
+              </button>
+            ) : (
+              <Link to="/auth" onClick={() => setOpen(false)} className="mt-2 rounded-lg bg-clay px-3 py-2.5 text-center text-sm font-semibold text-background">
+                Sign in
+              </Link>
+            )}
           </div>
         </div>
       )}
