@@ -1,10 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { useAuth } from "@/lib/auth";
+import { useListingStats, timeAgo } from "@/lib/store";
 import {
   Search, Users, Briefcase, Wheat, ShoppingBasket, Wrench, Megaphone,
   Tractor, Sprout, Beef, Hammer, Bike, Phone, Siren, MapPin, ArrowRight,
   Sparkles, Sun, Droplets, Wind, Star, Quote, CheckCircle2, Zap, Building2,
-  HandHeart, ShieldCheck, Activity,
+  HandHeart, ShieldCheck, Activity, LogIn, LogOut, User as UserIcon,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village.jpg";
 import heroVideo from "@/assets/hero-village.mp4.asset.json";
@@ -42,15 +44,15 @@ const categoryRoutes: Record<string, "/marketplace" | "/services"> = {
   Tools: "/marketplace", Transport: "/services", Repairs: "/services", "Daily Goods": "/marketplace",
 };
 
-const categories = [
-  { icon: Tractor, label: "Tractors", count: "24 listings" },
-  { icon: Sprout, label: "Seeds", count: "61 listings" },
-  { icon: Beef, label: "Livestock", count: "18 listings" },
-  { icon: Wheat, label: "Grain", count: "42 listings" },
-  { icon: Hammer, label: "Tools", count: "29 listings" },
-  { icon: Bike, label: "Transport", count: "12 listings" },
-  { icon: Wrench, label: "Repairs", count: "33 services" },
-  { icon: ShoppingBasket, label: "Daily Goods", count: "57 items" },
+const categoryDefs = [
+  { icon: Tractor, label: "Tractors", type: "service" as const },
+  { icon: Sprout, label: "Seeds", type: "market" as const },
+  { icon: Beef, label: "Livestock", type: "market" as const },
+  { icon: Wheat, label: "Grain", type: "market" as const },
+  { icon: Hammer, label: "Tools", type: "market" as const },
+  { icon: Bike, label: "Transport", type: "service" as const },
+  { icon: Wrench, label: "Repairs", type: "service" as const },
+  { icon: ShoppingBasket, label: "Daily Goods", type: "market" as const },
 ];
 
 const steps = [
@@ -76,24 +78,15 @@ const voices = [
   },
 ];
 
-const liveActivity = [
-  { icon: Briefcase, text: "Ramesh posted 5 workers needed for paddy harvest", time: "Just now", tint: "text-primary" },
-  { icon: ShoppingBasket, text: "Padma listed 30kg of fresh tomatoes — ₹25/kg", time: "12 min", tint: "text-secondary" },
-  { icon: Tractor, text: "Tractor available for ploughing tomorrow", time: "1 hr", tint: "text-accent-foreground" },
-  { icon: Megaphone, text: "New panchayat notice posted about water supply", time: "2 hr", tint: "text-primary" },
-];
+const typeIcon: Record<string, typeof Briefcase> = {
+  worker: Users, work: Briefcase, land: Wheat, market: ShoppingBasket, service: Wrench, announcement: Megaphone,
+};
+const typeTint: Record<string, string> = {
+  worker: "text-primary", work: "text-secondary", land: "text-accent-foreground",
+  market: "text-primary", service: "text-secondary", announcement: "text-primary",
+};
 
-const services = [
-  { title: "Master Electrician", who: "Babu Rao · 15 yrs", img: workersImg, tag: "Available now" },
-  { title: "2 Acres Fertile Land", who: "Savitri Amma · East Canal", img: farmlandImg, tag: "₹12,000 / season" },
-  { title: "Organic Produce", who: "Ravi Kumar · North Fields", img: marketplaceImg, tag: "₹40 / kg" },
-];
-
-const announcements = [
-  { tag: "Panchayat", time: "2h ago", title: "Livestock vaccination drive this Saturday", te: "పశువుల వ్యాక్సినేషన్ శనివారం ఉదయం 9 గంటలకు." },
-  { tag: "Agriculture", time: "Yesterday", title: "New subsidy for micro-irrigation announced", te: "బిందు సేద్యం పరికరాలకు కొత్త రాయితీలు." },
-  { tag: "Notice", time: "2 days ago", title: "Scheduled power maintenance, 10 AM – 4 PM", te: "విద్యుత్ నిర్వహణ పని కారణంగా అంతరాయం." },
-];
+const featuredImages = [workersImg, farmlandImg, marketplaceImg];
 
 const contacts = [
   { name: "Ambulance", role: "Primary Health Center", num: "108", urgent: true },
@@ -103,6 +96,11 @@ const contacts = [
 ];
 
 function Index() {
+  const { user, signOut } = useAuth();
+  const { data: stats } = useListingStats();
+  const liveActivity = stats?.recent.slice(0, 4) ?? [];
+  const announcementItems = stats?.recent.filter((r) => r.type === "announcement").slice(0, 3) ?? [];
+  const featured = stats?.recent.filter((r) => r.type !== "announcement").slice(0, 3) ?? [];
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
@@ -122,9 +120,20 @@ function Index() {
             <Link to="/services" className="hover:text-primary transition-colors">Services</Link>
             <Link to="/announcements" className="hover:text-primary transition-colors">Notices</Link>
           </div>
-          <Link to="/post-work" className="rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90">
-            + Post
-          </Link>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <span className="hidden items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground sm:inline-flex">
+                <UserIcon className="size-3.5" /> {user.email?.split("@")[0]}
+              </span>
+              <button onClick={() => signOut()} aria-label="Sign out" className="grid size-9 place-items-center rounded-full border border-border bg-card text-muted-foreground hover:text-primary">
+                <LogOut className="size-4" />
+              </button>
+            </div>
+          ) : (
+            <Link to="/auth" className="inline-flex items-center gap-1.5 rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90">
+              <LogIn className="size-4" /> Sign in
+            </Link>
+          )}
         </div>
       </nav>
 
@@ -193,9 +202,9 @@ function Index() {
 
             <div className="animate-fade-up mt-8 grid max-w-md grid-cols-3 gap-4 [animation-delay:320ms]">
               {[
-                { k: "1,200+", v: "Villagers" },
-                { k: "340+", v: "Workers" },
-                { k: "85+", v: "Acres listed" },
+                { k: stats?.villagers ?? 0, v: "Villagers" },
+                { k: stats?.workers ?? 0, v: "Workers" },
+                { k: stats?.land ?? 0, v: "Land posts" },
               ].map((s) => (
                 <div key={s.v} className="border-l-2 border-primary/40 pl-3">
                   <p className="font-display text-2xl font-semibold text-clay sm:text-3xl">{s.k}</p>
@@ -253,7 +262,7 @@ function Index() {
                 <span className="absolute inset-0 animate-ping rounded-full bg-accent/70" />
                 <span className="size-2 rounded-full bg-accent" />
               </span>
-              <span className="text-xs font-semibold">12 villagers active now</span>
+              <span className="text-xs font-semibold">{stats?.total ?? 0} live listings</span>
             </div>
           </div>
         </div>
