@@ -1,9 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { Megaphone, Plus, Phone } from "lucide-react";
+import { Building2, Church, Droplets, GraduationCap, HeartPulse, Lightbulb, Megaphone, PartyPopper, Phone, Plus, School } from "lucide-react";
+import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
+import { AppButton, EmptyState, FeatureIcon, SectionHeader, SurfaceCard } from "@/components/design-system";
+import { fallbackListings } from "@/lib/app-data";
 import { useListings, timeAgo } from "@/lib/store";
-import { useState } from "react";
 
 export const Route = createFileRoute("/announcements")({
   head: () => ({ meta: [{ title: "Announcements — ManaOoru" }] }),
@@ -12,16 +14,40 @@ export const Route = createFileRoute("/announcements")({
 
 function AnnPage() {
   const { items, remove } = useListings("announcement");
+  const displayItems = items.length > 0 ? items : fallbackListings.filter((item) => item.type === "announcement");
   const [showForm, setShowForm] = useState(false);
   return (
     <PageLayout title="Village Notice Board" subtitle="Panchayat updates, government notices, community alerts." icon={<Megaphone className="size-7" />}>
-      <div className="mb-6 flex justify-end">
-        <button onClick={() => setShowForm((v) => !v)} className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:brightness-110">
-          <Plus className="size-4" /> {showForm ? "Cancel" : "Post a notice"}
-        </button>
+      <SectionHeader
+        eyebrow="Community alerts"
+        title="Stay on top of local updates"
+        description="Share important notices and keep everyone informed without friction."
+        actions={<AppButton variant="primary" icon={<Plus className="size-4" />} onClick={() => setShowForm((v) => !v)}>{showForm ? "Cancel" : "Post a notice"}</AppButton>}
+      />
+      <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { label: "Temple", icon: Church },
+          { label: "School", icon: School },
+          { label: "Panchayat", icon: Building2 },
+          { label: "Government", icon: GraduationCap },
+          { label: "Water", icon: Droplets },
+          { label: "Electricity", icon: Lightbulb },
+          { label: "Medical Camp", icon: HeartPulse },
+          { label: "Festival", icon: PartyPopper },
+        ].map((item) => (
+          <SurfaceCard key={item.label} className="p-4">
+            <div className="flex items-center gap-3">
+              <FeatureIcon icon={<item.icon className="size-5" />} />
+              <div>
+                <p className="font-semibold text-clay">{item.label}</p>
+                <p className="text-xs text-muted-foreground">Village notice category</p>
+              </div>
+            </div>
+          </SurfaceCard>
+        ))}
       </div>
       {showForm && (
-        <div className="mb-8 rounded-3xl border border-border bg-card p-7 shadow-sm sm:p-9">
+        <SurfaceCard className="mb-8 p-6 sm:p-8">
           <ListingForm
             type="announcement"
             title="Notice details"
@@ -34,29 +60,32 @@ function AnnPage() {
               { name: "contact", label: "Posted by / contact", placeholder: "Name or phone", required: true },
             ]}
           />
-        </div>
+        </SurfaceCard>
       )}
-      {items.length === 0 ? (
-        <div className="rounded-3xl border-2 border-dashed border-border bg-card/50 p-12 text-center">
-          <p className="text-lg font-semibold text-clay">No notices yet</p>
-        </div>
+      {displayItems.length === 0 ? (
+        <EmptyState
+          icon={<Megaphone className="size-6" />}
+          title="No notices yet"
+          description="Post the first announcement so the whole village stays informed."
+          action={<AppButton variant="primary" icon={<Plus className="size-4" />} onClick={() => setShowForm(true)}>Post a notice</AppButton>}
+        />
       ) : (
         <div className="space-y-3">
-          {items.map((a) => (
-            <article key={a.id} className="hover-lift rounded-2xl border-l-4 border-accent bg-card p-5 shadow-sm">
+          {displayItems.map((a) => (
+            <SurfaceCard key={a.id} hover={false} className="rounded-[1.5rem] border-l-4 border-accent bg-card/95 p-5">
               <div className="flex items-start justify-between gap-3">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{a.category || "Notice"}</span>
+                <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">{a.category || "Notice"}</span>
                 <span className="text-xs text-muted-foreground">{timeAgo(a.createdAt)}</span>
               </div>
-              <h3 className="mt-1.5 font-display text-lg font-semibold text-clay">{a.title}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">{a.description}</p>
-              <div className="mt-3 flex items-center justify-between border-t border-border/60 pt-3">
+              <h3 className="mt-2 font-display text-lg font-semibold text-clay">{a.title}</h3>
+              <p className="mt-2 text-sm leading-7 text-muted-foreground">{a.description}</p>
+              <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
                 <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Phone className="size-3" /> {a.contact}
+                  <Phone className="size-3.5" /> {a.contact}
                 </p>
-                <button onClick={() => remove(a.id)} className="text-xs text-muted-foreground hover:text-destructive">Remove</button>
+                {items.length > 0 && <button onClick={() => remove(a.id)} className="text-xs font-semibold text-muted-foreground transition hover:text-destructive">Remove</button>}
               </div>
-            </article>
+            </SurfaceCard>
           ))}
         </div>
       )}

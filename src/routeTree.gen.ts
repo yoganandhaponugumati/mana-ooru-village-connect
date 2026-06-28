@@ -11,13 +11,21 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkersRouteImport } from './routes/workers'
 import { Route as WorkRouteImport } from './routes/work'
+import { Route as WeatherRouteImport } from './routes/weather'
+import { Route as TransportRouteImport } from './routes/transport'
 import { Route as ServicesRouteImport } from './routes/services'
+import { Route as SearchRouteImport } from './routes/search'
+import { Route as SchemesRouteImport } from './routes/schemes'
+import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as PostWorkerRouteImport } from './routes/post-worker'
 import { Route as PostWorkRouteImport } from './routes/post-work'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LandRouteImport } from './routes/land'
+import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnnouncementsRouteImport } from './routes/announcements'
+import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WorkersRoute = WorkersRouteImport.update({
@@ -30,9 +38,34 @@ const WorkRoute = WorkRouteImport.update({
   path: '/work',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WeatherRoute = WeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TransportRoute = TransportRouteImport.update({
+  id: '/transport',
+  path: '/transport',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SchemesRoute = SchemesRouteImport.update({
+  id: '/schemes',
+  path: '/schemes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileRoute = ProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostWorkerRoute = PostWorkerRouteImport.update({
@@ -55,6 +88,16 @@ const LandRoute = LandRouteImport.update({
   path: '/land',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmergencyRoute = EmergencyRouteImport.update({
+  id: '/emergency',
+  path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -65,6 +108,11 @@ const AnnouncementsRoute = AnnouncementsRouteImport.update({
   path: '/announcements',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AiAssistantRoute = AiAssistantRouteImport.update({
+  id: '/ai-assistant',
+  path: '/ai-assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -73,38 +121,62 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/profile': typeof ProfileRoute
+  '/schemes': typeof SchemesRoute
+  '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/transport': typeof TransportRoute
+  '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/profile': typeof ProfileRoute
+  '/schemes': typeof SchemesRoute
+  '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/transport': typeof TransportRoute
+  '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
+  '/dashboard': typeof DashboardRoute
+  '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/profile': typeof ProfileRoute
+  '/schemes': typeof SchemesRoute
+  '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/transport': typeof TransportRoute
+  '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
 }
@@ -112,50 +184,82 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/ai-assistant'
     | '/announcements'
     | '/auth'
+    | '/dashboard'
+    | '/emergency'
     | '/land'
     | '/marketplace'
     | '/post-work'
     | '/post-worker'
+    | '/profile'
+    | '/schemes'
+    | '/search'
     | '/services'
+    | '/transport'
+    | '/weather'
     | '/work'
     | '/workers'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/ai-assistant'
     | '/announcements'
     | '/auth'
+    | '/dashboard'
+    | '/emergency'
     | '/land'
     | '/marketplace'
     | '/post-work'
     | '/post-worker'
+    | '/profile'
+    | '/schemes'
+    | '/search'
     | '/services'
+    | '/transport'
+    | '/weather'
     | '/work'
     | '/workers'
   id:
     | '__root__'
     | '/'
+    | '/ai-assistant'
     | '/announcements'
     | '/auth'
+    | '/dashboard'
+    | '/emergency'
     | '/land'
     | '/marketplace'
     | '/post-work'
     | '/post-worker'
+    | '/profile'
+    | '/schemes'
+    | '/search'
     | '/services'
+    | '/transport'
+    | '/weather'
     | '/work'
     | '/workers'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AiAssistantRoute: typeof AiAssistantRoute
   AnnouncementsRoute: typeof AnnouncementsRoute
   AuthRoute: typeof AuthRoute
+  DashboardRoute: typeof DashboardRoute
+  EmergencyRoute: typeof EmergencyRoute
   LandRoute: typeof LandRoute
   MarketplaceRoute: typeof MarketplaceRoute
   PostWorkRoute: typeof PostWorkRoute
   PostWorkerRoute: typeof PostWorkerRoute
+  ProfileRoute: typeof ProfileRoute
+  SchemesRoute: typeof SchemesRoute
+  SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRoute
+  TransportRoute: typeof TransportRoute
+  WeatherRoute: typeof WeatherRoute
   WorkRoute: typeof WorkRoute
   WorkersRoute: typeof WorkersRoute
 }
@@ -176,11 +280,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/weather': {
+      id: '/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/transport': {
+      id: '/transport'
+      path: '/transport'
+      fullPath: '/transport'
+      preLoaderRoute: typeof TransportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
       fullPath: '/services'
       preLoaderRoute: typeof ServicesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schemes': {
+      id: '/schemes'
+      path: '/schemes'
+      fullPath: '/schemes'
+      preLoaderRoute: typeof SchemesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile': {
+      id: '/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post-worker': {
@@ -211,6 +350,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/emergency': {
+      id: '/emergency'
+      path: '/emergency'
+      fullPath: '/emergency'
+      preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -225,6 +378,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AnnouncementsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/ai-assistant': {
+      id: '/ai-assistant'
+      path: '/ai-assistant'
+      fullPath: '/ai-assistant'
+      preLoaderRoute: typeof AiAssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -237,16 +397,34 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AiAssistantRoute: AiAssistantRoute,
   AnnouncementsRoute: AnnouncementsRoute,
   AuthRoute: AuthRoute,
+  DashboardRoute: DashboardRoute,
+  EmergencyRoute: EmergencyRoute,
   LandRoute: LandRoute,
   MarketplaceRoute: MarketplaceRoute,
   PostWorkRoute: PostWorkRoute,
   PostWorkerRoute: PostWorkerRoute,
+  ProfileRoute: ProfileRoute,
+  SchemesRoute: SchemesRoute,
+  SearchRoute: SearchRoute,
   ServicesRoute: ServicesRoute,
+  TransportRoute: TransportRoute,
+  WeatherRoute: WeatherRoute,
   WorkRoute: WorkRoute,
   WorkersRoute: WorkersRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}

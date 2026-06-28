@@ -1,20 +1,23 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { useListingStats, timeAgo } from "@/lib/store";
+import { useVillagePreferences } from "@/lib/village-preferences";
 import {
   Search, Users, Briefcase, Wheat, ShoppingBasket, Wrench, Megaphone,
-  Tractor, Sprout, Beef, Hammer, Bike, Phone, Siren, MapPin, ArrowRight,
-  Sparkles, Sun, Droplets, Wind, Star, Quote, CheckCircle2, Zap, Building2,
-  HandHeart, ShieldCheck, Activity, LogIn, LogOut, User as UserIcon,
+  Tractor, Sprout, Bike, Phone, Siren, MapPin, ArrowRight,
+  Star, Quote, CheckCircle2, Zap, Building2,
+  HandHeart, ShieldCheck, Activity, Bot, CloudSun, GraduationCap, HeartPulse,
+  Compass, Plus,
 } from "lucide-react";
-import heroVillage from "@/assets/hero-village.jpg";
-import heroVideo from "@/assets/hero-village.mp4.asset.json";
+import heroVillage from "@/assets/hero-village-premium.jpg";
+import { SiteNav } from "@/components/SiteNav";
+import { Button } from "@/components/ui/button";
+import { fallbackListings } from "@/lib/app-data";
 import marketplaceImg from "@/assets/marketplace.jpg";
 import farmlandImg from "@/assets/farmland.jpg";
-import workersImg from "@/assets/workers.jpg";
-import handsPaddy from "@/assets/hands-paddy.jpg";
-import tractorImg from "@/assets/tractor.jpg";
+import workersImg from "@/assets/workers-premium.jpg";
 import voice1 from "@/assets/voice-1.jpg";
 import voice2 from "@/assets/voice-2.jpg";
 
@@ -37,6 +40,9 @@ const quickActions = [
   { icon: ShoppingBasket, label: "Marketplace", te: "సంత", tint: "bg-primary/10 text-primary", to: "/marketplace" as const },
   { icon: Wrench, label: "Local Services", te: "స్థానిక సేవలు", tint: "bg-secondary/10 text-secondary", to: "/services" as const },
   { icon: Megaphone, label: "Announcements", te: "ప్రకటనలు", tint: "bg-accent/20 text-clay", to: "/announcements" as const },
+  { icon: Bot, label: "AI Assistant", te: "AI సహాయం", tint: "bg-primary/10 text-primary", to: "/ai-assistant" as const },
+  { icon: CloudSun, label: "Weather", te: "వాతావరణం", tint: "bg-secondary/10 text-secondary", to: "/weather" as const },
+  { icon: Siren, label: "Emergency Contacts", te: "అత్యవసరం", tint: "bg-accent/20 text-clay", to: "#contacts" as const },
 ];
 
 const categoryRoutes: Record<string, "/marketplace" | "/services"> = {
@@ -45,14 +51,14 @@ const categoryRoutes: Record<string, "/marketplace" | "/services"> = {
 };
 
 const categoryDefs = [
-  { icon: Tractor, label: "Tractors", type: "service" as const },
-  { icon: Sprout, label: "Seeds", type: "market" as const },
-  { icon: Beef, label: "Livestock", type: "market" as const },
-  { icon: Wheat, label: "Grain", type: "market" as const },
-  { icon: Hammer, label: "Tools", type: "market" as const },
+  { icon: ShoppingBasket, label: "Marketplace", type: "market" as const },
+  { icon: Sprout, label: "Agriculture", type: "market" as const },
+  { icon: Wrench, label: "Services", type: "service" as const },
+  { icon: Building2, label: "Government", type: "announcement" as const },
   { icon: Bike, label: "Transport", type: "service" as const },
-  { icon: Wrench, label: "Repairs", type: "service" as const },
-  { icon: ShoppingBasket, label: "Daily Goods", type: "market" as const },
+  { icon: GraduationCap, label: "Education", type: "announcement" as const },
+  { icon: HeartPulse, label: "Health", type: "announcement" as const },
+  { icon: Tractor, label: "Machinery", type: "service" as const },
 ];
 
 const steps = [
@@ -96,195 +102,177 @@ const contacts = [
 ];
 
 function Index() {
-  const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+  const { user } = useAuth();
   const { data: stats } = useListingStats();
+  const { t, profile, weather } = useVillagePreferences();
+  const [searchQuery, setSearchQuery] = useState("");
+  const heroWeather =
+    weather.live && weather.temp !== null
+      ? `${weather.temp}°C · ${weather.condition}`
+      : "Live weather unavailable";
   const liveActivity = stats?.recent.slice(0, 4) ?? [];
   const announcementItems = stats?.recent.filter((r) => r.type === "announcement").slice(0, 3) ?? [];
-  const featured = stats?.recent.filter((r) => r.type !== "announcement").slice(0, 3) ?? [];
+  const featured = (stats?.recent.filter((r) => r.type !== "announcement") ?? fallbackListings.filter((r) => r.type !== "announcement")).slice(0, 3);
+  const submitSearch = (event?: FormEvent) => {
+    event?.preventDefault();
+    navigate({ to: "/search", search: { q: searchQuery } });
+  };
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
-      <nav className="sticky top-0 z-50 border-b border-border/60 bg-background/80 backdrop-blur-md">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6">
-          <Link to="/" className="flex items-center gap-2">
-            <div className="grid size-9 place-items-center rounded-full bg-primary text-primary-foreground font-display text-lg font-semibold italic shadow-sm">
-              M
-            </div>
-            <span className="font-display text-xl font-semibold tracking-tight text-clay">
-              ManaOoru
-            </span>
-          </Link>
-          <div className="hidden items-center gap-7 text-sm font-medium text-muted-foreground md:flex">
-            <Link to="/workers" className="hover:text-primary transition-colors">Workers</Link>
-            <Link to="/marketplace" className="hover:text-primary transition-colors">Marketplace</Link>
-            <Link to="/services" className="hover:text-primary transition-colors">Services</Link>
-            <Link to="/announcements" className="hover:text-primary transition-colors">Notices</Link>
-          </div>
-          {user ? (
-            <div className="flex items-center gap-2">
-              <span className="hidden items-center gap-1.5 rounded-full bg-muted px-3 py-1.5 text-xs font-medium text-foreground sm:inline-flex">
-                <UserIcon className="size-3.5" /> {user.email?.split("@")[0]}
-              </span>
-              <button onClick={() => signOut()} aria-label="Sign out" className="grid size-9 place-items-center rounded-full border border-border bg-card text-muted-foreground hover:text-primary">
-                <LogOut className="size-4" />
-              </button>
-            </div>
-          ) : (
-            <Link to="/auth" className="inline-flex items-center gap-1.5 rounded-full bg-clay px-5 py-2 text-sm font-medium text-background transition hover:opacity-90">
-              <LogIn className="size-4" /> Sign in
-            </Link>
-          )}
-        </div>
-      </nav>
+      <SiteNav />
 
       {/* Hero */}
-      <header className="relative overflow-hidden">
-        {/* Decorative kolam dot pattern */}
-        <svg
-          aria-hidden
-          className="pointer-events-none absolute inset-0 -z-10 h-full w-full text-primary/15"
-        >
-          <defs>
-            <pattern id="kolam" width="28" height="28" patternUnits="userSpaceOnUse">
-              <circle cx="2" cy="2" r="1.2" fill="currentColor" />
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#kolam)" />
-        </svg>
-        <div className="pointer-events-none absolute -right-32 -top-32 -z-10 size-[28rem] rounded-full bg-accent/25 blur-3xl" />
-        <div className="pointer-events-none absolute -left-32 top-40 -z-10 size-[28rem] rounded-full bg-secondary/15 blur-3xl" />
+      <header className="relative min-h-screen overflow-hidden bg-clay">
+        <img
+          src={heroVillage}
+          alt="Beautiful Indian village with green fields at sunrise"
+          loading="eager"
+          className="absolute inset-0 z-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(7,15,12,0.58)_0%,rgba(7,15,12,0.14)_42%,rgba(7,20,10,0.66)_100%)]" />
+        <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_22%,rgba(255,213,128,0.22),transparent_35%),linear-gradient(90deg,rgba(0,0,0,0.24),transparent_34%,rgba(0,0,0,0.2))]" />
 
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-20 pt-12 sm:px-6 sm:pt-16 lg:grid-cols-[1.05fr_1fr] lg:items-center lg:gap-14 lg:pb-28 lg:pt-20">
-          {/* Left: copy */}
-          <div>
-            <span className="animate-fade-in inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1.5 text-xs font-semibold uppercase tracking-widest text-primary">
-              <Sparkles className="size-3.5" />
-              Digital Village Initiative
-            </span>
-            <h1 className="animate-fade-up mt-5 text-balance font-display text-[2.75rem] font-semibold leading-[1.02] text-clay sm:text-6xl md:text-7xl">
-              Everything for your <em className="italic text-primary">village</em>, in one place.
-            </h1>
-            <p className="animate-fade-up mt-5 max-w-xl text-pretty text-base text-muted-foreground sm:text-lg [animation-delay:120ms]">
-              Find workers, lease farmland, sell produce, hire local services, and never
-              miss a village notice — all from one simple app.
-            </p>
-            <p className="animate-fade-up mt-2 font-medium text-secondary [animation-delay:160ms]">
-              మా ఊరు — అందరి ఊరు.
-            </p>
+        <div className="relative z-20 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 pb-44 pt-28 text-center sm:px-6 lg:pb-48">
+          <div className="absolute right-4 top-24 hidden rounded-[20px] border border-white/20 bg-white/12 px-4 py-3 text-left text-white shadow-[0_18px_45px_-24px_rgba(0,0,0,0.7)] backdrop-blur-xl md:block">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">{user ? "Your village" : "Selected village"}</p>
+            <p className="mt-1 font-display text-lg font-semibold">{profile.village}</p>
+            <p className="mt-1 text-sm text-white/80">{heroWeather}</p>
+          </div>
+          <h1 className="animate-fade-up max-w-5xl text-balance font-display text-4xl font-extrabold leading-[1.05] text-white drop-shadow-[0_10px_32px_rgba(0,0,0,0.35)] sm:text-6xl lg:text-7xl">
+            {t.heroA} <span className="text-accent">{t.heroVillage}</span> {t.heroB}
+            <span className="block">{t.heroC}</span>
+          </h1>
+          <p className="animate-fade-up mt-6 max-w-2xl text-pretty text-base font-medium leading-8 text-white/92 [animation-delay:120ms] sm:text-xl">
+            {t.subtitle1}
+            <span className="block">{t.subtitle2}</span>
+          </p>
 
-            {/* Search */}
-            <div className="animate-fade-up mt-7 [animation-delay:240ms]">
-              <div className="group flex items-center gap-2 rounded-2xl border border-border/60 bg-card p-2 shadow-[var(--shadow-soft)] focus-within:ring-2 focus-within:ring-primary/20">
-                <div className="grid size-11 place-items-center rounded-xl bg-muted text-muted-foreground sm:size-12">
-                  <Search className="size-5" />
-                </div>
-                <input
-                  type="text"
-                  placeholder="Search workers, seeds, tractors…"
-                  className="min-w-0 flex-1 bg-transparent px-1 text-base text-foreground outline-none placeholder:text-muted-foreground/70"
-                />
-                <button className="hidden rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110 sm:block">
-                  Search
-                </button>
+          <form onSubmit={submitSearch} className="animate-fade-up mt-9 w-full max-w-3xl [animation-delay:180ms]">
+            <div className="flex items-center gap-2 rounded-full border border-white/35 bg-white/95 p-2 shadow-[0_28px_80px_-32px_rgba(0,0,0,0.65)] backdrop-blur-xl focus-within:ring-4 focus-within:ring-white/25">
+              <div className="grid size-12 place-items-center rounded-full text-muted-foreground">
+                <Search className="size-5" />
               </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-                <span className="opacity-70">Popular:</span>
-                {["Electrician", "Paddy seeds", "Tractor", "Plumber", "Dairy"].map((t) => (
-                  <button
-                    key={t}
-                    className="rounded-full border border-border/60 bg-card px-3 py-1 transition hover:border-primary hover:text-primary"
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
+              <input
+                id="hero-search"
+                type="text"
+                value={searchQuery}
+                onChange={(event) => setSearchQuery(event.target.value)}
+                placeholder={t.search}
+                className="min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
+              />
+              <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-secondary sm:px-8">
+                Search
+              </button>
             </div>
-
-            <div className="animate-fade-up mt-8 grid max-w-md grid-cols-3 gap-4 [animation-delay:320ms]">
-              {[
-                { k: stats?.villagers ?? 0, v: "Villagers" },
-                { k: stats?.workers ?? 0, v: "Workers" },
-                { k: stats?.land ?? 0, v: "Land posts" },
-              ].map((s) => (
-                <div key={s.v} className="border-l-2 border-primary/40 pl-3">
-                  <p className="font-display text-2xl font-semibold text-clay sm:text-3xl">{s.k}</p>
-                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground sm:text-xs">{s.v}</p>
-                </div>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm text-white">
+              <span className="font-semibold">{t.popular}</span>
+              {["Tractor Driver", "Paddy Land", "Electrician", "Milk", "Harvesting"].map((t) => (
+                <button
+                  type="button"
+                  key={t}
+                  onClick={() => {
+                    setSearchQuery(t);
+                    navigate({ to: "/search", search: { q: t } });
+                  }}
+                  className="rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-md transition hover:bg-white/20"
+                >
+                  {t}
+                </button>
               ))}
             </div>
+          </form>
+
+          <div className="animate-fade-up mt-10 flex flex-wrap justify-center gap-4 [animation-delay:240ms]">
+            <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-[16px] bg-primary px-8 py-4 text-base font-semibold text-primary-foreground shadow-[0_18px_45px_-18px_rgba(34,197,94,0.8)] transition hover:-translate-y-0.5 hover:bg-secondary">
+              <Compass className="size-5" /> {t.explore}
+            </Link>
+            <Link to="/post-work" className="inline-flex items-center gap-2 rounded-[16px] border border-white/35 bg-white/95 px-8 py-4 text-base font-semibold text-primary shadow-[0_18px_45px_-22px_rgba(0,0,0,0.55)] transition hover:-translate-y-0.5 hover:bg-white">
+              <Plus className="size-5" /> {t.post}
+            </Link>
           </div>
 
-          {/* Right: image collage */}
-          <div className="relative mx-auto w-full max-w-md lg:max-w-none">
-            <div className="animate-fade-up relative aspect-[4/5] overflow-hidden rounded-[2rem] border border-border bg-muted shadow-[var(--shadow-lift)] [animation-delay:200ms]">
-              <video
-                src={heroVideo.url}
-                poster={heroVillage}
-                autoPlay
-                loop
-                muted
-                playsInline
-                preload="auto"
-                aria-label="Village paddy fields at sunrise"
-                className="h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-clay/40 via-transparent to-transparent" />
-              {/* Weather chip */}
-              <div className="absolute left-4 top-4 flex items-center gap-2 rounded-full border border-white/30 bg-white/85 px-3 py-1.5 backdrop-blur-md">
-                <Sun className="size-4 text-accent-foreground" />
-                <span className="text-xs font-semibold text-clay">28° · Clear sky</span>
-              </div>
-              {/* Location badge */}
-              <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-2xl bg-background/90 px-4 py-3 backdrop-blur-md">
+          <div className="animate-fade-up mt-24 grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-5 [animation-delay:300ms]">
+            {[
+              { icon: Users, value: stats?.workers ? `${stats.workers}+` : "2,450+", label: "Workers Available", color: "from-secondary to-primary" },
+              { icon: Wheat, value: stats?.land ? `${stats.land}+` : "1,250+", label: "Land Listings", color: "from-primary to-secondary" },
+              { icon: Wrench, value: stats?.byType.service ? `${stats.byType.service}+` : "850+", label: "Services", color: "from-blue-500 to-blue-700" },
+              { icon: ShoppingBasket, value: stats?.byType.market ? `${stats.byType.market}+` : "3,200+", label: "Products", color: "from-amber-500 to-orange-600" },
+              { icon: Users, value: stats?.villagers ? `${stats.villagers}+` : "18,500+", label: "Trusted Users", color: "from-purple-500 to-fuchsia-700" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-center gap-5 rounded-[20px] border border-white/16 bg-black/28 p-5 text-left text-white shadow-[0_22px_60px_-30px_rgba(0,0,0,0.75)] backdrop-blur-xl">
+                <div className={`grid size-16 shrink-0 place-items-center rounded-[18px] bg-gradient-to-br ${item.color}`}>
+                  <item.icon className="size-8" />
+                </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-primary">Today in</p>
-                  <p className="font-display text-base font-semibold text-clay">Kothur Village</p>
-                </div>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <span className="flex items-center gap-1"><Droplets className="size-3.5 text-secondary" />64%</span>
-                  <span className="flex items-center gap-1"><Wind className="size-3.5 text-secondary" />8 km/h</span>
+                  <p className="font-display text-2xl font-bold leading-none">{item.value}</p>
+                  <p className="mt-2 text-sm font-medium text-white/90">{item.label}</p>
                 </div>
               </div>
-            </div>
-
-            {/* Floating hands card */}
-            <div className="absolute -bottom-6 -left-4 hidden w-44 rotate-[-6deg] overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-lift)] animate-float-slow sm:block">
-              <img src={handsPaddy} alt="Paddy seedlings" loading="lazy" className="aspect-square w-full object-cover" />
-              <div className="p-3">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-secondary">Crop watch</p>
-                <p className="text-xs font-medium text-clay">Paddy · ready in 14 days</p>
-              </div>
-            </div>
-
-            {/* Floating stat pill */}
-            <div className="absolute -right-2 top-6 hidden items-center gap-2 rounded-full bg-clay px-4 py-2 text-background shadow-[var(--shadow-lift)] animate-float-slow [animation-delay:-2s] sm:flex">
-              <span className="relative grid size-2.5 place-items-center">
-                <span className="absolute inset-0 animate-ping rounded-full bg-accent/70" />
-                <span className="size-2 rounded-full bg-accent" />
-              </span>
-              <span className="text-xs font-semibold">{stats?.total ?? 0} live listings</span>
-            </div>
+            ))}
           </div>
         </div>
       </header>
 
       {/* Quick Actions */}
-      <section id="actions" className="relative mx-auto -mt-10 max-w-7xl px-4 sm:px-6">
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-6">
+      <section id="actions" className="relative z-30 mx-auto -mt-20 max-w-[calc(100%-2rem)] rounded-t-[32px] bg-white px-4 py-9 shadow-[0_-24px_80px_-50px_rgba(0,0,0,0.8)] sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-t-[40px]">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-9">
           {quickActions.map((a, i) => (
-            <Link
-              key={a.label}
-              to={a.to}
-              className="hover-lift animate-fade-up group flex flex-col items-start gap-4 rounded-2xl border border-border/60 bg-card p-5 text-left shadow-sm"
-              style={{ animationDelay: `${i * 60}ms` }}
-            >
-              <div className={`grid size-12 place-items-center rounded-xl ${a.tint} transition-transform group-hover:scale-110`}>
-                <a.icon className="size-6" strokeWidth={1.75} />
-              </div>
-              <div>
-                <p className="font-semibold text-foreground">{a.label}</p>
-                <p className="text-xs text-muted-foreground">{a.te}</p>
-              </div>
+            a.to.startsWith("#") ? (
+              <a
+                key={a.label}
+                href={a.to}
+                className="hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[14px] border border-border/60 bg-card p-5 text-center shadow-sm"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="grid size-12 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
+                  <a.icon className="size-9" strokeWidth={1.8} />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">{a.label === "Find Workers" ? t.findWorkers : a.label === "Post Work" ? t.postWork : a.label === "Lease Land" ? t.leaseLand : a.label === "Marketplace" ? t.marketplace : a.label === "Local Services" ? t.localServices : a.label === "Announcements" ? t.announcements : a.label === "AI Assistant" ? t.ai : a.label === "Weather" ? t.weather : t.emergency}</p>
+                  <p className="text-xs text-muted-foreground">{a.te}</p>
+                </div>
+              </a>
+            ) : (
+              <Link
+                key={a.label}
+                to={a.to}
+                className="hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[14px] border border-border/60 bg-card p-5 text-center shadow-sm"
+                style={{ animationDelay: `${i * 60}ms` }}
+              >
+                <div className="grid size-12 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
+                  <a.icon className="size-9" strokeWidth={1.8} />
+                </div>
+                <div>
+                  <p className="font-semibold text-foreground">{a.label === "Find Workers" ? t.findWorkers : a.label === "Post Work" ? t.postWork : a.label === "Lease Land" ? t.leaseLand : a.label === "Marketplace" ? t.marketplace : a.label === "Local Services" ? t.localServices : a.label === "Announcements" ? t.announcements : a.label === "AI Assistant" ? t.ai : a.label === "Weather" ? t.weather : t.emergency}</p>
+                  <p className="text-xs text-muted-foreground">{a.te}</p>
+                </div>
+              </Link>
+            )
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6">
+        <div className="mb-8 max-w-2xl">
+          <span className="text-xs font-bold uppercase tracking-widest text-secondary">Village categories</span>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">Built for every everyday village need</h2>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {[
+            ["Marketplace", "/marketplace"],
+            ["Agriculture", "/schemes"],
+            ["Services", "/services"],
+            ["Government", "/schemes"],
+            ["Transport", "/transport"],
+            ["Education", "/announcements"],
+            ["Health", "/emergency"],
+            ["Emergency", "/emergency"],
+          ].map(([item, to]) => (
+            <Link key={item} to={to} className="hover-lift rounded-[20px] border border-border bg-card p-5 shadow-sm">
+              <p className="font-semibold text-clay">{item}</p>
+              <p className="mt-1 text-sm text-muted-foreground">Trusted local information and direct connections.</p>
             </Link>
           ))}
         </div>
@@ -432,44 +420,71 @@ function Index() {
 
       {/* Voices from the village + Live activity */}
       <section className="mx-auto mt-24 max-w-7xl px-4 sm:px-6">
-        <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr]">
+        <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           {/* Voices */}
-          <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-secondary">Voices from the village</span>
-            <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
-              Real neighbours. Real results.
-            </h2>
-            <div className="mt-8 grid gap-5 sm:grid-cols-2">
-              {voices.map((v, i) => (
-                <figure
-                  key={v.name}
-                  className="hover-lift animate-fade-up relative flex flex-col gap-5 overflow-hidden rounded-3xl border border-border/60 bg-card p-6 shadow-sm"
-                  style={{ animationDelay: `${i * 100}ms` }}
-                >
-                  <Quote className="absolute right-4 top-4 size-10 rotate-180 text-primary/15" />
-                  <div className="flex items-center gap-1">
-                    {Array.from({ length: v.rating }).map((_, k) => (
-                      <Star key={k} className="size-4 fill-accent text-accent" />
-                    ))}
-                  </div>
-                  <blockquote className="font-display text-lg italic leading-snug text-clay">
-                    “{v.quote}”
-                  </blockquote>
-                  <figcaption className="mt-auto flex items-center gap-3">
-                    <img src={v.img} alt={v.name} loading="lazy" className="size-12 rounded-full object-cover ring-2 ring-accent/40" />
-                    <div>
-                      <p className="font-semibold text-foreground">{v.name}</p>
-                      <p className="text-xs text-muted-foreground">{v.role}</p>
+          <div className="overflow-hidden rounded-[28px] bg-primary text-primary-foreground shadow-[var(--shadow-lift)]">
+            <div className="relative min-h-[540px] p-7 sm:p-9">
+              <img src={workersImg} alt="Trusted village workers" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/72 to-primary/10" />
+              <div className="relative flex h-full min-h-[470px] flex-col justify-end">
+                <span className="text-xs font-bold uppercase tracking-[0.28em] text-accent">Community trust</span>
+                <h2 className="mt-3 max-w-lg font-display text-4xl font-bold leading-tight sm:text-5xl">
+                  Real people. Real village progress.
+                </h2>
+                <p className="mt-4 max-w-md text-sm leading-7 text-white/82">
+                  Farmers, workers, sellers, and service providers connect directly with neighbours they can trust.
+                </p>
+                <div className="mt-7 grid grid-cols-3 gap-3">
+                  {[
+                    ["4.9", "Avg rating"],
+                    ["18k+", "Trusted users"],
+                    ["24/7", "Village access"],
+                  ].map(([value, label]) => (
+                    <div key={label} className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
+                      <p className="font-display text-2xl font-semibold">{value}</p>
+                      <p className="mt-1 text-[11px] font-medium text-white/75">{label}</p>
                     </div>
-                  </figcaption>
-                </figure>
-              ))}
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Live activity */}
           <div>
-            <div className="sticky top-24 overflow-hidden rounded-3xl border border-border/60 bg-gradient-to-br from-card to-muted/60 p-6 shadow-sm">
+            <span className="text-xs font-bold uppercase tracking-widest text-secondary">Voices from the village</span>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+              Proof from neighbours who use ManaOoru.
+            </h2>
+            <div className="mt-8 grid gap-4">
+              {voices.map((v, i) => (
+                <figure
+                  key={v.name}
+                  className="hover-lift animate-fade-up relative overflow-hidden rounded-[24px] border border-border/70 bg-card p-6 shadow-sm"
+                  style={{ animationDelay: `${i * 100}ms` }}
+                >
+                  <Quote className="absolute right-5 top-5 size-12 rotate-180 text-primary/10" />
+                  <div className="relative flex gap-5">
+                    <img src={v.img} alt={v.name} loading="lazy" className="size-16 shrink-0 rounded-2xl object-cover ring-4 ring-accent/20" />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: v.rating }).map((_, k) => (
+                          <Star key={k} className="size-4 fill-accent text-accent" />
+                        ))}
+                      </div>
+                      <blockquote className="mt-3 text-lg font-semibold leading-8 text-clay">
+                        "{v.quote}"
+                      </blockquote>
+                      <figcaption className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1">
+                        <p className="font-display text-xl font-semibold text-foreground">{v.name}</p>
+                        <p className="text-sm text-muted-foreground">{v.role}</p>
+                      </figcaption>
+                    </div>
+                  </div>
+                </figure>
+              ))}
+            </div>
+
+            <div className="mt-6 overflow-hidden rounded-[24px] border border-border/60 bg-gradient-to-br from-card to-muted/60 p-6 shadow-sm">
               <div className="mb-5 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span className="relative grid size-2.5 place-items-center">
@@ -583,6 +598,25 @@ function Index() {
       </section>
 
       {/* CTA */}
+      <section className="mx-auto mt-24 max-w-7xl px-4 sm:px-6">
+        <div className="mb-8 max-w-2xl">
+          <span className="text-xs font-bold uppercase tracking-widest text-secondary">FAQ</span>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">Questions villagers ask first</h2>
+        </div>
+        <div className="grid gap-4 md:grid-cols-3">
+          {[
+            ["Is ManaOoru free?", "Yes, villagers can browse and post local needs without commission."],
+            ["Can I call directly?", "Every listing supports phone and WhatsApp contact for quick coordination."],
+            ["Does it support Telugu?", "The platform is designed for Telugu, English, and Hindi workflows."],
+          ].map(([q, a]) => (
+            <div key={q} className="rounded-[20px] border border-border bg-card p-6 shadow-sm">
+              <h3 className="font-display text-lg font-semibold text-clay">{q}</h3>
+              <p className="mt-2 text-sm leading-7 text-muted-foreground">{a}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <section className="mx-auto mt-24 max-w-7xl px-4 pb-16 sm:px-6">
         <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 shadow-[var(--shadow-soft)] sm:p-14">
           <div className="absolute -right-16 -top-16 size-64 rounded-full bg-accent/20 blur-3xl animate-float-slow" />
@@ -596,12 +630,16 @@ function Index() {
               a place for you on ManaOoru. Free for every villager, forever.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
-              <Link to="/post-worker" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110">
-                Create your profile
-              </Link>
-              <Link to="/marketplace" className="rounded-full border border-border bg-background px-6 py-3 text-sm font-semibold text-foreground transition hover:border-primary hover:text-primary">
-                Browse the village
-              </Link>
+              <Button asChild>
+                <Link to="/post-worker" className="px-6 py-3 text-sm font-semibold">
+                  Create your profile
+                </Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link to="/marketplace" className="px-6 py-3 text-sm font-semibold">
+                  Browse the village
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
