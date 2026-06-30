@@ -4,7 +4,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./auth";
 import { toast } from "sonner";
 
-export type ListingType = "worker" | "work" | "land" | "market" | "service" | "announcement";
+export type ListingType =
+  | "worker"
+  | "work"
+  | "land"
+  | "market"
+  | "service"
+  | "announcement"
+  | "complaint";
 
 export type Listing = {
   id: string;
@@ -15,8 +22,11 @@ export type Listing = {
   location: string;
   price?: string;
   category?: string;
+  imageUrl?: string;
+  storagePath?: string;
   createdAt: number;
   owner_id?: string;
+  localOnly?: boolean;
 };
 
 type Row = {
@@ -29,8 +39,59 @@ type Row = {
   location: string | null;
   price: string | null;
   category: string | null;
+  image_url?: string | null;
+  storage_path?: string | null;
   created_at: string;
 };
+
+const LOCAL_LISTINGS_KEY = "manaooru.local.listings.v1";
+const LOCAL_OWNER_KEY = "manaooru.local.owner.v1";
+
+function getLocalOwnerId() {
+  if (typeof window === "undefined") return "local";
+  const existing = window.localStorage.getItem(LOCAL_OWNER_KEY);
+  if (existing) return existing;
+  const next = `local-${crypto.randomUUID()}`;
+  window.localStorage.setItem(LOCAL_OWNER_KEY, next);
+  return next;
+}
+
+function readLocalListings(type?: ListingType) {
+  if (typeof window === "undefined") return [];
+  try {
+    const parsed = JSON.parse(window.localStorage.getItem(LOCAL_LISTINGS_KEY) || "[]") as Listing[];
+    return parsed
+      .filter((item) => !type || item.type === type)
+      .map((item) => ({ ...item, localOnly: true }));
+  } catch {
+    return [];
+  }
+}
+
+function writeLocalListings(items: Listing[]) {
+  if (typeof window === "undefined") return;
+  window.localStorage.setItem(LOCAL_LISTINGS_KEY, JSON.stringify(items));
+}
+
+function saveLocalListing(item: Omit<Listing, "id" | "createdAt" | "owner_id" | "localOnly">) {
+  const ownerId = getLocalOwnerId();
+  const listing: Listing = {
+    ...item,
+    id: `local-${crypto.randomUUID()}`,
+    createdAt: Date.now(),
+    owner_id: ownerId,
+    localOnly: true,
+  };
+  writeLocalListings([listing, ...readLocalListings()]);
+  window.dispatchEvent(new Event("manaooru:listings-changed"));
+  return listing;
+}
+
+function removeLocalListing(id: string) {
+  const current = readLocalListings();
+  writeLocalListings(current.filter((item) => item.id !== id));
+  window.dispatchEvent(new Event("manaooru:listings-changed"));
+}
 
 function toListing(r: Row): Listing {
   return {
@@ -42,6 +103,8 @@ function toListing(r: Row): Listing {
     location: r.location ?? "",
     price: r.price ?? undefined,
     category: r.category ?? undefined,
+    imageUrl: r.image_url ?? undefined,
+    storagePath: r.storage_path ?? undefined,
     createdAt: new Date(r.created_at).getTime(),
     owner_id: r.owner_id,
   };
@@ -57,17 +120,22 @@ export function useListings(type?: ListingType) {
       let q = supabase.from("listings").select("*").order("created_at", { ascending: false });
       if (type) q = q.eq("type", type);
       const { data, error } = await q;
-      if (error) throw error;
+      if (error) {
+        return [];
+      }
       return (data as Row[]).map(toListing);
     },
   });
 
   const add = useCallback(
-    async (item: Omit<Listing, "id" | "createdAt" | "owner_id">) => {
+    async (item: Omit<Listing, "id" | "createdAt" | "owner_id" | "localOnly">) => {
       if (!user) {
-        toast.error("Please sign in to post");
-        throw new Error("not authenticated");
+        const local = saveLocalListing(item);
+        qc.invalidateQueries({ queryKey: ["listings"] });
+        qc.invalidateQueries({ queryKey: ["listing-stats"] });
+        return local;
       }
+
       const { data, error } = await supabase
         .from("listings")
         .insert({
@@ -79,12 +147,19 @@ export function useListings(type?: ListingType) {
           location: item.location || null,
           price: item.price || null,
           category: item.category || null,
-        })
+          image_url: item.imageUrl || null,
+          storage_path: item.storagePath || null,
+        } as never)
         .select()
         .single();
       if (error) {
-        toast.error(error.message);
-        throw error;
+        const local = saveLocalListing(item);
+        toast.warning(
+          "Saved on this device. Apply the latest database migration to share it live.",
+        );
+        qc.invalidateQueries({ queryKey: ["listings"] });
+        qc.invalidateQueries({ queryKey: ["listing-stats"] });
+        return local;
       }
       qc.invalidateQueries({ queryKey: ["listings"] });
       qc.invalidateQueries({ queryKey: ["listing-stats"] });
@@ -95,6 +170,13 @@ export function useListings(type?: ListingType) {
 
   const remove = useCallback(
     async (id: string) => {
+      if (id.startsWith("local-")) {
+        removeLocalListing(id);
+        qc.invalidateQueries({ queryKey: ["listings"] });
+        qc.invalidateQueries({ queryKey: ["listing-stats"] });
+        toast.success("Removed");
+        return;
+      }
       const { error } = await supabase.from("listings").delete().eq("id", id);
       if (error) {
         toast.error(error.message);
@@ -107,7 +189,9 @@ export function useListings(type?: ListingType) {
     [qc],
   );
 
-  const items = query.data ?? [];
+  const items = [...(query.data ?? []), ...readLocalListings(type)].sort(
+    (a, b) => b.createdAt - a.createdAt,
+  );
   return { items, add, remove, total: items.length, loading: query.isLoading };
 }
 
@@ -122,7 +206,11 @@ export function useListingStats() {
         supabase.from("listings").select("id", { count: "exact", head: true }).eq("type", "land"),
         supabase.from("listings").select("*").order("created_at", { ascending: false }).limit(6),
       ]);
-      const all = (listings.data as { type: ListingType }[] | null) ?? [];
+      const local = readLocalListings();
+      const all = [
+        ...(((listings.data as { type: ListingType }[] | null) ?? []) as Listing[]),
+        ...local,
+      ];
       const byType = all.reduce<Record<string, number>>((acc, r) => {
         acc[r.type] = (acc[r.type] ?? 0) + 1;
         return acc;
@@ -131,9 +219,11 @@ export function useListingStats() {
         villagers: profiles.count ?? 0,
         workers: workers.count ?? 0,
         land: land.count ?? 0,
-        total: listings.count ?? all.length,
+        total: (listings.count ?? 0) + local.length,
         byType,
-        recent: ((recent.data as Row[] | null) ?? []).map(toListing),
+        recent: [...((recent.data as Row[] | null) ?? []).map(toListing), ...local].sort(
+          (a, b) => b.createdAt - a.createdAt,
+        ),
       };
     },
   });

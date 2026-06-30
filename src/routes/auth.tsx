@@ -1,11 +1,20 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SurfaceCard } from "@/components/design-system";
-import { lovable } from "@/integrations/lovable/index";
 import { supabase } from "@/integrations/supabase/client";
-import { useAuth, type AccountType } from "@/lib/auth";
+import { useAuth, type AppRole } from "@/lib/auth";
+import {
+  getAuthRedirectUrl,
+  getRoleDashboardPath,
+  normalizeRole,
+  signInWithEmailPassword,
+  signInWithOAuth,
+  signUpWithEmailPassword,
+  occupations,
+  type Occupation,
+} from "@/lib/supabase/auth";
 import {
   defaultProfile,
   getDistricts,
@@ -18,25 +27,25 @@ import {
   type VillageProfile,
 } from "@/lib/village-preferences";
 
-const accountTypes: {
-  value: AccountType;
+const occupationOptions: {
+  value: Occupation;
   label: string;
   description: string;
 }[] = [
   {
-    value: "villager",
-    label: "Villager",
-    description: "Browse, post needs, contact workers, and use village services.",
+    value: "Farmer",
+    label: "Farmer",
+    description: "Sell products, find services, and track agriculture updates.",
   },
   {
-    value: "village_admin",
-    label: "Village Admin",
-    description: "Operate and manage listings, notices, and support for one village.",
+    value: "Worker",
+    label: "Worker",
+    description: "Offer local services and manage your worker profile.",
   },
   {
-    value: "app_admin",
-    label: "App Admin",
-    description: "Run district-level or platform operations after approval.",
+    value: "Other",
+    label: "Other",
+    description: "Join as a citizen and update your occupation later.",
   },
 ];
 
@@ -52,10 +61,14 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
-  const [accountType, setAccountType] = useState<AccountType>("villager");
-  const { profile, setProfile } = useVillagePreferences();
-  const [villageProfile, setVillageProfile] = useState<VillageProfile>(profile);
+  const [occupation, setOccupation] = useState<Occupation>("Other");
+  const { profile, setProfile, hasProfile } = useVillagePreferences();
+  const [villageProfile, setVillageProfile] = useState<VillageProfile>({
+    ...profile,
+    village: hasProfile ? profile.village : "",
+  });
   const [busy, setBusy] = useState(false);
   const states = getStates();
   const districts = getDistricts(villageProfile.state);
@@ -65,30 +78,37 @@ function AuthPage() {
     villageProfile.district,
     villageProfile.mandal,
   );
+  const selectedVillageLocation = [
+    villageProfile.village,
+    villageProfile.mandal,
+    villageProfile.district,
+    villageProfile.state,
+  ]
+    .filter(Boolean)
+    .join(", ");
 
   useEffect(() => {
     if (!user || busy) return;
-    const route =
-      authProfile?.account_type === "village_admin" || authProfile?.account_type === "app_admin"
-        ? "/dashboard"
-        : "/";
-    navigate({ to: route });
+    navigate({ to: getRoleDashboardPath(authProfile?.role) });
   }, [user, authProfile, busy, navigate]);
 
   useEffect(() => {
-    setVillageProfile(normalizeProfile(profile));
-  }, [profile]);
+    setVillageProfile({ ...normalizeProfile(profile), village: hasProfile ? profile.village : "" });
+  }, [hasProfile, profile]);
 
   const saveProfile = async (
     userId: string,
     nextProfile: VillageProfile,
-    role: AccountType,
+    role: AppRole,
     displayName?: string,
   ) => {
     const { error } = await supabase.from("profiles").upsert({
       id: userId,
       display_name: displayName || undefined,
-      account_type: role,
+      full_name: displayName || undefined,
+      account_type: "villager",
+      role,
+      occupation,
       state: nextProfile.state,
       district: nextProfile.district,
       mandal: nextProfile.mandal,
@@ -98,10 +118,30 @@ function AuthPage() {
     if (error) throw error;
   };
 
+  const getFriendlyAuthError = (err: unknown) => {
+    const message = err instanceof Error ? err.message : String(err || "");
+    const normalized = message.toLowerCase();
+
+    if (normalized.includes("invalid login credentials")) {
+      return "Email or password is incorrect. If you signed up with Google or OTP, use that method or reset your password.";
+    }
+    if (normalized.includes("email not confirmed")) {
+      return "Please open the confirmation link in your email before signing in.";
+    }
+    if (normalized.includes("password should be at least")) {
+      return "Password must be at least 6 characters.";
+    }
+    if (normalized.includes("rate limit") || normalized.includes("too many")) {
+      return "Too many attempts. Please wait a minute and try again.";
+    }
+
+    return message || "Sign-in failed. Please try again.";
+  };
+
   const loadSignedInProfile = async (userId: string) => {
     const { data, error } = await supabase
       .from("profiles")
-      .select("account_type,state,district,mandal,village")
+      .select("account_type,role,state,district,mandal,village")
       .eq("id", userId)
       .maybeSingle();
     if (error) throw error;
@@ -121,41 +161,62 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
+        if (password.length < 6) {
+          toast.error("Password must be at least 6 characters.");
+          setBusy(false);
+          return;
+        }
+        if (!villageProfile.village.trim()) {
+          toast.error("Please select or type your village name.");
+          setBusy(false);
+          return;
+        }
         const selectedProfile = normalizeProfile(villageProfile);
-        const { data, error } = await supabase.auth.signUp({
+        const { data, error } = await signUpWithEmailPassword({
           email,
           password,
-          options: {
-            emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
-            data: {
-              display_name: name,
-              account_type: accountType,
-              ...selectedProfile,
-              village: selectedProfile.village,
-            },
+          fullName: name,
+          phone,
+          occupation,
+          metadata: {
+            state: selectedProfile.state,
+            district: selectedProfile.district,
+            mandal: selectedProfile.mandal,
+            village: selectedProfile.village,
           },
         });
         if (error) throw error;
         setProfile(selectedProfile);
-        if (data.user) {
-          await saveProfile(data.user.id, selectedProfile, accountType, name);
+        if (data.user && data.session) {
+          await saveProfile(data.user.id, selectedProfile, "citizen", name);
+        }
+        if (!data.session) {
+          toast.success(
+            "Account created. Check your email and open the ManaOoru confirmation link.",
+          );
+          setMode("signin");
+          setBusy(false);
+          return;
         }
         toast.success("Welcome to ManaOoru!");
-        navigate({ to: accountType === "villager" ? "/" : "/dashboard" });
+        navigate({ to: getRoleDashboardPath("citizen") });
       } else {
-        const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+        if (password.length < 6) {
+          toast.error("Enter the full password. It must be at least 6 characters.");
+          return;
+        }
+        const { data, error } = await signInWithEmailPassword(email, password);
         if (error) throw error;
         const signedInProfile = data.user ? await loadSignedInProfile(data.user.id) : null;
         toast.success("Welcome back!");
-        const route =
-          signedInProfile?.account_type === "village_admin" ||
-          signedInProfile?.account_type === "app_admin"
-            ? "/dashboard"
-            : "/";
-        navigate({ to: route });
+        navigate({
+          to: getRoleDashboardPath(
+            normalizeRole(signedInProfile?.role ?? signedInProfile?.account_type),
+          ),
+        });
       }
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Sign-in failed");
+      toast.error(getFriendlyAuthError(err));
     } finally {
       setBusy(false);
     }
@@ -163,16 +224,18 @@ function AuthPage() {
 
   const google = async () => {
     setBusy(true);
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: typeof window !== "undefined" ? window.location.origin : undefined,
-    });
-    if (result.error) {
-      toast.error(result.error.message || "Google sign-in failed");
+    const { error } = await signInWithOAuth("google");
+    if (error) {
+      const message = error.message || "Google sign-in failed";
+      toast.error(
+        message.toLowerCase().includes("provider")
+          ? "Google sign-in is not enabled in Supabase. Enable Google provider and add this site URL in Supabase Auth settings."
+          : message,
+      );
       setBusy(false);
       return;
     }
-    if (result.redirected) return;
-    navigate({ to: "/" });
+    toast.loading("Opening Google sign-in...");
   };
 
   const sendMagicLink = async () => {
@@ -183,7 +246,7 @@ function AuthPage() {
     setBusy(true);
     const { error } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: typeof window !== "undefined" ? window.location.origin : undefined },
+      options: { emailRedirectTo: getAuthRedirectUrl("/") },
     });
     setBusy(false);
     if (error) {
@@ -200,7 +263,7 @@ function AuthPage() {
     }
     setBusy(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: typeof window !== "undefined" ? window.location.origin : undefined,
+      redirectTo: getAuthRedirectUrl("/"),
     });
     setBusy(false);
     if (error) {
@@ -291,13 +354,13 @@ function AuthPage() {
                 className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
               />
               <div className="grid gap-2 sm:grid-cols-3">
-                {accountTypes.map((type) => (
+                {occupationOptions.map((type) => (
                   <button
                     key={type.value}
                     type="button"
-                    onClick={() => setAccountType(type.value)}
+                    onClick={() => setOccupation(type.value)}
                     className={`rounded-2xl border p-4 text-left transition ${
-                      accountType === type.value
+                      occupation === type.value
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-border bg-background text-foreground hover:border-primary/50"
                     }`}
@@ -309,6 +372,18 @@ function AuthPage() {
                   </button>
                 ))}
               </div>
+              <select
+                aria-label="Occupation"
+                value={occupation}
+                onChange={(event) => setOccupation(event.target.value as Occupation)}
+                className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
+              >
+                {occupations.map((item) => (
+                  <option key={item} value={item}>
+                    {item}
+                  </option>
+                ))}
+              </select>
               <div className="grid gap-3 sm:grid-cols-2">
                 <select
                   aria-label="State"
@@ -317,9 +392,7 @@ function AuthPage() {
                     const state = e.target.value;
                     const district = getDistricts(state)[0] ?? defaultProfile.district;
                     const mandal = getMandals(state, district)[0] ?? defaultProfile.mandal;
-                    const village =
-                      getVillages(state, district, mandal)[0] ?? defaultProfile.village;
-                    setVillageProfile({ state, district, mandal, village });
+                    setVillageProfile({ state, district, mandal, village: "" });
                   }}
                   className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
                 >
@@ -333,8 +406,7 @@ function AuthPage() {
                   onChange={(e) => {
                     const district = e.target.value;
                     const mandal = getMandals(villageProfile.state, district)[0] ?? "";
-                    const village = getVillages(villageProfile.state, district, mandal)[0] ?? "";
-                    setVillageProfile({ ...villageProfile, district, mandal, village });
+                    setVillageProfile({ ...villageProfile, district, mandal, village: "" });
                   }}
                   className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
                 >
@@ -347,9 +419,7 @@ function AuthPage() {
                   value={villageProfile.mandal}
                   onChange={(e) => {
                     const mandal = e.target.value;
-                    const village =
-                      getVillages(villageProfile.state, villageProfile.district, mandal)[0] ?? "";
-                    setVillageProfile({ ...villageProfile, mandal, village });
+                    setVillageProfile({ ...villageProfile, mandal, village: "" });
                   }}
                   className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
                 >
@@ -357,31 +427,24 @@ function AuthPage() {
                     <option key={mandal}>{mandal}</option>
                   ))}
                 </select>
-                <select
+                <input
                   aria-label="Village"
+                  list="signup-village-options"
                   value={villageProfile.village}
                   onChange={(e) =>
                     setVillageProfile({ ...villageProfile, village: e.target.value })
                   }
+                  placeholder="Select or type exact village name"
                   className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-                >
+                />
+                <datalist id="signup-village-options">
                   {villages.map((village) => (
-                    <option key={village}>{village}</option>
+                    <option key={village} value={village} />
                   ))}
-                  {villageProfile.village && !villages.includes(villageProfile.village) && (
-                    <option>{villageProfile.village}</option>
-                  )}
-                </select>
+                </datalist>
               </div>
-              <input
-                value={villageProfile.village}
-                onChange={(e) => setVillageProfile({ ...villageProfile, village: e.target.value })}
-                placeholder="Type exact village name if not shown"
-                className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-              />
               <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 text-sm text-primary">
-                Selected village: <strong>{villageProfile.village}</strong>,{" "}
-                {villageProfile.mandal}, {villageProfile.district}, {villageProfile.state}
+                Selected village: <strong>{selectedVillageLocation}</strong>
               </div>
             </>
           )}
@@ -394,10 +457,20 @@ function AuthPage() {
             className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
           />
           <div className="grid gap-2 sm:grid-cols-2">
-            <button type="button" onClick={sendMagicLink} disabled={busy} className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition hover:border-primary disabled:opacity-60">
+            <button
+              type="button"
+              onClick={sendMagicLink}
+              disabled={busy}
+              className="rounded-2xl border border-primary/20 bg-primary/10 px-4 py-3 text-sm font-semibold text-primary transition hover:border-primary disabled:opacity-60"
+            >
               Email OTP / Magic Link
             </button>
-            <button type="button" onClick={sendPasswordReset} disabled={busy} className="rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold text-clay transition hover:border-primary disabled:opacity-60">
+            <button
+              type="button"
+              onClick={sendPasswordReset}
+              disabled={busy}
+              className="rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold text-clay transition hover:border-primary disabled:opacity-60"
+            >
               Forgot password
             </button>
           </div>
@@ -408,26 +481,47 @@ function AuthPage() {
               placeholder="Phone with country code, e.g. +919876543210"
               className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
             />
-            <button type="button" onClick={sendPhoneOtp} disabled={busy} className="rounded-2xl border border-primary/20 bg-white px-4 py-3 text-sm font-semibold text-primary transition hover:border-primary disabled:opacity-60">
+            <button
+              type="button"
+              onClick={sendPhoneOtp}
+              disabled={busy}
+              className="rounded-2xl border border-primary/20 bg-white px-4 py-3 text-sm font-semibold text-primary transition hover:border-primary disabled:opacity-60"
+            >
               Phone OTP
             </button>
           </div>
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password (min 6 chars)"
-            required
-            minLength={6}
-            className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password (min 6 chars)"
+              required
+              minLength={6}
+              className="w-full rounded-2xl border border-border bg-background px-4 py-3 pr-12 text-sm text-foreground outline-none focus:border-primary"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((value) => !value)}
+              className="absolute right-3 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-full text-muted-foreground transition hover:bg-muted hover:text-foreground"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+            </button>
+          </div>
           <button
             type="submit"
             disabled={busy}
             className="flex w-full items-center justify-center gap-2 rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110 disabled:opacity-60"
           >
             {busy && <Loader2 className="size-4 animate-spin" />}
-            {mode === "signin" ? "Sign in" : "Create account"}
+            {busy
+              ? mode === "signin"
+                ? "Signing in..."
+                : "Creating account..."
+              : mode === "signin"
+                ? "Sign in"
+                : "Create account"}
           </button>
         </form>
 

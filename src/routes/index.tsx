@@ -5,18 +5,41 @@ import { useAuth } from "@/lib/auth";
 import { useListingStats, timeAgo } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
 import {
-  Search, Users, Briefcase, Wheat, ShoppingBasket, Wrench, Megaphone,
-  Tractor, Sprout, Bike, Phone, Siren, MapPin, ArrowRight,
-  Star, Quote, CheckCircle2, Zap, Building2,
-  HandHeart, ShieldCheck, Activity, Bot, CloudSun, GraduationCap, HeartPulse,
-  Compass, Plus,
+  Search,
+  Users,
+  Briefcase,
+  Wheat,
+  ShoppingBasket,
+  Wrench,
+  Megaphone,
+  Tractor,
+  Sprout,
+  Bike,
+  Phone,
+  Siren,
+  MapPin,
+  ArrowRight,
+  Star,
+  Quote,
+  CheckCircle2,
+  Zap,
+  Building2,
+  HandHeart,
+  ShieldCheck,
+  Activity,
+  Bot,
+  CloudSun,
+  GraduationCap,
+  HeartPulse,
+  Compass,
+  Plus,
+  AlertTriangle,
+  ImagePlus,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village-premium.jpg";
 import { SiteNav } from "@/components/SiteNav";
 import { Button } from "@/components/ui/button";
 import { fallbackListings } from "@/lib/app-data";
-import marketplaceImg from "@/assets/marketplace.jpg";
-import farmlandImg from "@/assets/farmland.jpg";
 import workersImg from "@/assets/workers-premium.jpg";
 import voice1 from "@/assets/voice-1.jpg";
 import voice2 from "@/assets/voice-2.jpg";
@@ -25,29 +48,103 @@ export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "ManaOoru — A Digital Home for Every Village" },
-      { name: "description", content: "Find workers, lease land, buy local produce, hire services, and stay updated with village announcements — all in one place." },
+      {
+        name: "description",
+        content:
+          "Find workers, lease land, buy local produce, hire services, and stay updated with village announcements — all in one place.",
+      },
       { property: "og:title", content: "ManaOoru — A Digital Home for Every Village" },
-      { property: "og:description", content: "One platform for farmers, workers, services, and villagers. మా ఊరు, మన చేతుల్లో." },
+      {
+        property: "og:description",
+        content: "One platform for farmers, workers, services, and villagers. మా ఊరు, మన చేతుల్లో.",
+      },
     ],
   }),
   component: Index,
 });
 
 const quickActions = [
-  { icon: Users, label: "Find Workers", te: "పనివారు", tint: "bg-primary/10 text-primary", to: "/workers" as const },
-  { icon: Briefcase, label: "Post Work", te: "పని ఇవ్వండి", tint: "bg-secondary/10 text-secondary", to: "/post-work" as const },
-  { icon: Wheat, label: "Lease Land", te: "భూమి కౌలు", tint: "bg-accent/20 text-clay", to: "/land" as const },
-  { icon: ShoppingBasket, label: "Marketplace", te: "సంత", tint: "bg-primary/10 text-primary", to: "/marketplace" as const },
-  { icon: Wrench, label: "Local Services", te: "స్థానిక సేవలు", tint: "bg-secondary/10 text-secondary", to: "/services" as const },
-  { icon: Megaphone, label: "Announcements", te: "ప్రకటనలు", tint: "bg-accent/20 text-clay", to: "/announcements" as const },
-  { icon: Bot, label: "AI Assistant", te: "AI సహాయం", tint: "bg-primary/10 text-primary", to: "/ai-assistant" as const },
-  { icon: CloudSun, label: "Weather", te: "వాతావరణం", tint: "bg-secondary/10 text-secondary", to: "/weather" as const },
-  { icon: Siren, label: "Emergency Contacts", te: "అత్యవసరం", tint: "bg-accent/20 text-clay", to: "#contacts" as const },
+  {
+    icon: Users,
+    label: "Find Workers",
+    te: "పనివారు",
+    tint: "bg-primary/10 text-primary",
+    to: "/workers" as const,
+  },
+  {
+    icon: Briefcase,
+    label: "Post Work",
+    te: "పని ఇవ్వండి",
+    tint: "bg-secondary/10 text-secondary",
+    to: "/post-work" as const,
+  },
+  {
+    icon: AlertTriangle,
+    label: "Report Problem",
+    te: "సమస్య చెప్పండి",
+    tint: "bg-red-50 text-red-600",
+    to: "/problems" as const,
+  },
+  {
+    icon: Wheat,
+    label: "Lease Land",
+    te: "భూమి కౌలు",
+    tint: "bg-accent/20 text-clay",
+    to: "/land" as const,
+  },
+  {
+    icon: ShoppingBasket,
+    label: "Marketplace",
+    te: "సంత",
+    tint: "bg-primary/10 text-primary",
+    to: "/marketplace" as const,
+  },
+  {
+    icon: Wrench,
+    label: "Local Services",
+    te: "స్థానిక సేవలు",
+    tint: "bg-secondary/10 text-secondary",
+    to: "/services" as const,
+  },
+  {
+    icon: Megaphone,
+    label: "Announcements",
+    te: "ప్రకటనలు",
+    tint: "bg-accent/20 text-clay",
+    to: "/announcements" as const,
+  },
+  {
+    icon: Bot,
+    label: "AI Assistant",
+    te: "AI సహాయం",
+    tint: "bg-primary/10 text-primary",
+    to: "/ai-assistant" as const,
+  },
+  {
+    icon: CloudSun,
+    label: "Weather",
+    te: "వాతావరణం",
+    tint: "bg-secondary/10 text-secondary",
+    to: "/weather" as const,
+  },
+  {
+    icon: Siren,
+    label: "Emergency Contacts",
+    te: "అత్యవసరం",
+    tint: "bg-accent/20 text-clay",
+    to: "#contacts" as const,
+  },
 ];
 
 const categoryRoutes: Record<string, "/marketplace" | "/services"> = {
-  Tractors: "/services", Seeds: "/marketplace", Livestock: "/marketplace", Grain: "/marketplace",
-  Tools: "/marketplace", Transport: "/services", Repairs: "/services", "Daily Goods": "/marketplace",
+  Tractors: "/services",
+  Seeds: "/marketplace",
+  Livestock: "/marketplace",
+  Grain: "/marketplace",
+  Tools: "/marketplace",
+  Transport: "/services",
+  Repairs: "/services",
+  "Daily Goods": "/marketplace",
 };
 
 const categoryDefs = [
@@ -62,9 +159,24 @@ const categoryDefs = [
 ];
 
 const steps = [
-  { n: "01", icon: HandHeart, title: "Join your village", body: "Sign up in seconds with your phone number. Pick your village and role." },
-  { n: "02", icon: Search, title: "Post or search", body: "Need workers? Have land? Selling produce? Post once, reach the whole village." },
-  { n: "03", icon: ShieldCheck, title: "Connect & verify", body: "Call directly or chat in-app. Every member is vouched for by neighbours." },
+  {
+    n: "01",
+    icon: HandHeart,
+    title: "Join your village",
+    body: "Sign up in seconds with your phone number. Pick your village and role.",
+  },
+  {
+    n: "02",
+    icon: Search,
+    title: "Post or search",
+    body: "Need workers? Have land? Selling produce? Post once, reach the whole village.",
+  },
+  {
+    n: "03",
+    icon: ShieldCheck,
+    title: "Connect & verify",
+    body: "Call directly or chat in-app. Every member is vouched for by neighbours.",
+  },
 ];
 
 const voices = [
@@ -72,7 +184,8 @@ const voices = [
     img: voice1,
     name: "Lakshmi Devi",
     role: "Dairy farmer · Kothur",
-    quote: "I leased two acres in one week. Earlier this would have taken a whole season of asking around.",
+    quote:
+      "I leased two acres in one week. Earlier this would have taken a whole season of asking around.",
     rating: 5,
   },
   {
@@ -85,14 +198,23 @@ const voices = [
 ];
 
 const typeIcon: Record<string, typeof Briefcase> = {
-  worker: Users, work: Briefcase, land: Wheat, market: ShoppingBasket, service: Wrench, announcement: Megaphone,
+  worker: Users,
+  work: Briefcase,
+  land: Wheat,
+  market: ShoppingBasket,
+  service: Wrench,
+  announcement: Megaphone,
+  complaint: AlertTriangle,
 };
 const typeTint: Record<string, string> = {
-  worker: "text-primary", work: "text-secondary", land: "text-accent-foreground",
-  market: "text-primary", service: "text-secondary", announcement: "text-primary",
+  worker: "text-primary",
+  work: "text-secondary",
+  land: "text-accent-foreground",
+  market: "text-primary",
+  service: "text-secondary",
+  announcement: "text-primary",
+  complaint: "text-red-600",
 };
-
-const featuredImages = [workersImg, farmlandImg, marketplaceImg];
 
 const contacts = [
   { name: "Ambulance", role: "Primary Health Center", num: "108", urgent: true },
@@ -105,15 +227,23 @@ function Index() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { data: stats } = useListingStats();
-  const { t, profile, weather } = useVillagePreferences();
+  const { t, profile, weather, hasProfile } = useVillagePreferences();
   const [searchQuery, setSearchQuery] = useState("");
-  const heroWeather =
-    weather.live && weather.temp !== null
+  const showSignedInVillage = Boolean(user && hasProfile && profile.village);
+  const heroWeather = showSignedInVillage
+    ? weather.live && weather.temp !== null
       ? `${weather.temp}°C · ${weather.condition}`
-      : "Live weather unavailable";
-  const liveActivity = stats?.recent.slice(0, 4) ?? [];
-  const announcementItems = stats?.recent.filter((r) => r.type === "announcement").slice(0, 3) ?? [];
-  const featured = (stats?.recent.filter((r) => r.type !== "announcement") ?? fallbackListings.filter((r) => r.type !== "announcement")).slice(0, 3);
+      : "Live weather unavailable"
+    : "Select village for live weather";
+  const recentItems = stats?.recent ?? fallbackListings;
+  const liveActivity = recentItems.slice(0, 4);
+  const announcementItems = recentItems.filter((r) => r.type === "announcement").slice(0, 3);
+  const problemItems = recentItems.filter((r) => r.type === "complaint").slice(0, 3);
+  const featured = recentItems
+    .filter((r) => r.type !== "announcement" && r.type !== "complaint")
+    .slice(0, 3);
+  const villageName = showSignedInVillage ? profile.village : "";
+  const heroTitle = villageName ? `Welcome to ManaOoru - ${villageName}` : "Welcome to ManaOoru";
   const submitSearch = (event?: FormEvent) => {
     event?.preventDefault();
     navigate({ to: "/search", search: { q: searchQuery } });
@@ -135,21 +265,28 @@ function Index() {
         <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_22%,rgba(255,213,128,0.22),transparent_35%),linear-gradient(90deg,rgba(0,0,0,0.24),transparent_34%,rgba(0,0,0,0.2))]" />
 
         <div className="relative z-20 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 pb-44 pt-28 text-center sm:px-6 lg:pb-48">
-          <div className="absolute right-4 top-24 hidden rounded-[20px] border border-white/20 bg-white/12 px-4 py-3 text-left text-white shadow-[0_18px_45px_-24px_rgba(0,0,0,0.7)] backdrop-blur-xl md:block">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">{user ? "Your village" : "Selected village"}</p>
-            <p className="mt-1 font-display text-lg font-semibold">{profile.village}</p>
+          <div className="mb-7 hidden max-w-sm rounded-[20px] border border-white/20 bg-white/12 px-5 py-3 text-center text-white shadow-[0_18px_45px_-24px_rgba(0,0,0,0.7)] backdrop-blur-xl md:block">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
+              {villageName ? "Selected village" : "Village setup"}
+            </p>
+            <p className="mt-1 font-display text-lg font-semibold">
+              {villageName || "Choose your village"}
+            </p>
             <p className="mt-1 text-sm text-white/80">{heroWeather}</p>
           </div>
           <h1 className="animate-fade-up max-w-5xl text-balance font-display text-4xl font-extrabold leading-[1.05] text-white drop-shadow-[0_10px_32px_rgba(0,0,0,0.35)] sm:text-6xl lg:text-7xl">
-            {t.heroA} <span className="text-accent">{t.heroVillage}</span> {t.heroB}
-            <span className="block">{t.heroC}</span>
+            {heroTitle}
+            <span className="block text-accent">{t.heroC}</span>
           </h1>
           <p className="animate-fade-up mt-6 max-w-2xl text-pretty text-base font-medium leading-8 text-white/92 [animation-delay:120ms] sm:text-xl">
             {t.subtitle1}
             <span className="block">{t.subtitle2}</span>
           </p>
 
-          <form onSubmit={submitSearch} className="animate-fade-up mt-9 w-full max-w-3xl [animation-delay:180ms]">
+          <form
+            onSubmit={submitSearch}
+            className="animate-fade-up mt-9 w-full max-w-3xl [animation-delay:180ms]"
+          >
             <div className="flex items-center gap-2 rounded-full border border-white/35 bg-white/95 p-2 shadow-[0_28px_80px_-32px_rgba(0,0,0,0.65)] backdrop-blur-xl focus-within:ring-4 focus-within:ring-white/25">
               <div className="grid size-12 place-items-center rounded-full text-muted-foreground">
                 <Search className="size-5" />
@@ -162,7 +299,10 @@ function Index() {
                 placeholder={t.search}
                 className="min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
               />
-              <button type="submit" className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-secondary sm:px-8">
+              <button
+                type="submit"
+                className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-secondary sm:px-8"
+              >
                 Search
               </button>
             </div>
@@ -185,24 +325,60 @@ function Index() {
           </form>
 
           <div className="animate-fade-up mt-10 flex flex-wrap justify-center gap-4 [animation-delay:240ms]">
-            <Link to="/dashboard" className="inline-flex items-center gap-2 rounded-[16px] bg-primary px-8 py-4 text-base font-semibold text-primary-foreground shadow-[0_18px_45px_-18px_rgba(34,197,94,0.8)] transition hover:-translate-y-0.5 hover:bg-secondary">
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center gap-2 rounded-[16px] bg-primary px-8 py-4 text-base font-semibold text-primary-foreground shadow-[0_18px_45px_-18px_rgba(34,197,94,0.8)] transition hover:-translate-y-0.5 hover:bg-secondary"
+            >
               <Compass className="size-5" /> {t.explore}
             </Link>
-            <Link to="/post-work" className="inline-flex items-center gap-2 rounded-[16px] border border-white/35 bg-white/95 px-8 py-4 text-base font-semibold text-primary shadow-[0_18px_45px_-22px_rgba(0,0,0,0.55)] transition hover:-translate-y-0.5 hover:bg-white">
+            <Link
+              to="/post-work"
+              className="inline-flex items-center gap-2 rounded-[16px] border border-white/35 bg-white/95 px-8 py-4 text-base font-semibold text-primary shadow-[0_18px_45px_-22px_rgba(0,0,0,0.55)] transition hover:-translate-y-0.5 hover:bg-white"
+            >
               <Plus className="size-5" /> {t.post}
             </Link>
           </div>
 
           <div className="animate-fade-up mt-24 grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-5 [animation-delay:300ms]">
             {[
-              { icon: Users, value: stats?.workers ? `${stats.workers}+` : "2,450+", label: "Workers Available", color: "from-secondary to-primary" },
-              { icon: Wheat, value: stats?.land ? `${stats.land}+` : "1,250+", label: "Land Listings", color: "from-primary to-secondary" },
-              { icon: Wrench, value: stats?.byType.service ? `${stats.byType.service}+` : "850+", label: "Services", color: "from-blue-500 to-blue-700" },
-              { icon: ShoppingBasket, value: stats?.byType.market ? `${stats.byType.market}+` : "3,200+", label: "Products", color: "from-amber-500 to-orange-600" },
-              { icon: Users, value: stats?.villagers ? `${stats.villagers}+` : "18,500+", label: "Trusted Users", color: "from-purple-500 to-fuchsia-700" },
+              {
+                icon: Users,
+                value: stats?.workers ? `${stats.workers}+` : "2,450+",
+                label: "Workers Available",
+                color: "from-secondary to-primary",
+              },
+              {
+                icon: Wheat,
+                value: stats?.land ? `${stats.land}+` : "1,250+",
+                label: "Land Listings",
+                color: "from-primary to-secondary",
+              },
+              {
+                icon: Wrench,
+                value: stats?.byType.service ? `${stats.byType.service}+` : "850+",
+                label: "Services",
+                color: "from-blue-500 to-blue-700",
+              },
+              {
+                icon: ShoppingBasket,
+                value: stats?.byType.market ? `${stats.byType.market}+` : "3,200+",
+                label: "Products",
+                color: "from-amber-500 to-orange-600",
+              },
+              {
+                icon: Users,
+                value: stats?.villagers ? `${stats.villagers}+` : "18,500+",
+                label: "Trusted Users",
+                color: "from-purple-500 to-fuchsia-700",
+              },
             ].map((item) => (
-              <div key={item.label} className="flex items-center gap-5 rounded-[20px] border border-white/16 bg-black/28 p-5 text-left text-white shadow-[0_22px_60px_-30px_rgba(0,0,0,0.75)] backdrop-blur-xl">
-                <div className={`grid size-16 shrink-0 place-items-center rounded-[18px] bg-gradient-to-br ${item.color}`}>
+              <div
+                key={item.label}
+                className="flex items-center gap-5 rounded-[20px] border border-white/16 bg-black/28 p-5 text-left text-white shadow-[0_22px_60px_-30px_rgba(0,0,0,0.75)] backdrop-blur-xl"
+              >
+                <div
+                  className={`grid size-16 shrink-0 place-items-center rounded-[18px] bg-gradient-to-br ${item.color}`}
+                >
                   <item.icon className="size-8" />
                 </div>
                 <div>
@@ -216,9 +392,12 @@ function Index() {
       </header>
 
       {/* Quick Actions */}
-      <section id="actions" className="relative z-30 mx-auto -mt-20 max-w-[calc(100%-2rem)] rounded-t-[32px] bg-white px-4 py-9 shadow-[0_-24px_80px_-50px_rgba(0,0,0,0.8)] sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-t-[40px]">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-9">
-          {quickActions.map((a, i) => (
+      <section
+        id="actions"
+        className="relative z-30 mx-auto -mt-20 max-w-[calc(100%-2rem)] rounded-t-[32px] bg-white px-4 py-9 shadow-[0_-24px_80px_-50px_rgba(0,0,0,0.8)] sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-t-[40px]"
+      >
+        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-4 md:grid-cols-5 xl:grid-cols-10">
+          {quickActions.map((a, i) =>
             a.to.startsWith("#") ? (
               <a
                 key={a.label}
@@ -230,7 +409,27 @@ function Index() {
                   <a.icon className="size-9" strokeWidth={1.8} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">{a.label === "Find Workers" ? t.findWorkers : a.label === "Post Work" ? t.postWork : a.label === "Lease Land" ? t.leaseLand : a.label === "Marketplace" ? t.marketplace : a.label === "Local Services" ? t.localServices : a.label === "Announcements" ? t.announcements : a.label === "AI Assistant" ? t.ai : a.label === "Weather" ? t.weather : t.emergency}</p>
+                  <p className="font-semibold text-foreground">
+                    {a.label === "Find Workers"
+                      ? t.findWorkers
+                      : a.label === "Post Work"
+                        ? t.postWork
+                        : a.label === "Report Problem"
+                          ? "Report Problem"
+                          : a.label === "Lease Land"
+                            ? t.leaseLand
+                            : a.label === "Marketplace"
+                              ? t.marketplace
+                              : a.label === "Local Services"
+                                ? t.localServices
+                                : a.label === "Announcements"
+                                  ? t.announcements
+                                  : a.label === "AI Assistant"
+                                    ? t.ai
+                                    : a.label === "Weather"
+                                      ? t.weather
+                                      : t.emergency}
+                  </p>
                   <p className="text-xs text-muted-foreground">{a.te}</p>
                 </div>
               </a>
@@ -245,19 +444,158 @@ function Index() {
                   <a.icon className="size-9" strokeWidth={1.8} />
                 </div>
                 <div>
-                  <p className="font-semibold text-foreground">{a.label === "Find Workers" ? t.findWorkers : a.label === "Post Work" ? t.postWork : a.label === "Lease Land" ? t.leaseLand : a.label === "Marketplace" ? t.marketplace : a.label === "Local Services" ? t.localServices : a.label === "Announcements" ? t.announcements : a.label === "AI Assistant" ? t.ai : a.label === "Weather" ? t.weather : t.emergency}</p>
+                  <p className="font-semibold text-foreground">
+                    {a.label === "Find Workers"
+                      ? t.findWorkers
+                      : a.label === "Post Work"
+                        ? t.postWork
+                        : a.label === "Report Problem"
+                          ? "Report Problem"
+                          : a.label === "Lease Land"
+                            ? t.leaseLand
+                            : a.label === "Marketplace"
+                              ? t.marketplace
+                              : a.label === "Local Services"
+                                ? t.localServices
+                                : a.label === "Announcements"
+                                  ? t.announcements
+                                  : a.label === "AI Assistant"
+                                    ? t.ai
+                                    : a.label === "Weather"
+                                      ? t.weather
+                                      : t.emergency}
+                  </p>
                   <p className="text-xs text-muted-foreground">{a.te}</p>
                 </div>
               </Link>
-            )
-          ))}
+            ),
+          )}
+        </div>
+      </section>
+
+      <section className="mx-auto mt-12 max-w-7xl px-4 sm:px-6">
+        <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+          <div className="overflow-hidden rounded-[24px] border border-primary/20 bg-primary text-primary-foreground shadow-[var(--shadow-soft)]">
+            <div className="flex flex-col gap-5 p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em]">
+                  <Megaphone className="size-3.5" /> Top notice
+                </span>
+                <Link
+                  to="/announcements"
+                  className="text-xs font-semibold text-white/80 hover:text-white"
+                >
+                  View all
+                </Link>
+              </div>
+              {announcementItems[0] ? (
+                <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_13rem] md:items-end">
+                  <div>
+                    <p className="text-sm text-white/72">
+                      {announcementItems[0].category || "Village Notice"}
+                    </p>
+                    <h2 className="mt-2 font-display text-2xl font-semibold leading-tight sm:text-3xl">
+                      {announcementItems[0].title}
+                    </h2>
+                    {announcementItems[0].description && (
+                      <p className="mt-3 max-w-2xl text-sm leading-7 text-white/82">
+                        {announcementItems[0].description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-3">
+                    {announcementItems[0].imageUrl ? (
+                      <img
+                        src={announcementItems[0].imageUrl}
+                        alt={announcementItems[0].title}
+                        className="aspect-[4/3] w-full rounded-2xl border border-white/15 object-cover shadow-sm"
+                      />
+                    ) : (
+                      <div className="grid aspect-[4/3] w-full place-items-center rounded-2xl border border-white/15 bg-white/10 text-white/80">
+                        <Megaphone className="size-8" />
+                      </div>
+                    )}
+                    <p className="rounded-full bg-white/15 px-4 py-2 text-center text-xs font-semibold text-white">
+                      {timeAgo(announcementItems[0].createdAt)}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <h2 className="font-display text-2xl font-semibold">No notice posted yet</h2>
+                  <p className="mt-2 text-sm text-white/75">
+                    Post a Panchayat, school, health, water, or power notice.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="rounded-[24px] border border-border bg-card p-6 shadow-sm">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.18em] text-red-600">
+                  Needs attention
+                </p>
+                <h2 className="mt-1 font-display text-2xl font-semibold text-clay">
+                  Citizen problem reports
+                </h2>
+              </div>
+              <Link
+                to="/problems"
+                className="inline-flex size-11 items-center justify-center rounded-full bg-red-50 text-red-600 transition hover:bg-red-100"
+                aria-label="Report problem"
+              >
+                <ImagePlus className="size-5" />
+              </Link>
+            </div>
+            {problemItems.length === 0 ? (
+              <p className="rounded-2xl border border-dashed border-border bg-muted/50 p-5 text-sm leading-7 text-muted-foreground">
+                No road, drainage, water, or streetlight issues posted yet. Add a photo report to
+                make it visible.
+              </p>
+            ) : (
+              <div className="space-y-3">
+                {problemItems.map((item) => (
+                  <Link
+                    key={item.id}
+                    to="/problems"
+                    className="flex gap-3 rounded-2xl border border-border bg-white p-3 transition hover:border-red-200 hover:bg-red-50/40"
+                  >
+                    {item.imageUrl ? (
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="size-16 rounded-xl object-cover"
+                      />
+                    ) : (
+                      <span className="grid size-16 place-items-center rounded-xl bg-red-50 text-red-600">
+                        <AlertTriangle className="size-5" />
+                      </span>
+                    )}
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate font-semibold text-clay">{item.title}</span>
+                      <span className="mt-1 block truncate text-xs text-muted-foreground">
+                        {item.location || item.category || "Village issue"} -{" "}
+                        {timeAgo(item.createdAt)}
+                      </span>
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </section>
 
       <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6">
         <div className="mb-8 max-w-2xl">
-          <span className="text-xs font-bold uppercase tracking-widest text-secondary">Village categories</span>
-          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">Built for every everyday village need</h2>
+          <span className="text-xs font-bold uppercase tracking-widest text-secondary">
+            Village categories
+          </span>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+            Built for every everyday village need
+          </h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
@@ -270,9 +608,15 @@ function Index() {
             ["Health", "/emergency"],
             ["Emergency", "/emergency"],
           ].map(([item, to]) => (
-            <Link key={item} to={to} className="hover-lift rounded-[20px] border border-border bg-card p-5 shadow-sm">
+            <Link
+              key={item}
+              to={to}
+              className="hover-lift rounded-[20px] border border-border bg-card p-5 shadow-sm"
+            >
               <p className="font-semibold text-clay">{item}</p>
-              <p className="mt-1 text-sm text-muted-foreground">Trusted local information and direct connections.</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Trusted local information and direct connections.
+              </p>
             </Link>
           ))}
         </div>
@@ -281,7 +625,9 @@ function Index() {
       {/* How it works */}
       <section className="mx-auto mt-20 max-w-7xl px-4 sm:mt-28 sm:px-6">
         <div className="mb-10 max-w-2xl">
-          <span className="text-xs font-bold uppercase tracking-widest text-secondary">How ManaOoru works</span>
+          <span className="text-xs font-bold uppercase tracking-widest text-secondary">
+            How ManaOoru works
+          </span>
           <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
             Three simple steps. No paperwork, no middlemen.
           </h2>
@@ -293,7 +639,9 @@ function Index() {
               className="hover-lift animate-fade-up relative overflow-hidden rounded-3xl border border-border/60 bg-card p-7 shadow-sm"
               style={{ animationDelay: `${i * 80}ms` }}
             >
-              <span className="absolute right-5 top-5 font-display text-5xl font-semibold text-primary/15">{s.n}</span>
+              <span className="absolute right-5 top-5 font-display text-5xl font-semibold text-primary/15">
+                {s.n}
+              </span>
               <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
                 <s.icon className="size-6" strokeWidth={1.75} />
               </div>
@@ -312,13 +660,20 @@ function Index() {
         <div className="mx-auto max-w-7xl px-4 sm:px-6">
           <div className="flex items-end justify-between">
             <div>
-              <span className="text-xs font-bold uppercase tracking-widest text-secondary">Village marketplace</span>
+              <span className="text-xs font-bold uppercase tracking-widest text-secondary">
+                Village marketplace
+              </span>
               <h2 className="font-display text-3xl font-semibold text-clay sm:text-4xl">
                 Browse the village market
               </h2>
-              <p className="mt-2 text-muted-foreground">From fresh produce to farm equipment — direct from neighbours.</p>
+              <p className="mt-2 text-muted-foreground">
+                From fresh produce to farm equipment — direct from neighbours.
+              </p>
             </div>
-            <Link to="/marketplace" className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex">
+            <Link
+              to="/marketplace"
+              className="hidden items-center gap-1 text-sm font-semibold text-primary hover:underline sm:inline-flex"
+            >
               See all <ArrowRight className="size-4" />
             </Link>
           </div>
@@ -339,7 +694,9 @@ function Index() {
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-foreground">{c.label}</p>
-                  <p className="text-[10px] text-muted-foreground">{stats?.byType[c.type] ?? 0} listings</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {stats?.byType[c.type] ?? 0} listings
+                  </p>
                 </div>
               </Link>
             ))}
@@ -349,16 +706,20 @@ function Index() {
         {/* Subtle marquee strip for variety */}
         <div className="relative mt-10 border-y border-border/60 bg-clay py-4 [mask-image:linear-gradient(to_right,transparent,black_5%,black_95%,transparent)]">
           <div className="flex w-max animate-marquee gap-10 text-background/80">
-            {[...Array(2)].flatMap((_, k) => [
-              "🌾 Fresh harvest daily",
-              "🤝 Verified neighbours only",
-              "📞 Direct phone connect",
-              "💸 No commission, ever",
-              "🚜 Same-day equipment rental",
-              "🌱 Seeds from local farmers",
-            ].map((t, i) => (
-              <span key={`${k}-${i}`} className="flex-none text-sm font-medium tracking-wide">{t}</span>
-            )))}
+            {[...Array(2)].flatMap((_, k) =>
+              [
+                "🌾 Fresh harvest daily",
+                "🤝 Verified neighbours only",
+                "📞 Direct phone connect",
+                "💸 No commission, ever",
+                "🚜 Same-day equipment rental",
+                "🌱 Seeds from local farmers",
+              ].map((t, i) => (
+                <span key={`${k}-${i}`} className="flex-none text-sm font-medium tracking-wide">
+                  {t}
+                </span>
+              )),
+            )}
           </div>
         </div>
 
@@ -366,11 +727,17 @@ function Index() {
         <div className="mx-auto mt-12 max-w-7xl px-4 sm:px-6">
           <div className="mb-6 flex items-end justify-between">
             <h3 className="font-display text-2xl font-semibold text-clay">Featured this week</h3>
-            <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">View all listings →</Link>
+            <Link to="/marketplace" className="text-sm font-semibold text-primary hover:underline">
+              View all listings →
+            </Link>
           </div>
           {featured.length === 0 ? (
             <div className="rounded-3xl border-2 border-dashed border-border bg-card/50 p-12 text-center text-muted-foreground">
-              No listings yet. <Link to="/auth" className="font-semibold text-primary hover:underline">Sign in</Link> to be the first to post.
+              No listings yet.{" "}
+              <Link to="/auth" className="font-semibold text-primary hover:underline">
+                Sign in
+              </Link>{" "}
+              to be the first to post.
             </div>
           ) : (
             <div className="grid gap-6 md:grid-cols-3">
@@ -381,12 +748,23 @@ function Index() {
                   style={{ animationDelay: `${i * 100}ms` }}
                 >
                   <div className="relative aspect-[4/3] overflow-hidden bg-muted">
-                    <img
-                      src={featuredImages[i % featuredImages.length]}
-                      alt={s.title}
-                      loading="lazy"
-                      className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                    />
+                    {s.imageUrl ? (
+                      <img
+                        src={s.imageUrl}
+                        alt={s.title}
+                        loading="lazy"
+                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div className="grid h-full w-full place-items-center bg-gradient-to-br from-primary/10 via-white to-accent/20 text-primary">
+                        <div className="text-center">
+                          <ImagePlus className="mx-auto size-10" />
+                          <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em] text-clay">
+                            Photo pending
+                          </p>
+                        </div>
+                      </div>
+                    )}
                     <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
                     <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-clay shadow-sm">
                       <Star className="size-3 fill-accent text-accent" /> {s.type}
@@ -406,7 +784,10 @@ function Index() {
                     )}
                     <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4">
                       <span className="text-xs text-muted-foreground">{timeAgo(s.createdAt)}</span>
-                      <a href={`tel:${s.contact.replace(/\s|-/g, "")}`} className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground">
+                      <a
+                        href={`tel:${s.contact.replace(/\s|-/g, "")}`}
+                        className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+                      >
                         <Phone className="size-3" /> Contact
                       </a>
                     </div>
@@ -424,15 +805,23 @@ function Index() {
           {/* Voices */}
           <div className="overflow-hidden rounded-[28px] bg-primary text-primary-foreground shadow-[var(--shadow-lift)]">
             <div className="relative min-h-[540px] p-7 sm:p-9">
-              <img src={workersImg} alt="Trusted village workers" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+              <img
+                src={workersImg}
+                alt="Trusted village workers"
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-primary via-primary/72 to-primary/10" />
               <div className="relative flex h-full min-h-[470px] flex-col justify-end">
-                <span className="text-xs font-bold uppercase tracking-[0.28em] text-accent">Community trust</span>
+                <span className="text-xs font-bold uppercase tracking-[0.28em] text-accent">
+                  Community trust
+                </span>
                 <h2 className="mt-3 max-w-lg font-display text-4xl font-bold leading-tight sm:text-5xl">
                   Real people. Real village progress.
                 </h2>
                 <p className="mt-4 max-w-md text-sm leading-7 text-white/82">
-                  Farmers, workers, sellers, and service providers connect directly with neighbours they can trust.
+                  Farmers, workers, sellers, and service providers connect directly with neighbours
+                  they can trust.
                 </p>
                 <div className="mt-7 grid grid-cols-3 gap-3">
                   {[
@@ -440,7 +829,10 @@ function Index() {
                     ["18k+", "Trusted users"],
                     ["24/7", "Village access"],
                   ].map(([value, label]) => (
-                    <div key={label} className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md">
+                    <div
+                      key={label}
+                      className="rounded-2xl border border-white/15 bg-white/10 p-4 backdrop-blur-md"
+                    >
                       <p className="font-display text-2xl font-semibold">{value}</p>
                       <p className="mt-1 text-[11px] font-medium text-white/75">{label}</p>
                     </div>
@@ -451,7 +843,9 @@ function Index() {
           </div>
 
           <div>
-            <span className="text-xs font-bold uppercase tracking-widest text-secondary">Voices from the village</span>
+            <span className="text-xs font-bold uppercase tracking-widest text-secondary">
+              Voices from the village
+            </span>
             <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
               Proof from neighbours who use ManaOoru.
             </h2>
@@ -464,7 +858,12 @@ function Index() {
                 >
                   <Quote className="absolute right-5 top-5 size-12 rotate-180 text-primary/10" />
                   <div className="relative flex gap-5">
-                    <img src={v.img} alt={v.name} loading="lazy" className="size-16 shrink-0 rounded-2xl object-cover ring-4 ring-accent/20" />
+                    <img
+                      src={v.img}
+                      alt={v.name}
+                      loading="lazy"
+                      className="size-16 shrink-0 rounded-2xl object-cover ring-4 ring-accent/20"
+                    />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1">
                         {Array.from({ length: v.rating }).map((_, k) => (
@@ -475,7 +874,9 @@ function Index() {
                         "{v.quote}"
                       </blockquote>
                       <figcaption className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <p className="font-display text-xl font-semibold text-foreground">{v.name}</p>
+                        <p className="font-display text-xl font-semibold text-foreground">
+                          {v.name}
+                        </p>
                         <p className="text-sm text-muted-foreground">{v.role}</p>
                       </figcaption>
                     </div>
@@ -491,12 +892,16 @@ function Index() {
                     <span className="absolute inset-0 animate-ping rounded-full bg-primary/60" />
                     <span className="size-2 rounded-full bg-primary" />
                   </span>
-                  <h3 className="font-display text-xl font-semibold text-clay">Live in your village</h3>
+                  <h3 className="font-display text-xl font-semibold text-clay">
+                    Live in your village
+                  </h3>
                 </div>
                 <Activity className="size-4 text-muted-foreground" />
               </div>
               {liveActivity.length === 0 ? (
-                <p className="py-8 text-center text-sm text-muted-foreground">No activity yet — be the first to post!</p>
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  No activity yet — be the first to post!
+                </p>
               ) : (
                 <ul className="space-y-4">
                   {liveActivity.map((a, i) => {
@@ -507,19 +912,28 @@ function Index() {
                         className="animate-fade-up flex gap-3 border-l-2 border-border pl-4"
                         style={{ animationDelay: `${i * 80}ms` }}
                       >
-                        <div className={`mt-0.5 grid size-8 flex-none place-items-center rounded-lg bg-background ${typeTint[a.type] ?? "text-primary"}`}>
+                        <div
+                          className={`mt-0.5 grid size-8 flex-none place-items-center rounded-lg bg-background ${typeTint[a.type] ?? "text-primary"}`}
+                        >
                           <Icon className="size-4" strokeWidth={2} />
                         </div>
                         <div className="min-w-0 flex-1">
-                          <p className="text-sm leading-snug text-foreground line-clamp-2">{a.title}</p>
-                          <p className="mt-0.5 text-[11px] uppercase tracking-wider text-muted-foreground">{a.type} · {timeAgo(a.createdAt)}</p>
+                          <p className="text-sm leading-snug text-foreground line-clamp-2">
+                            {a.title}
+                          </p>
+                          <p className="mt-0.5 text-[11px] uppercase tracking-wider text-muted-foreground">
+                            {a.type} · {timeAgo(a.createdAt)}
+                          </p>
                         </div>
                       </li>
                     );
                   })}
                 </ul>
               )}
-              <Link to="/announcements" className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary">
+              <Link
+                to="/announcements"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-border py-3 text-sm font-semibold text-muted-foreground hover:border-primary hover:text-primary"
+              >
                 <Zap className="size-4" /> See full activity feed
               </Link>
             </div>
@@ -536,12 +950,18 @@ function Index() {
               <div className="grid size-10 place-items-center rounded-xl bg-secondary/15 text-secondary">
                 <Megaphone className="size-5" />
               </div>
-              <h2 className="font-display text-2xl font-semibold text-clay sm:text-3xl">Village notice board</h2>
+              <h2 className="font-display text-2xl font-semibold text-clay sm:text-3xl">
+                Village notice board
+              </h2>
             </div>
             <div className="space-y-3">
               {announcementItems.length === 0 ? (
                 <p className="rounded-2xl border border-dashed border-border bg-card/50 p-8 text-center text-sm text-muted-foreground">
-                  No notices yet. <Link to="/announcements" className="font-semibold text-primary hover:underline">Post the first one</Link>.
+                  No notices yet.{" "}
+                  <Link to="/announcements" className="font-semibold text-primary hover:underline">
+                    Post the first one
+                  </Link>
+                  .
                 </p>
               ) : (
                 announcementItems.map((a, i) => (
@@ -550,12 +970,24 @@ function Index() {
                     className="hover-lift animate-fade-up rounded-2xl border-l-4 border-accent bg-card p-5 shadow-sm"
                     style={{ animationDelay: `${i * 80}ms` }}
                   >
+                    {a.imageUrl && (
+                      <img
+                        src={a.imageUrl}
+                        alt={a.title}
+                        loading="lazy"
+                        className="mb-4 aspect-[16/7] w-full rounded-xl object-cover"
+                      />
+                    )}
                     <div className="flex items-start justify-between gap-3">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">{a.category || "Notice"}</span>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                        {a.category || "Notice"}
+                      </span>
                       <span className="text-xs text-muted-foreground">{timeAgo(a.createdAt)}</span>
                     </div>
                     <p className="mt-1.5 font-medium text-foreground">{a.title}</p>
-                    {a.description && <p className="mt-1 text-sm text-muted-foreground">{a.description}</p>}
+                    {a.description && (
+                      <p className="mt-1 text-sm text-muted-foreground">{a.description}</p>
+                    )}
                   </article>
                 ))
               )}
@@ -570,7 +1002,9 @@ function Index() {
                   <Siren className="size-5" />
                   <span className="absolute inset-0 animate-pulse-ring rounded-xl" />
                 </div>
-                <h2 className="font-display text-2xl font-semibold sm:text-3xl">Important contacts</h2>
+                <h2 className="font-display text-2xl font-semibold sm:text-3xl">
+                  Important contacts
+                </h2>
               </div>
               <ul className="divide-y divide-background/10">
                 {contacts.map((c) => (
@@ -601,13 +1035,24 @@ function Index() {
       <section className="mx-auto mt-24 max-w-7xl px-4 sm:px-6">
         <div className="mb-8 max-w-2xl">
           <span className="text-xs font-bold uppercase tracking-widest text-secondary">FAQ</span>
-          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">Questions villagers ask first</h2>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+            Questions villagers ask first
+          </h2>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           {[
-            ["Is ManaOoru free?", "Yes, villagers can browse and post local needs without commission."],
-            ["Can I call directly?", "Every listing supports phone and WhatsApp contact for quick coordination."],
-            ["Does it support Telugu?", "The platform is designed for Telugu, English, and Hindi workflows."],
+            [
+              "Is ManaOoru free?",
+              "Yes, villagers can browse and post local needs without commission.",
+            ],
+            [
+              "Can I call directly?",
+              "Every listing supports phone and WhatsApp contact for quick coordination.",
+            ],
+            [
+              "Does it support Telugu?",
+              "The platform is designed for Telugu, English, and Hindi workflows.",
+            ],
           ].map(([q, a]) => (
             <div key={q} className="rounded-[20px] border border-border bg-card p-6 shadow-sm">
               <h3 className="font-display text-lg font-semibold text-clay">{q}</h3>
@@ -626,8 +1071,8 @@ function Index() {
               Bring your village online.
             </h2>
             <p className="mt-4 text-pretty text-muted-foreground sm:text-lg">
-              Whether you grow rice, fix motors, drive tractors, or run a small shop — there's
-              a place for you on ManaOoru. Free for every villager, forever.
+              Whether you grow rice, fix motors, drive tractors, or run a small shop — there's a
+              place for you on ManaOoru. Free for every villager, forever.
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Button asChild>
@@ -649,16 +1094,24 @@ function Index() {
       <footer className="border-t border-border/60 bg-muted/40">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 py-10 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
-            <div className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground font-display italic">M</div>
+            <div className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground font-display italic">
+              M
+            </div>
             <span className="font-display text-lg font-semibold text-clay">ManaOoru</span>
           </div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground">
             © {new Date().getFullYear()} ManaOoru · Built with care for our villages.
           </p>
           <div className="flex gap-6 text-sm text-muted-foreground">
-            <a href="#" className="hover:text-primary">Privacy</a>
-            <a href="#" className="hover:text-primary">Support</a>
-            <a href="#" className="hover:text-primary">తెలుగు</a>
+            <Link to="/announcements" className="transition hover:text-primary">
+              Notices
+            </Link>
+            <Link to="/services" className="transition hover:text-primary">
+              Support
+            </Link>
+            <Link to="/search" className="transition hover:text-primary">
+              Search
+            </Link>
           </div>
         </div>
       </footer>

@@ -12,7 +12,8 @@ const buttonStyles: Record<Variant, string> = {
     "border border-transparent bg-primary text-primary-foreground shadow-[0_10px_30px_-12px_rgba(46,125,50,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#256b2b]",
   secondary:
     "border border-primary/20 bg-white text-primary transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:-translate-y-0.5",
-  ghost: "border border-transparent bg-transparent text-primary transition-colors duration-300 hover:bg-primary/5",
+  ghost:
+    "border border-transparent bg-transparent text-primary transition-colors duration-300 hover:bg-primary/5",
 };
 
 const buttonSizes: Record<Size, string> = {
@@ -40,7 +41,7 @@ export function AppButton({
   return (
     <button
       className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold" ,
+        "inline-flex items-center justify-center gap-2 rounded-full font-semibold",
         buttonStyles[variant],
         buttonSizes[size],
         loading && "cursor-progress opacity-80",
@@ -103,7 +104,8 @@ export function SurfaceCard({
       transition={{ duration: 0.35, ease: "easeOut" }}
       className={clsx(
         "rounded-[20px] border border-border/70 bg-card/95 shadow-[var(--shadow-soft)] backdrop-blur-sm",
-        hover && "transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]",
+        hover &&
+          "transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]",
         className,
       )}
       {...props}
@@ -127,11 +129,24 @@ export function SectionHeader({
   compact?: boolean;
 }) {
   return (
-    <div className={clsx("mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between", compact && "mb-6")}>
+    <div
+      className={clsx(
+        "mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between",
+        compact && "mb-6",
+      )}
+    >
       <div className="max-w-2xl">
-        {eyebrow && <p className="text-sm font-semibold uppercase tracking-[0.25em] text-primary">{eyebrow}</p>}
-        <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-clay sm:text-4xl">{title}</h2>
-        {description && <p className="mt-2 text-sm leading-7 text-muted-foreground sm:text-base">{description}</p>}
+        {eyebrow && (
+          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-primary">
+            {eyebrow}
+          </p>
+        )}
+        <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-clay sm:text-4xl">
+          {title}
+        </h2>
+        {description && (
+          <p className="mt-2 text-sm leading-7 text-muted-foreground sm:text-base">{description}</p>
+        )}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
     </div>
@@ -152,12 +167,21 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div className={clsx("rounded-[2rem] border border-dashed border-border/80 bg-gradient-to-br from-background via-card to-muted/40 p-10 text-center shadow-sm", className)}>
+    <div
+      className={clsx(
+        "rounded-[2rem] border border-dashed border-border/80 bg-gradient-to-br from-background via-card to-muted/40 p-10 text-center shadow-sm",
+        className,
+      )}
+    >
       <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary shadow-sm">
         {icon}
       </div>
       <h3 className="mt-5 font-display text-2xl font-semibold text-clay">{title}</h3>
-      {description && <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-muted-foreground">{description}</p>}
+      {description && (
+        <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-muted-foreground">
+          {description}
+        </p>
+      )}
       {action && <div className="mt-6 flex justify-center">{action}</div>}
     </div>
   );
@@ -167,7 +191,10 @@ export function SkeletonCard({ count = 3 }: { count?: number }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, index) => (
-        <div key={index} className="animate-pulse rounded-[1.75rem] border border-border/60 bg-card p-5 shadow-sm">
+        <div
+          key={index}
+          className="animate-pulse rounded-[1.75rem] border border-border/60 bg-card p-5 shadow-sm"
+        >
           <div className="h-3 w-20 rounded-full bg-muted" />
           <div className="mt-4 h-5 w-3/4 rounded-full bg-muted" />
           <div className="mt-3 h-3 w-full rounded-full bg-muted/80" />
@@ -179,7 +206,13 @@ export function SkeletonCard({ count = 3 }: { count?: number }) {
   );
 }
 
-export function StatusBadge({ children, tone = "primary" }: { children: ReactNode; tone?: "primary" | "secondary" | "accent" | "success" | "danger" }) {
+export function StatusBadge({
+  children,
+  tone = "primary",
+}: {
+  children: ReactNode;
+  tone?: "primary" | "secondary" | "accent" | "success" | "danger";
+}) {
   const classes = {
     primary: "bg-primary/10 text-primary",
     secondary: "bg-secondary/10 text-secondary",
@@ -188,7 +221,16 @@ export function StatusBadge({ children, tone = "primary" }: { children: ReactNod
     danger: "bg-[#fee2e2] text-[#b91c1c]",
   };
 
-  return <span className={clsx("inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em]", classes[tone])}>{children}</span>;
+  return (
+    <span
+      className={clsx(
+        "inline-flex items-center rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.2em]",
+        classes[tone],
+      )}
+    >
+      {children}
+    </span>
+  );
 }
 
 export function SectionPill({ icon, label }: { icon?: ReactNode; label: string }) {
@@ -201,12 +243,32 @@ export function SectionPill({ icon, label }: { icon?: ReactNode; label: string }
 }
 
 export function FeatureIcon({ icon, className }: { icon: ReactNode; className?: string }) {
-  return <div className={clsx("grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary shadow-sm", className)}>{icon}</div>;
+  return (
+    <div
+      className={clsx(
+        "grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary shadow-sm",
+        className,
+      )}
+    >
+      {icon}
+    </div>
+  );
 }
 
-export function InlineAction({ icon, label, href }: { icon: ReactNode; label: string; href: string }) {
+export function InlineAction({
+  icon,
+  label,
+  href,
+}: {
+  icon: ReactNode;
+  label: string;
+  href: string;
+}) {
   return (
-    <Link to={href} className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:gap-3">
+    <Link
+      to={href}
+      className="inline-flex items-center gap-2 text-sm font-semibold text-primary transition hover:gap-3"
+    >
       {icon}
       <span>{label}</span>
       <ArrowRight className="size-4" />

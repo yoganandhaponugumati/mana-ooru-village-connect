@@ -12,13 +12,16 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as WorkersRouteImport } from './routes/workers'
 import { Route as WorkRouteImport } from './routes/work'
 import { Route as WeatherRouteImport } from './routes/weather'
+import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as TransportRouteImport } from './routes/transport'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SchemesRouteImport } from './routes/schemes'
 import { Route as ProfileRouteImport } from './routes/profile'
+import { Route as ProblemsRouteImport } from './routes/problems'
 import { Route as PostWorkerRouteImport } from './routes/post-worker'
 import { Route as PostWorkRouteImport } from './routes/post-work'
+import { Route as OfficialRouteImport } from './routes/official'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LandRouteImport } from './routes/land'
 import { Route as EmergencyRouteImport } from './routes/emergency'
@@ -41,6 +44,11 @@ const WorkRoute = WorkRouteImport.update({
 const WeatherRoute = WeatherRouteImport.update({
   id: '/weather',
   path: '/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnauthorizedRoute = UnauthorizedRouteImport.update({
+  id: '/unauthorized',
+  path: '/unauthorized',
   getParentRoute: () => rootRouteImport,
 } as any)
 const TransportRoute = TransportRouteImport.update({
@@ -68,6 +76,11 @@ const ProfileRoute = ProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProblemsRoute = ProblemsRouteImport.update({
+  id: '/problems',
+  path: '/problems',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PostWorkerRoute = PostWorkerRouteImport.update({
   id: '/post-worker',
   path: '/post-worker',
@@ -76,6 +89,11 @@ const PostWorkerRoute = PostWorkerRouteImport.update({
 const PostWorkRoute = PostWorkRouteImport.update({
   id: '/post-work',
   path: '/post-work',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OfficialRoute = OfficialRouteImport.update({
+  id: '/official',
+  path: '/official',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -128,13 +146,16 @@ export interface FileRoutesByFullPath {
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
+  '/official': typeof OfficialRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/problems': typeof ProblemsRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
   '/transport': typeof TransportRoute
+  '/unauthorized': typeof UnauthorizedRoute
   '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
@@ -148,13 +169,16 @@ export interface FileRoutesByTo {
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
+  '/official': typeof OfficialRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/problems': typeof ProblemsRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
   '/transport': typeof TransportRoute
+  '/unauthorized': typeof UnauthorizedRoute
   '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
@@ -169,13 +193,16 @@ export interface FileRoutesById {
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
+  '/official': typeof OfficialRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/problems': typeof ProblemsRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
   '/transport': typeof TransportRoute
+  '/unauthorized': typeof UnauthorizedRoute
   '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
@@ -191,13 +218,16 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/land'
     | '/marketplace'
+    | '/official'
     | '/post-work'
     | '/post-worker'
+    | '/problems'
     | '/profile'
     | '/schemes'
     | '/search'
     | '/services'
     | '/transport'
+    | '/unauthorized'
     | '/weather'
     | '/work'
     | '/workers'
@@ -211,13 +241,16 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/land'
     | '/marketplace'
+    | '/official'
     | '/post-work'
     | '/post-worker'
+    | '/problems'
     | '/profile'
     | '/schemes'
     | '/search'
     | '/services'
     | '/transport'
+    | '/unauthorized'
     | '/weather'
     | '/work'
     | '/workers'
@@ -231,13 +264,16 @@ export interface FileRouteTypes {
     | '/emergency'
     | '/land'
     | '/marketplace'
+    | '/official'
     | '/post-work'
     | '/post-worker'
+    | '/problems'
     | '/profile'
     | '/schemes'
     | '/search'
     | '/services'
     | '/transport'
+    | '/unauthorized'
     | '/weather'
     | '/work'
     | '/workers'
@@ -252,13 +288,16 @@ export interface RootRouteChildren {
   EmergencyRoute: typeof EmergencyRoute
   LandRoute: typeof LandRoute
   MarketplaceRoute: typeof MarketplaceRoute
+  OfficialRoute: typeof OfficialRoute
   PostWorkRoute: typeof PostWorkRoute
   PostWorkerRoute: typeof PostWorkerRoute
+  ProblemsRoute: typeof ProblemsRoute
   ProfileRoute: typeof ProfileRoute
   SchemesRoute: typeof SchemesRoute
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRoute
   TransportRoute: typeof TransportRoute
+  UnauthorizedRoute: typeof UnauthorizedRoute
   WeatherRoute: typeof WeatherRoute
   WorkRoute: typeof WorkRoute
   WorkersRoute: typeof WorkersRoute
@@ -285,6 +324,13 @@ declare module '@tanstack/react-router' {
       path: '/weather'
       fullPath: '/weather'
       preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/unauthorized': {
+      id: '/unauthorized'
+      path: '/unauthorized'
+      fullPath: '/unauthorized'
+      preLoaderRoute: typeof UnauthorizedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/transport': {
@@ -322,6 +368,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProfileRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/problems': {
+      id: '/problems'
+      path: '/problems'
+      fullPath: '/problems'
+      preLoaderRoute: typeof ProblemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/post-worker': {
       id: '/post-worker'
       path: '/post-worker'
@@ -334,6 +387,13 @@ declare module '@tanstack/react-router' {
       path: '/post-work'
       fullPath: '/post-work'
       preLoaderRoute: typeof PostWorkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/official': {
+      id: '/official'
+      path: '/official'
+      fullPath: '/official'
+      preLoaderRoute: typeof OfficialRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -404,13 +464,16 @@ const rootRouteChildren: RootRouteChildren = {
   EmergencyRoute: EmergencyRoute,
   LandRoute: LandRoute,
   MarketplaceRoute: MarketplaceRoute,
+  OfficialRoute: OfficialRoute,
   PostWorkRoute: PostWorkRoute,
   PostWorkerRoute: PostWorkerRoute,
+  ProblemsRoute: ProblemsRoute,
   ProfileRoute: ProfileRoute,
   SchemesRoute: SchemesRoute,
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRoute,
   TransportRoute: TransportRoute,
+  UnauthorizedRoute: UnauthorizedRoute,
   WeatherRoute: WeatherRoute,
   WorkRoute: WorkRoute,
   WorkersRoute: WorkersRoute,

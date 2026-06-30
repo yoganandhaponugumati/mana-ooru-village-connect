@@ -16,6 +16,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
+import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLinkButton, FeatureIcon, SectionHeader, SurfaceCard } from "@/components/design-system";
 import { useAuth } from "@/lib/auth";
 import { timeAgo, useListingStats } from "@/lib/store";
@@ -23,26 +24,50 @@ import { formatVillageProfile, useVillagePreferences } from "@/lib/village-prefe
 
 export const Route = createFileRoute("/dashboard")({
   head: () => ({ meta: [{ title: "Dashboard - ManaOoru" }] }),
-  component: DashboardPage,
+  component: () => (
+    <ProtectedRoute>
+      <DashboardPage />
+    </ProtectedRoute>
+  ),
 });
 
 function DashboardPage() {
-  const { profile: authProfile } = useAuth();
+  const { role: authRole } = useAuth();
   const { profile } = useVillagePreferences();
   const { data: stats } = useListingStats();
-  const role = authProfile?.account_type ?? "villager";
+  const role = authRole ?? "citizen";
   const roleTitle =
-    role === "app_admin"
+    role === "super_admin"
       ? "App operations dashboard"
       : role === "village_admin"
         ? "Village admin dashboard"
-        : "Village dashboard";
+        : "Citizen dashboard";
   const roleDescription =
-    role === "app_admin"
+    role === "super_admin"
       ? "Supervise platform health, village onboarding, admin approval, and cross-district activity."
       : role === "village_admin"
-        ? `Operate notices, listings, support, and verification for ${formatVillageProfile(profile)}.`
-        : "Track listings, service demand, marketplace activity, and important community updates.";
+        ? `Operate complaints, notices, works, and alerts for ${formatVillageProfile(profile)}.`
+        : "Track complaints, services, marketplace activity, and important community updates.";
+
+  const roleTasks =
+    role === "super_admin"
+      ? [
+          "Approve village administrators and oversee onboarding.",
+          "Monitor platform-wide complaints, notices, and live activity.",
+          "Publish global announcements and enforce platform safety.",
+        ]
+      : role === "village_admin"
+        ? [
+            "Review and update citizen complaints for your village.",
+            "Publish official notices, works, and local alerts.",
+            "Keep village services, listings, and assignments current.",
+          ]
+        : [
+            "Post work requests, find services, and hire trusted workers.",
+            "Browse marketplace listings, land offers, and community updates.",
+            "Report issues, join village conversations, and stay informed.",
+          ];
+
   const metrics = [
     { label: "Workers Available", value: stats?.workers ?? 0, icon: Users },
     { label: "Land Listings", value: stats?.land ?? 0, icon: LandPlot },
@@ -58,23 +83,23 @@ function DashboardPage() {
       icon={<Activity className="size-7" />}
     >
       <SectionHeader
-        eyebrow={role === "villager" ? "Overview" : "Operations"}
+        eyebrow={role === "citizen" ? "Overview" : "Operations"}
         title={
-          role === "app_admin"
+          role === "super_admin"
             ? "Platform-wide controls"
             : role === "village_admin"
-              ? "Manage your village"
+              ? "Manage public services"
               : "Everything happening in your village"
         }
         description={roleDescription}
         actions={
-          role === "villager" ? (
+          role === "citizen" ? (
             <AppLinkButton to="/post-work" icon={<Plus className="size-4" />}>
               Post requirement
             </AppLinkButton>
           ) : role === "village_admin" ? (
-            <AppLinkButton to="/announcements" icon={<Megaphone className="size-4" />}>
-              Post village notice
+            <AppLinkButton to="/official" icon={<Megaphone className="size-4" />}>
+              Official workspace
             </AppLinkButton>
           ) : (
             <AppLinkButton to="/profile" icon={<UserCog className="size-4" />}>
@@ -83,22 +108,43 @@ function DashboardPage() {
           )
         }
       />
-      {role !== "villager" && (
+      <SurfaceCard className="mb-8 p-6">
+        <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Your role</p>
+            <h3 className="mt-2 text-2xl font-semibold text-clay capitalize">{role.replace("_", " ")}</h3>
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">
+              {role === "super_admin"
+                ? "You can manage platform operations, approve village admins, and publish global notices."
+                : role === "village_admin"
+                  ? "You can manage village complaints, update local works, and share official announcements."
+                  : "You can browse village listings, post work requests, and stay updated on community activity."}
+            </p>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {roleTasks.map((task) => (
+              <div key={task} className="rounded-3xl border border-border bg-background p-4 text-sm text-muted-foreground">
+                {task}
+              </div>
+            ))}
+          </div>
+        </div>
+      </SurfaceCard>
+      {role !== "citizen" && (
         <div className="mb-8 grid gap-4 md:grid-cols-3">
           {(role === "village_admin"
             ? [
                 {
-                  label: "Verify local posts",
-                  detail:
-                    "Review new worker, land, market, and service posts before promoting them.",
+                  label: "Update complaints",
+                  detail: "Review citizen complaints and publish status updates for resolution.",
                   icon: ShieldCheck,
-                  to: "/dashboard",
+                  to: "/official",
                 },
                 {
-                  label: "Publish notices",
-                  detail: "Share official village updates, alerts, events, and scheme information.",
+                  label: "Upload work photos",
+                  detail: "Post government works with progress photos for public transparency.",
                   icon: Megaphone,
-                  to: "/announcements",
+                  to: "/official",
                 },
                 {
                   label: "Village support",
@@ -110,10 +156,13 @@ function DashboardPage() {
               ]
             : [
                 {
-                  label: "Approve village admins",
-                  detail: "Review operator accounts and assign responsibility village by village.",
+                  label: role === "super_admin" ? "Approve village admins" : "Manage profile",
+                  detail:
+                    role === "super_admin"
+                      ? "Review operator accounts and assign responsibility village by village."
+                      : "Keep your local services, products, and contact information current.",
                   icon: UserCog,
-                  to: "/profile",
+                  to: role === "super_admin" ? "/official" : "/profile",
                 },
                 {
                   label: "Monitor all districts",

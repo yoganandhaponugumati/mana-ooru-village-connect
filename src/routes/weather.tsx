@@ -61,8 +61,7 @@ function WeatherPage() {
               const state = e.target.value;
               const district = getDistricts(state)[0] ?? defaultProfile.district;
               const mandal = getMandals(state, district)[0] ?? defaultProfile.mandal;
-              const village = getVillages(state, district, mandal)[0] ?? defaultProfile.village;
-              setProfile({ state, district, mandal, village });
+              setProfile({ state, district, mandal, village: "" });
             }}
             className="rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold"
           >
@@ -75,8 +74,7 @@ function WeatherPage() {
             onChange={(e) => {
               const district = e.target.value;
               const mandal = getMandals(profile.state, district)[0] ?? "";
-              const village = getVillages(profile.state, district, mandal)[0] ?? "";
-              setProfile({ ...profile, district, mandal, village });
+              setProfile({ ...profile, district, mandal, village: "" });
             }}
             className="rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold"
           >
@@ -88,8 +86,7 @@ function WeatherPage() {
             value={profile.mandal}
             onChange={(e) => {
               const mandal = e.target.value;
-              const village = getVillages(profile.state, profile.district, mandal)[0] ?? "";
-              setProfile({ ...profile, mandal, village });
+              setProfile({ ...profile, mandal, village: "" });
             }}
             className="rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold"
           >
@@ -97,31 +94,25 @@ function WeatherPage() {
               <option key={mandal}>{mandal}</option>
             ))}
           </select>
-          <select
+          <input
+            list="weather-village-options"
             value={profile.village}
             onChange={(e) => setProfile({ ...profile, village: e.target.value })}
+            placeholder="Select or type exact village"
             className="rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold"
-          >
+          />
+          <datalist id="weather-village-options">
             {villages.map((village) => (
-              <option key={village}>{village}</option>
+              <option key={village} value={village} />
             ))}
-            {profile.village && !villages.includes(profile.village) && (
-              <option>{profile.village}</option>
-            )}
-          </select>
+          </datalist>
         </div>
-        <input
-          value={profile.village}
-          onChange={(e) => setProfile({ ...profile, village: e.target.value })}
-          placeholder="Type exact village name if it is not shown"
-          className="mt-3 w-full rounded-2xl border border-border bg-white px-4 py-3 text-sm font-semibold"
-        />
       </SurfaceCard>
       <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <SurfaceCard className="overflow-hidden p-0">
           <div className="bg-gradient-to-br from-primary to-secondary p-8 text-white">
             <div className="flex flex-wrap items-center justify-between gap-3">
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-white/70">
+              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-white/70">
                 Live Weather
               </p>
               <span className="rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white/85">
@@ -148,7 +139,8 @@ function WeatherPage() {
                 )}
                 {weather.error && (
                   <p className="mt-2 max-w-md text-xs leading-5 text-white/70">
-                    {weather.error}. No fallback temperature is shown because it would be inaccurate.
+                    {weather.error}. No fallback temperature is shown because it would be
+                    inaccurate.
                   </p>
                 )}
               </div>
@@ -177,8 +169,8 @@ function WeatherPage() {
               {!hasLiveWeather
                 ? "Live weather could not be loaded for this village yet. Please check the selected state, district, mandal, and village spelling."
                 : isRaining
-                ? "Rain is being reported now. Pause spraying, fertilizer application, and harvest movement."
-                : "No rain is being reported in the current update. Morning field work is generally safer than afternoon heat."}
+                  ? "Rain is being reported now. Pause spraying, fertilizer application, and harvest movement."
+                  : "No rain is being reported in the current update. Morning field work is generally safer than afternoon heat."}
             </p>
             <p className="rounded-2xl bg-muted/60 p-4">
               Humidity is {humidityText}.{" "}

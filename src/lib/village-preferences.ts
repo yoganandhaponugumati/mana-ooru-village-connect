@@ -36,7 +36,7 @@ export const defaultProfile: VillageProfile = {
   state: "Telangana",
   district: "Rangareddy",
   mandal: "Kandukur",
-  village: "Kothur",
+  village: "",
 };
 
 const telanganaDistricts = [
@@ -137,7 +137,28 @@ export const locationTree = {
       Bonakal: ["Bonakal", "Govindapuram", "Mustikuntla", "Ravinoothala"],
       Chintakani: ["Chintakani", "Pandillapalli", "Proddutur", "Nagulavancha"],
       Enkoor: ["Enkoor", "Nacharam", "Thimmaraopeta", "Raimadaram"],
-      Kallur: ["Kallur", "Peruvancha", "Yerraboinapalli", "Lokavaram"],
+      Kallur: [
+        "Kallur",
+        "Peruvancha",
+        "Yerraboinapalli",
+        "Lokavaram",
+        "Chennuru",
+        "Kappalabandham",
+        "Mucharam",
+        "Vennavalli",
+        "Narayanapuram",
+        "Peddakorukondi",
+        "Chinnakorukondi",
+        "Bathulapalli",
+        "Kistapuram",
+        "Lakshmipuram",
+        "Madhapuram",
+        "Mittapalli",
+        "Narlapuram",
+        "Payapuram",
+        "Raghunadhapalem",
+        "Thalluru",
+      ],
       Kamepally: ["Kamepally", "Mucherla", "Komminepalli", "Govindrala"],
       "Khammam Rural": ["Edulapuram", "Gollagudem", "Gudurupadu", "Mallemadugu"],
       "Khammam Urban": ["Khammam", "Burhanpuram", "Khanapuram Haveli", "Rotary Nagar"],
@@ -205,6 +226,7 @@ const dictionary = {
     land: "Land",
     marketplace: "Marketplace",
     services: "Services",
+    problems: "Problems",
     notices: "Notices",
     weather: "Weather",
     ai: "AI Assistant",
@@ -235,6 +257,7 @@ const dictionary = {
     land: "భూమి",
     marketplace: "సంత",
     services: "సేవలు",
+    problems: "సమస్యలు",
     notices: "నోటీసులు",
     weather: "వాతావరణం",
     ai: "AI సహాయకుడు",
@@ -265,6 +288,7 @@ const dictionary = {
     land: "ज़मीन",
     marketplace: "बाज़ार",
     services: "सेवाएं",
+    problems: "समस्याएं",
     notices: "सूचनाएं",
     weather: "मौसम",
     ai: "AI सहायक",
@@ -292,12 +316,54 @@ const dictionary = {
 } as const;
 
 const weatherProfiles: Record<string, WeatherProfile> = {
-  Kothur: { temp: null, humidity: null, wind: null, rain: "Live weather loading", condition: "Live weather loading", live: false },
-  Dasarlapally: { temp: null, humidity: null, wind: null, rain: "Live weather loading", condition: "Live weather loading", live: false },
-  Lemoor: { temp: null, humidity: null, wind: null, rain: "Live weather loading", condition: "Live weather loading", live: false },
-  Mansanpally: { temp: null, humidity: null, wind: null, rain: "Live weather loading", condition: "Live weather loading", live: false },
-  Chandupatla: { temp: null, humidity: null, wind: null, rain: "Live weather loading", condition: "Live weather loading", live: false },
-  Vemulapally: { temp: null, humidity: null, wind: null, rain: "Live weather loading", condition: "Live weather loading", live: false },
+  Kothur: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Dasarlapally: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Lemoor: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Mansanpally: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Chandupatla: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Vemulapally: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
 };
 
 const knownVillageCoordinates: Record<string, GeoResult> = {
@@ -317,6 +383,7 @@ const prefEvent = "manaooru-preferences-change";
 type StoredPreferences = {
   language: Language;
   profile: VillageProfile;
+  hasProfile: boolean;
 };
 
 function canUseBrowserStorage() {
@@ -325,20 +392,21 @@ function canUseBrowserStorage() {
 
 function readStoredPreferences(): StoredPreferences {
   if (!canUseBrowserStorage()) {
-    return { language: "te", profile: defaultProfile };
+    return { language: "te", profile: defaultProfile, hasProfile: false };
   }
 
   const saved = window.localStorage.getItem(prefKey);
-  if (!saved) return { language: "te", profile: defaultProfile };
+  if (!saved) return { language: "te", profile: defaultProfile, hasProfile: false };
 
   try {
     const parsed = JSON.parse(saved) as Partial<StoredPreferences>;
     return {
       language: parsed.language ?? "te",
       profile: normalizeProfile(parsed.profile),
+      hasProfile: Boolean(parsed.hasProfile ?? parsed.profile?.village),
     };
   } catch {
-    return { language: "te", profile: defaultProfile };
+    return { language: "te", profile: defaultProfile, hasProfile: false };
   }
 }
 
@@ -348,6 +416,7 @@ function writeStoredPreferences(next: StoredPreferences) {
   const normalized = {
     language: next.language,
     profile: normalizeProfile(next.profile),
+    hasProfile: next.hasProfile,
   };
   window.localStorage.setItem(prefKey, JSON.stringify(normalized));
   window.dispatchEvent(new CustomEvent(prefEvent, { detail: normalized }));
@@ -358,6 +427,7 @@ export function saveVillageProfilePreference(nextProfile: Partial<VillageProfile
   writeStoredPreferences({
     language: current.language,
     profile: normalizeProfile(nextProfile),
+    hasProfile: true,
   });
 }
 
@@ -384,7 +454,8 @@ async function fetchLiveWeather(
   profile: VillageProfile,
   signal: AbortSignal,
 ): Promise<WeatherProfile> {
-  const coordinateKey = `${profile.state}|${profile.district}|${profile.mandal}|${profile.village}`.toLowerCase();
+  const coordinateKey =
+    `${profile.state}|${profile.district}|${profile.mandal}|${profile.village}`.toLowerCase();
   const knownCoordinates = knownVillageCoordinates[coordinateKey];
   const searchTerms = [
     `${profile.village}, ${profile.mandal}, ${profile.district}`,
@@ -405,9 +476,7 @@ async function fetchLiveWeather(
       results.find((result) =>
         [result?.name, result?.admin1, result?.admin2, result?.admin3]
           .filter(Boolean)
-          .some((value) =>
-            `${value}`.toLowerCase().includes(profile.district.toLowerCase()),
-          ),
+          .some((value) => `${value}`.toLowerCase().includes(profile.district.toLowerCase())),
       ) ?? results[0];
     if (first) break;
   }
@@ -452,6 +521,9 @@ export function getVillages(state: string, district: string, mandal: string) {
 }
 
 export function normalizeProfile(profile: Partial<VillageProfile> | undefined): VillageProfile {
+  if (!profile) return defaultProfile;
+
+  const hasVillageInput = typeof profile?.village === "string";
   const villageName = profile?.village?.split(",")[0]?.trim();
   const state =
     profile?.state && locationTree[profile.state] ? profile.state : defaultProfile.state;
@@ -466,15 +538,13 @@ export function normalizeProfile(profile: Partial<VillageProfile> | undefined): 
       ? profile.mandal
       : (mandals[0] ?? defaultProfile.mandal);
   const villages = getVillages(state, district, mandal);
-  const village = villageName
-    ? villageName
-    : (villages[0] ?? defaultProfile.village);
+  const village = hasVillageInput ? (villageName ?? "") : (villages[0] ?? defaultProfile.village);
 
   return { state, district, mandal, village };
 }
 
 export function formatVillageProfile(profile: VillageProfile) {
-  return `${profile.village}, ${profile.mandal}, ${profile.district}, ${profile.state}`;
+  return `${profile.village || "Choose village"}, ${profile.mandal}, ${profile.district}, ${profile.state}`;
 }
 
 export function useVillagePreferences() {
@@ -499,8 +569,16 @@ export function useVillagePreferences() {
     };
   }, []);
 
-  const persist = (nextLanguage: Language, nextProfile: VillageProfile) => {
-    const next = { language: nextLanguage, profile: normalizeProfile(nextProfile) };
+  const persist = (
+    nextLanguage: Language,
+    nextProfile: VillageProfile,
+    hasProfile = stored.hasProfile,
+  ) => {
+    const next = {
+      language: nextLanguage,
+      profile: normalizeProfile(nextProfile),
+      hasProfile,
+    };
     setStored(next);
     writeStoredPreferences(next);
   };
@@ -510,7 +588,7 @@ export function useVillagePreferences() {
   };
 
   const setProfile = (next: VillageProfile) => {
-    persist(language, next);
+    persist(language, next, Boolean(next.village.trim()));
   };
 
   const t = useMemo(() => dictionary[language], [language]);
@@ -530,6 +608,19 @@ export function useVillagePreferences() {
   const [weather, setWeather] = useState<WeatherProfile>(fallbackWeather);
 
   useEffect(() => {
+    if (!stored.hasProfile || !profile.village) {
+      setWeather({
+        temp: null,
+        humidity: null,
+        wind: null,
+        rain: "Select village for live rain data",
+        condition: "Village not selected",
+        source: "Waiting for village selection",
+        live: false,
+      });
+      return;
+    }
+
     if (typeof fetch === "undefined") {
       setWeather({
         ...fallbackWeather,
@@ -558,7 +649,7 @@ export function useVillagePreferences() {
       );
 
     return () => controller.abort();
-  }, [fallbackWeather, profile.state, profile.district, profile.mandal, profile.village]);
+  }, [fallbackWeather, profile, stored.hasProfile]);
 
-  return { language, setLanguage, profile, setProfile, t, weather };
+  return { language, setLanguage, profile, setProfile, hasProfile: stored.hasProfile, t, weather };
 }

@@ -97,6 +97,16 @@ export const fallbackListings: Listing[] = [
     category: "Medical Camp",
     createdAt: Date.now() - 1000 * 60 * 60 * 52,
   },
+  {
+    id: "seed-problem-drainage",
+    type: "complaint",
+    title: "Drainage overflow near main road",
+    description: "Water is overflowing near the bus stop after rain. Children and elders are finding it difficult to cross.",
+    contact: "9876543210",
+    location: "Kothur bus stop",
+    category: "Drainage",
+    createdAt: Date.now() - 1000 * 60 * 60 * 3,
+  },
 ];
 
 export const schemes = [
@@ -153,6 +163,7 @@ export function listingRoute(type: ListingType) {
   if (type === "land") return "/land";
   if (type === "market") return "/marketplace";
   if (type === "service") return "/services";
+  if (type === "complaint") return "/problems";
   return "/announcements";
 }
 
