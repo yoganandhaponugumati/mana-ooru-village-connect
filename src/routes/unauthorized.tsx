@@ -21,7 +21,8 @@ function UnauthorizedPage() {
         </div>
         <h2 className="mt-8 text-3xl font-semibold text-clay">Unauthorized</h2>
         <p className="mt-4 max-w-xl text-sm leading-7 text-muted-foreground">
-          This section is reserved for village administrators or platform operators. If you believe this is a mistake, contact support or sign in with a different account.
+          This section is reserved for village administrators or platform operators. If you believe
+          this is a mistake, contact support or sign in with a different account.
         </p>
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <AppLinkButton to="/dashboard">Return to dashboard</AppLinkButton>

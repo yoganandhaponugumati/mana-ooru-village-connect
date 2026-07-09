@@ -43,6 +43,7 @@ export type Database = {
           occupation: Occupation | null;
           full_name: string | null;
           display_name: string | null;
+          username: string | null;
           phone: string | null;
           email: string | null;
           photo_url: string | null;
@@ -55,6 +56,8 @@ export type Database = {
           district: string | null;
           mandal: string | null;
           village: string | null;
+          preferred_language: "te" | "en" | "hi";
+          profile_completed_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -100,7 +103,10 @@ export type Database = {
           updated_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["announcements"]["Row"]> &
-          Pick<Database["public"]["Tables"]["announcements"]["Row"], "author_id" | "title" | "body">;
+          Pick<
+            Database["public"]["Tables"]["announcements"]["Row"],
+            "author_id" | "title" | "body"
+          >;
         Update: Partial<Database["public"]["Tables"]["announcements"]["Row"]>;
         Relationships: [];
       };
@@ -173,7 +179,10 @@ export type Database = {
           updated_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["events"]["Row"]> &
-          Pick<Database["public"]["Tables"]["events"]["Row"], "created_by" | "title" | "event_date">;
+          Pick<
+            Database["public"]["Tables"]["events"]["Row"],
+            "created_by" | "title" | "event_date"
+          >;
         Update: Partial<Database["public"]["Tables"]["events"]["Row"]>;
         Relationships: [];
       };
@@ -204,7 +213,10 @@ export type Database = {
           created_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["likes"]["Row"]> &
-          Pick<Database["public"]["Tables"]["likes"]["Row"], "user_id" | "entity_type" | "entity_id">;
+          Pick<
+            Database["public"]["Tables"]["likes"]["Row"],
+            "user_id" | "entity_type" | "entity_id"
+          >;
         Update: Partial<Database["public"]["Tables"]["likes"]["Row"]>;
         Relationships: [];
       };
@@ -225,7 +237,10 @@ export type Database = {
           updated_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["listings"]["Row"]> &
-          Pick<Database["public"]["Tables"]["listings"]["Row"], "owner_id" | "type" | "title" | "contact">;
+          Pick<
+            Database["public"]["Tables"]["listings"]["Row"],
+            "owner_id" | "type" | "title" | "contact"
+          >;
         Update: Partial<Database["public"]["Tables"]["listings"]["Row"]>;
         Relationships: [];
       };
@@ -239,6 +254,137 @@ export type Database = {
         Insert: Partial<Database["public"]["Tables"]["user_roles"]["Row"]> &
           Pick<Database["public"]["Tables"]["user_roles"]["Row"], "user_id" | "role">;
         Update: Partial<Database["public"]["Tables"]["user_roles"]["Row"]>;
+        Relationships: [];
+      };
+      government_schemes: {
+        Row: {
+          id: string;
+          created_by: string;
+          village_id: string | null;
+          title: string;
+          description: string;
+          department: string | null;
+          eligibility: string | null;
+          benefit_amount: number | null;
+          application_url: string | null;
+          document_url: string | null;
+          category:
+            | "agriculture"
+            | "health"
+            | "education"
+            | "housing"
+            | "women"
+            | "senior_citizen"
+            | "general";
+          status: "active" | "closed" | "upcoming";
+          deadline: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["government_schemes"]["Row"]> &
+          Pick<
+            Database["public"]["Tables"]["government_schemes"]["Row"],
+            "created_by" | "title" | "description"
+          >;
+        Update: Partial<Database["public"]["Tables"]["government_schemes"]["Row"]>;
+        Relationships: [];
+      };
+      scheme_applications: {
+        Row: {
+          id: string;
+          scheme_id: string;
+          applicant_id: string;
+          status: "submitted" | "under_review" | "approved" | "rejected";
+          notes: string | null;
+          reviewed_by: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["scheme_applications"]["Row"]> &
+          Pick<
+            Database["public"]["Tables"]["scheme_applications"]["Row"],
+            "scheme_id" | "applicant_id"
+          >;
+        Update: Partial<Database["public"]["Tables"]["scheme_applications"]["Row"]>;
+        Relationships: [];
+      };
+      blood_donors: {
+        Row: {
+          id: string;
+          profile_id: string;
+          village_id: string | null;
+          blood_group: "A+" | "A-" | "B+" | "B-" | "AB+" | "AB-" | "O+" | "O-";
+          phone: string;
+          last_donated_on: string | null;
+          available: boolean;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["blood_donors"]["Row"]> &
+          Pick<
+            Database["public"]["Tables"]["blood_donors"]["Row"],
+            "profile_id" | "blood_group" | "phone"
+          >;
+        Update: Partial<Database["public"]["Tables"]["blood_donors"]["Row"]>;
+        Relationships: [];
+      };
+      village_polls: {
+        Row: {
+          id: string;
+          created_by: string;
+          village_id: string | null;
+          question: string;
+          description: string | null;
+          options: Json;
+          starts_at: string;
+          ends_at: string;
+          status: "open" | "closed";
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["village_polls"]["Row"]> &
+          Pick<
+            Database["public"]["Tables"]["village_polls"]["Row"],
+            "created_by" | "question" | "options" | "ends_at"
+          >;
+        Update: Partial<Database["public"]["Tables"]["village_polls"]["Row"]>;
+        Relationships: [];
+      };
+      poll_votes: {
+        Row: {
+          id: string;
+          poll_id: string;
+          voter_id: string;
+          option_id: string;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["poll_votes"]["Row"]> &
+          Pick<
+            Database["public"]["Tables"]["poll_votes"]["Row"],
+            "poll_id" | "voter_id" | "option_id"
+          >;
+        Update: Partial<Database["public"]["Tables"]["poll_votes"]["Row"]>;
+        Relationships: [];
+      };
+      village_budget_items: {
+        Row: {
+          id: string;
+          village_id: string;
+          government_work_id: string | null;
+          created_by: string;
+          fiscal_year: string;
+          category: string;
+          allocated_amount: number;
+          spent_amount: number;
+          notes: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["village_budget_items"]["Row"]> &
+          Pick<
+            Database["public"]["Tables"]["village_budget_items"]["Row"],
+            "village_id" | "created_by" | "fiscal_year" | "category"
+          >;
+        Update: Partial<Database["public"]["Tables"]["village_budget_items"]["Row"]>;
         Relationships: [];
       };
     };
@@ -268,7 +414,14 @@ export type Database = {
     };
     Enums: {
       app_role: AppRole;
-      listing_type: "worker" | "work" | "land" | "market" | "service" | "announcement" | "complaint";
+      listing_type:
+        | "worker"
+        | "work"
+        | "land"
+        | "market"
+        | "service"
+        | "announcement"
+        | "complaint";
     };
     CompositeTypes: {
       [_ in never]: never;
@@ -283,7 +436,9 @@ export type Tables<
   DefaultSchemaTableNameOrOptions extends
     | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
     | { schema: keyof DatabaseWithoutInternals },
-  TableName extends DefaultSchemaTableNameOrOptions extends { schema: keyof DatabaseWithoutInternals }
+  TableName extends DefaultSchemaTableNameOrOptions extends {
+    schema: keyof DatabaseWithoutInternals;
+  }
     ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
         DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
     : never = never,

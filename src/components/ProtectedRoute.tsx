@@ -6,10 +6,16 @@ import type { AppRole } from "@/lib/supabase/auth";
 type ProtectedRouteProps = {
   children: ReactNode;
   roles?: AppRole[];
+  /** Set false only on the complete-profile page itself, to avoid a redirect loop. */
+  requireCompleteProfile?: boolean;
 };
 
-export function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
-  const { user, role, loading } = useAuth();
+export function ProtectedRoute({
+  children,
+  roles,
+  requireCompleteProfile = true,
+}: ProtectedRouteProps) {
+  const { user, role, loading, needsProfileCompletion } = useAuth();
 
   if (loading) {
     return (
@@ -21,6 +27,10 @@ export function ProtectedRoute({ children, roles }: ProtectedRouteProps) {
 
   if (!user) {
     return <Navigate to="/auth" replace />;
+  }
+
+  if (requireCompleteProfile && needsProfileCompletion) {
+    return <Navigate to="/complete-profile" replace />;
   }
 
   const effectiveRole = role ?? "citizen";

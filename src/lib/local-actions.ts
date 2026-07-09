@@ -6,7 +6,6 @@ const savedKey = "manaooru-saved-items";
 const contactKey = "manaooru-contact-log";
 const themeKey = "manaooru-theme";
 const notificationsKey = "manaooru-notifications";
-const profilePhotoKey = "manaooru-profile-photo";
 
 type ContactLog = {
   id: string;
@@ -124,21 +123,4 @@ export function useNotificationSettings() {
   };
 
   return { notificationsEnabled: enabled, setNotifications };
-}
-
-export function useProfilePhoto() {
-  const [photo, setPhotoState] = useState(() => {
-    if (typeof window === "undefined") return "";
-    return window.localStorage.getItem(profilePhotoKey) || "";
-  });
-
-  const setPhoto = (next: string) => {
-    setPhotoState(next);
-    if (typeof window !== "undefined") {
-      if (next) window.localStorage.setItem(profilePhotoKey, next);
-      else window.localStorage.removeItem(profilePhotoKey);
-    }
-  };
-
-  return { photo, setPhoto };
 }

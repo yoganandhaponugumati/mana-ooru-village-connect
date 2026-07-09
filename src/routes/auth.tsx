@@ -1,26 +1,25 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { CheckCircle2, Eye, EyeOff, Loader2, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { SurfaceCard } from "@/components/design-system";
+import { VillageLocationPicker } from "@/components/VillageLocationPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth, type AppRole } from "@/lib/auth";
 import {
   getAuthRedirectUrl,
+  getPasswordError,
+  getPasswordStrength,
   getRoleDashboardPath,
   normalizeRole,
   signInWithEmailPassword,
   signInWithOAuth,
   signUpWithEmailPassword,
+  verifyPhoneOtp,
   occupations,
   type Occupation,
 } from "@/lib/supabase/auth";
 import {
-  defaultProfile,
-  getDistricts,
-  getMandals,
-  getStates,
-  getVillages,
   normalizeProfile,
   saveVillageProfilePreference,
   useVillagePreferences,
@@ -61,6 +60,7 @@ function AuthPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
   const [occupation, setOccupation] = useState<Occupation>("Other");
@@ -70,14 +70,8 @@ function AuthPage() {
     village: hasProfile ? profile.village : "",
   });
   const [busy, setBusy] = useState(false);
-  const states = getStates();
-  const districts = getDistricts(villageProfile.state);
-  const mandals = getMandals(villageProfile.state, villageProfile.district);
-  const villages = getVillages(
-    villageProfile.state,
-    villageProfile.district,
-    villageProfile.mandal,
-  );
+  const [phoneOtpSent, setPhoneOtpSent] = useState(false);
+  const [phoneOtpCode, setPhoneOtpCode] = useState("");
   const selectedVillageLocation = [
     villageProfile.village,
     villageProfile.mandal,
@@ -161,8 +155,14 @@ function AuthPage() {
     setBusy(true);
     try {
       if (mode === "signup") {
-        if (password.length < 6) {
-          toast.error("Password must be at least 6 characters.");
+        const passwordError = getPasswordError(password);
+        if (passwordError) {
+          toast.error(passwordError);
+          setBusy(false);
+          return;
+        }
+        if (password !== confirmPassword) {
+          toast.error("Passwords do not match.");
           setBusy(false);
           return;
         }
@@ -201,8 +201,8 @@ function AuthPage() {
         toast.success("Welcome to ManaOoru!");
         navigate({ to: getRoleDashboardPath("citizen") });
       } else {
-        if (password.length < 6) {
-          toast.error("Enter the full password. It must be at least 6 characters.");
+        if (!password) {
+          toast.error("Please enter your password.");
           return;
         }
         const { data, error } = await signInWithEmailPassword(email, password);
@@ -282,10 +282,40 @@ function AuthPage() {
     const { error } = await supabase.auth.signInWithOtp({ phone });
     setBusy(false);
     if (error) {
-      toast.error(error.message);
+      toast.error(
+        error.message.toLowerCase().includes("provider")
+          ? "Phone sign-in is not enabled in Supabase yet. Enable the Phone provider (and an SMS sender) in Supabase Auth settings."
+          : error.message,
+      );
       return;
     }
-    toast.success("Phone OTP sent if phone login is enabled");
+    setPhoneOtpSent(true);
+    toast.success("We sent a 6-digit code to your phone. Enter it below to continue.");
+  };
+
+  const confirmPhoneOtp = async () => {
+    if (phoneOtpCode.trim().length < 4) {
+      toast.error("Enter the code we sent to your phone");
+      return;
+    }
+    setBusy(true);
+    try {
+      const { data, error } = await verifyPhoneOtp(phone, phoneOtpCode.trim());
+      if (error) throw error;
+      if (data.user) {
+        const existing = await loadSignedInProfile(data.user.id);
+        if (!existing) {
+          await saveProfile(data.user.id, normalizeProfile(villageProfile), "citizen");
+        }
+      }
+      toast.success("Phone verified. Welcome to ManaOoru!");
+      setPhoneOtpSent(false);
+      setPhoneOtpCode("");
+    } catch (err) {
+      toast.error(getFriendlyAuthError(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -385,63 +415,11 @@ function AuthPage() {
                 ))}
               </select>
               <div className="grid gap-3 sm:grid-cols-2">
-                <select
-                  aria-label="State"
-                  value={villageProfile.state}
-                  onChange={(e) => {
-                    const state = e.target.value;
-                    const district = getDistricts(state)[0] ?? defaultProfile.district;
-                    const mandal = getMandals(state, district)[0] ?? defaultProfile.mandal;
-                    setVillageProfile({ state, district, mandal, village: "" });
-                  }}
-                  className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-                >
-                  {states.map((state) => (
-                    <option key={state}>{state}</option>
-                  ))}
-                </select>
-                <select
-                  aria-label="District"
-                  value={villageProfile.district}
-                  onChange={(e) => {
-                    const district = e.target.value;
-                    const mandal = getMandals(villageProfile.state, district)[0] ?? "";
-                    setVillageProfile({ ...villageProfile, district, mandal, village: "" });
-                  }}
-                  className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-                >
-                  {districts.map((district) => (
-                    <option key={district}>{district}</option>
-                  ))}
-                </select>
-                <select
-                  aria-label="Mandal"
-                  value={villageProfile.mandal}
-                  onChange={(e) => {
-                    const mandal = e.target.value;
-                    setVillageProfile({ ...villageProfile, mandal, village: "" });
-                  }}
-                  className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-                >
-                  {mandals.map((mandal) => (
-                    <option key={mandal}>{mandal}</option>
-                  ))}
-                </select>
-                <input
-                  aria-label="Village"
-                  list="signup-village-options"
-                  value={villageProfile.village}
-                  onChange={(e) =>
-                    setVillageProfile({ ...villageProfile, village: e.target.value })
-                  }
-                  placeholder="Select or type exact village name"
-                  className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
+                <VillageLocationPicker
+                  value={villageProfile}
+                  onChange={setVillageProfile}
+                  idPrefix="signup"
                 />
-                <datalist id="signup-village-options">
-                  {villages.map((village) => (
-                    <option key={village} value={village} />
-                  ))}
-                </datalist>
               </div>
               <div className="rounded-2xl border border-primary/15 bg-primary/10 p-4 text-sm text-primary">
                 Selected village: <strong>{selectedVillageLocation}</strong>
@@ -477,7 +455,10 @@ function AuthPage() {
           <div className="grid gap-2 sm:grid-cols-[1fr_auto]">
             <input
               value={phone}
-              onChange={(e) => setPhone(e.target.value)}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setPhoneOtpSent(false);
+              }}
               placeholder="Phone with country code, e.g. +919876543210"
               className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
             />
@@ -490,14 +471,36 @@ function AuthPage() {
               Phone OTP
             </button>
           </div>
+          {phoneOtpSent && (
+            <div className="grid gap-2 rounded-2xl border border-primary/20 bg-primary/5 p-3 sm:grid-cols-[1fr_auto]">
+              <input
+                value={phoneOtpCode}
+                onChange={(e) => setPhoneOtpCode(e.target.value)}
+                placeholder="Enter the 6-digit code"
+                inputMode="numeric"
+                maxLength={6}
+                className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
+              />
+              <button
+                type="button"
+                onClick={confirmPhoneOtp}
+                disabled={busy}
+                className="rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110 disabled:opacity-60"
+              >
+                Verify &amp; continue
+              </button>
+            </div>
+          )}
           <div className="relative">
             <input
               type={showPassword ? "text" : "password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password (min 6 chars)"
+              placeholder={
+                mode === "signup" ? "Password (min 8 chars, letters + numbers)" : "Password"
+              }
               required
-              minLength={6}
+              minLength={mode === "signup" ? 8 : 1}
               className="w-full rounded-2xl border border-border bg-background px-4 py-3 pr-12 text-sm text-foreground outline-none focus:border-primary"
             />
             <button
@@ -509,6 +512,60 @@ function AuthPage() {
               {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
             </button>
           </div>
+          {mode === "signup" && password && (
+            <div className="flex items-center gap-2">
+              <div className="flex h-1.5 flex-1 gap-1 overflow-hidden rounded-full bg-muted">
+                <div
+                  className={`h-full flex-1 rounded-full transition-colors ${
+                    getPasswordStrength(password) === "weak" ? "bg-destructive" : "bg-primary"
+                  }`}
+                />
+                <div
+                  className={`h-full flex-1 rounded-full transition-colors ${
+                    getPasswordStrength(password) === "weak"
+                      ? "bg-muted"
+                      : getPasswordStrength(password) === "fair"
+                        ? "bg-amber-500"
+                        : "bg-primary"
+                  }`}
+                />
+                <div
+                  className={`h-full flex-1 rounded-full transition-colors ${
+                    getPasswordStrength(password) === "strong" ? "bg-primary" : "bg-muted"
+                  }`}
+                />
+              </div>
+              <span className="text-xs font-medium capitalize text-muted-foreground">
+                {getPasswordStrength(password)}
+              </span>
+            </div>
+          )}
+          {mode === "signup" && (
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Confirm password"
+                required
+                aria-invalid={Boolean(confirmPassword) && confirmPassword !== password}
+                className={`w-full rounded-2xl border bg-background px-4 py-3 pr-12 text-sm text-foreground outline-none ${
+                  confirmPassword && confirmPassword !== password
+                    ? "border-destructive"
+                    : "border-border focus:border-primary"
+                }`}
+              />
+              {confirmPassword && (
+                <span className="absolute right-3 top-1/2 -translate-y-1/2">
+                  {confirmPassword === password ? (
+                    <CheckCircle2 className="size-4 text-[#15803d]" />
+                  ) : (
+                    <XCircle className="size-4 text-destructive" />
+                  )}
+                </span>
+              )}
+            </div>
+          )}
           <button
             type="submit"
             disabled={busy}
@@ -528,7 +585,10 @@ function AuthPage() {
         <p className="mt-5 text-center text-sm text-muted-foreground">
           {mode === "signin" ? "New to ManaOoru?" : "Already have an account?"}{" "}
           <button
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+            onClick={() => {
+              setMode(mode === "signin" ? "signup" : "signin");
+              setConfirmPassword("");
+            }}
             className="font-semibold text-primary hover:underline"
           >
             {mode === "signin" ? "Create account" : "Sign in"}

@@ -33,7 +33,7 @@ export function SiteNav() {
   const [open, setOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const { user, role, signOut } = useAuth();
+  const { user, role, signOut, profile: authProfile } = useAuth();
   const { language, setLanguage, t, profile, weather, hasProfile } = useVillagePreferences();
   useThemePreference();
   const location = useLocation();
@@ -113,7 +113,16 @@ export function SiteNav() {
                 to="/profile"
                 className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
               >
-                <UserRound className="size-3.5" /> Profile
+                {authProfile?.photo_url ? (
+                  <img
+                    src={authProfile.photo_url}
+                    alt=""
+                    className="size-4 rounded-full object-cover"
+                  />
+                ) : (
+                  <UserRound className="size-3.5" />
+                )}
+                Profile
               </Link>
               <button
                 onClick={() => signOut()}

@@ -236,6 +236,7 @@ function Index() {
       : "Live weather unavailable"
     : "Select village for live weather";
   const recentItems = stats?.recent ?? fallbackListings;
+  const hasRealActivity = Boolean(stats && stats.total > 0);
   const liveActivity = recentItems.slice(0, 4);
   const announcementItems = recentItems.filter((r) => r.type === "announcement").slice(0, 3);
   const problemItems = recentItems.filter((r) => r.type === "complaint").slice(0, 3);
@@ -339,35 +340,42 @@ function Index() {
             </Link>
           </div>
 
-          <div className="animate-fade-up mt-24 grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-5 [animation-delay:300ms]">
+          {!hasRealActivity && (
+            <p className="animate-fade-up mt-10 text-sm font-medium text-white/80 [animation-delay:260ms]">
+              🌱 We just launched here — be one of the first to post and help your village fill this
+              up.
+            </p>
+          )}
+
+          <div className="animate-fade-up mt-8 grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-5 [animation-delay:300ms]">
             {[
               {
                 icon: Users,
-                value: stats?.workers ? `${stats.workers}+` : "2,450+",
+                value: stats?.workers ? `${stats.workers}+` : "0",
                 label: "Workers Available",
                 color: "from-secondary to-primary",
               },
               {
                 icon: Wheat,
-                value: stats?.land ? `${stats.land}+` : "1,250+",
+                value: stats?.land ? `${stats.land}+` : "0",
                 label: "Land Listings",
                 color: "from-primary to-secondary",
               },
               {
                 icon: Wrench,
-                value: stats?.byType.service ? `${stats.byType.service}+` : "850+",
+                value: stats?.byType.service ? `${stats.byType.service}+` : "0",
                 label: "Services",
                 color: "from-blue-500 to-blue-700",
               },
               {
                 icon: ShoppingBasket,
-                value: stats?.byType.market ? `${stats.byType.market}+` : "3,200+",
+                value: stats?.byType.market ? `${stats.byType.market}+` : "0",
                 label: "Products",
                 color: "from-amber-500 to-orange-600",
               },
               {
                 icon: Users,
-                value: stats?.villagers ? `${stats.villagers}+` : "18,500+",
+                value: stats?.villagers ? `${stats.villagers}+` : "0",
                 label: "Trusted Users",
                 color: "from-purple-500 to-fuchsia-700",
               },
@@ -436,7 +444,7 @@ function Index() {
             ) : (
               <Link
                 key={a.label}
-                to={a.to}
+                to={a.to as Exclude<(typeof quickActions)[number]["to"], "#contacts">}
                 className="hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[14px] border border-border/60 bg-card p-5 text-center shadow-sm"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
@@ -599,24 +607,34 @@ function Index() {
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {[
-            ["Marketplace", "/marketplace"],
-            ["Agriculture", "/schemes"],
-            ["Services", "/services"],
-            ["Government", "/schemes"],
-            ["Transport", "/transport"],
-            ["Education", "/announcements"],
-            ["Health", "/emergency"],
-            ["Emergency", "/emergency"],
-          ].map(([item, to]) => (
+            [
+              "Marketplace",
+              "/marketplace",
+              "Buy and sell crops, produce, and everyday goods with neighbours.",
+            ],
+            [
+              "Agriculture",
+              "/schemes",
+              "Government farm schemes, subsidies, and crop support programs.",
+            ],
+            ["Services", "/services", "Electricians, plumbers, tutors, and local service pros."],
+            [
+              "Government",
+              "/schemes",
+              "Certificates, records, and official village scheme updates.",
+            ],
+            ["Transport", "/transport", "Shared rides, bus timings, and local transport options."],
+            ["Education", "/announcements", "School notices, scholarships, and learning updates."],
+            ["Health", "/emergency", "Health centre details and nearby medical contacts."],
+            ["Emergency", "/emergency", "Police, ambulance, fire, and other emergency numbers."],
+          ].map(([item, to, description]) => (
             <Link
               key={item}
               to={to}
               className="hover-lift rounded-[20px] border border-border bg-card p-5 shadow-sm"
             >
               <p className="font-semibold text-clay">{item}</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Trusted local information and direct connections.
-              </p>
+              <p className="mt-1 text-sm text-muted-foreground">{description}</p>
             </Link>
           ))}
         </div>
@@ -1109,7 +1127,7 @@ function Index() {
             <Link to="/services" className="transition hover:text-primary">
               Support
             </Link>
-            <Link to="/search" className="transition hover:text-primary">
+            <Link to="/search" search={{ q: "" }} className="transition hover:text-primary">
               Search
             </Link>
           </div>

@@ -4,6 +4,8 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useNavigate,
+  useLocation,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,7 +14,7 @@ import { useEffect, type ReactNode } from "react";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/lib/auth";
+import { AuthProvider, useAuth } from "@/lib/auth";
 
 function NotFoundComponent() {
   return (
@@ -80,7 +82,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "ManaOoru - Premium Digital Village Platform" },
-      { name: "description", content: "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and AI support." },
+      {
+        name: "description",
+        content:
+          "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and AI support.",
+      },
       { name: "author", content: "ManaOoru" },
       { property: "og:title", content: "ManaOoru - Premium Digital Village Platform" },
       { property: "og:description", content: "Everything your village needs. All in one place." },
@@ -89,8 +95,16 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:site", content: "@ManaOoru" },
       { name: "twitter:title", content: "ManaOoru" },
       { name: "twitter:description", content: "Everything your village needs. All in one place." },
-      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/6443d029-9210-477c-9cbc-a6f036717993" },
-      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/6443d029-9210-477c-9cbc-a6f036717993" },
+      {
+        property: "og:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/6443d029-9210-477c-9cbc-a6f036717993",
+      },
+      {
+        name: "twitter:image",
+        content:
+          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/6443d029-9210-477c-9cbc-a6f036717993",
+      },
     ],
     links: [
       {
@@ -125,6 +139,23 @@ function RootShell({ children }: { children: ReactNode }) {
   );
 }
 
+function ProfileCompletionGate() {
+  const { user, needsProfileCompletion, loading } = useAuth();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  useEffect(() => {
+    if (loading || !user || !needsProfileCompletion) return;
+    // Google OAuth and magic-link sign-ins land on a full page redirect (not a
+    // client-side route change), so they can arrive on any public page — this
+    // catches that case in addition to the per-page ProtectedRoute checks.
+    if (location.pathname === "/complete-profile" || location.pathname === "/auth") return;
+    navigate({ to: "/complete-profile", replace: true });
+  }, [loading, user, needsProfileCompletion, location.pathname, navigate]);
+
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -132,6 +163,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <ProfileCompletionGate />
         <Outlet />
         <Toaster position="top-center" richColors />
       </AuthProvider>

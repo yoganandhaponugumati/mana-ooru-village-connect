@@ -111,8 +111,12 @@ function DashboardPage() {
       <SurfaceCard className="mb-8 p-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">Your role</p>
-            <h3 className="mt-2 text-2xl font-semibold text-clay capitalize">{role.replace("_", " ")}</h3>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
+              Your role
+            </p>
+            <h3 className="mt-2 text-2xl font-semibold text-clay capitalize">
+              {role.replace("_", " ")}
+            </h3>
             <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">
               {role === "super_admin"
                 ? "You can manage platform operations, approve village admins, and publish global notices."
@@ -123,7 +127,10 @@ function DashboardPage() {
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {roleTasks.map((task) => (
-              <div key={task} className="rounded-3xl border border-border bg-background p-4 text-sm text-muted-foreground">
+              <div
+                key={task}
+                className="rounded-3xl border border-border bg-background p-4 text-sm text-muted-foreground"
+              >
                 {task}
               </div>
             ))}

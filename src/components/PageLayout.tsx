@@ -38,8 +38,14 @@ export function PageLayout({
                   <Sparkles className="size-3.5" />
                   ManaOoru Platform
                 </div>
-                <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight text-clay sm:text-5xl">{title}</h1>
-                {subtitle && <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-lg">{subtitle}</p>}
+                <h1 className="mt-4 font-display text-3xl font-semibold tracking-tight text-clay sm:text-5xl">
+                  {title}
+                </h1>
+                {subtitle && (
+                  <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground sm:text-lg">
+                    {subtitle}
+                  </p>
+                )}
               </div>
             </div>
           </motion.div>

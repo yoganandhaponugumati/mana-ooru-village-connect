@@ -90,12 +90,17 @@ export function AppLinkButton({
   );
 }
 
-export function SurfaceCard({
-  children,
-  className,
-  hover = true,
-  ...props
-}: HTMLAttributes<HTMLDivElement> & { hover?: boolean }) {
+type SurfaceCardProps = Omit<
+  HTMLAttributes<HTMLDivElement>,
+  | "onDrag"
+  | "onDragStart"
+  | "onDragEnd"
+  | "onAnimationStart"
+  | "onAnimationEnd"
+  | "onAnimationIteration"
+> & { hover?: boolean };
+
+export function SurfaceCard({ children, className, hover = true, ...props }: SurfaceCardProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -121,18 +126,21 @@ export function SectionHeader({
   description,
   actions,
   compact = false,
+  className,
 }: {
   eyebrow?: string;
   title: string;
   description?: string;
   actions?: ReactNode;
   compact?: boolean;
+  className?: string;
 }) {
   return (
     <div
       className={clsx(
         "mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between",
         compact && "mb-6",
+        className,
       )}
     >
       <div className="max-w-2xl">

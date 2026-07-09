@@ -8,18 +8,29 @@ import {
   type AccountType,
   type AppRole,
   type LegacyAccountType,
+  type Occupation,
 } from "@/lib/supabase/auth";
-import { saveVillageProfilePreference } from "@/lib/village-preferences";
+import {
+  saveLanguagePreference,
+  saveVillageProfilePreference,
+  type Language,
+} from "@/lib/village-preferences";
 
 export type { AccountType, AppRole, LegacyAccountType };
 
 type AuthProfile = {
   account_type: LegacyAccountType;
   role: AppRole;
+  username: string | null;
+  full_name: string | null;
+  photo_url: string | null;
+  occupation: Occupation | null;
   state: string | null;
   district: string | null;
   mandal: string | null;
   village: string | null;
+  preferred_language: Language;
+  profileCompletedAt: string | null;
 };
 
 type AuthCtx = {
@@ -27,8 +38,13 @@ type AuthCtx = {
   session: Session | null;
   profile: AuthProfile | null;
   role: AppRole | null;
+  /** True once a profile row exists AND has a username + completion timestamp. */
+  needsProfileCompletion: boolean;
+  /** True for password accounts whose email hasn't been confirmed yet. Google/phone accounts don't need this. */
+  needsEmailVerification: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 };
 
 const Ctx = createContext<AuthCtx>({
@@ -36,9 +52,15 @@ const Ctx = createContext<AuthCtx>({
   session: null,
   profile: null,
   role: null,
+  needsProfileCompletion: false,
+  needsEmailVerification: false,
   loading: true,
   signOut: async () => {},
+  refreshProfile: async () => {},
 });
+
+const PROFILE_COLUMNS =
+  "account_type,role,username,full_name,photo_url,occupation,state,district,mandal,village,preferred_language,profile_completed_at";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -48,7 +70,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadProfile = useCallback(async (userId: string) => {
     const { data } = await supabase
       .from("profiles")
-      .select("account_type,role,state,district,mandal,village")
+      .select(PROFILE_COLUMNS)
       .eq("id", userId)
       .maybeSingle();
 
@@ -58,10 +80,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         ? {
             account_type: roleToLegacyAccountType(role),
             role,
+            username: data.username,
+            full_name: data.full_name,
+            photo_url: data.photo_url,
+            occupation: data.occupation,
             state: data.state,
             district: data.district,
             mandal: data.mandal,
             village: data.village,
+            preferred_language: data.preferred_language,
+            profileCompletedAt: data.profile_completed_at,
           }
         : null,
     );
@@ -72,6 +100,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         mandal: data.mandal,
         village: data.village,
       });
+    }
+    if (data?.preferred_language) {
+      saveLanguagePreference(data.preferred_language);
     }
   }, []);
 
@@ -100,15 +131,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setProfile(null);
   };
 
+  const refreshProfile = useCallback(async () => {
+    if (session?.user) await loadProfile(session.user.id);
+  }, [session, loadProfile]);
+
+  const user = session?.user ?? null;
+  const needsProfileCompletion = Boolean(user) && Boolean(profile) && !profile?.profileCompletedAt;
+  // Only password-based sign-ins have a meaningful confirmation step here; Google
+  // accounts arrive pre-verified and phone accounts are verified via OTP itself.
+  const hasPasswordIdentity = Boolean(
+    user?.identities?.some((identity) => identity.provider === "email"),
+  );
+  const needsEmailVerification = hasPasswordIdentity && !user?.email_confirmed_at;
+
   return (
     <Ctx.Provider
       value={{
-        user: session?.user ?? null,
+        user,
         session,
         profile,
         role: profile?.role ?? null,
+        needsProfileCompletion,
+        needsEmailVerification,
         loading,
         signOut,
+        refreshProfile,
       }}
     >
       {children}

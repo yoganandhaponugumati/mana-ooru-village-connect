@@ -26,6 +26,7 @@ import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LandRouteImport } from './routes/land'
 import { Route as EmergencyRouteImport } from './routes/emergency'
 import { Route as DashboardRouteImport } from './routes/dashboard'
+import { Route as CompleteProfileRouteImport } from './routes/complete-profile'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnnouncementsRouteImport } from './routes/announcements'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
@@ -116,6 +117,11 @@ const DashboardRoute = DashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CompleteProfileRoute = CompleteProfileRouteImport.update({
+  id: '/complete-profile',
+  path: '/complete-profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
+  '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
+  '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
@@ -189,6 +197,7 @@ export interface FileRoutesById {
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
+  '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
@@ -214,6 +223,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/announcements'
     | '/auth'
+    | '/complete-profile'
     | '/dashboard'
     | '/emergency'
     | '/land'
@@ -237,6 +247,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/announcements'
     | '/auth'
+    | '/complete-profile'
     | '/dashboard'
     | '/emergency'
     | '/land'
@@ -260,6 +271,7 @@ export interface FileRouteTypes {
     | '/ai-assistant'
     | '/announcements'
     | '/auth'
+    | '/complete-profile'
     | '/dashboard'
     | '/emergency'
     | '/land'
@@ -284,6 +296,7 @@ export interface RootRouteChildren {
   AiAssistantRoute: typeof AiAssistantRoute
   AnnouncementsRoute: typeof AnnouncementsRoute
   AuthRoute: typeof AuthRoute
+  CompleteProfileRoute: typeof CompleteProfileRoute
   DashboardRoute: typeof DashboardRoute
   EmergencyRoute: typeof EmergencyRoute
   LandRoute: typeof LandRoute
@@ -424,6 +437,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/complete-profile': {
+      id: '/complete-profile'
+      path: '/complete-profile'
+      fullPath: '/complete-profile'
+      preLoaderRoute: typeof CompleteProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/auth': {
       id: '/auth'
       path: '/auth'
@@ -460,6 +480,7 @@ const rootRouteChildren: RootRouteChildren = {
   AiAssistantRoute: AiAssistantRoute,
   AnnouncementsRoute: AnnouncementsRoute,
   AuthRoute: AuthRoute,
+  CompleteProfileRoute: CompleteProfileRoute,
   DashboardRoute: DashboardRoute,
   EmergencyRoute: EmergencyRoute,
   LandRoute: LandRoute,

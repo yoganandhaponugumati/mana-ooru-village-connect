@@ -2,15 +2,10 @@ import {
   Ambulance,
   Bike,
   Building2,
-  Bus,
-  CalendarDays,
   Car,
-  FileText,
   Flame,
   HeartPulse,
-  Landmark,
   Lightbulb,
-  MapPin,
   Phone,
   Shield,
   Tractor,
@@ -36,7 +31,8 @@ export const fallbackListings: Listing[] = [
     id: "seed-worker-tractor",
     type: "worker",
     title: "Ramesh Tractor Driver",
-    description: "Experienced tractor and rotavator driver available for ploughing, puddling, and transport work.",
+    description:
+      "Experienced tractor and rotavator driver available for ploughing, puddling, and transport work.",
     contact: "9876543210",
     location: "Kothur",
     price: "₹900/day",
@@ -101,7 +97,8 @@ export const fallbackListings: Listing[] = [
     id: "seed-problem-drainage",
     type: "complaint",
     title: "Drainage overflow near main road",
-    description: "Water is overflowing near the bus stop after rain. Children and elders are finding it difficult to cross.",
+    description:
+      "Water is overflowing near the bus stop after rain. Children and elders are finding it difficult to cross.",
     contact: "9876543210",
     location: "Kothur bus stop",
     category: "Drainage",
@@ -140,22 +137,78 @@ export const schemes = [
 ];
 
 export const transportOptions = [
-  { id: "tractor-booking", title: "Tractor Booking", price: "₹900/hr", icon: Tractor, contact: "9876543210" },
-  { id: "auto-booking", title: "Auto Booking", price: "Local fare", icon: Bike, contact: "9876501111" },
+  {
+    id: "tractor-booking",
+    title: "Tractor Booking",
+    price: "₹900/hr",
+    icon: Tractor,
+    contact: "9876543210",
+  },
+  {
+    id: "auto-booking",
+    title: "Auto Booking",
+    price: "Local fare",
+    icon: Bike,
+    contact: "9876501111",
+  },
   { id: "mini-truck", title: "Mini Truck", price: "₹18/km", icon: Truck, contact: "9848123000" },
   { id: "pickup", title: "Pickup Vehicle", price: "₹15/km", icon: Car, contact: "9848123001" },
-  { id: "harvester", title: "Harvest Machine", price: "Season rate", icon: Tractor, contact: "9848123002" },
+  {
+    id: "harvester",
+    title: "Harvest Machine",
+    price: "Season rate",
+    icon: Tractor,
+    contact: "9848123002",
+  },
   { id: "jcb", title: "JCB", price: "₹1,600/hr", icon: Wrench, contact: "9848123003" },
 ];
 
 export const emergencyContacts = [
-  { id: "ambulance", title: "Ambulance", contact: "108", role: "Emergency medical help", icon: Ambulance, urgent: true },
-  { id: "police", title: "Police", contact: "100", role: "Law and order support", icon: Shield, urgent: true },
+  {
+    id: "ambulance",
+    title: "Ambulance",
+    contact: "108",
+    role: "Emergency medical help",
+    icon: Ambulance,
+    urgent: true,
+  },
+  {
+    id: "police",
+    title: "Police",
+    contact: "100",
+    role: "Law and order support",
+    icon: Shield,
+    urgent: true,
+  },
   { id: "fire", title: "Fire", contact: "101", role: "Fire and rescue", icon: Flame, urgent: true },
-  { id: "hospital", title: "Hospital", contact: "104", role: "Health advice and referral", icon: HeartPulse },
-  { id: "electricity", title: "Electricity", contact: "1912", role: "Power cut and line issues", icon: Lightbulb },
-  { id: "veterinary", title: "Veterinary", contact: "1962", role: "Animal health support", icon: Phone },
-  { id: "panchayat", title: "Village Officer", contact: "0841-23456", role: "Panchayat support desk", icon: Building2 },
+  {
+    id: "hospital",
+    title: "Hospital",
+    contact: "104",
+    role: "Health advice and referral",
+    icon: HeartPulse,
+  },
+  {
+    id: "electricity",
+    title: "Electricity",
+    contact: "1912",
+    role: "Power cut and line issues",
+    icon: Lightbulb,
+  },
+  {
+    id: "veterinary",
+    title: "Veterinary",
+    contact: "1962",
+    role: "Animal health support",
+    icon: Phone,
+  },
+  {
+    id: "panchayat",
+    title: "Village Officer",
+    contact: "0841-23456",
+    role: "Panchayat support desk",
+    icon: Building2,
+  },
 ];
 
 export function listingRoute(type: ListingType) {

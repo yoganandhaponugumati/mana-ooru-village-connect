@@ -179,49 +179,55 @@ export function ListingForm({
         </div>
         <StatusBadge tone="secondary">Village verified</StatusBadge>
       </div>
-      {fields.map((field) => (
-        <div key={field.name} className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">
-            {field.label} {field.required && <span className="text-primary">*</span>}
-          </label>
-          {field.options ? (
-            <select
-              required={field.required}
-              value={values[field.name] || ""}
-              onChange={(e) => handleFieldChange(field.name, e.target.value)}
-              aria-invalid={Boolean(errors[field.name])}
-              className={`w-full rounded-2xl border bg-card px-4 py-3.5 text-sm text-foreground shadow-sm ${errors[field.name] ? "border-destructive" : "border-border focus:border-primary"}`}
-            >
-              <option value="">Select…</option>
-              {field.options.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-          ) : field.textarea ? (
-            <textarea
-              required={field.required}
-              placeholder={field.placeholder}
-              rows={4}
-              value={values[field.name] || ""}
-              onChange={(e) => handleFieldChange(field.name, e.target.value)}
-              aria-invalid={Boolean(errors[field.name])}
-              className={`min-h-32 w-full rounded-2xl border bg-card px-4 py-3.5 text-sm text-foreground shadow-sm ${errors[field.name] ? "border-destructive" : "border-border focus:border-primary"}`}
-            />
-          ) : (
-            <input
-              required={field.required}
-              placeholder={field.placeholder}
-              value={values[field.name] || ""}
-              onChange={(e) => handleFieldChange(field.name, e.target.value)}
-              aria-invalid={Boolean(errors[field.name])}
-              className={`w-full rounded-2xl border bg-card px-4 py-3.5 text-sm text-foreground shadow-sm ${errors[field.name] ? "border-destructive" : "border-border focus:border-primary"}`}
-            />
-          )}
-          {errors[field.name] && <p className="text-sm text-destructive">{errors[field.name]}</p>}
-        </div>
-      ))}
+      {fields.map((field) => {
+        const fieldId = `${type}-field-${field.name}`;
+        return (
+          <div key={field.name} className="space-y-2">
+            <label htmlFor={fieldId} className="text-sm font-semibold text-foreground">
+              {field.label} {field.required && <span className="text-primary">*</span>}
+            </label>
+            {field.options ? (
+              <select
+                id={fieldId}
+                required={field.required}
+                value={values[field.name] || ""}
+                onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                aria-invalid={Boolean(errors[field.name])}
+                className={`w-full rounded-2xl border bg-card px-4 py-3.5 text-sm text-foreground shadow-sm ${errors[field.name] ? "border-destructive" : "border-border focus:border-primary"}`}
+              >
+                <option value="">Select…</option>
+                {field.options.map((option) => (
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
+                ))}
+              </select>
+            ) : field.textarea ? (
+              <textarea
+                id={fieldId}
+                required={field.required}
+                placeholder={field.placeholder}
+                rows={4}
+                value={values[field.name] || ""}
+                onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                aria-invalid={Boolean(errors[field.name])}
+                className={`min-h-32 w-full rounded-2xl border bg-card px-4 py-3.5 text-sm text-foreground shadow-sm ${errors[field.name] ? "border-destructive" : "border-border focus:border-primary"}`}
+              />
+            ) : (
+              <input
+                id={fieldId}
+                required={field.required}
+                placeholder={field.placeholder}
+                value={values[field.name] || ""}
+                onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                aria-invalid={Boolean(errors[field.name])}
+                className={`w-full rounded-2xl border bg-card px-4 py-3.5 text-sm text-foreground shadow-sm ${errors[field.name] ? "border-destructive" : "border-border focus:border-primary"}`}
+              />
+            )}
+            {errors[field.name] && <p className="text-sm text-destructive">{errors[field.name]}</p>}
+          </div>
+        );
+      })}
       <div className="space-y-2">
         <label className="text-sm font-semibold text-foreground">
           {photoLabel} {photoRequired && <span className="text-primary">*</span>}

@@ -104,29 +104,65 @@ const andhraDistricts = [
   "YSR Kadapa",
 ];
 
-function makeDistrictCoverage(districts: string[]) {
-  return Object.fromEntries(
-    districts.map((district) => [
-      district,
-      {
-        [`${district} Rural`]: [
-          `${district} Rural Village`,
-          `${district} Colony`,
-          `${district} Thanda`,
-        ],
-        [`${district} Urban`]: [
-          `${district} Town`,
-          `${district} Ward Area`,
-          `${district} Market Area`,
-        ],
-      },
-    ]),
-  ) as LocationTree[string];
+// All 28 states + 8 union territories of India. Telangana and Andhra Pradesh
+// have hand-curated district/mandal/village data below; every other state is
+// listed here so it's selectable, with district/mandal/village entered as
+// free text (see VillageLocationPicker) since we don't have a verified
+// village-level dataset for the rest of the country.
+const otherStatesAndUTs = [
+  "Andaman and Nicobar Islands",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chandigarh",
+  "Chhattisgarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jammu and Kashmir",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Ladakh",
+  "Lakshadweep",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Puducherry",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+];
+
+function makeStateSkeleton(): LocationTree[string] {
+  // No fabricated placeholder districts/mandals/villages — this state is
+  // selectable, and district/mandal/village are entered as free text with
+  // no suggestions until real data is curated for it.
+  return {};
+}
+
+function makeDistrictSkeleton(districts: string[]): LocationTree[string] {
+  // Real district names, so they show up as suggestions — but no fabricated
+  // mandal/village placeholders. Mandal and village are free text for any
+  // district we haven't hand-curated real mandal/village data for below.
+  return Object.fromEntries(districts.map((district) => [district, {}]));
 }
 
 export const locationTree = {
   Telangana: {
-    ...makeDistrictCoverage(telanganaDistricts),
+    ...makeDistrictSkeleton(telanganaDistricts),
     Rangareddy: {
       Kandukur: ["Kothur", "Dasarlapally", "Lemoor"],
       Maheshwaram: ["Mansanpally", "Nagaram", "Tukkuguda"],
@@ -194,7 +230,7 @@ export const locationTree = {
     },
   },
   "Andhra Pradesh": {
-    ...makeDistrictCoverage(andhraDistricts),
+    ...makeDistrictSkeleton(andhraDistricts),
     Krishna: {
       Gudivada: ["Pedayerukapadu", "Bethavolu", "Chowtapalli"],
       Machilipatnam: ["Manginapudi", "Pedapatnam", "Tallapalem"],
@@ -211,6 +247,7 @@ export const locationTree = {
       Anandapuram: ["Anandapuram", "Gambheeram", "Vellanki"],
     },
   },
+  ...Object.fromEntries(otherStatesAndUTs.map((state) => [state, makeStateSkeleton()])),
 } satisfies LocationTree;
 
 export const languageOptions: { code: Language; label: string }[] = [
@@ -431,6 +468,15 @@ export function saveVillageProfilePreference(nextProfile: Partial<VillageProfile
   });
 }
 
+export function saveLanguagePreference(nextLanguage: Language) {
+  const current = readStoredPreferences();
+  writeStoredPreferences({
+    language: nextLanguage,
+    profile: current.profile,
+    hasProfile: current.hasProfile,
+  });
+}
+
 function weatherCodeToCondition(code: number | undefined) {
   if (code === undefined) return "Current weather";
   if (code === 0) return "Clear sky";
@@ -504,20 +550,22 @@ async function fetchLiveWeather(
   };
 }
 
+const typedLocationTree = locationTree as LocationTree;
+
 export function getStates() {
   return Object.keys(locationTree);
 }
 
 export function getDistricts(state: string) {
-  return Object.keys(locationTree[state] ?? {});
+  return Object.keys(typedLocationTree[state] ?? {});
 }
 
 export function getMandals(state: string, district: string) {
-  return Object.keys(locationTree[state]?.[district] ?? {});
+  return Object.keys(typedLocationTree[state]?.[district] ?? {});
 }
 
-export function getVillages(state: string, district: string, mandal: string) {
-  return locationTree[state]?.[district]?.[mandal] ?? [];
+export function getVillages(state: string, district: string, mandal: string): string[] {
+  return typedLocationTree[state]?.[district]?.[mandal] ?? [];
 }
 
 export function normalizeProfile(profile: Partial<VillageProfile> | undefined): VillageProfile {
@@ -526,7 +574,7 @@ export function normalizeProfile(profile: Partial<VillageProfile> | undefined): 
   const hasVillageInput = typeof profile?.village === "string";
   const villageName = profile?.village?.split(",")[0]?.trim();
   const state =
-    profile?.state && locationTree[profile.state] ? profile.state : defaultProfile.state;
+    profile?.state && typedLocationTree[profile.state] ? profile.state : defaultProfile.state;
   const districts = getDistricts(state);
   const district =
     profile?.district && districts.includes(profile.district)
