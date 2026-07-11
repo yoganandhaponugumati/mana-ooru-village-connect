@@ -2400,27 +2400,185 @@ footer {
   }
 }
 
+@keyframes hero-grid-glow {
+  0%,
+  100% {
+    opacity: 0.38;
+    background-position: 0 0;
+  }
+  50% {
+    opacity: 0.62;
+    background-position: 28px 18px;
+  }
+}
+
+@keyframes hero-field-life {
+  0%,
+  100% {
+    filter: saturate(1) brightness(1);
+  }
+  50% {
+    filter: saturate(1.16) brightness(1.06);
+  }
+}
+
+@keyframes hero-house-float-a {
+  0%,
+  100% {
+    transform: translateZ(52px) translateY(0);
+  }
+  50% {
+    transform: translateZ(52px) translateY(-5px);
+  }
+}
+
+@keyframes hero-house-float-b {
+  0%,
+  100% {
+    transform: translateZ(68px) scale(0.88) translateY(0);
+  }
+  50% {
+    transform: translateZ(68px) scale(0.88) translateY(-6px);
+  }
+}
+
+@keyframes hero-tower-signal {
+  0%,
+  100% {
+    transform: translateZ(86px) translateY(0);
+  }
+  50% {
+    transform: translateZ(86px) translateY(-7px);
+  }
+}
+
+.hero-3d-base::after {
+  animation: hero-grid-glow 8s ease-in-out infinite;
+}
+
+.hero-3d-field {
+  animation: hero-field-life 7s ease-in-out infinite;
+}
+
+.hero-3d-field-b {
+  animation-delay: -2.2s;
+}
+
+.hero-3d-field-c {
+  animation-delay: -4s;
+}
+
+.hero-3d-house-a {
+  animation: hero-house-float-a 5.8s ease-in-out infinite;
+}
+
+.hero-3d-house-b {
+  animation: hero-house-float-b 6.4s ease-in-out infinite;
+}
+
+.hero-3d-tower {
+  animation: hero-tower-signal 5.2s ease-in-out infinite;
+}
+
 @media (max-width: 1023px) {
   .hero-3d-stage {
-    min-height: 520px;
+    min-height: 500px;
   }
 
   .hero-3d-world {
     inset: 0;
-    scale: 0.84;
+    left: -3%;
+    width: 106%;
+    scale: 0.82;
     transform-origin: center top;
+  }
+
+  .hero-3d-base {
+    left: 9%;
+    top: 28%;
+    width: min(92vw, 600px);
+  }
+
+  .hero-3d-panel-main {
+    left: 5%;
+    top: 6%;
+  }
+
+  .hero-3d-panel-weather {
+    right: 4%;
+    top: 38%;
+  }
+
+  .hero-3d-panel-action {
+    left: 14%;
+    bottom: 13%;
   }
 }
 
 @media (max-width: 640px) {
   .hero-3d-stage {
-    min-height: 430px;
-    margin-top: 1.5rem;
+    min-height: 360px;
+    margin-top: 0.75rem;
+    overflow: hidden;
   }
 
   .hero-3d-world {
-    left: -12%;
-    width: 124%;
-    scale: 0.72;
+    left: -8%;
+    width: 116%;
+    scale: 0.66;
+    transform-origin: center top;
+  }
+
+  .hero-3d-stage::before {
+    inset: 4% 0 10%;
+    border-radius: 34px;
+    filter: blur(24px);
+  }
+
+  .hero-3d-base {
+    left: 5%;
+    top: 30%;
+    width: min(118vw, 520px);
+    border-radius: 34px;
+  }
+
+  .hero-3d-panel-main {
+    left: 3%;
+    top: 3%;
+    width: min(86vw, 330px);
+    border-radius: 24px;
+    padding: 18px;
+  }
+
+  .hero-3d-panel-weather {
+    right: 2%;
+    top: 42%;
+    gap: 10px;
+    border-radius: 20px;
+    padding: 13px 15px;
+  }
+
+  .hero-3d-panel-weather p:last-child {
+    max-width: 160px;
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .hero-3d-panel-action {
+    left: 8%;
+    bottom: 10%;
+    max-width: 78%;
+    padding: 12px 14px;
+    font-size: 12px;
+  }
+
+  .hero-3d-house {
+    width: 64px;
+    height: 50px;
+  }
+
+  .hero-3d-tower {
+    width: 48px;
+    height: 86px;
   }
 }

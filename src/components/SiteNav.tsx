@@ -52,6 +52,12 @@ export function SiteNav() {
     setLanguageOpen(false);
   };
 
+  const chooseMobileLanguage = (next: Language) => {
+    setLanguage(next);
+    setLanguageOpen(false);
+    setOpen(false);
+  };
+
   const focusSearch = () => {
     if (location.pathname !== "/") {
       window.location.href = "/#hero-search";
@@ -156,16 +162,18 @@ export function SiteNav() {
               {selectedVillage || "Choose your village"}
             </span>
           </Link>
-          <div className="relative hidden lg:block">
+          <div className="relative">
             <button
               onClick={() => setLanguageOpen((value) => !value)}
-              className={`inline-flex h-10 items-center gap-2 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+              className={`inline-flex h-10 w-10 items-center justify-center gap-2 rounded-full border px-0 text-xs font-semibold shadow-sm transition lg:w-auto lg:px-3 ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
               aria-label="Language selector"
               aria-expanded={languageOpen}
             >
               <Globe2 className="size-4" />
-              {languageOptions.find((item) => item.code === language)?.label}
-              <ChevronDown className="size-3.5" />
+              <span className="hidden lg:inline">
+                {languageOptions.find((item) => item.code === language)?.label}
+              </span>
+              <ChevronDown className="hidden size-3.5 lg:block" />
             </button>
             <AnimatePresence>
               {languageOpen && (
@@ -174,7 +182,7 @@ export function SiteNav() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 8, scale: 0.98 }}
                   transition={{ duration: 0.18 }}
-                  className="absolute right-0 mt-2 w-40 overflow-hidden rounded-2xl border border-white/70 bg-white/85 p-1 text-sm text-foreground shadow-[var(--shadow-lift)] backdrop-blur-xl"
+                  className="absolute right-0 mt-2 w-40 overflow-hidden rounded-2xl border border-white/70 bg-white/90 p-1 text-sm text-foreground shadow-[var(--shadow-lift)] backdrop-blur-xl"
                 >
                   {languageOptions.map((item) => (
                     <button
@@ -249,6 +257,27 @@ export function SiteNav() {
                   </Link>
                 </motion.div>
               ))}
+              <div className="mt-3 rounded-2xl border border-border/70 bg-white/70 p-2 shadow-sm">
+                <div className="mb-2 flex items-center gap-2 px-2 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
+                  <Globe2 className="size-3.5" />
+                  Language
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  {languageOptions.map((item) => (
+                    <button
+                      key={item.code}
+                      onClick={() => chooseMobileLanguage(item.code)}
+                      className={`inline-flex h-10 items-center justify-center rounded-xl border px-2 text-xs font-bold transition ${
+                        item.code === language
+                          ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
+                          : "border-border bg-background text-foreground hover:border-primary hover:text-primary"
+                      }`}
+                    >
+                      {item.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
               {user ? (
                 <>
                   {(role === "village_admin" || role === "super_admin") && (

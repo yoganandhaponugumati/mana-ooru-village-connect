@@ -3,8 +3,14 @@
  * Reusable animation functions for Framer Motion
  */
 
-import type { Variants, TargetAndTransition } from "framer-motion";
+import type { Variants, TargetAndTransition, Transition } from "framer-motion";
 import { animationConfig } from "./design-tokens";
+
+type MotionPreset = {
+  [key: string]: unknown;
+  transition?: Transition;
+  whileHover?: TargetAndTransition;
+};
 
 /**
  * Container for staggered child animations
@@ -35,7 +41,7 @@ export const getStaggerItem = (duration = 0.3): Variants => ({
 /**
  * Fade in animation
  */
-export const fadeInAnimation = (): Variants => ({
+export const fadeInAnimation = (): MotionPreset => ({
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
@@ -45,7 +51,7 @@ export const fadeInAnimation = (): Variants => ({
 /**
  * Slide up animation (entrance from bottom)
  */
-export const slideUpAnimation = (offset = 20): Variants => ({
+export const slideUpAnimation = (offset = 20): MotionPreset => ({
   initial: { opacity: 0, y: offset },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: offset },
@@ -55,7 +61,7 @@ export const slideUpAnimation = (offset = 20): Variants => ({
 /**
  * Slide down animation (entrance from top)
  */
-export const slideDownAnimation = (offset = 20): Variants => ({
+export const slideDownAnimation = (offset = 20): MotionPreset => ({
   initial: { opacity: 0, y: -offset },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -offset },
@@ -65,7 +71,7 @@ export const slideDownAnimation = (offset = 20): Variants => ({
 /**
  * Slide left animation
  */
-export const slideLeftAnimation = (offset = 20): Variants => ({
+export const slideLeftAnimation = (offset = 20): MotionPreset => ({
   initial: { opacity: 0, x: offset },
   animate: { opacity: 1, x: 0 },
   exit: { opacity: 0, x: offset },
@@ -75,7 +81,7 @@ export const slideLeftAnimation = (offset = 20): Variants => ({
 /**
  * Slide right animation
  */
-export const slideRightAnimation = (offset = 20): Variants => ({
+export const slideRightAnimation = (offset = 20): MotionPreset => ({
   initial: { opacity: 0, x: -offset },
   animate: { opacity: 1, x: 0 },
   exit: { opacity: 0, x: -offset },
@@ -85,7 +91,7 @@ export const slideRightAnimation = (offset = 20): Variants => ({
 /**
  * Scale in animation
  */
-export const scaleInAnimation = (startScale = 0.95): Variants => ({
+export const scaleInAnimation = (startScale = 0.95): MotionPreset => ({
   initial: { opacity: 0, scale: startScale },
   animate: { opacity: 1, scale: 1 },
   exit: { opacity: 0, scale: startScale },
@@ -95,7 +101,7 @@ export const scaleInAnimation = (startScale = 0.95): Variants => ({
 /**
  * Pop in animation (bigger scale)
  */
-export const popInAnimation = (startScale = 0.8): Variants => ({
+export const popInAnimation = (startScale = 0.8): MotionPreset => ({
   initial: { opacity: 0, scale: startScale },
   animate: { opacity: 1, scale: 1 },
   exit: { opacity: 0, scale: startScale },
@@ -105,7 +111,7 @@ export const popInAnimation = (startScale = 0.8): Variants => ({
 /**
  * Float in animation
  */
-export const floatInAnimation = (offset = 40): Variants => ({
+export const floatInAnimation = (offset = 40): MotionPreset => ({
   initial: { opacity: 0, y: offset },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: offset },
@@ -115,7 +121,7 @@ export const floatInAnimation = (offset = 40): Variants => ({
 /**
  * Rotate in animation
  */
-export const rotateInAnimation = (rotation = -10): Variants => ({
+export const rotateInAnimation = (rotation = -10): MotionPreset => ({
   initial: { opacity: 0, rotate: rotation },
   animate: { opacity: 1, rotate: 0 },
   exit: { opacity: 0, rotate: rotation },
@@ -148,7 +154,7 @@ export const buttonPressAnimation = (): Variants => ({
 /**
  * Loading pulse animation
  */
-export const loadingPulseAnimation = (): Variants => ({
+export const loadingPulseAnimation = (): MotionPreset => ({
   initial: { opacity: 0.6 },
   animate: { opacity: 1 },
   transition: { duration: 1, repeat: Infinity, repeatType: "reverse" },
@@ -157,7 +163,7 @@ export const loadingPulseAnimation = (): Variants => ({
 /**
  * Rotate continuous animation (for spinners)
  */
-export const rotateAnimation = (): Variants => ({
+export const rotateAnimation = (): MotionPreset => ({
   animate: { rotate: 360 },
   transition: { duration: 2, repeat: Infinity, ease: "linear" },
 });
@@ -165,7 +171,7 @@ export const rotateAnimation = (): Variants => ({
 /**
  * Bounce animation
  */
-export const bounceAnimation = (distance = 10): Variants => ({
+export const bounceAnimation = (distance = 10): MotionPreset => ({
   initial: { y: 0 },
   animate: {
     y: [-distance, 0, -distance / 2, 0],
@@ -176,7 +182,7 @@ export const bounceAnimation = (distance = 10): Variants => ({
 /**
  * Shake animation for errors
  */
-export const shakeAnimation = (): Variants => ({
+export const shakeAnimation = (): MotionPreset => ({
   animate: { x: [-10, 10, -10, 10, 0] },
   transition: { duration: 0.5 },
 });
@@ -184,7 +190,7 @@ export const shakeAnimation = (): Variants => ({
 /**
  * Pulse ring animation (for notifications)
  */
-export const pulseRingAnimation = (): Variants => ({
+export const pulseRingAnimation = (): MotionPreset => ({
   animate: { scale: [1, 1.1, 1] },
   transition: { duration: 2, repeat: Infinity },
 });
@@ -192,7 +198,7 @@ export const pulseRingAnimation = (): Variants => ({
 /**
  * Floating animation (vertical movement)
  */
-export const floatingAnimation = (distance = 10): Variants => ({
+export const floatingAnimation = (distance = 10): MotionPreset => ({
   animate: {
     y: [0, -distance, 0],
   },
@@ -202,7 +208,7 @@ export const floatingAnimation = (distance = 10): Variants => ({
 /**
  * Glow pulse animation
  */
-export const glowPulseAnimation = (): Variants => ({
+export const glowPulseAnimation = (): MotionPreset => ({
   initial: { boxShadow: "0 0 0 0 rgba(22, 101, 52, 0.7)" },
   animate: {
     boxShadow: "0 0 0 20px rgba(22, 101, 52, 0)",
@@ -213,7 +219,9 @@ export const glowPulseAnimation = (): Variants => ({
 /**
  * Slide and fade (combined animation)
  */
-export const slideAndFadeAnimation = (direction: "up" | "down" | "left" | "right" = "up"): Variants => {
+export const slideAndFadeAnimation = (
+  direction: "up" | "down" | "left" | "right" = "up",
+): MotionPreset => {
   const directions = {
     up: { y: 20, x: 0 },
     down: { y: -20, x: 0 },
@@ -234,7 +242,7 @@ export const slideAndFadeAnimation = (direction: "up" | "down" | "left" | "right
 /**
  * Success animation (check mark scale)
  */
-export const successAnimation = (): Variants => ({
+export const successAnimation = (): MotionPreset => ({
   initial: { scale: 0, opacity: 0 },
   animate: { scale: 1, opacity: 1 },
   transition: { type: "spring", stiffness: 400, damping: 30 },
@@ -243,7 +251,7 @@ export const successAnimation = (): Variants => ({
 /**
  * Error shake animation combined with color
  */
-export const errorAnimation = (): Variants => ({
+export const errorAnimation = (): MotionPreset => ({
   animate: { x: [-10, 10, -10, 10, 0] },
   transition: { duration: 0.4 },
 });
@@ -251,7 +259,7 @@ export const errorAnimation = (): Variants => ({
 /**
  * Page transition animation (for route changes)
  */
-export const pageTransitionAnimation = (): Variants => ({
+export const pageTransitionAnimation = (): MotionPreset => ({
   initial: { opacity: 0, y: 10 },
   animate: { opacity: 1, y: 0 },
   exit: { opacity: 0, y: -10 },
@@ -261,7 +269,7 @@ export const pageTransitionAnimation = (): Variants => ({
 /**
  * Accordion expand animation
  */
-export const accordionAnimation = (): Variants => ({
+export const accordionAnimation = (): MotionPreset => ({
   initial: { height: 0, opacity: 0 },
   animate: { height: "auto", opacity: 1 },
   exit: { height: 0, opacity: 0 },
@@ -271,7 +279,7 @@ export const accordionAnimation = (): Variants => ({
 /**
  * Modal backdrop fade animation
  */
-export const backdropAnimation = (): Variants => ({
+export const backdropAnimation = (): MotionPreset => ({
   initial: { opacity: 0 },
   animate: { opacity: 1 },
   exit: { opacity: 0 },
@@ -281,7 +289,7 @@ export const backdropAnimation = (): Variants => ({
 /**
  * Modal content scale animation
  */
-export const modalContentAnimation = (): Variants => ({
+export const modalContentAnimation = (): MotionPreset => ({
   initial: { opacity: 0, scale: 0.95, y: 20 },
   animate: { opacity: 1, scale: 1, y: 0 },
   exit: { opacity: 0, scale: 0.95, y: 20 },
@@ -291,7 +299,7 @@ export const modalContentAnimation = (): Variants => ({
 /**
  * Drawer slide animation (from side)
  */
-export const drawerAnimation = (from: "left" | "right" = "left"): Variants => {
+export const drawerAnimation = (from: "left" | "right" = "left"): MotionPreset => {
   const direction = from === "left" ? { x: -100 } : { x: 100 };
   return {
     initial: { ...direction, opacity: 0 },
@@ -304,7 +312,7 @@ export const drawerAnimation = (from: "left" | "right" = "left"): Variants => {
 /**
  * Toast notification animation
  */
-export const toastAnimation = (position: "top" | "bottom" = "top"): Variants => {
+export const toastAnimation = (position: "top" | "bottom" = "top"): MotionPreset => {
   const initial = position === "top" ? { y: -100 } : { y: 100 };
   return {
     initial: { ...initial, opacity: 0 },
@@ -317,7 +325,7 @@ export const toastAnimation = (position: "top" | "bottom" = "top"): Variants => 
 /**
  * Tooltip fade animation
  */
-export const tooltipAnimation = (): Variants => ({
+export const tooltipAnimation = (): MotionPreset => ({
   initial: { opacity: 0, scale: 0.95 },
   animate: { opacity: 1, scale: 1 },
   exit: { opacity: 0, scale: 0.95 },
@@ -327,7 +335,7 @@ export const tooltipAnimation = (): Variants => ({
 /**
  * Skeleton loading shimmer animation
  */
-export const skeletonAnimation = (): Variants => ({
+export const skeletonAnimation = (): MotionPreset => ({
   animate: {
     backgroundPosition: ["200% 0", "-200% 0"],
   },
@@ -337,7 +345,7 @@ export const skeletonAnimation = (): Variants => ({
 /**
  * Countdown timer animation
  */
-export const countdownAnimation = (): Variants => ({
+export const countdownAnimation = (): MotionPreset => ({
   animate: { scale: [1, 0.9, 1] },
   transition: { duration: 1, repeat: Infinity },
 });
@@ -360,7 +368,7 @@ export const viewportAnimation = (): {
 /**
  * Image zoom on hover
  */
-export const imageZoomAnimation = (): Variants => ({
+export const imageZoomAnimation = (): MotionPreset => ({
   initial: { scale: 1 },
   whileHover: { scale: 1.05 },
   transition: { duration: 0.3 },

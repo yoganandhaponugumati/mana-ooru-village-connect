@@ -402,6 +402,7 @@ function InternalPage3DScene({ title, icon }: { title: string; icon?: ReactNode 
 function FeatureHeroShowcase({ title }: { title: string }) {
   const kind = getSceneKind(title);
   const meta = sceneMeta[kind];
+  const SceneIcon = meta.icon;
   const detail =
     kind === "workers"
       ? "Workers, tools, and tractors moving in sync"
