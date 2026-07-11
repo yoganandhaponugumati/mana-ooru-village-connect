@@ -9,11 +9,11 @@ type Size = "sm" | "md" | "lg";
 
 const buttonStyles: Record<Variant, string> = {
   primary:
-    "border border-transparent bg-primary text-primary-foreground shadow-[0_10px_30px_-12px_rgba(46,125,50,0.35)] transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#256b2b]",
+    "border border-white/10 bg-[linear-gradient(135deg,var(--primary),var(--secondary))] text-primary-foreground shadow-[var(--shadow-glow)] transition-all duration-300 hover:-translate-y-0.5 hover:brightness-105",
   secondary:
-    "border border-primary/20 bg-white text-primary transition-all duration-300 hover:border-primary hover:bg-primary/5 hover:-translate-y-0.5",
+    "border border-primary/20 bg-card/85 text-primary shadow-sm backdrop-blur-xl transition-all duration-300 hover:-translate-y-0.5 hover:border-primary hover:bg-primary/8",
   ghost:
-    "border border-transparent bg-transparent text-primary transition-colors duration-300 hover:bg-primary/5",
+    "border border-transparent bg-transparent text-primary transition-all duration-300 hover:bg-primary/8",
 };
 
 const buttonSizes: Record<Size, string> = {
@@ -39,20 +39,22 @@ export function AppButton({
   iconPosition?: "left" | "right";
 }) {
   return (
-    <button
-      className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold",
-        buttonStyles[variant],
-        buttonSizes[size],
-        loading && "cursor-progress opacity-80",
-        className,
-      )}
-      {...props}
-    >
-      {icon && iconPosition === "left" && !loading && <span>{icon}</span>}
-      {loading ? <Loader2 className="size-4 animate-spin" /> : children}
-      {icon && iconPosition === "right" && !loading && <span>{icon}</span>}
-    </button>
+    <motion.span whileTap={{ scale: 0.98 }} className="inline-flex">
+      <button
+        className={clsx(
+          "inline-flex items-center justify-center gap-2 rounded-full font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 disabled:pointer-events-none",
+          buttonStyles[variant],
+          buttonSizes[size],
+          loading && "cursor-progress opacity-80",
+          className,
+        )}
+        {...props}
+      >
+        {icon && iconPosition === "left" && !loading && <span>{icon}</span>}
+        {loading ? <Loader2 className="size-4 animate-spin" /> : children}
+        {icon && iconPosition === "right" && !loading && <span>{icon}</span>}
+      </button>
+    </motion.span>
   );
 }
 
@@ -74,19 +76,21 @@ export function AppLinkButton({
   to: string;
 }) {
   return (
-    <Link
-      to={to}
-      className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold",
-        buttonStyles[variant],
-        buttonSizes[size],
-        className,
-      )}
-    >
-      {icon && iconPosition === "left" && <span>{icon}</span>}
-      {children}
-      {icon && iconPosition === "right" && <span>{icon}</span>}
-    </Link>
+    <motion.div whileTap={{ scale: 0.98 }} className="inline-flex">
+      <Link
+        to={to}
+        className={clsx(
+          "inline-flex items-center justify-center gap-2 rounded-full font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20",
+          buttonStyles[variant],
+          buttonSizes[size],
+          className,
+        )}
+      >
+        {icon && iconPosition === "left" && <span>{icon}</span>}
+        {children}
+        {icon && iconPosition === "right" && <span>{icon}</span>}
+      </Link>
+    </motion.div>
   );
 }
 
@@ -107,10 +111,11 @@ export function SurfaceCard({ children, className, hover = true, ...props }: Sur
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.2 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
+      whileHover={hover ? { y: -5 } : undefined}
       className={clsx(
-        "rounded-[20px] border border-border/70 bg-card/95 shadow-[var(--shadow-soft)] backdrop-blur-sm",
+        "premium-surface rounded-[22px]",
         hover &&
-          "transition-all duration-300 hover:-translate-y-1 hover:shadow-[var(--shadow-lift)]",
+          "transition-all duration-300 hover:border-primary/20 hover:shadow-[var(--shadow-lift)]",
         className,
       )}
       {...props}
@@ -149,7 +154,7 @@ export function SectionHeader({
             {eyebrow}
           </p>
         )}
-        <h2 className="mt-2 font-display text-3xl font-semibold tracking-tight text-clay sm:text-4xl">
+        <h2 className="mt-2 text-balance font-display text-3xl font-semibold text-clay sm:text-4xl">
           {title}
         </h2>
         {description && (
@@ -175,23 +180,29 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <div
+    <motion.div
+      initial={{ opacity: 0, y: 14, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
       className={clsx(
-        "rounded-[2rem] border border-dashed border-border/80 bg-gradient-to-br from-background via-card to-muted/40 p-10 text-center shadow-sm",
+        "relative overflow-hidden rounded-[28px] border border-dashed border-primary/25 bg-gradient-to-br from-card/95 via-background to-muted/60 p-10 text-center shadow-[var(--shadow-soft)]",
         className,
       )}
     >
-      <div className="mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary shadow-sm">
+      <div className="pointer-events-none absolute -right-16 -top-20 size-48 rounded-full bg-accent/20 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-12 size-56 rounded-full bg-secondary/15 blur-3xl" />
+      <div className="relative mx-auto grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary shadow-sm">
         {icon}
       </div>
-      <h3 className="mt-5 font-display text-2xl font-semibold text-clay">{title}</h3>
+      <h3 className="relative mt-5 font-display text-2xl font-semibold text-clay">{title}</h3>
       {description && (
-        <p className="mx-auto mt-2 max-w-md text-sm leading-7 text-muted-foreground">
+        <p className="relative mx-auto mt-2 max-w-md text-sm leading-7 text-muted-foreground">
           {description}
         </p>
       )}
-      {action && <div className="mt-6 flex justify-center">{action}</div>}
-    </div>
+      {action && <div className="relative mt-6 flex justify-center">{action}</div>}
+    </motion.div>
   );
 }
 
@@ -199,15 +210,12 @@ export function SkeletonCard({ count = 3 }: { count?: number }) {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: count }).map((_, index) => (
-        <div
-          key={index}
-          className="animate-pulse rounded-[1.75rem] border border-border/60 bg-card p-5 shadow-sm"
-        >
-          <div className="h-3 w-20 rounded-full bg-muted" />
-          <div className="mt-4 h-5 w-3/4 rounded-full bg-muted" />
-          <div className="mt-3 h-3 w-full rounded-full bg-muted/80" />
-          <div className="mt-2 h-3 w-5/6 rounded-full bg-muted/70" />
-          <div className="mt-6 h-10 rounded-2xl bg-muted/70" />
+        <div key={index} className="premium-surface rounded-[1.75rem] p-5">
+          <div className="h-3 w-20 animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
+          <div className="mt-4 h-5 w-3/4 animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
+          <div className="mt-3 h-3 w-full animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
+          <div className="mt-2 h-3 w-5/6 animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
+          <div className="mt-6 h-10 animate-pulse rounded-2xl bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
         </div>
       ))}
     </div>
@@ -252,14 +260,15 @@ export function SectionPill({ icon, label }: { icon?: ReactNode; label: string }
 
 export function FeatureIcon({ icon, className }: { icon: ReactNode; className?: string }) {
   return (
-    <div
+    <motion.div
+      whileHover={{ scale: 1.04, rotate: -1 }}
       className={clsx(
-        "grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary shadow-sm",
+        "grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-primary/12 to-secondary/12 text-primary shadow-sm ring-1 ring-primary/10",
         className,
       )}
     >
       {icon}
-    </div>
+    </motion.div>
   );
 }
 

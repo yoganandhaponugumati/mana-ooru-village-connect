@@ -20,6 +20,8 @@ type WeatherProfile = {
   updatedAt?: string;
   loading?: boolean;
   placeName?: string;
+  coordinates?: { latitude: number; longitude: number };
+  confidence?: "verified" | "matched" | "fallback";
   live: boolean;
   error?: string;
 };
@@ -504,12 +506,17 @@ async function fetchLiveWeather(
     `${profile.state}|${profile.district}|${profile.mandal}|${profile.village}`.toLowerCase();
   const knownCoordinates = knownVillageCoordinates[coordinateKey];
   const searchTerms = [
+    `${profile.village}, ${profile.mandal}, ${profile.district}, ${profile.state}`,
     `${profile.village}, ${profile.mandal}, ${profile.district}`,
-    `${profile.village}, ${profile.district}`,
+    `${profile.village}, ${profile.district}, ${profile.state}`,
     `${profile.mandal}, ${profile.district}`,
     `${profile.district}, ${profile.state}`,
-  ];
+  ].filter((term) => term.replace(/,\s*/g, "").trim().length > 0);
   let first: GeoResult | undefined = knownCoordinates;
+  let confidence: WeatherProfile["confidence"] = knownCoordinates ? "verified" : undefined;
+  const profileParts = [profile.village, profile.mandal, profile.district, profile.state]
+    .filter(Boolean)
+    .map((part) => part.toLowerCase());
 
   for (const term of first ? [] : searchTerms) {
     const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(term)}&count=10&countryCode=IN&language=en&format=json`;
@@ -518,12 +525,22 @@ async function fetchLiveWeather(
       return res.json();
     });
     const results = (geo?.results ?? []) as GeoResult[];
-    first =
-      results.find((result) =>
-        [result?.name, result?.admin1, result?.admin2, result?.admin3]
+    const exactVillage = profile.village.trim().toLowerCase();
+    const ranked = results
+      .map((result) => {
+        const values = [result?.name, result?.admin1, result?.admin2, result?.admin3]
           .filter(Boolean)
-          .some((value) => `${value}`.toLowerCase().includes(profile.district.toLowerCase())),
-      ) ?? results[0];
+          .map((value) => `${value}`.toLowerCase());
+        const exactScore = values.some((value) => value === exactVillage) ? 8 : 0;
+        const partScore = profileParts.reduce(
+          (score, part) => score + (values.some((value) => value.includes(part)) ? 1 : 0),
+          0,
+        );
+        return { result, score: exactScore + partScore };
+      })
+      .sort((a, b) => b.score - a.score);
+    first = ranked[0]?.result;
+    confidence = ranked[0]?.score >= 3 ? "matched" : "fallback";
     if (first) break;
   }
 
@@ -546,6 +563,8 @@ async function fetchLiveWeather(
     source: "Open-Meteo live",
     updatedAt: current.time,
     placeName: [first.name, first.admin3, first.admin2, first.admin1].filter(Boolean).join(", "),
+    coordinates: { latitude: first.latitude, longitude: first.longitude },
+    confidence: confidence ?? "matched",
     live: true,
   };
 }
@@ -573,18 +592,11 @@ export function normalizeProfile(profile: Partial<VillageProfile> | undefined): 
 
   const hasVillageInput = typeof profile?.village === "string";
   const villageName = profile?.village?.split(",")[0]?.trim();
-  const state =
-    profile?.state && typedLocationTree[profile.state] ? profile.state : defaultProfile.state;
+  const state = profile?.state?.trim() || defaultProfile.state;
   const districts = getDistricts(state);
-  const district =
-    profile?.district && districts.includes(profile.district)
-      ? profile.district
-      : (districts[0] ?? defaultProfile.district);
+  const district = profile?.district?.trim() || districts[0] || defaultProfile.district;
   const mandals = getMandals(state, district);
-  const mandal =
-    profile?.mandal && mandals.includes(profile.mandal)
-      ? profile.mandal
-      : (mandals[0] ?? defaultProfile.mandal);
+  const mandal = profile?.mandal?.trim() || mandals[0] || defaultProfile.mandal;
   const villages = getVillages(state, district, mandal);
   const village = hasVillageInput ? (villageName ?? "") : (villages[0] ?? defaultProfile.village);
 

@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
+import { motion } from "framer-motion";
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { useListingStats, timeAgo } from "@/lib/store";
@@ -35,6 +36,7 @@ import {
   Plus,
   AlertTriangle,
   ImagePlus,
+  Leaf,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village-premium.jpg";
 import { SiteNav } from "@/components/SiteNav";
@@ -158,6 +160,57 @@ const categoryDefs = [
   { icon: Tractor, label: "Machinery", type: "service" as const },
 ];
 
+const villageNeeds = [
+  {
+    icon: ShoppingBasket,
+    label: "Marketplace",
+    to: "/marketplace" as const,
+    description: "Buy and sell crops, produce, and everyday goods with neighbours.",
+  },
+  {
+    icon: Sprout,
+    label: "Agriculture",
+    to: "/schemes" as const,
+    description: "Government farm schemes, subsidies, and crop support programs.",
+  },
+  {
+    icon: Wrench,
+    label: "Services",
+    to: "/services" as const,
+    description: "Electricians, plumbers, tutors, and local service pros.",
+  },
+  {
+    icon: Building2,
+    label: "Government",
+    to: "/schemes" as const,
+    description: "Certificates, records, and official village scheme updates.",
+  },
+  {
+    icon: Bike,
+    label: "Transport",
+    to: "/transport" as const,
+    description: "Shared rides, bus timings, and local transport options.",
+  },
+  {
+    icon: GraduationCap,
+    label: "Education",
+    to: "/announcements" as const,
+    description: "School notices, scholarships, and learning updates.",
+  },
+  {
+    icon: HeartPulse,
+    label: "Health",
+    to: "/emergency" as const,
+    description: "Health centre details and nearby medical contacts.",
+  },
+  {
+    icon: Siren,
+    label: "Emergency",
+    to: "/emergency" as const,
+    description: "Police, ambulance, fire, and other emergency numbers.",
+  },
+];
+
 const steps = [
   {
     n: "01",
@@ -223,6 +276,110 @@ const contacts = [
   { name: "Agriculture Officer", role: "Crop & Subsidy Help", num: "98481 12443" },
 ];
 
+function Hero3DVillage({
+  villageName,
+  heroWeather,
+  stats,
+}: {
+  villageName: string;
+  heroWeather: string;
+  stats?: ReturnType<typeof useListingStats>["data"];
+}) {
+  const heroMetrics = [
+    { label: "Workers", value: stats?.workers ? `${stats.workers}+` : "0", icon: Users },
+    { label: "Land", value: stats?.land ? `${stats.land}+` : "0", icon: Wheat },
+    {
+      label: "Services",
+      value: stats?.byType.service ? `${stats.byType.service}+` : "0",
+      icon: Wrench,
+    },
+  ];
+
+  return (
+    <div className="hero-3d-stage" aria-hidden="true">
+      <motion.div
+        initial={{ opacity: 0, rotateX: 18, rotateY: -22, y: 30 }}
+        animate={{ opacity: 1, rotateX: 12, rotateY: -18, y: 0 }}
+        transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+        className="hero-3d-world"
+      >
+        <div className="hero-3d-orbit hero-3d-orbit-one" />
+        <div className="hero-3d-orbit hero-3d-orbit-two" />
+
+        <div className="hero-3d-base">
+          <div className="hero-3d-field hero-3d-field-a" />
+          <div className="hero-3d-field hero-3d-field-b" />
+          <div className="hero-3d-field hero-3d-field-c" />
+          <div className="hero-3d-road" />
+          <div className="hero-3d-house hero-3d-house-a">
+            <span />
+          </div>
+          <div className="hero-3d-house hero-3d-house-b">
+            <span />
+          </div>
+          <div className="hero-3d-tower">
+            <span />
+          </div>
+        </div>
+
+        <motion.div
+          animate={{ y: [0, -12, 0] }}
+          transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+          className="hero-3d-panel hero-3d-panel-main"
+        >
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-primary/70">
+                Live village OS
+              </p>
+              <p className="mt-1 font-display text-xl font-bold text-clay">
+                {villageName || "Choose your village"}
+              </p>
+            </div>
+            <div className="grid size-12 place-items-center rounded-2xl bg-primary text-white shadow-[var(--shadow-glow)]">
+              <Leaf className="size-6" />
+            </div>
+          </div>
+          <div className="mt-5 grid grid-cols-3 gap-2">
+            {heroMetrics.map((metric) => (
+              <div key={metric.label} className="rounded-2xl bg-white/72 p-3 shadow-sm">
+                <metric.icon className="size-4 text-primary" />
+                <p className="mt-2 font-display text-lg font-bold text-clay">{metric.value}</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                  {metric.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, 10, 0], rotateZ: [0, -1.5, 0] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          className="hero-3d-panel hero-3d-panel-weather"
+        >
+          <CloudSun className="size-6 text-accent" />
+          <div>
+            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/60">
+              Weather
+            </p>
+            <p className="font-display text-lg font-bold text-white">{heroWeather}</p>
+          </div>
+        </motion.div>
+
+        <motion.div
+          animate={{ y: [0, -9, 0], rotateZ: [0, 2, 0] }}
+          transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+          className="hero-3d-panel hero-3d-panel-action"
+        >
+          <ShieldCheck className="size-5 text-primary" />
+          <span>Verified village network</span>
+        </motion.div>
+      </motion.div>
+    </div>
+  );
+}
+
 function Index() {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -250,170 +407,137 @@ function Index() {
     navigate({ to: "/search", search: { q: searchQuery } });
   };
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="village-site-bg min-h-screen text-foreground">
       {/* Nav */}
       <SiteNav />
 
       {/* Hero */}
-      <header className="relative min-h-screen overflow-hidden bg-clay">
+      <header className="relative min-h-screen overflow-hidden bg-[#06140d]">
         <img
           src={heroVillage}
           alt="Beautiful Indian village with green fields at sunrise"
           loading="eager"
-          className="absolute inset-0 z-0 h-full w-full object-cover"
+          className="absolute inset-0 z-0 h-full w-full object-cover opacity-60"
         />
-        <div className="absolute inset-0 z-10 bg-[linear-gradient(180deg,rgba(7,15,12,0.58)_0%,rgba(7,15,12,0.14)_42%,rgba(7,20,10,0.66)_100%)]" />
-        <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_50%_22%,rgba(255,213,128,0.22),transparent_35%),linear-gradient(90deg,rgba(0,0,0,0.24),transparent_34%,rgba(0,0,0,0.2))]" />
+        <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_72%_28%,rgba(24,169,153,0.36),transparent_30%),radial-gradient(circle_at_18%_16%,rgba(242,184,75,0.34),transparent_25%),linear-gradient(90deg,rgba(4,18,10,0.92)_0%,rgba(8,31,18,0.72)_45%,rgba(8,41,33,0.28)_100%)]" />
+        <div className="absolute inset-x-0 bottom-0 z-10 h-52 bg-gradient-to-t from-[#eef8ed] via-[#eef8ed]/78 to-transparent" />
+        <div className="pointer-events-none absolute left-0 top-28 z-10 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+        <div className="hero-life-layer pointer-events-none absolute inset-0 z-10" />
 
-        <div className="relative z-20 mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-center px-4 pb-44 pt-28 text-center sm:px-6 lg:pb-48">
-          <div className="mb-7 hidden max-w-sm rounded-[20px] border border-white/20 bg-white/12 px-5 py-3 text-center text-white shadow-[0_18px_45px_-24px_rgba(0,0,0,0.7)] backdrop-blur-xl md:block">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/65">
-              {villageName ? "Selected village" : "Village setup"}
-            </p>
-            <p className="mt-1 font-display text-lg font-semibold">
-              {villageName || "Choose your village"}
-            </p>
-            <p className="mt-1 text-sm text-white/80">{heroWeather}</p>
-          </div>
-          <h1 className="animate-fade-up max-w-5xl text-balance font-display text-4xl font-extrabold leading-[1.05] text-white drop-shadow-[0_10px_32px_rgba(0,0,0,0.35)] sm:text-6xl lg:text-7xl">
-            {heroTitle}
-            <span className="block text-accent">{t.heroC}</span>
-          </h1>
-          <p className="animate-fade-up mt-6 max-w-2xl text-pretty text-base font-medium leading-8 text-white/92 [animation-delay:120ms] sm:text-xl">
-            {t.subtitle1}
-            <span className="block">{t.subtitle2}</span>
-          </p>
+        <div className="relative z-20 mx-auto grid min-h-screen max-w-7xl items-center gap-10 px-4 pb-32 pt-28 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:pb-28">
+          <div className="max-w-3xl text-left">
+            <motion.h1
+              initial={{ opacity: 0, y: 22 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.55, delay: 0.08, ease: [0.32, 0.72, 0, 1] }}
+              className="max-w-4xl text-balance font-display text-5xl font-black leading-[0.95] text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.48)] sm:text-7xl lg:text-8xl"
+            >
+              ManaOoru
+              <span className="block bg-gradient-to-r from-accent via-white to-secondary bg-clip-text text-transparent">
+                Village in your hands
+              </span>
+            </motion.h1>
 
-          <form
-            onSubmit={submitSearch}
-            className="animate-fade-up mt-9 w-full max-w-3xl [animation-delay:180ms]"
-          >
-            <div className="flex items-center gap-2 rounded-full border border-white/35 bg-white/95 p-2 shadow-[0_28px_80px_-32px_rgba(0,0,0,0.65)] backdrop-blur-xl focus-within:ring-4 focus-within:ring-white/25">
-              <div className="grid size-12 place-items-center rounded-full text-muted-foreground">
-                <Search className="size-5" />
-              </div>
-              <input
-                id="hero-search"
-                type="text"
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder={t.search}
-                className="min-w-0 flex-1 bg-transparent text-base text-foreground outline-none placeholder:text-muted-foreground"
-              />
-              <button
-                type="submit"
-                className="rounded-full bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground shadow-sm transition hover:bg-secondary sm:px-8"
-              >
-                Search
-              </button>
-            </div>
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm text-white">
-              <span className="font-semibold">{t.popular}</span>
-              {["Tractor Driver", "Paddy Land", "Electrician", "Milk", "Harvesting"].map((t) => (
+            <motion.p
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.16, ease: "easeOut" }}
+              className="mt-6 max-w-2xl text-pretty text-lg font-medium leading-8 text-white/84 sm:text-xl"
+            >
+              {heroTitle}. {t.subtitle1} {t.subtitle2}
+            </motion.p>
+
+            <motion.form
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.24, ease: "easeOut" }}
+              onSubmit={submitSearch}
+              className="mt-8 w-full max-w-2xl"
+            >
+              <div className="group flex items-center gap-2 rounded-[24px] border border-white/22 bg-white/92 p-2 shadow-[0_34px_110px_-42px_rgba(0,0,0,0.72)] backdrop-blur-2xl transition focus-within:ring-4 focus-within:ring-secondary/25">
+                <div className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                  <Search className="size-5" />
+                </div>
+                <input
+                  id="hero-search"
+                  type="text"
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder={t.search}
+                  className="min-w-0 flex-1 bg-transparent text-base font-semibold text-foreground outline-none placeholder:text-muted-foreground"
+                />
                 <button
-                  type="button"
-                  key={t}
-                  onClick={() => {
-                    setSearchQuery(t);
-                    navigate({ to: "/search", search: { q: t } });
-                  }}
-                  className="rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-medium text-white backdrop-blur-md transition hover:bg-white/20"
+                  type="submit"
+                  className="rounded-[18px] bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5 hover:bg-secondary sm:px-8"
                 >
-                  {t}
+                  Search
                 </button>
-              ))}
-            </div>
-          </form>
-
-          <div className="animate-fade-up mt-10 flex flex-wrap justify-center gap-4 [animation-delay:240ms]">
-            <Link
-              to="/dashboard"
-              className="inline-flex items-center gap-2 rounded-[16px] bg-primary px-8 py-4 text-base font-semibold text-primary-foreground shadow-[0_18px_45px_-18px_rgba(34,197,94,0.8)] transition hover:-translate-y-0.5 hover:bg-secondary"
-            >
-              <Compass className="size-5" /> {t.explore}
-            </Link>
-            <Link
-              to="/post-work"
-              className="inline-flex items-center gap-2 rounded-[16px] border border-white/35 bg-white/95 px-8 py-4 text-base font-semibold text-primary shadow-[0_18px_45px_-22px_rgba(0,0,0,0.55)] transition hover:-translate-y-0.5 hover:bg-white"
-            >
-              <Plus className="size-5" /> {t.post}
-            </Link>
-          </div>
-
-          {!hasRealActivity && (
-            <p className="animate-fade-up mt-10 text-sm font-medium text-white/80 [animation-delay:260ms]">
-              🌱 We just launched here — be one of the first to post and help your village fill this
-              up.
-            </p>
-          )}
-
-          <div className="animate-fade-up mt-8 grid w-full gap-4 sm:grid-cols-2 lg:grid-cols-5 [animation-delay:300ms]">
-            {[
-              {
-                icon: Users,
-                value: stats?.workers ? `${stats.workers}+` : "0",
-                label: "Workers Available",
-                color: "from-secondary to-primary",
-              },
-              {
-                icon: Wheat,
-                value: stats?.land ? `${stats.land}+` : "0",
-                label: "Land Listings",
-                color: "from-primary to-secondary",
-              },
-              {
-                icon: Wrench,
-                value: stats?.byType.service ? `${stats.byType.service}+` : "0",
-                label: "Services",
-                color: "from-blue-500 to-blue-700",
-              },
-              {
-                icon: ShoppingBasket,
-                value: stats?.byType.market ? `${stats.byType.market}+` : "0",
-                label: "Products",
-                color: "from-amber-500 to-orange-600",
-              },
-              {
-                icon: Users,
-                value: stats?.villagers ? `${stats.villagers}+` : "0",
-                label: "Trusted Users",
-                color: "from-purple-500 to-fuchsia-700",
-              },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="flex items-center gap-5 rounded-[20px] border border-white/16 bg-black/28 p-5 text-left text-white shadow-[0_22px_60px_-30px_rgba(0,0,0,0.75)] backdrop-blur-xl"
-              >
-                <div
-                  className={`grid size-16 shrink-0 place-items-center rounded-[18px] bg-gradient-to-br ${item.color}`}
-                >
-                  <item.icon className="size-8" />
-                </div>
-                <div>
-                  <p className="font-display text-2xl font-bold leading-none">{item.value}</p>
-                  <p className="mt-2 text-sm font-medium text-white/90">{item.label}</p>
-                </div>
               </div>
-            ))}
+              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-white">
+                <span className="font-semibold">{t.popular}</span>
+                {["Tractor Driver", "Paddy Land", "Electrician", "Milk", "Harvesting"].map((t) => (
+                  <button
+                    type="button"
+                    key={t}
+                    onClick={() => {
+                      setSearchQuery(t);
+                      navigate({ to: "/search", search: { q: t } });
+                    }}
+                    className="rounded-full border border-white/22 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/20"
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </motion.form>
+
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.32, ease: "easeOut" }}
+              className="mt-8 flex flex-wrap gap-4"
+            >
+              <Link
+                to="/dashboard"
+                className="inline-flex items-center gap-2 rounded-[20px] bg-primary px-7 py-4 text-base font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-1 hover:bg-secondary"
+              >
+                <Compass className="size-5" /> {t.explore}
+              </Link>
+              <Link
+                to="/post-work"
+                className="inline-flex items-center gap-2 rounded-[20px] border border-white/28 bg-white/92 px-7 py-4 text-base font-bold text-primary shadow-[0_22px_70px_-34px_rgba(0,0,0,0.72)] transition hover:-translate-y-1 hover:bg-white"
+              >
+                <Plus className="size-5" /> {t.post}
+              </Link>
+            </motion.div>
+
+            {!hasRealActivity && (
+              <p className="mt-8 max-w-xl rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-semibold text-white/78 backdrop-blur-xl">
+                New village workspace: post first, connect faster, and make local activity visible.
+              </p>
+            )}
           </div>
+
+          <Hero3DVillage villageName={villageName} heroWeather={heroWeather} stats={stats} />
         </div>
       </header>
 
       {/* Quick Actions */}
       <section
         id="actions"
-        className="relative z-30 mx-auto -mt-20 max-w-[calc(100%-2rem)] rounded-t-[32px] bg-white px-4 py-9 shadow-[0_-24px_80px_-50px_rgba(0,0,0,0.8)] sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-t-[40px]"
+        className="relative z-30 mx-auto -mt-20 max-w-[calc(100%-2rem)] overflow-hidden rounded-t-[32px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(232,247,239,0.82)_48%,rgba(255,246,222,0.8))] px-4 py-9 shadow-[0_-24px_80px_-50px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-t-[40px]"
       >
+        <div className="pointer-events-none absolute inset-0 village-pattern opacity-80" />
         <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-4 md:grid-cols-5 xl:grid-cols-10">
           {quickActions.map((a, i) =>
             a.to.startsWith("#") ? (
               <a
                 key={a.label}
                 href={a.to}
-                className="hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[14px] border border-border/60 bg-card p-5 text-center shadow-sm"
+                className="premium-action-card hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[16px] p-5 text-center"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                <div className="grid size-12 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
+                <div className="premium-action-icon grid size-12 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
                   <a.icon className="size-9" strokeWidth={1.8} />
                 </div>
                 <div>
@@ -445,10 +569,10 @@ function Index() {
               <Link
                 key={a.label}
                 to={a.to as Exclude<(typeof quickActions)[number]["to"], "#contacts">}
-                className="hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[14px] border border-border/60 bg-card p-5 text-center shadow-sm"
+                className="premium-action-card hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[16px] p-5 text-center"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                <div className="grid size-12 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
+                <div className="premium-action-icon grid size-12 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
                   <a.icon className="size-9" strokeWidth={1.8} />
                 </div>
                 <div>
@@ -596,45 +720,32 @@ function Index() {
         </div>
       </section>
 
-      <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6">
+      <section className="relative mx-auto mt-20 max-w-7xl px-4 sm:px-6">
+        <div className="pointer-events-none absolute inset-x-4 -top-10 h-48 rounded-[36px] bg-[linear-gradient(135deg,rgba(24,169,153,0.16),rgba(242,184,75,0.14))] blur-2xl" />
         <div className="mb-8 max-w-2xl">
           <span className="text-xs font-bold uppercase tracking-widest text-secondary">
             Village categories
           </span>
           <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
-            Built for every everyday village need
+            Built for every village need
           </h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {[
-            [
-              "Marketplace",
-              "/marketplace",
-              "Buy and sell crops, produce, and everyday goods with neighbours.",
-            ],
-            [
-              "Agriculture",
-              "/schemes",
-              "Government farm schemes, subsidies, and crop support programs.",
-            ],
-            ["Services", "/services", "Electricians, plumbers, tutors, and local service pros."],
-            [
-              "Government",
-              "/schemes",
-              "Certificates, records, and official village scheme updates.",
-            ],
-            ["Transport", "/transport", "Shared rides, bus timings, and local transport options."],
-            ["Education", "/announcements", "School notices, scholarships, and learning updates."],
-            ["Health", "/emergency", "Health centre details and nearby medical contacts."],
-            ["Emergency", "/emergency", "Police, ambulance, fire, and other emergency numbers."],
-          ].map(([item, to, description]) => (
+          {villageNeeds.map((item, index) => (
             <Link
-              key={item}
-              to={to}
-              className="hover-lift rounded-[20px] border border-border bg-card p-5 shadow-sm"
+              key={item.label}
+              to={item.to}
+              className="premium-need-card hover-lift animate-fade-up group rounded-[22px] p-5"
+              style={{ animationDelay: `${index * 60}ms` }}
             >
-              <p className="font-semibold text-clay">{item}</p>
-              <p className="mt-1 text-sm text-muted-foreground">{description}</p>
+              <div className="mb-5 flex items-center justify-between gap-3">
+                <span className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary shadow-sm transition group-hover:rotate-[-4deg] group-hover:scale-105">
+                  <item.icon className="size-6" strokeWidth={1.8} />
+                </span>
+                <ArrowRight className="size-4 text-primary/50 transition group-hover:translate-x-1 group-hover:text-primary" />
+              </div>
+              <p className="font-display text-xl font-semibold text-clay">{item.label}</p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
             </Link>
           ))}
         </div>
@@ -654,13 +765,13 @@ function Index() {
           {steps.map((s, i) => (
             <div
               key={s.n}
-              className="hover-lift animate-fade-up relative overflow-hidden rounded-3xl border border-border/60 bg-card p-7 shadow-sm"
+              className="premium-step-card hover-lift animate-fade-up relative overflow-hidden rounded-3xl p-7"
               style={{ animationDelay: `${i * 80}ms` }}
             >
               <span className="absolute right-5 top-5 font-display text-5xl font-semibold text-primary/15">
                 {s.n}
               </span>
-              <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary">
+              <div className="grid size-12 place-items-center rounded-xl bg-primary/10 text-primary shadow-sm">
                 <s.icon className="size-6" strokeWidth={1.75} />
               </div>
               <h3 className="mt-5 font-display text-xl font-semibold text-clay">{s.title}</h3>
@@ -704,7 +815,7 @@ function Index() {
               <Link
                 key={c.label}
                 to={categoryRoutes[c.label] || "/marketplace"}
-                className="hover-lift animate-fade-up group flex aspect-square flex-col items-start justify-between rounded-2xl border border-border/60 bg-card p-4 text-left shadow-sm"
+                className="premium-market-tile hover-lift animate-fade-up group flex aspect-square flex-col items-start justify-between rounded-2xl p-4 text-left"
                 style={{ animationDelay: `${i * 40}ms` }}
               >
                 <div className="grid size-10 place-items-center rounded-lg bg-gradient-to-br from-primary/15 to-accent/25 text-primary transition-transform group-hover:rotate-[-6deg]">
