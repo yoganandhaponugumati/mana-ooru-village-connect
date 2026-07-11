@@ -26,6 +26,25 @@ export type SearchableItem = {
   to: string;
 };
 
+export type SchemeInfo = {
+  id: string;
+  title: string;
+  category: string;
+  benefit: string;
+  documents: string[];
+  eligibility: string;
+  apply: string;
+};
+
+export type CitizenService = {
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  documents: string[];
+  apply: string;
+};
+
 export const fallbackListings: Listing[] = [
   {
     id: "seed-worker-tractor",
@@ -106,21 +125,12 @@ export const fallbackListings: Listing[] = [
   },
 ];
 
-export const schemes = [
-  {
-    id: "scheme-rythu-bandhu",
-    title: "Rythu Bandhu",
-    category: "Farmer Support",
-    benefit: "Seasonal investment support for eligible farmers.",
-    documents: ["Aadhaar", "Land passbook", "Bank account"],
-    eligibility: "Telangana farmers with verified land records.",
-    apply: "https://rythubandhu.telangana.gov.in/",
-  },
+export const schemes: SchemeInfo[] = [
   {
     id: "scheme-pm-kisan",
     title: "PM-KISAN",
-    category: "Central Scheme",
-    benefit: "Income support for eligible farmer families.",
+    category: "Farmer Income",
+    benefit: "Income support for eligible farmer families through direct bank transfer.",
     documents: ["Aadhaar", "Bank account", "Land details"],
     eligibility: "Eligible farmer families as per government norms.",
     apply: "https://pmkisan.gov.in/",
@@ -133,6 +143,147 @@ export const schemes = [
     documents: ["Aadhaar", "Land record", "Crop details", "Bank account"],
     eligibility: "Farmers growing notified crops in notified areas.",
     apply: "https://pmfby.gov.in/",
+  },
+  {
+    id: "scheme-myscheme",
+    title: "myScheme Eligibility Finder",
+    category: "All Schemes",
+    benefit: "Find central and state government schemes based on family, income, caste, occupation, and location.",
+    documents: ["Aadhaar", "Income details", "Caste certificate if applicable", "Bank account"],
+    eligibility: "Any citizen can check schemes and eligibility.",
+    apply: "https://www.myscheme.gov.in/",
+  },
+  {
+    id: "scheme-pm-kusum",
+    title: "PM-KUSUM Solar Pump Scheme",
+    category: "Farm Energy",
+    benefit: "Support for solar pumps and renewable energy systems for farmers.",
+    documents: ["Aadhaar", "Land record", "Bank account", "Pump or electricity details"],
+    eligibility: "Eligible farmers and farmer groups as per scheme component and state rules.",
+    apply: "https://pmkusum.mnre.gov.in/",
+  },
+  {
+    id: "scheme-soil-health-card",
+    title: "Soil Health Card",
+    category: "Crop Planning",
+    benefit: "Soil nutrient testing and fertilizer recommendations for better crop planning.",
+    documents: ["Farmer details", "Land details", "Mobile number"],
+    eligibility: "Farmers seeking soil testing and crop nutrient guidance.",
+    apply: "https://soilhealth.dac.gov.in/",
+  },
+  {
+    id: "scheme-enam",
+    title: "e-NAM Agriculture Market",
+    category: "Market Access",
+    benefit: "Online agricultural market access for better price discovery and trade.",
+    documents: ["Farmer ID or registration details", "Bank account", "Produce details"],
+    eligibility: "Farmers and traders linked with participating APMC markets.",
+    apply: "https://www.enam.gov.in/",
+  },
+  {
+    id: "scheme-agri-infra",
+    title: "Agriculture Infrastructure Fund",
+    category: "Farm Business",
+    benefit: "Financing support for post-harvest management and community farming assets.",
+    documents: ["Aadhaar", "Project details", "Bank documents", "Land or business records"],
+    eligibility: "Farmers, FPOs, cooperatives, agri entrepreneurs, and eligible institutions.",
+    apply: "https://agriinfra.dac.gov.in/",
+  },
+  {
+    id: "scheme-pmksy",
+    title: "PM Krishi Sinchai Yojana",
+    category: "Irrigation",
+    benefit: "Irrigation and water-use efficiency support under government guidelines.",
+    documents: ["Aadhaar", "Land record", "Bank account", "Irrigation details"],
+    eligibility: "Farmers and farmer groups covered by state implementation rules.",
+    apply: "https://pmksy.gov.in/",
+  },
+  {
+    id: "scheme-mgnrega",
+    title: "MGNREGA Job Card & Work",
+    category: "Rural Work",
+    benefit: "Rural wage employment and job card services for eligible households.",
+    documents: ["Aadhaar", "Address proof", "Bank account", "Job card if already issued"],
+    eligibility: "Adult members of rural households seeking unskilled wage work.",
+    apply: "https://nrega.nic.in/",
+  },
+  {
+    id: "scheme-pmayg",
+    title: "PMAY-Gramin Housing",
+    category: "Housing",
+    benefit: "Rural housing assistance for eligible households.",
+    documents: ["Aadhaar", "Bank account", "Income or SECC details", "Land or house details"],
+    eligibility: "Eligible rural households as per government housing priority lists.",
+    apply: "https://pmayg.nic.in/",
+  },
+  {
+    id: "scheme-ayushman",
+    title: "Ayushman Bharat PM-JAY",
+    category: "Health",
+    benefit: "Health coverage for eligible families at empanelled hospitals.",
+    documents: ["Aadhaar", "Ration card or family ID", "Mobile number"],
+    eligibility: "Eligible families as per PM-JAY/state health scheme rules.",
+    apply: "https://beneficiary.nha.gov.in/",
+  },
+  {
+    id: "scheme-national-scholarship",
+    title: "National Scholarship Portal",
+    category: "Education",
+    benefit: "Scholarships for eligible students from central and state departments.",
+    documents: ["Aadhaar", "Student ID", "Income certificate", "Caste certificate if applicable", "Bank account"],
+    eligibility: "Students meeting scholarship-specific income, category, and academic rules.",
+    apply: "https://scholarships.gov.in/",
+  },
+];
+
+export const citizenServices: CitizenService[] = [
+  {
+    id: "service-aadhaar-update",
+    title: "Aadhaar Update / Download",
+    category: "Identity",
+    description: "Update Aadhaar details, download e-Aadhaar, check update status, and book Aadhaar services.",
+    documents: ["Aadhaar number", "Mobile linked to Aadhaar", "Proof document for update"],
+    apply: "https://myaadhaar.uidai.gov.in/",
+  },
+  {
+    id: "service-digilocker",
+    title: "DigiLocker Documents",
+    category: "Documents",
+    description: "Access Aadhaar, driving licence, certificates, marksheets, and other digital documents.",
+    documents: ["Aadhaar or mobile number", "OTP access"],
+    apply: "https://www.digilocker.gov.in/",
+  },
+  {
+    id: "service-umang",
+    title: "UMANG Government Services",
+    category: "One App Services",
+    description: "Use many central and state government services from one official portal.",
+    documents: ["Mobile number", "Aadhaar or service-specific ID if required"],
+    apply: "https://web.umang.gov.in/",
+  },
+  {
+    id: "service-ration",
+    title: "Ration Card / NFSA",
+    category: "Food Security",
+    description: "Check ration card and food security services through the national NFSA portal.",
+    documents: ["Ration card number", "Aadhaar", "Family details"],
+    apply: "https://nfsa.gov.in/",
+  },
+  {
+    id: "service-eshram",
+    title: "e-Shram Card",
+    category: "Worker Support",
+    description: "Register unorganised workers for e-Shram and social security access.",
+    documents: ["Aadhaar", "Bank account", "Mobile number", "Occupation details"],
+    apply: "https://eshram.gov.in/",
+  },
+  {
+    id: "service-pan",
+    title: "PAN Services",
+    category: "Tax ID",
+    description: "Apply for PAN, update PAN, or check PAN application status.",
+    documents: ["Aadhaar", "Address proof", "Photo if required"],
+    apply: "https://www.onlineservices.nsdl.com/paam/endUserRegisterContact.html",
   },
 ];
 
@@ -242,6 +393,15 @@ export function getSearchableItems(listings: Listing[]): SearchableItem[] {
       description: `${scheme.benefit} Documents: ${scheme.documents.join(", ")}`,
       category: scheme.category,
       location: "Government",
+      to: "/schemes",
+    })),
+    ...citizenServices.map((service) => ({
+      id: service.id,
+      type: "scheme" as const,
+      title: service.title,
+      description: `${service.description} Documents: ${service.documents.join(", ")}`,
+      category: service.category,
+      location: "Citizen service",
       to: "/schemes",
     })),
     ...transportOptions.map((item) => ({

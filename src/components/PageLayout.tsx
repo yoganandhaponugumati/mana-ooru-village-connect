@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
   Activity,
@@ -488,23 +489,11 @@ function FullScreenFeatureBackground({ title }: { title: string }) {
     <div className="feature-background-stage" data-scene={kind} aria-hidden="true">
       <div className="feature-background-haze feature-background-haze-a" />
       <div className="feature-background-haze feature-background-haze-b" />
-      <motion.div
-        className="feature-background-plane"
-        animate={{ rotateX: [64, 60, 64], rotateZ: [-31, -34, -31] }}
-        transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-      >
+      <div className="feature-background-plane">
         <FeatureSceneObjects kind={kind} />
-      </motion.div>
-      <motion.div
-        className="feature-background-chip feature-background-chip-a"
-        animate={{ y: [0, -18, 0], x: [0, 10, 0] }}
-        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
-      />
-      <motion.div
-        className="feature-background-chip feature-background-chip-b"
-        animate={{ y: [0, 16, 0], x: [0, -12, 0] }}
-        transition={{ duration: 8.5, repeat: Infinity, ease: "easeInOut" }}
-      />
+      </div>
+      <div className="feature-background-chip feature-background-chip-a" />
+      <div className="feature-background-chip feature-background-chip-b" />
     </div>
   );
 }
@@ -538,7 +527,7 @@ export function PageLayout({
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
-            className="relative z-10 flex flex-col gap-5 rounded-[26px] border border-white/62 bg-white/58 p-5 shadow-[0_26px_80px_-50px_rgba(20,49,32,0.75)] backdrop-blur-2xl sm:flex-row sm:items-center sm:p-7"
+            className="relative z-10 flex flex-col gap-5 rounded-[26px] border border-white/78 bg-white/82 p-5 shadow-[0_28px_80px_-48px_rgba(20,49,32,0.72)] backdrop-blur-2xl sm:flex-row sm:items-center sm:p-7"
           >
             <div className="flex items-start gap-4">
               {icon && (
@@ -584,21 +573,21 @@ export function PageLayout({
           aria-label="Page quick actions"
         >
           {[
-            { label: "Search", to: "/search?q=", icon: Search },
+            { label: "Search", to: "/search", icon: Search },
             { label: "Weather", to: "/weather", icon: CloudSun },
             { label: "Emergency", to: "/emergency", icon: Siren },
             { label: "Dashboard", to: "/dashboard", icon: Activity },
           ].map((item) => (
-            <a
+            <Link
               key={item.label}
-              href={item.to}
+              to={item.to}
               className="group flex items-center gap-3 rounded-[18px] px-4 py-3 text-sm font-bold text-clay transition hover:-translate-y-0.5 hover:bg-white hover:shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
             >
               <span className="grid size-10 place-items-center rounded-2xl bg-primary/10 text-primary transition group-hover:scale-105">
                 <item.icon className="size-4" />
               </span>
               {item.label}
-            </a>
+            </Link>
           ))}
         </motion.nav>
         {children}

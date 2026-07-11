@@ -17,6 +17,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoleManager } from "@/components/AdminRoleManager";
 import {
   AppButton,
+  AppLinkButton,
   EmptyState,
   FeatureIcon,
   SectionHeader,
@@ -102,14 +103,13 @@ function OfficialPage() {
         title="Government work updates"
         description="Create public work records with photos so villagers can see what is planned, active, and completed."
         actions={
-          <AppButton
-            type="button"
+          <AppLinkButton
+            to="/announcements"
             variant="secondary"
             icon={<Megaphone className="size-4" />}
-            onClick={() => (window.location.href = "/announcements")}
           >
             Post notice
-          </AppButton>
+          </AppLinkButton>
         }
       />
 

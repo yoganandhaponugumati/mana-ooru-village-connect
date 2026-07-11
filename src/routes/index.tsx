@@ -37,11 +37,12 @@ import {
   AlertTriangle,
   ImagePlus,
   Leaf,
+  Landmark,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village-premium.jpg";
 import { SiteNav } from "@/components/SiteNav";
 import { Button } from "@/components/ui/button";
-import { fallbackListings } from "@/lib/app-data";
+import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
 import voice1 from "@/assets/voice-1.jpg";
 import voice2 from "@/assets/voice-2.jpg";
@@ -716,6 +717,91 @@ function Index() {
                 ))}
               </div>
             )}
+          </div>
+        </div>
+      </section>
+
+      <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6">
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
+          <div className="max-w-2xl">
+            <span className="text-xs font-bold uppercase tracking-widest text-secondary">
+              Government help desk
+            </span>
+            <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+              Aadhaar, schemes, cards, and documents in one place
+            </h2>
+            <p className="mt-2 text-sm leading-7 text-muted-foreground sm:text-base">
+              Useful official services villagers need before applying for support, work, health,
+              and farming schemes.
+            </p>
+          </div>
+          <Link
+            to="/schemes"
+            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5 hover:bg-secondary"
+          >
+            View all schemes <ArrowRight className="size-4" />
+          </Link>
+        </div>
+        <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="grid gap-4 sm:grid-cols-2">
+            {citizenServices.slice(0, 4).map((service, index) => {
+              const Icon = [ShieldCheck, Building2, GraduationCap, HeartPulse][index];
+              return (
+                <a
+                  key={service.id}
+                  href={service.apply}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="premium-need-card hover-lift group rounded-[22px] p-5"
+                >
+                  <div className="mb-5 flex items-center justify-between gap-3">
+                    <span className="grid size-12 place-items-center rounded-2xl bg-secondary/12 text-secondary shadow-sm transition group-hover:rotate-[-4deg] group-hover:scale-105">
+                      <Icon className="size-6" strokeWidth={1.8} />
+                    </span>
+                    <ArrowRight className="size-4 text-primary/50 transition group-hover:translate-x-1 group-hover:text-primary" />
+                  </div>
+                  <p className="font-display text-xl font-semibold text-clay">{service.title}</p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                    {service.description}
+                  </p>
+                  <p className="mt-4 rounded-2xl bg-muted/60 px-3 py-2 text-xs font-semibold leading-5 text-clay">
+                    Keep ready: {service.documents.slice(0, 3).join(", ")}
+                  </p>
+                </a>
+              );
+            })}
+          </div>
+          <div className="rounded-[24px] bg-clay p-6 text-background shadow-[var(--shadow-lift)]">
+            <div className="flex items-center gap-3">
+              <div className="grid size-12 place-items-center rounded-2xl bg-white/10 text-accent">
+                <Landmark className="size-6" />
+              </div>
+              <div>
+                <p className="text-xs font-bold uppercase tracking-[0.2em] text-accent">
+                  Farmer schemes
+                </p>
+                <h3 className="font-display text-2xl font-semibold">Popular official portals</h3>
+              </div>
+            </div>
+            <div className="mt-6 grid gap-3">
+              {schemes.slice(0, 5).map((scheme) => (
+                <a
+                  key={scheme.id}
+                  href={scheme.apply}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/14"
+                >
+                  <span className="min-w-0">
+                    <span className="block truncate">{scheme.title}</span>
+                    <span className="mt-0.5 block text-xs font-medium text-white/62">
+                      {scheme.category}
+                    </span>
+                  </span>
+                  <ArrowRight className="size-4 shrink-0 text-accent" />
+                </a>
+              ))}
+            </div>
           </div>
         </div>
       </section>

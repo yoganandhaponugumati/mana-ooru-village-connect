@@ -1,4 +1,4 @@
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell,
@@ -16,6 +16,8 @@ import {
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
 import { useThemePreference } from "@/lib/local-actions";
+import { useNotifications } from "@/lib/notifications";
+import { timeAgo } from "@/lib/store";
 import { languageOptions, useVillagePreferences, type Language } from "@/lib/village-preferences";
 
 const links = [
@@ -33,11 +35,15 @@ const links = [
 export function SiteNav() {
   const [open, setOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, role, signOut, profile: authProfile } = useAuth();
   const { language, setLanguage, t, profile, weather, hasProfile } = useVillagePreferences();
+  const { notifications, unreadCount, loading: notificationsLoading, markRead, markAllRead } =
+    useNotifications();
   useThemePreference();
   const location = useLocation();
+  const navigate = useNavigate();
   const isHeroTop = location.pathname === "/" && !scrolled;
 
   useEffect(() => {
@@ -60,11 +66,18 @@ export function SiteNav() {
 
   const focusSearch = () => {
     if (location.pathname !== "/") {
-      window.location.href = "/#hero-search";
+      navigate({ to: "/" });
+      window.setTimeout(() => document.getElementById("hero-search")?.focus(), 120);
       return;
     }
     document.getElementById("hero-search")?.focus();
   };
+
+  const openNotifications = () => {
+    setNotificationsOpen((value) => !value);
+    setLanguageOpen(false);
+  };
+
   const selectedVillage = user && hasProfile && profile.village ? profile.village : "";
   const weatherText = selectedVillage
     ? weather.live && weather.temp !== null
@@ -80,15 +93,15 @@ export function SiteNav() {
       className={`fixed inset-x-0 top-0 z-50 border-b backdrop-blur-2xl transition-all duration-300 ${isHeroTop ? "border-white/10 bg-black/12 text-white" : "border-white/80 bg-background/84 text-foreground shadow-[0_18px_54px_-40px_rgba(20,49,32,0.82)]"}`}
     >
       <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-2 px-4 py-2 sm:px-6">
-        <Link to="/" className="group flex shrink-0 items-center gap-2">
+        <Link to="/" className="group flex min-w-0 shrink-0 items-center gap-2">
           <motion.div
-            whileHover={{ rotate: -8, scale: 1.06 }}
+            whileHover={{ rotate: -4, scale: 1.03 }}
             className="grid size-9 place-items-center rounded-[14px] bg-[var(--gradient-village)] text-white shadow-[var(--shadow-glow)]"
           >
             <Leaf className="size-5" />
           </motion.div>
           <span
-            className={`font-display text-xl font-semibold tracking-tight ${isHeroTop ? "text-white" : "text-clay"}`}
+            className={`truncate font-display text-xl font-semibold tracking-tight ${isHeroTop ? "text-white" : "text-clay"}`}
           >
             ManaOoru
           </span>
@@ -182,7 +195,7 @@ export function SiteNav() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 8, scale: 0.98 }}
                   transition={{ duration: 0.18 }}
-                  className="absolute right-0 mt-2 w-40 overflow-hidden rounded-2xl border border-white/70 bg-white/90 p-1 text-sm text-foreground shadow-[var(--shadow-lift)] backdrop-blur-xl"
+                  className="absolute right-0 z-[80] mt-2 w-40 overflow-hidden rounded-2xl border border-white/70 bg-white/95 p-1 text-sm text-foreground shadow-[var(--shadow-lift)] backdrop-blur-xl"
                 >
                   {languageOptions.map((item) => (
                     <button
@@ -205,14 +218,113 @@ export function SiteNav() {
           >
             <Search className="size-4" />
           </button>
-          <Link
-            to="/announcements"
-            className={`relative hidden size-10 items-center justify-center rounded-full border shadow-sm transition 2xl:grid ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
-            aria-label="Notifications"
-          >
-            <Bell className="size-4" />
-            <span className="absolute right-2 top-2 size-2.5 rounded-full bg-red-500 ring-2 ring-white" />
-          </Link>
+          {user && (
+            <div className="relative hidden 2xl:block">
+              <button
+                type="button"
+                onClick={openNotifications}
+                className={`relative grid size-10 place-items-center rounded-full border shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+                aria-label="Notifications"
+                aria-expanded={notificationsOpen}
+              >
+                <Bell className="size-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute -right-1 -top-1 grid min-w-5 place-items-center rounded-full bg-red-500 px-1.5 py-0.5 text-[10px] font-black leading-none text-white ring-2 ring-white">
+                    {unreadCount > 9 ? "9+" : unreadCount}
+                  </span>
+                )}
+              </button>
+              <AnimatePresence>
+                {notificationsOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.18 }}
+                    className="absolute right-0 z-[90] mt-2 w-[360px] overflow-hidden rounded-3xl border border-white/70 bg-white/96 text-foreground shadow-[var(--shadow-lift)] backdrop-blur-xl"
+                  >
+                    <div className="flex items-center justify-between gap-3 border-b border-border/70 p-4">
+                      <div>
+                        <p className="font-display text-lg font-semibold text-clay">
+                          Notifications
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          {unreadCount > 0
+                            ? `${unreadCount} unread village update${unreadCount === 1 ? "" : "s"}`
+                            : "All caught up"}
+                        </p>
+                      </div>
+                      {unreadCount > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => markAllRead()}
+                          className="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-primary hover:text-primary-foreground"
+                        >
+                          Mark read
+                        </button>
+                      )}
+                    </div>
+                    <div className="max-h-[420px] overflow-y-auto p-2">
+                      {notificationsLoading ? (
+                        <p className="p-5 text-center text-sm text-muted-foreground">
+                          Loading notifications...
+                        </p>
+                      ) : notifications.length === 0 ? (
+                        <div className="p-6 text-center">
+                          <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                            <Bell className="size-5" />
+                          </div>
+                          <p className="mt-3 text-sm font-semibold text-clay">
+                            No notifications yet
+                          </p>
+                          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                            New posts, notices, problems, services, and market updates will appear
+                            here after sign-in.
+                          </p>
+                        </div>
+                      ) : (
+                        notifications.map((item) => (
+                          <button
+                            key={item.id}
+                            type="button"
+                            onClick={() => markRead(item.id)}
+                            className={`flex w-full gap-3 rounded-2xl p-3 text-left transition hover:bg-primary/8 ${
+                              item.read_at ? "opacity-72" : "bg-primary/6"
+                            }`}
+                          >
+                            <span
+                              className={`mt-1 size-2.5 shrink-0 rounded-full ${
+                                item.read_at ? "bg-border" : "bg-red-500"
+                              }`}
+                            />
+                            <span className="min-w-0 flex-1">
+                              <span className="block truncate text-sm font-bold text-clay">
+                                {item.title}
+                              </span>
+                              <span className="mt-1 line-clamp-2 block text-xs leading-5 text-muted-foreground">
+                                {item.body}
+                              </span>
+                              <span className="mt-2 block text-[10px] font-bold uppercase tracking-[0.16em] text-primary/70">
+                                {item.type.replaceAll("_", " ")} -{" "}
+                                {timeAgo(new Date(item.created_at).getTime())}
+                              </span>
+                            </span>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                    <Link
+                      to="/announcements"
+                      onClick={() => setNotificationsOpen(false)}
+                      className="flex items-center justify-center border-t border-border/70 px-4 py-3 text-sm font-bold text-primary transition hover:bg-primary/8"
+                    >
+                      Open village notices
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          )}
           <button
             className={`grid size-10 place-items-center rounded-full border shadow-sm xl:hidden ${isHeroTop ? "border-white/25 bg-white/10 text-white" : "border-border bg-white text-foreground"}`}
             onClick={() => setOpen((v) => !v)}

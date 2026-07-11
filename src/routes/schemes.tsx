@@ -4,8 +4,11 @@ import {
   Clock3,
   ExternalLink,
   FileText,
+  Fingerprint,
   Landmark,
   Plus,
+  SearchCheck,
+  ShieldCheck,
   X,
   XCircle,
 } from "lucide-react";
@@ -19,7 +22,7 @@ import {
   StatusBadge,
   SurfaceCard,
 } from "@/components/design-system";
-import { schemes } from "@/lib/app-data";
+import { citizenServices, schemes } from "@/lib/app-data";
 import { useAuth } from "@/lib/auth";
 import {
   applicationStatusLabels,
@@ -172,10 +175,55 @@ function SchemesPage() {
         </div>
       )}
 
+      <SectionHeader
+        eyebrow="Useful services"
+        title="Aadhaar, documents, ration, worker cards, and more"
+        description="Fast official links villagers often need before applying for schemes."
+        compact
+        className="mt-16"
+      />
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+        {citizenServices.map((service, index) => {
+          const Icon = [Fingerprint, FileText, SearchCheck, ShieldCheck][index % 4];
+          return (
+            <SurfaceCard key={service.id} className="p-6">
+              <div className="flex items-start justify-between gap-3">
+                <div className="grid size-12 place-items-center rounded-2xl bg-secondary/12 text-secondary ring-1 ring-secondary/15">
+                  <Icon className="size-5" />
+                </div>
+                <StatusBadge tone="secondary">{service.category}</StatusBadge>
+              </div>
+              <h3 className="mt-4 font-display text-2xl font-semibold text-clay">
+                {service.title}
+              </h3>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                {service.description}
+              </p>
+              <div className="mt-5 rounded-2xl bg-muted/60 p-4">
+                <p className="flex items-center gap-2 text-sm font-semibold text-clay">
+                  <FileText className="size-4 text-primary" /> Keep ready
+                </p>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  {service.documents.join(", ")}
+                </p>
+              </div>
+              <a
+                href={service.apply}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-semibold text-secondary-foreground transition hover:-translate-y-0.5 hover:brightness-105"
+              >
+                Open official service <ExternalLink className="size-4" />
+              </a>
+            </SurfaceCard>
+          );
+        })}
+      </div>
+
       {/* Static reference list of major national/state schemes */}
       <SectionHeader
         eyebrow="Reference"
-        title={`Nationwide & state schemes for ${profile.district || "your district"}`}
+        title={`Important government schemes for ${profile.district || "your district"}`}
         description="General schemes you apply for directly on the official government portal."
         compact
         className="mt-16"
@@ -199,7 +247,7 @@ function SchemesPage() {
               href={scheme.apply}
               target="_blank"
               rel="noreferrer"
-              className="mt-5 inline-flex items-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground"
+              className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:-translate-y-0.5 hover:brightness-105"
             >
               Apply / Check status <ExternalLink className="size-4" />
             </a>
