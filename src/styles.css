@@ -392,6 +392,17 @@
 }
 
 .premium-page-bg {
+  --background: #f7fbf2;
+  --foreground: #132219;
+  --card: #ffffff;
+  --card-foreground: #17231c;
+  --popover: rgba(255, 255, 255, 0.94);
+  --popover-foreground: #17231c;
+  --muted: #eaf2e8;
+  --muted-foreground: #53645b;
+  --border: #dfeae2;
+  --input: #ffffff;
+  --clay: #173322;
   background:
     linear-gradient(
       180deg,
@@ -449,11 +460,12 @@
 }
 
 .page-village-hero {
+  color: #132219;
   background:
-    radial-gradient(circle at 16% 18%, rgba(255, 218, 137, 0.28), transparent 18rem),
-    radial-gradient(circle at 86% 4%, rgba(24, 169, 153, 0.2), transparent 24rem),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.74), rgba(235, 249, 237, 0.62)),
-    linear-gradient(180deg, rgba(248, 253, 244, 0.78), rgba(229, 243, 222, 0.72));
+    radial-gradient(circle at 16% 18%, rgba(255, 218, 137, 0.2), transparent 18rem),
+    radial-gradient(circle at 86% 4%, rgba(24, 169, 153, 0.18), transparent 24rem),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.92), rgba(235, 249, 237, 0.84)),
+    linear-gradient(180deg, rgba(248, 253, 244, 0.94), rgba(229, 243, 222, 0.88));
 }
 
 .page-village-hero::before {
@@ -469,9 +481,10 @@
 }
 
 .village-quick-nav {
+  color: #173322;
   border: 1px solid rgba(255, 255, 255, 0.72);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(244, 252, 243, 0.56)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 252, 243, 0.8)),
     radial-gradient(circle at 12% 0%, rgba(242, 184, 75, 0.12), transparent 42%);
 }
 
@@ -563,10 +576,11 @@
 
 .premium-surface {
   position: relative;
+  color: #17231c;
   background: linear-gradient(
     180deg,
-    color-mix(in srgb, var(--card) 88%, transparent),
-    color-mix(in srgb, #eef9ed 80%, transparent)
+    rgba(255, 255, 255, 0.94),
+    rgba(238, 249, 237, 0.86)
   );
   border: 1px solid rgba(255, 255, 255, 0.72);
   box-shadow:
@@ -1846,8 +1860,20 @@ footer {
   top: 7%;
   width: min(78%, 390px);
   border-radius: 30px;
-  background: rgba(255, 255, 255, 0.76);
+  background: rgba(255, 255, 255, 0.9);
+  color: #173322;
   padding: 22px;
+}
+
+.feature-hero-panel-main p,
+.feature-hero-panel-main strong,
+.feature-hero-mini-stat,
+.feature-hero-mini-action {
+  color: #173322;
+}
+
+.feature-hero-panel-main > p:first-child {
+  color: #17633a;
 }
 
 .feature-hero-panel-side {
@@ -1871,6 +1897,23 @@ footer {
   color: white;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+}
+
+.page-village-hero h1,
+.page-village-hero h2,
+.page-village-hero h3,
+.page-village-hero .font-display,
+.village-quick-nav a {
+  color: #173322;
+}
+
+.page-village-hero p {
+  color: #53645b;
+}
+
+.page-village-hero [class*="text-primary"],
+.village-quick-nav [class*="text-primary"] {
+  color: #17633a;
 }
 
 .feature-hero-showcase .feature-person-a {
