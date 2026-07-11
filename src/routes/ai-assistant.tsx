@@ -50,6 +50,12 @@ function AiAssistantPage() {
     weather.live && weather.temp !== null
       ? `${weather.temp}°C, humidity ${weather.humidity ?? "--"}%, wind ${weather.wind ?? "--"} km/h, rain alert ${weather.rain}`
       : "live weather is unavailable right now. Check the Weather page after confirming the village spelling.";
+  const weatherTrust =
+    weather.live && weather.temp !== null
+      ? `Source: ${weather.source ?? "Open-Meteo live"}${
+          weather.placeName ? `, matched to ${weather.placeName}` : ""
+        }.`
+      : "I will not guess weather values when live data is unavailable.";
 
   const replies: Record<string, string> = {
     "Crop Suggestions":
@@ -90,17 +96,65 @@ function AiAssistantPage() {
           : `Services in ${profile.village}: electrician, plumber, borewell, internet, vehicle repair, and transport.`,
   };
 
-  const send = () => {
-    if (!message.trim()) return;
-    const response =
-      replies[message] ??
-      "I can help with that. Share your village, crop or service need, and urgency so I can suggest the best next step.";
+  const buildResponse = (text: string) => {
+    const normalized = text.toLowerCase();
+    if (
+      normalized.includes("weather") ||
+      normalized.includes("rain") ||
+      normalized.includes("వాతావరణ") ||
+      normalized.includes("बारिश") ||
+      normalized.includes("मौसम")
+    ) {
+      return `${replies["Weather Help"]} ${weatherTrust}`;
+    }
+    if (
+      normalized.includes("crop") ||
+      normalized.includes("paddy") ||
+      normalized.includes("cotton") ||
+      normalized.includes("పంట") ||
+      normalized.includes("फसल")
+    ) {
+      return replies["Crop Suggestions"];
+    }
+    if (
+      normalized.includes("scheme") ||
+      normalized.includes("subsidy") ||
+      normalized.includes("పథ")
+    ) {
+      return replies["Government Schemes"];
+    }
+    if (
+      normalized.includes("worker") ||
+      normalized.includes("labour") ||
+      normalized.includes("పని")
+    ) {
+      return replies["Nearby Workers"];
+    }
+    return (
+      replies[text] ??
+      `I can help with that for ${profile.village || "your village"}. Share the crop, service need, urgency, and location so I can suggest the best next step.`
+    );
+  };
+
+  const send = (text = message) => {
+    if (!text.trim()) return;
+    const response = buildResponse(text.trim());
     setChat((items) => [
       ...items,
-      { role: "user", text: message },
+      { role: "user", text: text.trim() },
       { role: "assistant", text: response },
     ]);
     setMessage("");
+  };
+
+  const speakLastAnswer = () => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    const lastAssistant = [...chat].reverse().find((item) => item.role === "assistant");
+    if (!lastAssistant) return;
+    const utterance = new SpeechSynthesisUtterance(lastAssistant.text);
+    utterance.lang = language === "hi" ? "hi-IN" : language === "en" ? "en-IN" : "te-IN";
+    window.speechSynthesis.cancel();
+    window.speechSynthesis.speak(utterance);
   };
 
   const startVoice = () => {
@@ -161,11 +215,11 @@ function AiAssistantPage() {
       <SectionHeader
         eyebrow="Smart village help"
         title="Ask in Telugu, English, or Hindi"
-        description="A simple assistant experience designed for villagers, farmers, workers, and local service providers."
+        description="A polished assistant for farmers, workers, services, schemes, and live weather-aware guidance."
       />
       <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-4">
-          <SurfaceCard className="p-5">
+          <SurfaceCard className="overflow-hidden p-5">
             <div className="flex items-center gap-3">
               <FeatureIcon icon={<Languages className="size-5" />} />
               <div>
@@ -173,18 +227,21 @@ function AiAssistantPage() {
                 <p className="text-sm text-muted-foreground">Telugu, English, Hindi</p>
               </div>
             </div>
+            <div className="mt-5 rounded-[18px] border border-primary/15 bg-primary/10 p-4">
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
+                Weather aware
+              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">
+                {weatherDetails}. {weatherTrust}
+              </p>
+            </div>
           </SurfaceCard>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
             {prompts.map((prompt) => (
               <SurfaceCard key={prompt.label} className="p-4">
                 <button
                   onClick={() => {
-                    setMessage(prompt.label);
-                    setChat((items) => [
-                      ...items,
-                      { role: "user", text: prompt.label },
-                      { role: "assistant", text: replies[prompt.label] },
-                    ]);
+                    send(prompt.label);
                   }}
                   className="flex w-full items-center gap-3 text-left"
                 >
@@ -195,19 +252,39 @@ function AiAssistantPage() {
             ))}
           </div>
         </div>
-        <SurfaceCard className="flex min-h-[620px] flex-col overflow-hidden p-0">
-          <div className="border-b border-border bg-primary p-5 text-primary-foreground">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
-                  ManaOoru AI
-                </p>
-                <h2 className="font-display text-2xl font-semibold">Village support chat</h2>
+        <SurfaceCard className="flex min-h-[620px] flex-col overflow-hidden p-0" hover={false}>
+          <div className="relative overflow-hidden border-b border-border bg-gradient-to-br from-[#123820] via-primary to-secondary p-5 text-primary-foreground">
+            <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(128deg,rgba(255,255,255,0.16),transparent_34%),linear-gradient(246deg,rgba(242,184,75,0.2),transparent_38%)]" />
+            <div className="relative">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
+                    ManaOoru AI
+                  </p>
+                  <h2 className="font-display text-2xl font-semibold">Village support chat</h2>
+                </div>
+                <Sparkles className="size-6" />
               </div>
-              <Sparkles className="size-6" />
+              <div className="mt-5 grid gap-3 sm:grid-cols-3">
+                {[
+                  ["Village", profile.village || "Not selected"],
+                  ["Weather", weatherSummary],
+                  ["Mode", listening ? "Voice active" : "Ready"],
+                ].map(([label, value]) => (
+                  <div
+                    key={label}
+                    className="rounded-[16px] border border-white/16 bg-white/12 p-3"
+                  >
+                    <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-white/55">
+                      {label}
+                    </p>
+                    <p className="mt-1 truncate text-sm font-semibold text-white">{value}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          <div className="flex-1 space-y-4 overflow-y-auto bg-muted/40 p-5">
+          <div className="flex-1 space-y-4 overflow-y-auto bg-[linear-gradient(180deg,rgba(234,242,232,0.62),rgba(255,255,255,0.52))] p-5">
             {chat.map((item, index) => (
               <div
                 key={index}
@@ -221,11 +298,11 @@ function AiAssistantPage() {
               </div>
             ))}
           </div>
-          <div className="border-t border-border bg-white p-4">
+          <div className="border-t border-white/70 bg-white/80 p-4 backdrop-blur-xl">
             <div className="flex gap-2">
               <button
                 onClick={startVoice}
-                className={`grid size-12 place-items-center rounded-full border text-primary transition hover:border-primary ${listening ? "border-primary bg-primary text-primary-foreground" : "border-border"}`}
+                className={`grid size-12 place-items-center rounded-[18px] border text-primary transition hover:-translate-y-0.5 hover:border-primary ${listening ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white"}`}
                 aria-label="Voice input"
               >
                 <Mic className="size-5" />
@@ -235,17 +312,25 @@ function AiAssistantPage() {
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder="Ask anything about your village..."
-                className="min-w-0 flex-1 rounded-full border border-border px-4 text-sm"
+                className="premium-input min-w-0 flex-1 rounded-[18px] px-4 text-sm"
               />
-              <AppButton onClick={send} icon={<Send className="size-4" />}>
+              <AppButton onClick={() => send()} icon={<Send className="size-4" />}>
                 Send
               </AppButton>
             </div>
             <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
-              <Volume2 className="size-3.5" />{" "}
-              {listening
-                ? "Listening in Telugu..."
-                : "Mic works on browsers that support speech recognition."}
+              <button
+                type="button"
+                onClick={speakLastAnswer}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-white px-3 py-1.5 font-semibold text-primary transition hover:border-primary"
+              >
+                <Volume2 className="size-3.5" /> Read answer
+              </button>
+              <span>
+                {listening
+                  ? "Listening in your selected language..."
+                  : "Mic works on browsers that support speech recognition."}
+              </span>
             </div>
           </div>
         </SurfaceCard>

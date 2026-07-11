@@ -29,73 +29,63 @@ export function VillageLocationPicker({
   const districts = getDistricts(value.state);
   const mandals = getMandals(value.state, value.district);
   const villages = getVillages(value.state, value.district, value.mandal);
+  const fields = [
+    {
+      label: "State",
+      list: `${idPrefix}-states`,
+      value: value.state,
+      placeholder: "Type your state",
+      options: states,
+      onChange: (next: string) => onChange({ state: next, district: "", mandal: "", village: "" }),
+    },
+    {
+      label: "District",
+      list: `${idPrefix}-districts`,
+      value: value.district,
+      placeholder: "Type your district",
+      options: districts,
+      onChange: (next: string) => onChange({ ...value, district: next, mandal: "", village: "" }),
+    },
+    {
+      label: "Mandal / Tehsil",
+      list: `${idPrefix}-mandals`,
+      value: value.mandal,
+      placeholder: "Type your mandal / tehsil",
+      options: mandals,
+      onChange: (next: string) => onChange({ ...value, mandal: next, village: "" }),
+    },
+    {
+      label: "Village",
+      list: `${idPrefix}-villages`,
+      value: value.village,
+      placeholder: "Type your exact village name",
+      options: villages,
+      onChange: (next: string) => onChange({ ...value, village: next }),
+    },
+  ];
 
   return (
     <div className="grid gap-3 sm:grid-cols-2">
-      <div>
-        <input
-          aria-label="State"
-          list={`${idPrefix}-states`}
-          value={value.state}
-          onChange={(e) =>
-            onChange({ state: e.target.value, district: "", mandal: "", village: "" })
-          }
-          placeholder="Type your state"
-          className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-        />
-        <datalist id={`${idPrefix}-states`}>
-          {states.map((state) => (
-            <option key={state} value={state} />
-          ))}
-        </datalist>
-      </div>
-      <div>
-        <input
-          aria-label="District"
-          list={`${idPrefix}-districts`}
-          value={value.district}
-          onChange={(e) =>
-            onChange({ ...value, district: e.target.value, mandal: "", village: "" })
-          }
-          placeholder="Type your district"
-          className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-        />
-        <datalist id={`${idPrefix}-districts`}>
-          {districts.map((district) => (
-            <option key={district} value={district} />
-          ))}
-        </datalist>
-      </div>
-      <div>
-        <input
-          aria-label="Mandal"
-          list={`${idPrefix}-mandals`}
-          value={value.mandal}
-          onChange={(e) => onChange({ ...value, mandal: e.target.value, village: "" })}
-          placeholder="Type your mandal / tehsil"
-          className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-        />
-        <datalist id={`${idPrefix}-mandals`}>
-          {mandals.map((mandal) => (
-            <option key={mandal} value={mandal} />
-          ))}
-        </datalist>
-      </div>
-      <div>
-        <input
-          aria-label="Village"
-          list={`${idPrefix}-villages`}
-          value={value.village}
-          onChange={(e) => onChange({ ...value, village: e.target.value })}
-          placeholder="Type your exact village name"
-          className="w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-        />
-        <datalist id={`${idPrefix}-villages`}>
-          {villages.map((village) => (
-            <option key={village} value={village} />
-          ))}
-        </datalist>
-      </div>
+      {fields.map((field) => (
+        <label key={field.label} className="block">
+          <span className="mb-1.5 block text-xs font-black uppercase tracking-[0.18em] text-primary/75">
+            {field.label}
+          </span>
+          <input
+            aria-label={field.label}
+            list={field.list}
+            value={field.value}
+            onChange={(e) => field.onChange(e.target.value)}
+            placeholder={field.placeholder}
+            className="premium-input w-full rounded-2xl px-4 py-3 text-sm font-semibold text-foreground"
+          />
+          <datalist id={field.list}>
+            {field.options.map((option) => (
+              <option key={option} value={option} />
+            ))}
+          </datalist>
+        </label>
+      ))}
     </div>
   );
 }
