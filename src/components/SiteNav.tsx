@@ -1,6 +1,7 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Activity,
   Bell,
   Check,
   ChevronDown,
@@ -23,6 +24,7 @@ import { languageOptions, useVillagePreferences, type Language } from "@/lib/vil
 
 const links = [
   { to: "/", key: "home" },
+  { to: "/timeline", key: "timeline" },
   { to: "/workers", key: "workers" },
   { to: "/land", key: "land" },
   { to: "/marketplace", key: "marketplace" },

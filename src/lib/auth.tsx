@@ -29,6 +29,7 @@ type AuthProfile = {
   district: string | null;
   mandal: string | null;
   village: string | null;
+  village_id: string | null;
   preferred_language: Language;
   profileCompletedAt: string | null;
 };
@@ -60,7 +61,7 @@ const Ctx = createContext<AuthCtx>({
 });
 
 const PROFILE_COLUMNS =
-  "account_type,role,username,full_name,photo_url,occupation,state,district,mandal,village,preferred_language,profile_completed_at";
+  "account_type,role,username,full_name,photo_url,occupation,state,district,mandal,village,village_id,preferred_language,profile_completed_at";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -88,6 +89,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             district: data.district,
             mandal: data.mandal,
             village: data.village,
+            village_id: data.village_id,
             preferred_language: data.preferred_language,
             profileCompletedAt: data.profile_completed_at,
           }

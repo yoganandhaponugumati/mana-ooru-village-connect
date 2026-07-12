@@ -14,6 +14,7 @@ import { Route as WorkRouteImport } from './routes/work'
 import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as TransportRouteImport } from './routes/transport'
+import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SchemesRouteImport } from './routes/schemes'
@@ -55,6 +56,11 @@ const UnauthorizedRoute = UnauthorizedRouteImport.update({
 const TransportRoute = TransportRouteImport.update({
   id: '/transport',
   path: '/transport',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TimelineRoute = TimelineRouteImport.update({
+  id: '/timeline',
+  path: '/timeline',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesRoute = ServicesRouteImport.update({
@@ -161,6 +167,7 @@ export interface FileRoutesByFullPath {
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/weather': typeof WeatherRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/weather': typeof WeatherRoute
@@ -210,6 +218,7 @@ export interface FileRoutesById {
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
   '/unauthorized': typeof UnauthorizedRoute
   '/weather': typeof WeatherRoute
@@ -236,6 +245,7 @@ export interface FileRouteTypes {
     | '/schemes'
     | '/search'
     | '/services'
+    | '/timeline'
     | '/transport'
     | '/unauthorized'
     | '/weather'
@@ -260,6 +270,7 @@ export interface FileRouteTypes {
     | '/schemes'
     | '/search'
     | '/services'
+    | '/timeline'
     | '/transport'
     | '/unauthorized'
     | '/weather'
@@ -284,6 +295,7 @@ export interface FileRouteTypes {
     | '/schemes'
     | '/search'
     | '/services'
+    | '/timeline'
     | '/transport'
     | '/unauthorized'
     | '/weather'
@@ -309,6 +321,7 @@ export interface RootRouteChildren {
   SchemesRoute: typeof SchemesRoute
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRoute
+  TimelineRoute: typeof TimelineRoute
   TransportRoute: typeof TransportRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
   WeatherRoute: typeof WeatherRoute
@@ -351,6 +364,13 @@ declare module '@tanstack/react-router' {
       path: '/transport'
       fullPath: '/transport'
       preLoaderRoute: typeof TransportRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/timeline': {
+      id: '/timeline'
+      path: '/timeline'
+      fullPath: '/timeline'
+      preLoaderRoute: typeof TimelineRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services': {
@@ -493,6 +513,7 @@ const rootRouteChildren: RootRouteChildren = {
   SchemesRoute: SchemesRoute,
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRoute,
+  TimelineRoute: TimelineRoute,
   TransportRoute: TransportRoute,
   UnauthorizedRoute: UnauthorizedRoute,
   WeatherRoute: WeatherRoute,

@@ -574,9 +574,9 @@ export function PageLayout({
         >
           {[
             { label: "Search", to: "/search", icon: Search },
+            { label: "Timeline", to: "/timeline", icon: Activity },
             { label: "Weather", to: "/weather", icon: CloudSun },
             { label: "Emergency", to: "/emergency", icon: Siren },
-            { label: "Dashboard", to: "/dashboard", icon: Activity },
           ].map((item) => (
             <Link
               key={item.label}

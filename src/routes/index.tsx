@@ -478,7 +478,7 @@ function Index() {
               className="mt-8 flex flex-wrap gap-4"
             >
               <Link
-                to="/dashboard"
+                to="/timeline"
                 className="inline-flex items-center gap-2 rounded-[20px] bg-primary px-7 py-4 text-base font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-1 hover:bg-secondary"
               >
                 <Compass className="size-5" /> {t.explore}

@@ -22,7 +22,7 @@ import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
 import { logContact, useSavedItems } from "@/lib/local-actions";
-import { uploadUserFile, type StorageBucket } from "@/lib/supabase/storage";
+import { deleteUserFile, uploadUserFile, type StorageBucket } from "@/lib/supabase/storage";
 import { useListings, type Listing, timeAgo } from "@/lib/store";
 import { SurfaceCard, StatusBadge } from "./design-system";
 
@@ -126,6 +126,7 @@ export function ListingForm({
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
+    if (submitting) return;
     const nextErrors: Record<string, string> = {};
 
     fields.forEach((field) => {
@@ -143,21 +144,29 @@ export function ListingForm({
       return;
     }
 
+    if (!user) {
+      toast.error("Please sign in before posting. Posts are saved only to Supabase.");
+      return;
+    }
+
     setSubmitting(true);
+    const bucket = bucketByType[type];
+    let uploadedStoragePath: string | undefined;
     try {
-      let imageUrl = photoPreview;
+      console.info("[posting] form:submit:start", {
+        type,
+        title: values.title,
+        hasPhoto: Boolean(photoFile),
+        bucket,
+      });
+      let imageUrl = "";
       let storagePath: string | undefined;
 
-      if (user && photoFile) {
-        try {
-          const uploaded = await uploadUserFile(bucketByType[type], user.id, photoFile);
-          imageUrl = uploaded.url;
-          storagePath = uploaded.path;
-        } catch {
-          toast.warning(
-            "Photo saved on this device. Apply storage migrations to share uploads live.",
-          );
-        }
+      if (photoFile) {
+        const uploaded = await uploadUserFile(bucket, user.id, photoFile);
+        imageUrl = uploaded.url;
+        storagePath = uploaded.path;
+        uploadedStoragePath = uploaded.path;
       }
 
       await add({
@@ -171,15 +180,26 @@ export function ListingForm({
         imageUrl,
         storagePath,
       });
+      uploadedStoragePath = undefined;
+      console.info("[posting] form:submit:success", { type, title: values.title });
       toast.success("Posted successfully!", { icon: <CheckCircle2 className="size-4" /> });
       setValues({});
       setPhotoPreview("");
       setPhotoName("");
       setPhotoFile(null);
       setTimeout(() => navigate({ to: redirectTo }), 400);
-    } catch {
-      // add() shows the relevant toast and falls back locally when possible.
+    } catch (error) {
+      console.error("[posting] form:submit:error", error);
+      if (uploadedStoragePath) {
+        try {
+          await deleteUserFile(bucket, uploadedStoragePath);
+        } catch (rollbackError) {
+          console.error("[posting] rollback:error", rollbackError);
+        }
+      }
+      toast.error(error instanceof Error ? error.message : "Could not post. Please try again.");
     } finally {
+      console.info("[posting] form:submit:finish", { type });
       setSubmitting(false);
     }
   };

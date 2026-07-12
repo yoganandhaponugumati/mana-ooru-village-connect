@@ -29,9 +29,9 @@ export const occupations: Occupation[] = [
 ];
 
 export const dashboardRouteByRole: Record<AppRole, string> = {
-  super_admin: "/dashboard",
-  village_admin: "/dashboard",
-  citizen: "/dashboard",
+  super_admin: "/timeline",
+  village_admin: "/timeline",
+  citizen: "/timeline",
 };
 
 export function normalizeRole(value: string | null | undefined): AppRole {

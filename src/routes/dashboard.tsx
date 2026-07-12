@@ -110,8 +110,8 @@ function DashboardPage() {
         description={roleDescription}
         actions={
           role === "citizen" ? (
-            <AppLinkButton to="/post-work" icon={<Plus className="size-4" />}>
-              Post requirement
+            <AppLinkButton to="/timeline" icon={<Activity className="size-4" />}>
+              Open timeline
             </AppLinkButton>
           ) : role === "village_admin" ? (
             <AppLinkButton to="/official" icon={<Megaphone className="size-4" />}>

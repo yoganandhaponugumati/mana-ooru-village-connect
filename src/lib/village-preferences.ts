@@ -261,6 +261,7 @@ export const languageOptions: { code: Language; label: string }[] = [
 const dictionary = {
   en: {
     home: "Home",
+    timeline: "Timeline",
     workers: "Workers",
     land: "Land",
     marketplace: "Marketplace",
@@ -292,6 +293,7 @@ const dictionary = {
   },
   te: {
     home: "హోమ్",
+    timeline: "టైమ్‌లైన్",
     workers: "పనివారు",
     land: "భూమి",
     marketplace: "సంత",
@@ -323,6 +325,7 @@ const dictionary = {
   },
   hi: {
     home: "होम",
+    timeline: "टाइमलाइन",
     workers: "कामगार",
     land: "ज़मीन",
     marketplace: "बाज़ार",
