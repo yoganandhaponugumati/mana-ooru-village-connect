@@ -1,4 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
+import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 /**
@@ -18,8 +19,41 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  */
 export const deleteMyAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .handler(async ({ context }) => {
+  .inputValidator(z.object({ password: z.string().min(1, "Current password is required.") }))
+  .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { createClient } = await import("@supabase/supabase-js");
+    const { createSupabaseFetch } = await import("@/integrations/supabase/supabase-fetch.server");
+    const SUPABASE_URL = process.env.SUPABASE_URL;
+    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+
+    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+      throw new Error("Account deletion is not configured.");
+    }
+
+    const { data: userData, error: userError } = await supabaseAdmin.auth.admin.getUserById(
+      context.userId,
+    );
+    const email = userData.user?.email;
+    if (userError || !email) {
+      throw new Error("Could not verify your account before deletion.");
+    }
+
+    const authClient = createClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
+      global: { fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY) },
+      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    });
+
+    const { data: verified, error: verifyError } = await authClient.auth.signInWithPassword({
+      email,
+      password: data.password,
+    });
+
+    if (verifyError || verified.user?.id !== context.userId) {
+      throw new Error("Incorrect password. Your account was not deleted.");
+    }
+
+    await supabaseAdmin.from("push_subscriptions").delete().eq("user_id", context.userId);
     const { error } = await supabaseAdmin.auth.admin.deleteUser(context.userId);
     if (error) {
       throw new Error(error.message || "Could not delete account. Please try again.");

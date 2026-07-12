@@ -15,6 +15,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { useBrowserPushNotifications } from "@/lib/push-notifications";
 
 function NotFoundComponent() {
   return (
@@ -156,6 +157,11 @@ function ProfileCompletionGate() {
   return null;
 }
 
+function BrowserPushGate() {
+  useBrowserPushNotifications();
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -164,6 +170,7 @@ function RootComponent() {
       <AuthProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
         <ProfileCompletionGate />
+        <BrowserPushGate />
         <Outlet />
         <Toaster position="top-center" richColors />
       </AuthProvider>

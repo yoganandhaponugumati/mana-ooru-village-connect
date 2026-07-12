@@ -35,6 +35,29 @@ type Field = {
   options?: string[];
 };
 
+const MOBILE_RE = /^[6-9]\d{9}$/;
+
+function onlyDigits(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function isMobileField(field: Field) {
+  return field.name === "contact";
+}
+
+function validateField(field: Field, rawValue: string) {
+  const value = rawValue.trim();
+  if (!value) return `${field.label} is required`;
+  if (field.name === "title" && value.length < 4) return "Please enter at least 4 characters";
+  if (field.textarea && value.length < 10) {
+    return "Please enter at least 10 characters";
+  }
+  if (isMobileField(field) && !MOBILE_RE.test(onlyDigits(value))) {
+    return "10-digit mobile number required";
+  }
+  return "";
+}
+
 const accentStyles = {
   primary: "bg-primary text-primary-foreground hover:bg-[#256b2b]",
   secondary: "bg-secondary text-secondary-foreground hover:bg-[#4ea75a]",
@@ -106,13 +129,12 @@ export function ListingForm({
     const nextErrors: Record<string, string> = {};
 
     fields.forEach((field) => {
-      if (field.required && !values[field.name]) {
-        nextErrors[field.name] = `${field.label} is required`;
-      }
+      const error = validateField(field, values[field.name] || "");
+      if (error) nextErrors[field.name] = error;
     });
 
-    if (!values.title) nextErrors.title = "Please add a clear title";
-    if (!values.contact) nextErrors.contact = "Please include your contact number";
+    if (!values.title?.trim()) nextErrors.title = "Please add a clear title";
+    if (!values.contact?.trim()) nextErrors.contact = "Please include your contact number";
     if (photoRequired && !photoPreview) nextErrors.imageUrl = "Please add a photo";
 
     setErrors(nextErrors);
@@ -140,12 +162,12 @@ export function ListingForm({
 
       await add({
         type,
-        title: values.title || "",
-        description: values.description || "",
-        contact: values.contact || "",
-        location: values.location || "",
-        price: values.price,
-        category: values.category,
+        title: values.title?.trim() || "",
+        description: values.description?.trim() || "",
+        contact: onlyDigits(values.contact || ""),
+        location: values.location?.trim() || "",
+        price: values.price?.trim(),
+        category: values.category?.trim(),
         imageUrl,
         storagePath,
       });
@@ -163,7 +185,8 @@ export function ListingForm({
   };
 
   const handleFieldChange = (name: string, value: string) => {
-    setValues((prev) => ({ ...prev, [name]: value }));
+    const nextValue = name === "contact" ? onlyDigits(value).slice(0, 10) : value;
+    setValues((prev) => ({ ...prev, [name]: nextValue }));
     setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
@@ -191,14 +214,18 @@ export function ListingForm({
         return (
           <div key={field.name} className="space-y-2">
             <label htmlFor={fieldId} className="text-sm font-semibold text-foreground">
-              {field.label} {field.required && <span className="text-primary">*</span>}
+              {field.label} <span className="text-primary">*</span>
             </label>
             {field.options ? (
               <select
                 id={fieldId}
-                required={field.required}
+                required
                 value={values[field.name] || ""}
                 onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                onBlur={(e) => {
+                  const error = validateField(field, e.target.value);
+                  if (error) setErrors((prev) => ({ ...prev, [field.name]: error }));
+                }}
                 aria-invalid={Boolean(errors[field.name])}
                 className={`premium-input w-full rounded-2xl px-4 py-3.5 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
               >
@@ -212,21 +239,31 @@ export function ListingForm({
             ) : field.textarea ? (
               <textarea
                 id={fieldId}
-                required={field.required}
+                required
                 placeholder={field.placeholder}
                 rows={4}
                 value={values[field.name] || ""}
                 onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                onBlur={(e) => {
+                  const error = validateField(field, e.target.value);
+                  if (error) setErrors((prev) => ({ ...prev, [field.name]: error }));
+                }}
                 aria-invalid={Boolean(errors[field.name])}
                 className={`premium-input min-h-32 w-full rounded-2xl px-4 py-3.5 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
               />
             ) : (
               <input
                 id={fieldId}
-                required={field.required}
+                required
                 placeholder={field.placeholder}
+                inputMode={isMobileField(field) ? "numeric" : undefined}
+                maxLength={isMobileField(field) ? 10 : undefined}
                 value={values[field.name] || ""}
                 onChange={(e) => handleFieldChange(field.name, e.target.value)}
+                onBlur={(e) => {
+                  const error = validateField(field, e.target.value);
+                  if (error) setErrors((prev) => ({ ...prev, [field.name]: error }));
+                }}
                 aria-invalid={Boolean(errors[field.name])}
                 className={`premium-input w-full rounded-2xl px-4 py-3.5 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
               />
@@ -323,7 +360,8 @@ export function ListingCard({
     { role: "seller", text: `Namaste, this is about ${item.title}. How can I help?` },
   ]);
   const canDelete = !!onDelete && (!!item.localOnly || (!!user && user.id === item.owner_id));
-  const cleanContact = item.contact.replace(/\s|-/g, "");
+  const cleanContact = onlyDigits(item.contact);
+  const hasMobileContact = MOBILE_RE.test(cleanContact);
   const mapQuery = encodeURIComponent(`${item.location || item.title}, India`);
   const initials = item.title
     .split(" ")
@@ -334,8 +372,8 @@ export function ListingCard({
   const typeMeta = {
     worker: {
       eyebrow: "Verified worker",
-      details: ["4.8 rating", "27 reviews", "Available today"],
-      chips: ["5+ yrs exp", item.category || "Skilled", "Nearby"],
+      details: ["Experience shown", "Availability visible", "Village verified"],
+      chips: [item.price || "Daily wage", item.category || "Skilled", "4.8 rating"],
     },
     work: {
       eyebrow: "Open work",
@@ -353,9 +391,9 @@ export function ListingCard({
       chips: [item.category || "Produce", "Today", "Local seller"],
     },
     service: {
-      eyebrow: "Local service",
-      details: ["Same-day booking", "Tools ready", "Service guarantee"],
-      chips: [item.category || "Service", item.price || "Call for rate", "Trusted"],
+      eyebrow: "Open now",
+      details: ["Opening hours in description", "Phone and WhatsApp", "Directions available"],
+      chips: [item.category || "Service", item.price || "Call for rate", "Reviews enabled"],
     },
     announcement: {
       eyebrow: "Village notice",
@@ -368,6 +406,14 @@ export function ListingCard({
       chips: [item.category || "Issue", "Public", "Needs action"],
     },
   }[item.type];
+  const complaintSteps = ["Submitted", "Accepted", "In Progress", "Resolved"];
+  const complaintStepIndex =
+    item.type === "complaint"
+      ? Math.min(
+          complaintSteps.length - 1,
+          Math.max(0, Math.floor((Date.now() - item.createdAt) / (1000 * 60 * 60 * 24))),
+        )
+      : -1;
 
   return (
     <SurfaceCard className="listing-3d-card group overflow-hidden p-5">
@@ -416,6 +462,27 @@ export function ListingCard({
       {item.description && (
         <p className="mt-4 text-sm leading-7 text-muted-foreground">{item.description}</p>
       )}
+      {item.type === "complaint" && (
+        <div className="mt-4 rounded-2xl border border-red-100 bg-red-50/50 p-3">
+          <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-red-700">
+            Public status
+          </p>
+          <div className="grid grid-cols-4 gap-2">
+            {complaintSteps.map((step, index) => (
+              <div key={step} className="min-w-0">
+                <div
+                  className={`h-1.5 rounded-full ${index <= complaintStepIndex ? "bg-red-600" : "bg-red-100"}`}
+                />
+                <p
+                  className={`mt-2 text-[10px] font-semibold leading-4 ${index <= complaintStepIndex ? "text-red-700" : "text-muted-foreground"}`}
+                >
+                  {step}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
       <div className="mt-4 grid gap-2 rounded-2xl bg-muted/60 p-3 text-xs text-muted-foreground">
         {typeMeta.details.map((detail) => (
           <span key={detail} className="flex items-center gap-2">
@@ -462,7 +529,8 @@ export function ListingCard({
           <a
             href={`tel:${cleanContact}`}
             onClick={() => logContact(item, "call")}
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground transition hover:brightness-110"
+            aria-disabled={!hasMobileContact}
+            className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold transition ${hasMobileContact ? "bg-primary text-primary-foreground hover:brightness-110" : "pointer-events-none bg-muted text-muted-foreground"}`}
           >
             <Phone className="size-3.5" /> Call
           </a>
@@ -471,7 +539,8 @@ export function ListingCard({
             target="_blank"
             rel="noreferrer"
             onClick={() => logContact(item, "whatsapp")}
-            className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white px-4 py-2 text-xs font-semibold text-primary transition hover:border-primary hover:bg-primary/5"
+            aria-disabled={!hasMobileContact}
+            className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold transition ${hasMobileContact ? "border-primary/20 bg-white text-primary hover:border-primary hover:bg-primary/5" : "pointer-events-none border-border bg-muted text-muted-foreground"}`}
           >
             <MessageCircle className="size-3.5" /> WhatsApp
           </a>
@@ -571,7 +640,7 @@ export function ListingCard({
                     <a
                       href={`tel:${cleanContact}`}
                       onClick={() => logContact(item, "call")}
-                      className="rounded-full bg-primary px-4 py-2 text-center text-sm font-semibold text-primary-foreground"
+                      className={`rounded-full px-4 py-2 text-center text-sm font-semibold ${hasMobileContact ? "bg-primary text-primary-foreground" : "pointer-events-none bg-muted text-muted-foreground"}`}
                     >
                       Call now
                     </a>
@@ -580,7 +649,7 @@ export function ListingCard({
                       target="_blank"
                       rel="noreferrer"
                       onClick={() => logContact(item, "whatsapp")}
-                      className="rounded-full border border-primary/20 bg-white px-4 py-2 text-center text-sm font-semibold text-primary"
+                      className={`rounded-full border px-4 py-2 text-center text-sm font-semibold ${hasMobileContact ? "border-primary/20 bg-white text-primary" : "pointer-events-none border-border bg-muted text-muted-foreground"}`}
                     >
                       WhatsApp
                     </a>

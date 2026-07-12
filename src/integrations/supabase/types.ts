@@ -157,12 +157,46 @@ export type Database = {
           title: string;
           body: string;
           type: string;
+          entity_type: string | null;
+          entity_id: string | null;
+          action_url: string | null;
+          dedupe_key: string | null;
           read_at: string | null;
           created_at: string;
         };
         Insert: Partial<Database["public"]["Tables"]["notifications"]["Row"]> &
           Pick<Database["public"]["Tables"]["notifications"]["Row"], "title" | "body">;
         Update: Partial<Database["public"]["Tables"]["notifications"]["Row"]>;
+        Relationships: [];
+      };
+      push_events: {
+        Row: {
+          event_key: string;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["push_events"]["Row"]> &
+          Pick<Database["public"]["Tables"]["push_events"]["Row"], "event_key">;
+        Update: Partial<Database["public"]["Tables"]["push_events"]["Row"]>;
+        Relationships: [];
+      };
+      push_subscriptions: {
+        Row: {
+          id: string;
+          user_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          user_agent: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: Partial<Database["public"]["Tables"]["push_subscriptions"]["Row"]> &
+          Pick<
+            Database["public"]["Tables"]["push_subscriptions"]["Row"],
+            "user_id" | "endpoint" | "p256dh" | "auth"
+          >;
+        Update: Partial<Database["public"]["Tables"]["push_subscriptions"]["Row"]>;
         Relationships: [];
       };
       events: {
@@ -233,6 +267,8 @@ export type Database = {
           category: string | null;
           image_url: string | null;
           storage_path: string | null;
+          is_pinned: boolean;
+          status: string;
           created_at: string;
           updated_at: string;
         };

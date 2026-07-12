@@ -28,7 +28,6 @@ import {
   HandHeart,
   ShieldCheck,
   Activity,
-  Bot,
   CloudSun,
   GraduationCap,
   HeartPulse,
@@ -69,73 +68,53 @@ export const Route = createFileRoute("/")({
 const quickActions = [
   {
     icon: Users,
-    label: "Find Workers",
+    label: "Need Workers",
     te: "పనివారు",
+    description: "Daily wage, farm, drivers, and skilled workers",
     tint: "bg-primary/10 text-primary",
     to: "/workers" as const,
   },
   {
-    icon: Briefcase,
-    label: "Post Work",
-    te: "పని ఇవ్వండి",
+    icon: Wrench,
+    label: "Find Services",
+    te: "సేవలు",
+    description: "Mechanics, electricians, tractors, tent house",
     tint: "bg-secondary/10 text-secondary",
-    to: "/post-work" as const,
+    to: "/services" as const,
+    search: { kind: "services" as const },
+  },
+  {
+    icon: Building2,
+    label: "Village Shops",
+    te: "దుకాణాలు",
+    description: "Kirana, medical, bakery, hotel, hardware",
+    tint: "bg-accent/20 text-clay",
+    to: "/services" as const,
+    search: { kind: "shops" as const },
+  },
+  {
+    icon: ShoppingBasket,
+    label: "Buy & Sell",
+    te: "కొనుగోలు అమ్మకం",
+    description: "Crops, milk, seeds, tools, and local goods",
+    tint: "bg-primary/10 text-primary",
+    to: "/marketplace" as const,
+  },
+  {
+    icon: Megaphone,
+    label: "Village Notices",
+    te: "గ్రామ నోటీసులు",
+    description: "Water, power, school, health, and events",
+    tint: "bg-primary/10 text-primary",
+    to: "/announcements" as const,
   },
   {
     icon: AlertTriangle,
     label: "Report Problem",
     te: "సమస్య చెప్పండి",
+    description: "Road, drainage, water, lights, garbage",
     tint: "bg-red-50 text-red-600",
     to: "/problems" as const,
-  },
-  {
-    icon: Wheat,
-    label: "Lease Land",
-    te: "భూమి కౌలు",
-    tint: "bg-accent/20 text-clay",
-    to: "/land" as const,
-  },
-  {
-    icon: ShoppingBasket,
-    label: "Marketplace",
-    te: "సంత",
-    tint: "bg-primary/10 text-primary",
-    to: "/marketplace" as const,
-  },
-  {
-    icon: Wrench,
-    label: "Local Services",
-    te: "స్థానిక సేవలు",
-    tint: "bg-secondary/10 text-secondary",
-    to: "/services" as const,
-  },
-  {
-    icon: Megaphone,
-    label: "Announcements",
-    te: "ప్రకటనలు",
-    tint: "bg-accent/20 text-clay",
-    to: "/announcements" as const,
-  },
-  {
-    icon: Bot,
-    label: "AI Assistant",
-    te: "AI సహాయం",
-    tint: "bg-primary/10 text-primary",
-    to: "/ai-assistant" as const,
-  },
-  {
-    icon: CloudSun,
-    label: "Weather",
-    te: "వాతావరణం",
-    tint: "bg-secondary/10 text-secondary",
-    to: "/weather" as const,
-  },
-  {
-    icon: Siren,
-    label: "Emergency Contacts",
-    te: "అత్యవసరం",
-    tint: "bg-accent/20 text-clay",
-    to: "#contacts" as const,
   },
 ];
 
@@ -529,76 +508,45 @@ function Index() {
         className="relative z-30 mx-auto -mt-20 max-w-[calc(100%-2rem)] overflow-hidden rounded-t-[32px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(232,247,239,0.82)_48%,rgba(255,246,222,0.8))] px-4 py-9 shadow-[0_-24px_80px_-50px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-t-[40px]"
       >
         <div className="pointer-events-none absolute inset-0 village-pattern opacity-80" />
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:gap-4 md:grid-cols-5 xl:grid-cols-10">
+        <div className="mx-auto mb-7 max-w-7xl text-center">
+          <p className="text-xs font-bold uppercase tracking-[0.22em] text-primary">Start here</p>
+          <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
+            What do you need today?
+          </h2>
+        </div>
+        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map((a, i) =>
             a.to.startsWith("#") ? (
               <a
                 key={a.label}
                 href={a.to}
-                className="premium-action-card hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[16px] p-5 text-center"
+                className="premium-action-card hover-lift animate-fade-up group flex min-h-44 items-center gap-5 rounded-[16px] p-6 text-left"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                <div className="premium-action-icon grid size-12 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
+                <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
                   <a.icon className="size-9" strokeWidth={1.8} />
                 </div>
-                <div>
-                  <p className="font-semibold text-foreground">
-                    {a.label === "Find Workers"
-                      ? t.findWorkers
-                      : a.label === "Post Work"
-                        ? t.postWork
-                        : a.label === "Report Problem"
-                          ? "Report Problem"
-                          : a.label === "Lease Land"
-                            ? t.leaseLand
-                            : a.label === "Marketplace"
-                              ? t.marketplace
-                              : a.label === "Local Services"
-                                ? t.localServices
-                                : a.label === "Announcements"
-                                  ? t.announcements
-                                  : a.label === "AI Assistant"
-                                    ? t.ai
-                                    : a.label === "Weather"
-                                      ? t.weather
-                                      : t.emergency}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{a.te}</p>
+                <div className="min-w-0">
+                  <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
+                  <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
                 </div>
               </a>
             ) : (
               <Link
                 key={a.label}
                 to={a.to as Exclude<(typeof quickActions)[number]["to"], "#contacts">}
-                className="premium-action-card hover-lift animate-fade-up group flex min-h-36 flex-col items-center justify-center gap-4 rounded-[16px] p-5 text-center"
+                search={"search" in a ? a.search : undefined}
+                className="premium-action-card hover-lift animate-fade-up group flex min-h-44 items-center gap-5 rounded-[16px] p-6 text-left"
                 style={{ animationDelay: `${i * 60}ms` }}
               >
-                <div className="premium-action-icon grid size-12 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
+                <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
                   <a.icon className="size-9" strokeWidth={1.8} />
                 </div>
-                <div>
-                  <p className="font-semibold text-foreground">
-                    {a.label === "Find Workers"
-                      ? t.findWorkers
-                      : a.label === "Post Work"
-                        ? t.postWork
-                        : a.label === "Report Problem"
-                          ? "Report Problem"
-                          : a.label === "Lease Land"
-                            ? t.leaseLand
-                            : a.label === "Marketplace"
-                              ? t.marketplace
-                              : a.label === "Local Services"
-                                ? t.localServices
-                                : a.label === "Announcements"
-                                  ? t.announcements
-                                  : a.label === "AI Assistant"
-                                    ? t.ai
-                                    : a.label === "Weather"
-                                      ? t.weather
-                                      : t.emergency}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{a.te}</p>
+                <div className="min-w-0">
+                  <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
+                  <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
                 </div>
               </Link>
             ),
@@ -731,8 +679,8 @@ function Index() {
               Aadhaar, schemes, cards, and documents in one place
             </h2>
             <p className="mt-2 text-sm leading-7 text-muted-foreground sm:text-base">
-              Useful official services villagers need before applying for support, work, health,
-              and farming schemes.
+              Useful official services villagers need before applying for support, work, health, and
+              farming schemes.
             </p>
           </div>
           <Link
@@ -1321,7 +1269,11 @@ function Index() {
             <Link to="/announcements" className="transition hover:text-primary">
               Notices
             </Link>
-            <Link to="/services" className="transition hover:text-primary">
+            <Link
+              to="/services"
+              search={{ kind: "services" }}
+              className="transition hover:text-primary"
+            >
               Support
             </Link>
             <Link to="/search" search={{ q: "" }} className="transition hover:text-primary">

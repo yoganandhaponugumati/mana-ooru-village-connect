@@ -15,10 +15,12 @@ import {
   Users,
   Wrench,
 } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppLinkButton, FeatureIcon, SectionHeader, SurfaceCard } from "@/components/design-system";
 import { useAuth } from "@/lib/auth";
+import { subscribeToPush } from "@/lib/push-notifications";
 import { timeAgo, useListingStats } from "@/lib/store";
 import { formatVillageProfile, useVillagePreferences } from "@/lib/village-preferences";
 
@@ -32,7 +34,8 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  const { role: authRole } = useAuth();
+  const { role: authRole, user } = useAuth();
+  const pushAttemptedForUserRef = useRef<string | null>(null);
   const { profile, weather } = useVillagePreferences();
   const { data: stats } = useListingStats();
   const role = authRole ?? "citizen";
@@ -79,6 +82,15 @@ function DashboardPage() {
     weather.live && weather.temp !== null
       ? `${weather.temp}°C, ${weather.condition}. ${weather.rain}. Wind ${weather.wind ?? "--"} km/h.`
       : "Live weather is unavailable right now. Select or confirm your village on the Weather page.";
+
+  useEffect(() => {
+    if (!user || pushAttemptedForUserRef.current === user.id) return;
+    pushAttemptedForUserRef.current = user.id;
+    void subscribeToPush("dashboard").catch((error) => {
+      console.error("[Push] Dashboard subscription failed:", error);
+      pushAttemptedForUserRef.current = null;
+    });
+  }, [user]);
 
   return (
     <PageLayout

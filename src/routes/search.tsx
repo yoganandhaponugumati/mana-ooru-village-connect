@@ -2,7 +2,7 @@ import { Link, createFileRoute, useSearch } from "@tanstack/react-router";
 import { ArrowRight, Search, Sparkles } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { EmptyState, SectionHeader, SurfaceCard, StatusBadge } from "@/components/design-system";
-import { fallbackListings, getSearchableItems } from "@/lib/app-data";
+import { expandSearchQuery, fallbackListings, getSearchableItems } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
@@ -18,13 +18,15 @@ function SearchPage() {
   const { profile } = useVillagePreferences();
   const allItems = getSearchableItems(items.length > 0 ? items : fallbackListings);
   const normalized = q.trim().toLowerCase();
+  const expandedQuery = expandSearchQuery(q);
+  const queryTerms = expandedQuery.split(/\s+/).filter(Boolean);
   const results = normalized
-    ? allItems.filter((item) =>
-        [item.title, item.description, item.category, item.location, item.type]
+    ? allItems.filter((item) => {
+        const haystack = [item.title, item.description, item.category, item.location, item.type]
           .join(" ")
-          .toLowerCase()
-          .includes(normalized),
-      )
+          .toLowerCase();
+        return haystack.includes(normalized) || queryTerms.some((term) => haystack.includes(term));
+      })
     : allItems;
 
   return (

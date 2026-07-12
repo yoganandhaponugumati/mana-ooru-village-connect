@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import {
   AlertTriangle,
   Droplets,
   ImagePlus,
   Lightbulb,
   Milestone,
+  Phone,
   Plus,
+  Siren,
   Trash2,
   Waves,
 } from "lucide-react";
@@ -19,7 +22,8 @@ import {
   SectionHeader,
   SurfaceCard,
 } from "@/components/design-system";
-import { fallbackListings } from "@/lib/app-data";
+import { emergencyContacts, fallbackListings } from "@/lib/app-data";
+import { logContact } from "@/lib/local-actions";
 import { useListings } from "@/lib/store";
 
 export const Route = createFileRoute("/problems")({
@@ -41,6 +45,7 @@ function ProblemsPage() {
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "complaint");
   const [showForm, setShowForm] = useState(true);
+  const urgentContacts = emergencyContacts.filter((item) => item.urgent).slice(0, 3);
 
   return (
     <PageLayout
@@ -53,15 +58,52 @@ function ProblemsPage() {
         title="Photo proof makes problems clear"
         description="Road damage, drainage overflow, water leakage, broken streetlights, garbage, and other local issues."
         actions={
-          <AppButton
-            variant="primary"
-            icon={<Plus className="size-4" />}
-            onClick={() => setShowForm((value) => !value)}
-          >
-            {showForm ? "Hide form" : "Report issue"}
-          </AppButton>
+          <>
+            <Link
+              to="/emergency"
+              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-5 text-sm font-semibold text-red-700 transition hover:-translate-y-0.5 hover:bg-red-100"
+            >
+              <Siren className="size-4" /> Emergency contacts
+            </Link>
+            <AppButton
+              variant="primary"
+              icon={<Plus className="size-4" />}
+              onClick={() => setShowForm((value) => !value)}
+            >
+              {showForm ? "Hide form" : "Report issue"}
+            </AppButton>
+          </>
         }
       />
+
+      <div className="mb-8 grid gap-3 md:grid-cols-3">
+        {urgentContacts.map((contact) => (
+          <SurfaceCard
+            key={contact.id}
+            hover={false}
+            className="border-red-200 bg-red-50/80 p-4"
+          >
+            <div className="flex items-center gap-3">
+              <FeatureIcon
+                icon={<contact.icon className="size-5" />}
+                className="bg-red-100 text-red-700"
+              />
+              <div className="min-w-0 flex-1">
+                <p className="font-display text-lg font-semibold text-clay">{contact.title}</p>
+                <p className="text-xs text-muted-foreground">{contact.role}</p>
+              </div>
+              <a
+                href={`tel:${contact.contact}`}
+                onClick={() => logContact(contact, "call")}
+                className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-red-600 text-white shadow-sm transition hover:brightness-110"
+                aria-label={`Call ${contact.title}`}
+              >
+                <Phone className="size-4" />
+              </a>
+            </div>
+          </SurfaceCard>
+        ))}
+      </div>
 
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {issueTypes.map((issue) => (

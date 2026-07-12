@@ -99,6 +99,7 @@ function ProfilePage() {
   const [savingProfile, setSavingProfile] = useState(false);
   const [resendingVerification, setResendingVerification] = useState(false);
   const [deleteStep, setDeleteStep] = useState<"idle" | "confirm">("idle");
+  const [deletePassword, setDeletePassword] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
@@ -245,12 +246,16 @@ function ProfilePage() {
   };
 
   const handleDeleteAccount = async () => {
+    if (!deletePassword) {
+      toast.error("Enter your current password to delete your account.");
+      return;
+    }
     setDeleting(true);
     try {
-      await deleteMyAccount();
+      await deleteMyAccount(deletePassword);
       toast.success("Your account has been deleted.");
       await signOut();
-      navigate({ to: "/" });
+      navigate({ to: "/auth" });
     } catch (err) {
       toast.error(
         err instanceof Error ? err.message : "Could not delete your account. Please try again.",
@@ -654,14 +659,32 @@ function ProfilePage() {
                   <Trash2 className="size-4" /> Delete my account
                 </button>
               ) : (
-                <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-destructive/40 bg-white p-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="mt-4 rounded-2xl border border-destructive/40 bg-white p-4">
                   <p className="text-sm font-semibold text-destructive">
-                    Are you absolutely sure? This is permanent.
+                    This action is permanent and cannot be undone. Are you sure you want to delete
+                    your account?
                   </p>
-                  <div className="flex gap-2">
+                  <label
+                    htmlFor="delete-password"
+                    className="mt-4 block text-sm font-semibold text-foreground"
+                  >
+                    Current password
+                  </label>
+                  <input
+                    id="delete-password"
+                    type="password"
+                    value={deletePassword}
+                    onChange={(event) => setDeletePassword(event.target.value)}
+                    className="mt-1 w-full rounded-2xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
+                    autoComplete="current-password"
+                  />
+                  <div className="mt-4 flex gap-2">
                     <button
                       type="button"
-                      onClick={() => setDeleteStep("idle")}
+                      onClick={() => {
+                        setDeleteStep("idle");
+                        setDeletePassword("");
+                      }}
                       disabled={deleting}
                       className="rounded-full border border-border px-4 py-2 text-sm font-semibold text-foreground disabled:opacity-60"
                     >

@@ -3,6 +3,7 @@ import { useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./auth";
 import { toast } from "sonner";
+import { sendNewPostPushNotifications } from "@/lib/api/notification.functions";
 
 export type ListingType =
   | "worker"
@@ -24,6 +25,8 @@ export type Listing = {
   category?: string;
   imageUrl?: string;
   storagePath?: string;
+  isPinned?: boolean;
+  status?: "active" | "completed" | "pending" | "accepted" | "in_progress" | "resolved" | "rejected";
   createdAt: number;
   owner_id?: string;
   localOnly?: boolean;
@@ -41,6 +44,8 @@ type Row = {
   category: string | null;
   image_url?: string | null;
   storage_path?: string | null;
+  is_pinned?: boolean | null;
+  status?: string | null;
   created_at: string;
 };
 
@@ -105,6 +110,8 @@ function toListing(r: Row): Listing {
     category: r.category ?? undefined,
     imageUrl: r.image_url ?? undefined,
     storagePath: r.storage_path ?? undefined,
+    isPinned: Boolean(r.is_pinned),
+    status: (r.status as Listing["status"]) ?? "active",
     createdAt: new Date(r.created_at).getTime(),
     owner_id: r.owner_id,
   };
@@ -149,6 +156,8 @@ export function useListings(type?: ListingType) {
           category: item.category || null,
           image_url: item.imageUrl || null,
           storage_path: item.storagePath || null,
+          is_pinned: item.isPinned ?? false,
+          status: item.status ?? "active",
         } as never)
         .select()
         .single();
@@ -163,7 +172,11 @@ export function useListings(type?: ListingType) {
       }
       qc.invalidateQueries({ queryKey: ["listings"] });
       qc.invalidateQueries({ queryKey: ["listing-stats"] });
-      return toListing(data as Row);
+      const listing = toListing(data as Row);
+      void sendNewPostPushNotifications({ data: { postId: listing.id } }).catch((err) => {
+        console.error("Could not send push notifications", err);
+      });
+      return listing;
     },
     [user, qc],
   );
@@ -189,10 +202,40 @@ export function useListings(type?: ListingType) {
     [qc],
   );
 
-  const items = [...(query.data ?? []), ...readLocalListings(type)].sort(
-    (a, b) => b.createdAt - a.createdAt,
+  const update = useCallback(
+    async (id: string, patch: Partial<Pick<Listing, "isPinned" | "status">>) => {
+      if (id.startsWith("local-")) {
+        const current = readLocalListings();
+        writeLocalListings(
+          current.map((item) => (item.id === id ? { ...item, ...patch } : item)),
+        );
+        window.dispatchEvent(new Event("manaooru:listings-changed"));
+        qc.invalidateQueries({ queryKey: ["listings"] });
+        qc.invalidateQueries({ queryKey: ["listing-stats"] });
+        toast.success("Updated");
+        return;
+      }
+
+      const dbPatch: Record<string, boolean | string> = {};
+      if (typeof patch.isPinned === "boolean") dbPatch.is_pinned = patch.isPinned;
+      if (patch.status) dbPatch.status = patch.status;
+
+      const { error } = await supabase.from("listings").update(dbPatch as never).eq("id", id);
+      if (error) {
+        toast.error(error.message || "Could not update listing");
+        return;
+      }
+      qc.invalidateQueries({ queryKey: ["listings"] });
+      qc.invalidateQueries({ queryKey: ["listing-stats"] });
+      toast.success("Updated");
+    },
+    [qc],
   );
-  return { items, add, remove, total: items.length, loading: query.isLoading };
+
+  const items = [...(query.data ?? []), ...readLocalListings(type)].sort(
+    (a, b) => Number(b.isPinned) - Number(a.isPinned) || b.createdAt - a.createdAt,
+  );
+  return { items, add, remove, update, total: items.length, loading: query.isLoading };
 }
 
 export function useListingStats() {

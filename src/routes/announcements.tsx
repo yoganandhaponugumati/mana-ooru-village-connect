@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
   Building2,
+  CheckCircle2,
   Church,
   Droplets,
   GraduationCap,
@@ -9,6 +10,7 @@ import {
   Megaphone,
   PartyPopper,
   Phone,
+  Pin,
   Plus,
   School,
 } from "lucide-react";
@@ -32,11 +34,40 @@ export const Route = createFileRoute("/announcements")({
 });
 
 function AnnPage() {
-  const { items, remove } = useListings("announcement");
-  const { user } = useAuth();
+  const { items, remove, update } = useListings("announcement");
+  const { user, role } = useAuth();
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "announcement");
   const [showForm, setShowForm] = useState(false);
+  const canManageNotices = role === "village_admin" || role === "super_admin";
+  const pinnedNotice =
+    displayItems.find((item) => item.isPinned) ??
+    displayItems.find((item) =>
+      /water|urgent|emergency|power|electricity/i.test(`${item.title} ${item.category}`),
+    );
+  const groupedNotices = displayItems.reduce(
+    (groups, item) => {
+      if (item.id === pinnedNotice?.id) return groups;
+      const ageDays = Math.floor((Date.now() - item.createdAt) / 86400000);
+      if (ageDays === 0) groups.today.push(item);
+      else if (ageDays === 1) groups.yesterday.push(item);
+      else if (ageDays <= 7) groups.lastWeek.push(item);
+      else groups.older.push(item);
+      return groups;
+    },
+    {
+      today: [] as typeof displayItems,
+      yesterday: [] as typeof displayItems,
+      lastWeek: [] as typeof displayItems,
+      older: [] as typeof displayItems,
+    },
+  );
+  const noticeGroups = [
+    ["Today's Updates", groupedNotices.today],
+    ["Yesterday", groupedNotices.yesterday],
+    ["Last Week", groupedNotices.lastWeek],
+    ["Older Notices", groupedNotices.older],
+  ] as const;
   return (
     <PageLayout
       title="Village Notice Board"
@@ -103,10 +134,15 @@ function AnnPage() {
                   "Agriculture",
                   "Health",
                   "Education",
-                  "Notice",
-                  "Event",
+                  "Water Supply",
+                  "Electricity",
+                  "Festival",
+                  "Gram Sabha",
+                  "Health Camp",
+                  "School Event",
                   "Emergency",
                 ],
+                required: true,
               },
               {
                 name: "description",
@@ -118,8 +154,8 @@ function AnnPage() {
               { name: "location", label: "Location", placeholder: "Where it applies" },
               {
                 name: "contact",
-                label: "Posted by / contact",
-                placeholder: "Name or phone",
+                label: "Posted by phone",
+                placeholder: "10-digit mobile",
                 required: true,
               },
             ]}
@@ -142,43 +178,159 @@ function AnnPage() {
           }
         />
       ) : (
-        <div className="space-y-3">
-          {displayItems.map((a) => (
-            <SurfaceCard
-              key={a.id}
-              hover={false}
-              className="rounded-[1.5rem] border-l-4 border-accent bg-card/95 p-5"
-            >
-              {a.imageUrl && (
-                <img
-                  src={a.imageUrl}
-                  alt={a.title}
-                  className="mb-4 aspect-[16/7] w-full rounded-2xl object-cover"
-                />
-              )}
-              <div className="flex items-start justify-between gap-3">
-                <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
-                  {a.category || "Notice"}
-                </span>
-                <span className="text-xs text-muted-foreground">{timeAgo(a.createdAt)}</span>
-              </div>
-              <h3 className="mt-2 font-display text-lg font-semibold text-clay">{a.title}</h3>
-              <p className="mt-2 text-sm leading-7 text-muted-foreground">{a.description}</p>
-              <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3">
-                <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Phone className="size-3.5" /> {a.contact}
-                </p>
-                {(a.localOnly || (!!user && user.id === a.owner_id)) && (
-                  <button
-                    onClick={() => remove(a.id)}
-                    className="text-xs font-semibold text-muted-foreground transition hover:text-destructive"
-                  >
-                    Remove
-                  </button>
-                )}
+        <div className="space-y-7">
+          {pinnedNotice && (
+            <SurfaceCard hover={false} className="overflow-hidden border-accent bg-card p-0">
+              <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
+                <div className="bg-primary p-6 text-primary-foreground sm:p-8">
+                  <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.2em]">
+                    <Pin className="size-3.5" /> Pinned
+                  </span>
+                  <p className="mt-7 text-sm font-semibold text-white/70">
+                    {pinnedNotice.category || "Village Notice"}
+                  </p>
+                  <h3 className="mt-2 font-display text-3xl font-semibold leading-tight">
+                    {pinnedNotice.title}
+                  </h3>
+                  <p className="mt-4 text-sm leading-7 text-white/82">{pinnedNotice.description}</p>
+                </div>
+                <div className="p-6 sm:p-8">
+                  {pinnedNotice.imageUrl && (
+                    <img
+                      src={pinnedNotice.imageUrl}
+                      alt={pinnedNotice.title}
+                      className="mb-5 aspect-[16/8] w-full rounded-2xl object-cover"
+                    />
+                  )}
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {[
+                      ["Date", timeAgo(pinnedNotice.createdAt)],
+                      ["Posted by", pinnedNotice.contact],
+                      ["Category", pinnedNotice.category || "Notice"],
+                      ["Status", pinnedNotice.status === "completed" ? "Completed" : "Active"],
+                    ].map(([label, value]) => (
+                      <div key={label} className="rounded-2xl bg-muted/60 p-4">
+                        <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
+                          {label}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-clay">{value}</p>
+                      </div>
+                    ))}
+                  </div>
+                  {canManageNotices && (
+                    <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update(pinnedNotice.id, { isPinned: !pinnedNotice.isPinned })
+                        }
+                        className="inline-flex items-center gap-2 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
+                      >
+                        <Pin className="size-3.5" />
+                        {pinnedNotice.isPinned ? "Unpin notice" : "Pin notice"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          update(pinnedNotice.id, {
+                            status:
+                              pinnedNotice.status === "completed" ? "active" : "completed",
+                          })
+                        }
+                        className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white px-4 py-2 text-xs font-semibold text-primary"
+                      >
+                        <CheckCircle2 className="size-3.5" />
+                        {pinnedNotice.status === "completed" ? "Mark active" : "Mark completed"}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
             </SurfaceCard>
-          ))}
+          )}
+
+          {noticeGroups.map(([groupTitle, groupItems]) =>
+            groupItems.length > 0 ? (
+              <section key={groupTitle}>
+                <h3 className="mb-3 font-display text-xl font-semibold text-clay">{groupTitle}</h3>
+                <div className="space-y-3">
+                  {groupItems.map((a) => (
+                    <SurfaceCard
+                      key={a.id}
+                      hover={false}
+                      className="rounded-[1.5rem] border-l-4 border-accent bg-card/95 p-5"
+                    >
+                      {a.imageUrl && (
+                        <img
+                          src={a.imageUrl}
+                          alt={a.title}
+                          className="mb-4 aspect-[16/7] w-full rounded-2xl object-cover"
+                        />
+                      )}
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="text-[10px] font-bold uppercase tracking-[0.24em] text-primary">
+                          {a.category || "Notice"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">
+                          {timeAgo(a.createdAt)}
+                        </span>
+                      </div>
+                      <h3 className="mt-2 font-display text-lg font-semibold text-clay">
+                        {a.title}
+                      </h3>
+                      <p className="mt-2 text-sm leading-7 text-muted-foreground">
+                        {a.description}
+                      </p>
+                      <div className="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
+                        <div className="flex flex-wrap gap-2 text-xs font-semibold text-muted-foreground">
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1">
+                            <Phone className="size-3.5" /> {a.contact}
+                          </span>
+                          <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-primary">
+                            <CheckCircle2 className="size-3.5" />{" "}
+                            {a.status === "completed" ? "Completed" : "Active"}
+                          </span>
+                        </div>
+                        {(canManageNotices || a.localOnly || (!!user && user.id === a.owner_id)) && (
+                          <div className="flex flex-wrap items-center gap-3">
+                            {canManageNotices && (
+                              <>
+                                <button
+                                  onClick={() => update(a.id, { isPinned: !a.isPinned })}
+                                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary transition hover:text-secondary"
+                                >
+                                  <Pin className="size-3.5" />
+                                  {a.isPinned ? "Unpin" : "Pin"}
+                                </button>
+                                <button
+                                  onClick={() =>
+                                    update(a.id, {
+                                      status: a.status === "completed" ? "active" : "completed",
+                                    })
+                                  }
+                                  className="text-xs font-semibold text-primary transition hover:text-secondary"
+                                >
+                                  {a.status === "completed" ? "Mark active" : "Complete"}
+                                </button>
+                              </>
+                            )}
+                            {(a.localOnly || (!!user && user.id === a.owner_id)) && (
+                              <button
+                                onClick={() => remove(a.id)}
+                                className="text-xs font-semibold text-muted-foreground transition hover:text-destructive"
+                              >
+                                Remove
+                              </button>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    </SurfaceCard>
+                  ))}
+                </div>
+              </section>
+            ) : null,
+          )}
         </div>
       )}
     </PageLayout>

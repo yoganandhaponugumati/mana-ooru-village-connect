@@ -180,7 +180,7 @@ export async function resendEmailVerification(email: string) {
 }
 
 /** Hard-deletes the signed-in user's account and everything that cascades from it. */
-export async function deleteMyAccount() {
+export async function deleteMyAccount(password: string) {
   const { deleteMyAccount: deleteMyAccountFn } = await import("@/lib/api/account.functions");
-  return deleteMyAccountFn();
+  return deleteMyAccountFn({ data: { password } });
 }

@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   UserRound,
   X,
+  Trash2,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -39,8 +40,15 @@ export function SiteNav() {
   const [scrolled, setScrolled] = useState(false);
   const { user, role, signOut, profile: authProfile } = useAuth();
   const { language, setLanguage, t, profile, weather, hasProfile } = useVillagePreferences();
-  const { notifications, unreadCount, loading: notificationsLoading, markRead, markAllRead } =
-    useNotifications();
+  const {
+    notifications,
+    unreadCount,
+    loading: notificationsLoading,
+    markRead,
+    markAllRead,
+    deleteNotification,
+    clearAll,
+  } = useNotifications();
   useThemePreference();
   const location = useLocation();
   const navigate = useNavigate();
@@ -263,6 +271,15 @@ export function SiteNav() {
                           Mark read
                         </button>
                       )}
+                      {notifications.length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => clearAll()}
+                          className="rounded-full border border-border px-3 py-1.5 text-xs font-bold text-muted-foreground transition hover:border-destructive hover:text-destructive"
+                        >
+                          Clear
+                        </button>
+                      )}
                     </div>
                     <div className="max-h-[420px] overflow-y-auto p-2">
                       {notificationsLoading ? (
@@ -284,11 +301,9 @@ export function SiteNav() {
                         </div>
                       ) : (
                         notifications.map((item) => (
-                          <button
+                          <div
                             key={item.id}
-                            type="button"
-                            onClick={() => markRead(item.id)}
-                            className={`flex w-full gap-3 rounded-2xl p-3 text-left transition hover:bg-primary/8 ${
+                            className={`group flex w-full gap-3 rounded-2xl p-3 text-left transition hover:bg-primary/8 ${
                               item.read_at ? "opacity-72" : "bg-primary/6"
                             }`}
                           >
@@ -297,7 +312,14 @@ export function SiteNav() {
                                 item.read_at ? "bg-border" : "bg-red-500"
                               }`}
                             />
-                            <span className="min-w-0 flex-1">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                markRead(item.id);
+                                if (item.action_url) window.location.assign(item.action_url);
+                              }}
+                              className="min-w-0 flex-1 text-left"
+                            >
                               <span className="block truncate text-sm font-bold text-clay">
                                 {item.title}
                               </span>
@@ -308,8 +330,16 @@ export function SiteNav() {
                                 {item.type.replaceAll("_", " ")} -{" "}
                                 {timeAgo(new Date(item.created_at).getTime())}
                               </span>
-                            </span>
-                          </button>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => deleteNotification(item.id)}
+                              className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+                              aria-label="Delete notification"
+                            >
+                              <Trash2 className="size-3.5" />
+                            </button>
+                          </div>
                         ))
                       )}
                     </div>

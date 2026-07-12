@@ -13,6 +13,10 @@ export type AppNotification = {
   type: string;
   read_at: string | null;
   created_at: string;
+  entity_type: string | null;
+  entity_id: string | null;
+  action_url: string | null;
+  dedupe_key: string | null;
 };
 
 export function useNotifications() {
@@ -87,6 +91,26 @@ export function useNotifications() {
     },
   });
 
+  const deleteNotification = useMutation({
+    mutationFn: async (id: string) => {
+      if (!user) return;
+      await supabase.from("notifications").delete().eq("id", id).eq("recipient_id", user.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+    },
+  });
+
+  const clearAll = useMutation({
+    mutationFn: async () => {
+      if (!user) return;
+      await supabase.from("notifications").delete().eq("recipient_id", user.id);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["notifications", user?.id] });
+    },
+  });
+
   const notifications = query.data ?? [];
   const unreadCount = notifications.filter((item) => !item.read_at).length;
 
@@ -96,5 +120,7 @@ export function useNotifications() {
     loading: query.isLoading,
     markRead: markRead.mutate,
     markAllRead: markAllRead.mutate,
+    deleteNotification: deleteNotification.mutate,
+    clearAll: clearAll.mutate,
   };
 }

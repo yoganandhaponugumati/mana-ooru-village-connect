@@ -45,6 +45,84 @@ export type CitizenService = {
   apply: string;
 };
 
+const villageDirectoryItems: SearchableItem[] = [
+  {
+    id: "dir-kirana",
+    type: "service",
+    title: "Kirana Shops",
+    description: "Daily goods, rice, oil, snacks, household items, and grocery stores.",
+    category: "Shops",
+    location: "Your village",
+    to: "/services",
+  },
+  {
+    id: "dir-medical",
+    type: "service",
+    title: "Medical Shops",
+    description: "Pharmacy, medicines, first aid, health supplies, and nearby medical support.",
+    category: "Health",
+    location: "Your village",
+    to: "/services",
+  },
+  {
+    id: "dir-chicken",
+    type: "service",
+    title: "Chicken and Meat Shops",
+    description: "Chicken shop, mutton shop, fish seller, and local non-veg stores.",
+    category: "Shops",
+    location: "Your village",
+    to: "/services",
+  },
+  {
+    id: "dir-tent-house",
+    type: "service",
+    title: "Tent House and Event Services",
+    description:
+      "Tent house, chairs, shamiyana, catering, DJ, photographer, videographer, flowers.",
+    category: "Event Services",
+    location: "Your village",
+    to: "/services",
+  },
+  {
+    id: "dir-tractor",
+    type: "transport",
+    title: "Tractor Owners",
+    description: "Tractor rental, ploughing, rotavator, trolley, water tanker, and farm transport.",
+    category: "Machinery",
+    location: "Your village",
+    to: "/transport",
+  },
+  {
+    id: "dir-panchayat",
+    type: "service",
+    title: "Panchayat Office",
+    description:
+      "Village secretary, gram sabha, certificates, public works, notices, and complaints.",
+    category: "Panchayat",
+    location: "Your village",
+    to: "/services",
+  },
+];
+
+const searchSynonyms: Record<string, string[]> = {
+  tent: ["tent house", "event services", "shamiyana", "catering", "chairs"],
+  tractor: ["tractor owner", "tractor rental", "ploughing", "rotavator", "machinery"],
+  chicken: ["chicken shop", "meat", "non veg", "mutton", "fish"],
+  medical: ["medical shop", "pharmacy", "health", "medicine"],
+  kirana: ["grocery", "daily goods", "shop", "store"],
+  electrician: ["current", "wiring", "streetlight", "power"],
+  plumber: ["water", "pipe", "tap", "borewell"],
+};
+
+export function expandSearchQuery(query: string) {
+  const normalized = query.toLowerCase().replace(/\b(need|want|find|nearby|local)\b/g, " ");
+  const terms = new Set(normalized.split(/\s+/).filter(Boolean));
+  Object.entries(searchSynonyms).forEach(([key, values]) => {
+    if (normalized.includes(key)) values.forEach((value) => terms.add(value));
+  });
+  return Array.from(terms).join(" ");
+}
+
 export const fallbackListings: Listing[] = [
   {
     id: "seed-worker-tractor",
@@ -148,7 +226,8 @@ export const schemes: SchemeInfo[] = [
     id: "scheme-myscheme",
     title: "myScheme Eligibility Finder",
     category: "All Schemes",
-    benefit: "Find central and state government schemes based on family, income, caste, occupation, and location.",
+    benefit:
+      "Find central and state government schemes based on family, income, caste, occupation, and location.",
     documents: ["Aadhaar", "Income details", "Caste certificate if applicable", "Bank account"],
     eligibility: "Any citizen can check schemes and eligibility.",
     apply: "https://www.myscheme.gov.in/",
@@ -230,7 +309,13 @@ export const schemes: SchemeInfo[] = [
     title: "National Scholarship Portal",
     category: "Education",
     benefit: "Scholarships for eligible students from central and state departments.",
-    documents: ["Aadhaar", "Student ID", "Income certificate", "Caste certificate if applicable", "Bank account"],
+    documents: [
+      "Aadhaar",
+      "Student ID",
+      "Income certificate",
+      "Caste certificate if applicable",
+      "Bank account",
+    ],
     eligibility: "Students meeting scholarship-specific income, category, and academic rules.",
     apply: "https://scholarships.gov.in/",
   },
@@ -241,7 +326,8 @@ export const citizenServices: CitizenService[] = [
     id: "service-aadhaar-update",
     title: "Aadhaar Update / Download",
     category: "Identity",
-    description: "Update Aadhaar details, download e-Aadhaar, check update status, and book Aadhaar services.",
+    description:
+      "Update Aadhaar details, download e-Aadhaar, check update status, and book Aadhaar services.",
     documents: ["Aadhaar number", "Mobile linked to Aadhaar", "Proof document for update"],
     apply: "https://myaadhaar.uidai.gov.in/",
   },
@@ -249,7 +335,8 @@ export const citizenServices: CitizenService[] = [
     id: "service-digilocker",
     title: "DigiLocker Documents",
     category: "Documents",
-    description: "Access Aadhaar, driving licence, certificates, marksheets, and other digital documents.",
+    description:
+      "Access Aadhaar, driving licence, certificates, marksheets, and other digital documents.",
     documents: ["Aadhaar or mobile number", "OTP access"],
     apply: "https://www.digilocker.gov.in/",
   },
@@ -386,6 +473,7 @@ export function getSearchableItems(listings: Listing[]): SearchableItem[] {
 
   return [
     ...listingItems,
+    ...villageDirectoryItems,
     ...schemes.map((scheme) => ({
       id: scheme.id,
       type: "scheme" as const,
