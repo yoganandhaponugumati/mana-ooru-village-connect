@@ -7,16 +7,13 @@ import {
   roleToLegacyAccountType,
   type AccountType,
   type AppRole,
+  type DealerStatus,
   type LegacyAccountType,
   type Occupation,
 } from "@/lib/supabase/auth";
-import {
-  saveLanguagePreference,
-  saveVillageProfilePreference,
-  type Language,
-} from "@/lib/village-preferences";
+import { type Language } from "@/lib/village-preferences";
 
-export type { AccountType, AppRole, LegacyAccountType };
+export type { AccountType, AppRole, DealerStatus, LegacyAccountType };
 
 type AuthProfile = {
   account_type: LegacyAccountType;
@@ -32,6 +29,16 @@ type AuthProfile = {
   village_id: string | null;
   preferred_language: Language;
   profileCompletedAt: string | null;
+  // ── Dealer fields ──
+  dealer_status: DealerStatus | null;
+  dealer_category: string | null;
+  shop_name: string | null;
+  shop_description: string | null;
+  shop_address: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  // ── Village Admin fields ──
+  designation: string | null;
 };
 
 type AuthCtx = {
@@ -43,6 +50,12 @@ type AuthCtx = {
   needsProfileCompletion: boolean;
   /** True for password accounts whose email hasn't been confirmed yet. Google/phone accounts don't need this. */
   needsEmailVerification: boolean;
+  /** True if the user is an approved dealer. */
+  isDealerApproved: boolean;
+  /** True if the user has applied as a dealer and is awaiting approval. */
+  isDealerPending: boolean;
+  /** True if the user is a suspended dealer. */
+  isDealerSuspended: boolean;
   loading: boolean;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
@@ -55,13 +68,16 @@ const Ctx = createContext<AuthCtx>({
   role: null,
   needsProfileCompletion: false,
   needsEmailVerification: false,
+  isDealerApproved: false,
+  isDealerPending: false,
+  isDealerSuspended: false,
   loading: true,
   signOut: async () => {},
   refreshProfile: async () => {},
 });
 
 const PROFILE_COLUMNS =
-  "account_type,role,username,full_name,photo_url,occupation,state,district,mandal,village,village_id,preferred_language,profile_completed_at";
+  "account_type,role,username,full_name,photo_url,occupation,state,district,mandal,village,village_id,preferred_language,profile_completed_at,dealer_status,dealer_category,shop_name,shop_description,shop_address,approved_by,approved_at,designation";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
@@ -69,13 +85,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   const loadProfile = useCallback(async (userId: string) => {
-    const { data } = await supabase
+    console.log("AUTH USER ID:", userId);
+
+    const { data, error } = await supabase
       .from("profiles")
       .select(PROFILE_COLUMNS)
       .eq("id", userId)
       .maybeSingle();
 
+    console.log("PROFILE DATA:", data);
+    console.log("PROFILE ERROR:", error);
+
     const role = normalizeRole(data?.role ?? data?.account_type);
+
     setProfile(
       data
         ? {
@@ -92,20 +114,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             village_id: data.village_id,
             preferred_language: data.preferred_language,
             profileCompletedAt: data.profile_completed_at,
+            // ── Dealer fields ──
+            dealer_status: data.dealer_status ?? null,
+            dealer_category: data.dealer_category ?? null,
+            shop_name: data.shop_name ?? null,
+            shop_description: data.shop_description ?? null,
+            shop_address: data.shop_address ?? null,
+            approved_by: data.approved_by ?? null,
+            approved_at: data.approved_at ?? null,
+            // ── Village Admin fields ──
+            designation: data.designation ?? null,
           }
         : null,
     );
-    if (data?.state && data.district && data.mandal && data.village) {
-      saveVillageProfilePreference({
-        state: data.state,
-        district: data.district,
-        mandal: data.mandal,
-        village: data.village,
-      });
-    }
-    if (data?.preferred_language) {
-      saveLanguagePreference(data.preferred_language);
-    }
   }, []);
 
   useEffect(() => {
@@ -146,6 +167,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
   const needsEmailVerification = hasPasswordIdentity && !user?.email_confirmed_at;
 
+  // Dealer status computed properties
+  const isDealerApproved = profile?.role === "dealer" && profile?.dealer_status === "approved";
+  const isDealerPending = profile?.dealer_status === "pending";
+  const isDealerSuspended = profile?.role === "dealer" && profile?.dealer_status === "suspended";
+
   return (
     <Ctx.Provider
       value={{
@@ -155,6 +181,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role: profile?.role ?? null,
         needsProfileCompletion,
         needsEmailVerification,
+        isDealerApproved,
+        isDealerPending,
+        isDealerSuspended,
         loading,
         signOut,
         refreshProfile,

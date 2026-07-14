@@ -233,8 +233,7 @@ function AnnPage() {
                         type="button"
                         onClick={() =>
                           update(pinnedNotice.id, {
-                            status:
-                              pinnedNotice.status === "completed" ? "active" : "completed",
+                            status: pinnedNotice.status === "completed" ? "active" : "completed",
                           })
                         }
                         className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-white px-4 py-2 text-xs font-semibold text-primary"
@@ -291,7 +290,9 @@ function AnnPage() {
                             {a.status === "completed" ? "Completed" : "Active"}
                           </span>
                         </div>
-                        {(canManageNotices || a.localOnly || (!!user && user.id === a.owner_id)) && (
+                        {(canManageNotices ||
+                          a.localOnly ||
+                          (!!user && user.id === a.owner_id)) && (
                           <div className="flex flex-wrap items-center gap-3">
                             {canManageNotices && (
                               <>

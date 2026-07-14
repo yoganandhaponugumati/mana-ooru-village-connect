@@ -1,32 +1,33 @@
 # ManaOoru — Codebase Audit & Fix Report
-*Senior engineer pass. No new features, no UI redesign, Supabase connection untouched. Every fix verified with a clean typecheck + lint pass before moving to the next.*
+
+_Senior engineer pass. No new features, no UI redesign, Supabase connection untouched. Every fix verified with a clean typecheck + lint pass before moving to the next._
 
 ## Summary
 
-| Metric | Before | After |
-|---|---|---|
-| TypeScript errors | 9 | **0** |
-| ESLint errors | 5,260 | **0** |
-| ESLint warnings | 7 | 7 (documented, low-risk, intentionally left — see §6) |
-| Dead files removed | — | 1 directory (6 files, 274 lines) |
-| Unused imports removed | — | 6 |
-| Accessibility fixes | — | 2 (label association, missing aria-label) |
-| Files with CRLF/formatting inconsistency | ~90 | 0 |
-| Secrets/env vars exposed | 0 | 0 (verified) |
-| Supabase connection logic changed | — | **No** (verified byte-identical behavior) |
+| Metric                                   | Before | After                                                 |
+| ---------------------------------------- | ------ | ----------------------------------------------------- |
+| TypeScript errors                        | 9      | **0**                                                 |
+| ESLint errors                            | 5,260  | **0**                                                 |
+| ESLint warnings                          | 7      | 7 (documented, low-risk, intentionally left — see §6) |
+| Dead files removed                       | —      | 1 directory (6 files, 274 lines)                      |
+| Unused imports removed                   | —      | 6                                                     |
+| Accessibility fixes                      | —      | 2 (label association, missing aria-label)             |
+| Files with CRLF/formatting inconsistency | ~90    | 0                                                     |
+| Secrets/env vars exposed                 | 0      | 0 (verified)                                          |
+| Supabase connection logic changed        | —      | **No** (verified byte-identical behavior)             |
 
 ---
 
 ## 1. Broken Code (TypeScript errors) — 9 found, 9 fixed
 
-| # | File | Issue | Fix |
-|---|---|---|---|
-| 1 | `design-system.tsx` | `SurfaceCard` spread native `HTMLAttributes` into a `motion.div`; `onDrag`/`onAnimationStart` etc. have incompatible signatures between React and framer-motion | Narrowed the prop type to `Omit<...>` excluding the 6 conflicting handlers |
-| 2–5 | `village-preferences.ts` | Indexing the `locationTree` object with a plain `string` gave implicit `any` (4 call sites) | Reused the file's own already-declared `LocationTree` type via a single typed alias (`typedLocationTree`), applied consistently |
-| 6 | `routes/auth.tsx` | `villages.map((village) => ...)` inferred `any` — downstream of #2–5 | Resolved automatically once `getVillages()` got an explicit `string[]` return type |
-| 7 | `routes/weather.tsx` | Same root cause as #6 | Same fix |
-| 8 | `routes/index.tsx` | `Link to={a.to}` — TS couldn't narrow away the `"#contacts"` anchor case after the `.startsWith("#")` runtime check | Added a precise `Exclude<...>` cast at that call site only |
-| 9 | `routes/index.tsx` | Footer `<Link to="/search">` was missing a required `search` param the route itself defines | Added `search={{ q: "" }}` |
+| #   | File                     | Issue                                                                                                                                                           | Fix                                                                                                                             |
+| --- | ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | `design-system.tsx`      | `SurfaceCard` spread native `HTMLAttributes` into a `motion.div`; `onDrag`/`onAnimationStart` etc. have incompatible signatures between React and framer-motion | Narrowed the prop type to `Omit<...>` excluding the 6 conflicting handlers                                                      |
+| 2–5 | `village-preferences.ts` | Indexing the `locationTree` object with a plain `string` gave implicit `any` (4 call sites)                                                                     | Reused the file's own already-declared `LocationTree` type via a single typed alias (`typedLocationTree`), applied consistently |
+| 6   | `routes/auth.tsx`        | `villages.map((village) => ...)` inferred `any` — downstream of #2–5                                                                                            | Resolved automatically once `getVillages()` got an explicit `string[]` return type                                              |
+| 7   | `routes/weather.tsx`     | Same root cause as #6                                                                                                                                           | Same fix                                                                                                                        |
+| 8   | `routes/index.tsx`       | `Link to={a.to}` — TS couldn't narrow away the `"#contacts"` anchor case after the `.startsWith("#")` runtime check                                             | Added a precise `Exclude<...>` cast at that call site only                                                                      |
+| 9   | `routes/index.tsx`       | Footer `<Link to="/search">` was missing a required `search` param the route itself defines                                                                     | Added `search={{ q: "" }}`                                                                                                      |
 
 **Also enabled `noUnusedLocals`/`noUnusedParameters` in `tsconfig.json`** (previously both `false`, silently hiding unused code). This surfaced 6 unused imports (see §4) and now stays on as a permanent guardrail — it passes clean, so it costs nothing going forward and catches this class of issue automatically in future PRs.
 
@@ -46,9 +47,9 @@
 
 ## 4. Unused Imports — 6 found, 6 removed
 
-| File | Removed |
-|---|---|
-| `src/lib/app-data.ts` | `Bus`, `CalendarDays`, `FileText`, `Landmark`, `MapPin` (unused lucide-react icons) |
+| File                     | Removed                                                                                           |
+| ------------------------ | ------------------------------------------------------------------------------------------------- |
+| `src/lib/app-data.ts`    | `Bus`, `CalendarDays`, `FileText`, `Landmark`, `MapPin` (unused lucide-react icons)               |
 | `src/routes/schemes.tsx` | `Loader2` (leftover from an earlier draft — `AppButton`'s own `loading` prop handles the spinner) |
 
 ---
@@ -57,7 +58,7 @@
 
 - **36 of the 45 installed shadcn `ui/*` components are currently unused** (`accordion`, `alert`, `badge`, `calendar`, `carousel`, `chart`, `command`, `form`, `sidebar`, `table`, etc.). These are the standard pre-installed shadcn component kit. Left in place deliberately: unused React components that are never imported are excluded from the production bundle by the bundler automatically (verified — they cost nothing at runtime), and deleting a working design-system kit on spec risks having to re-add pieces the moment a real feature needs them. Recommend leaving as-is.
 - **`src/lib/api/example.functions.ts` + `src/lib/config.server.ts`**: an explicitly-commented example/template pair showing the correct TanStack Start server-function pattern. Zero real usage, but it's documentation-as-code for a pattern you'll likely need once you add server-side logic. Left in place.
-- **`src/integrations/supabase/client.server.ts`, `auth-middleware.ts`, `auth-attacher.ts`**: header-labeled *"This file is automatically generated. Do not edit it directly"* — these are Supabase/Lovable-generated server-side integration scaffolding (service-role client, auth middleware) for future server functions. Currently unused because no server function needs them yet. **Not deleted, per your instruction to never touch the Supabase connection setup** — even though they were swept up in the formatting pass (see §9), their logic is byte-for-byte unchanged, verified by token-level diff.
+- **`src/integrations/supabase/client.server.ts`, `auth-middleware.ts`, `auth-attacher.ts`**: header-labeled _"This file is automatically generated. Do not edit it directly"_ — these are Supabase/Lovable-generated server-side integration scaffolding (service-role client, auth middleware) for future server functions. Currently unused because no server function needs them yet. **Not deleted, per your instruction to never touch the Supabase connection setup** — even though they were swept up in the formatting pass (see §9), their logic is byte-for-byte unchanged, verified by token-level diff.
 
 ---
 
@@ -65,7 +66,7 @@
 
 **5,260 errors → 0.** Overwhelming majority (5,257) were `prettier/prettier` violations from inconsistent CRLF line endings across ~90 files (explained in §9) — fixed via the project's own configured formatter, zero logic risk.
 
-**7 warnings remain, deliberately left:** `react-refresh/only-export-components` in `badge.tsx`, `button.tsx`, `form.tsx`, `navigation-menu.tsx`, `sidebar.tsx`, `toggle.tsx` (all shadcn-generated, exporting a small variant-helper function alongside the component — standard, low-risk shadcn pattern) and `lib/auth.tsx` (exports `useAuth` alongside `AuthProvider`). Fixing these means splitting each file and updating every import site across the app — high blast radius for a dev-experience-only warning (it only affects Fast Refresh during local development, not production behavior). Flagged rather than force-fixed, since you asked for issues identified *and* fixed, but this one's cost/benefit doesn't justify the risk in a "no new features, careful pass" session — happy to do it as a dedicated follow-up if you want it gone.
+**7 warnings remain, deliberately left:** `react-refresh/only-export-components` in `badge.tsx`, `button.tsx`, `form.tsx`, `navigation-menu.tsx`, `sidebar.tsx`, `toggle.tsx` (all shadcn-generated, exporting a small variant-helper function alongside the component — standard, low-risk shadcn pattern) and `lib/auth.tsx` (exports `useAuth` alongside `AuthProvider`). Fixing these means splitting each file and updating every import site across the app — high blast radius for a dev-experience-only warning (it only affects Fast Refresh during local development, not production behavior). Flagged rather than force-fixed, since you asked for issues identified _and_ fixed, but this one's cost/benefit doesn't justify the risk in a "no new features, careful pass" session — happy to do it as a dedicated follow-up if you want it gone.
 
 **3 `no-explicit-any` warnings → fixed.** All three were in `routes/ai-assistant.tsx`'s Web Speech API integration (`(window as any).SpeechRecognition`). Replaced with a minimal, accurate local interface for the Speech Recognition API (which has no official TS lib types), so voice input is now fully typed instead of opting out of type-checking.
 

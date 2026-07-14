@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
 import {
   Bookmark,
   Camera,
@@ -21,10 +21,12 @@ import {
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
+import { supabase } from "@/integrations/supabase/client";
+import { useVillagePreferences } from "@/lib/village-preferences";
 import { logContact, useSavedItems } from "@/lib/local-actions";
 import { deleteUserFile, uploadUserFile, type StorageBucket } from "@/lib/supabase/storage";
 import { useListings, type Listing, timeAgo } from "@/lib/store";
-import { SurfaceCard, StatusBadge } from "./design-system";
+import { StatusBadge } from "./design-system";
 
 type Field = {
   name: keyof Omit<Listing, "id" | "createdAt" | "type">;
@@ -94,7 +96,8 @@ export function ListingForm({
   photoRequired?: boolean;
 }) {
   const { add } = useListings();
-  const { user } = useAuth();
+  const { user, profile: authProfile } = useAuth();
+  const { profile: prefProfile } = useVillagePreferences();
   const navigate = useNavigate();
   const [values, setValues] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -169,6 +172,19 @@ export function ListingForm({
         uploadedStoragePath = uploaded.path;
       }
 
+      let villageId = authProfile?.village_id || undefined;
+      if (!villageId && prefProfile?.village) {
+        const { data: vData } = await supabase
+          .from("villages")
+          .select("id")
+          .eq("name", prefProfile.village)
+          .limit(1)
+          .maybeSingle();
+        if (vData) {
+          villageId = vData.id;
+        }
+      }
+
       await add({
         type,
         title: values.title?.trim() || "",
@@ -179,6 +195,7 @@ export function ListingForm({
         category: values.category?.trim(),
         imageUrl,
         storagePath,
+        villageId,
       });
       uploadedStoragePath = undefined;
       console.info("[posting] form:submit:success", { type, title: values.title });
@@ -435,13 +452,39 @@ export function ListingCard({
         )
       : -1;
 
+  // Interactive 3D tilt physics using Framer Motion
+  const mouseX = useMotionValue(200);
+  const mouseY = useMotionValue(200);
+  const rotateX = useTransform(mouseY, [0, 400], [10, -10]);
+  const rotateY = useTransform(mouseX, [0, 400], [-10, 10]);
+
+  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const rect = event.currentTarget.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const relX = ((event.clientX - rect.left) / width) * 400;
+    const relY = ((event.clientY - rect.top) / height) * 400;
+    mouseX.set(relX);
+    mouseY.set(relY);
+  };
+
+  const handleMouseLeave = () => {
+    mouseX.set(200);
+    mouseY.set(200);
+  };
+
   return (
-    <SurfaceCard className="listing-3d-card group overflow-hidden p-5">
+    <motion.div
+      style={{ rotateX, rotateY, transformStyle: "preserve-3d", perspective: 1000 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="listing-3d-card group relative overflow-hidden rounded-[24px] border border-border bg-card p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(23,99,58,0.12)] transition-shadow duration-300"
+    >
       {item.imageUrl && (
         <button
           type="button"
           onClick={() => setDetailsOpen(true)}
-          className="mb-4 block w-full overflow-hidden rounded-[18px] bg-muted text-left"
+          className="mb-4 block w-full overflow-hidden rounded-[18px] bg-muted text-left transform transition duration-300 group-hover:translate-z-10"
         >
           <img
             src={item.imageUrl}
@@ -450,7 +493,7 @@ export function ListingCard({
           />
         </button>
       )}
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-3 transform transition duration-300 group-hover:translate-z-20">
         <div className="flex flex-1 gap-3">
           <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary font-display text-sm font-semibold text-white shadow-sm">
             {item.imageUrl ? <ImagePlus className="size-6" /> : initials || "MO"}
@@ -761,6 +804,6 @@ export function ListingCard({
           </motion.div>
         )}
       </AnimatePresence>
-    </SurfaceCard>
+    </motion.div>
   );
 }

@@ -622,11 +622,7 @@
 .premium-surface {
   position: relative;
   color: #17231c;
-  background: linear-gradient(
-    180deg,
-    rgba(255, 255, 255, 0.94),
-    rgba(238, 249, 237, 0.86)
-  );
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(238, 249, 237, 0.86));
   border: 1px solid rgba(255, 255, 255, 0.72);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.82) inset,

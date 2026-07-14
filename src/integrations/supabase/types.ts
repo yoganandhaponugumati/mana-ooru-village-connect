@@ -1,6 +1,7 @@
 export type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
 
-type AppRole = "super_admin" | "village_admin" | "citizen";
+type AppRole = "super_admin" | "village_admin" | "dealer" | "citizen";
+type DealerStatus = "pending" | "approved" | "suspended" | "rejected";
 type Occupation =
   | "Farmer"
   | "Worker"
@@ -10,6 +11,7 @@ type Occupation =
   | "Mechanic"
   | "Doctor"
   | "Business"
+  | "Driver"
   | "Other";
 
 export type Database = {
@@ -58,6 +60,14 @@ export type Database = {
           village: string | null;
           preferred_language: "te" | "en" | "hi";
           profile_completed_at: string | null;
+          designation: string | null;
+          dealer_status: DealerStatus | null;
+          dealer_category: string | null;
+          shop_name: string | null;
+          shop_description: string | null;
+          shop_address: string | null;
+          approved_by: string | null;
+          approved_at: string | null;
           created_at: string;
           updated_at: string;
         };
@@ -263,6 +273,7 @@ export type Database = {
           description: string | null;
           contact: string;
           location: string | null;
+          village_id: string | null;
           price: string | null;
           category: string | null;
           image_url: string | null;
@@ -447,6 +458,20 @@ export type Database = {
         Args: Record<PropertyKey, never>;
         Returns: boolean;
       };
+      caller_village_id: {
+        Args: Record<PropertyKey, never>;
+        Returns: string;
+      };
+      same_village_as_caller: {
+        Args: {
+          _village_id: string;
+        };
+        Returns: boolean;
+      };
+      is_approved_dealer: {
+        Args: Record<PropertyKey, never>;
+        Returns: boolean;
+      };
     };
     Enums: {
       app_role: AppRole;
@@ -505,7 +530,7 @@ export type Enums<DefaultSchemaEnumName extends keyof DefaultSchema["Enums"]> =
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["super_admin", "village_admin", "citizen"],
+      app_role: ["super_admin", "village_admin", "dealer", "citizen"],
       listing_type: ["worker", "work", "land", "market", "service", "announcement", "complaint"],
     },
   },

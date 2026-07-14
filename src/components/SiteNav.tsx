@@ -1,7 +1,6 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  Activity,
   Bell,
   Check,
   ChevronDown,
@@ -14,6 +13,7 @@ import {
   UserRound,
   X,
   Trash2,
+  LayoutDashboard,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -145,6 +145,12 @@ export function SiteNav() {
                   <ShieldCheck className="size-3.5" /> Official
                 </Link>
               )}
+              <Link
+                to="/dashboard"
+                className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+              >
+                <LayoutDashboard className="size-3.5" /> Dashboard
+              </Link>
               <Link
                 to="/profile"
                 className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
@@ -433,6 +439,13 @@ export function SiteNav() {
                       Official workspace
                     </Link>
                   )}
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setOpen(false)}
+                    className="mt-2 rounded-xl border border-border px-3 py-2.5 text-center text-sm font-semibold text-foreground"
+                  >
+                    Dashboard
+                  </Link>
                   <Link
                     to="/profile"
                     onClick={() => setOpen(false)}

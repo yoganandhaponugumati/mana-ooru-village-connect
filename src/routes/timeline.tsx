@@ -5,7 +5,6 @@ import {
   AlertTriangle,
   Bell,
   Bookmark,
-  Briefcase,
   CalendarDays,
   CheckCircle2,
   ChevronDown,
@@ -294,8 +293,10 @@ function inferType(item: Listing): TimelineType {
   const text = `${item.title} ${item.description} ${item.category}`.toLowerCase();
   if (item.type === "worker") return "worker";
   if (item.type === "market") return "marketplace";
-  if (item.type === "complaint") return item.status === "resolved" ? "complaint_resolved" : "complaint";
-  if (item.type === "service") return shopCategories.has(item.category || "") ? "village_shop" : "service";
+  if (item.type === "complaint")
+    return item.status === "resolved" ? "complaint_resolved" : "complaint";
+  if (item.type === "service")
+    return shopCategories.has(item.category || "") ? "village_shop" : "service";
   if (item.type === "announcement") {
     if (/emergency|urgent|danger|missing|flood|failure/i.test(text)) return "emergency";
     if (/water|tank|drainage/i.test(text)) return "water";
@@ -335,7 +336,9 @@ function inHistoryWindow(createdAt: number, filter: (typeof historyFilters)[numb
   }
   if (filter === "Last Month") {
     const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
-    return date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear();
+    return (
+      date.getMonth() === lastMonth.getMonth() && date.getFullYear() === lastMonth.getFullYear()
+    );
   }
   return date.getFullYear() === now.getFullYear() - 1;
 }
@@ -343,7 +346,8 @@ function inHistoryWindow(createdAt: number, filter: (typeof historyFilters)[numb
 function matchesFilter(item: TimelineActivity, filter: (typeof filters)[number]) {
   if (filter === "Today") return groupTitle(item.createdAt) === "Today";
   if (filter === "Government") return item.type === "government_work" || item.verified;
-  if (filter === "Complaints") return item.type === "complaint" || item.type === "complaint_resolved";
+  if (filter === "Complaints")
+    return item.type === "complaint" || item.type === "complaint_resolved";
   if (filter === "Workers") return item.type === "worker";
   if (filter === "Marketplace") return item.type === "marketplace";
   if (filter === "Services") return item.type === "service";
@@ -484,7 +488,7 @@ function TimelinePage() {
 
     const workActivities = works.map((work) => ({
       id: `work-${work.id}`,
-      type: /road/i.test(work.title) ? "road_work" : "government_work",
+      type: /road/i.test(work.title) ? "road_work" : ("government_work" as const),
       title: `${work.status === "completed" ? "Government work completed" : "Government work update"}: ${work.title}`,
       body: work.description || `${work.department || "Panchayat"} work is ${work.status}.`,
       village: work.location || villageName || "Your village",
@@ -493,6 +497,7 @@ function TimelinePage() {
       href: "/official",
       imageUrl: work.government_work_images?.[0]?.image_url,
       isPinned: work.status === "active",
+      isEmergency: false,
       verified: true,
       source: "government_work",
     })) satisfies TimelineActivity[];
@@ -525,12 +530,15 @@ function TimelinePage() {
       officialActivities.length > 0 ? officialActivities : fallbackActivities;
 
     return [...weatherActivity, ...sourceActivities].sort(
-      (a, b) => Number(b.isPinned || b.isEmergency) - Number(a.isPinned || a.isEmergency) || b.createdAt - a.createdAt,
+      (a, b) =>
+        Number(b.isPinned || b.isEmergency) - Number(a.isPinned || a.isEmergency) ||
+        b.createdAt - a.createdAt,
     );
   }, [items, timelineQuery.data, villageName, weather, works]);
 
   const filtered = activities.filter((item) => {
-    const searchText = `${item.title} ${item.body} ${item.author} ${item.village} ${activityMeta[item.type].label}`.toLowerCase();
+    const searchText =
+      `${item.title} ${item.body} ${item.author} ${item.village} ${activityMeta[item.type].label}`.toLowerCase();
     return (
       sameVillage(item, villageName, isSuperAdmin) &&
       matchesFilter(item, activeFilter) &&
@@ -563,7 +571,9 @@ function TimelinePage() {
     `${filtered.filter((item) => item.type === "worker").length} worker updates`,
     `${analytics.resolved} complaints resolved`,
     `${filtered.filter((item) => item.type === "village_shop").length} shop updates`,
-    analytics.emergency ? `${analytics.emergency} emergency alerts need attention` : "No emergency alerts now",
+    analytics.emergency
+      ? `${analytics.emergency} emergency alerts need attention`
+      : "No emergency alerts now",
   ];
 
   const submitComment = (id: string, value: string) => {
@@ -612,7 +622,10 @@ function TimelinePage() {
               <h3 className="mt-5 font-display text-3xl font-semibold">Today's Village Summary</h3>
               <div className="mt-5 grid gap-3 sm:grid-cols-2">
                 {summary.map((item) => (
-                  <div key={item} className="rounded-2xl border border-white/14 bg-white/10 p-4 text-sm font-semibold leading-6 backdrop-blur-xl">
+                  <div
+                    key={item}
+                    className="rounded-2xl border border-white/14 bg-white/10 p-4 text-sm font-semibold leading-6 backdrop-blur-xl"
+                  >
                     {item}
                   </div>
                 ))}
@@ -717,7 +730,11 @@ function TimelinePage() {
                   commentOpen={commentOpen === item.id}
                   onLike={() => setLiked((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}
                   onSave={() => toggleSaved({ id: item.id, title: item.title })}
-                  onShare={() => void navigator.clipboard?.writeText(`${location.origin}${item.href}`).then(() => toast.success("Timeline link copied"))}
+                  onShare={() =>
+                    void navigator.clipboard
+                      ?.writeText(`${location.origin}${item.href}`)
+                      .then(() => toast.success("Timeline link copied"))
+                  }
                   onReport={() => toast.success("Report received for review")}
                   onToggleComments={() => setCommentOpen(commentOpen === item.id ? null : item.id)}
                   onComment={submitComment}
@@ -743,9 +760,15 @@ function TimelinePage() {
                     commentOpen={commentOpen === item.id}
                     onLike={() => setLiked((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}
                     onSave={() => toggleSaved({ id: item.id, title: item.title })}
-                    onShare={() => void navigator.clipboard?.writeText(`${location.origin}${item.href}`).then(() => toast.success("Timeline link copied"))}
+                    onShare={() =>
+                      void navigator.clipboard
+                        ?.writeText(`${location.origin}${item.href}`)
+                        .then(() => toast.success("Timeline link copied"))
+                    }
                     onReport={() => toast.success("Report received for review")}
-                    onToggleComments={() => setCommentOpen(commentOpen === item.id ? null : item.id)}
+                    onToggleComments={() =>
+                      setCommentOpen(commentOpen === item.id ? null : item.id)
+                    }
                     onComment={submitComment}
                   />
                 ))}
@@ -831,7 +854,9 @@ function TimelineCard({
               </div>
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${meta.tone}`}>
+                  <span
+                    className={`rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] ${meta.tone}`}
+                  >
                     {meta.label}
                   </span>
                   {item.verified && (
@@ -841,7 +866,11 @@ function TimelineCard({
                   )}
                   {(item.isPinned || item.isEmergency) && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-red-700">
-                      {item.isEmergency ? <AlertTriangle className="size-3" /> : <Pin className="size-3" />}
+                      {item.isEmergency ? (
+                        <AlertTriangle className="size-3" />
+                      ) : (
+                        <Pin className="size-3" />
+                      )}
                       {item.isEmergency ? "Emergency" : "Pinned"}
                     </span>
                   )}
@@ -851,7 +880,9 @@ function TimelineCard({
                 </h4>
               </div>
             </div>
-            <span className="text-xs font-semibold text-muted-foreground">{timeAgo(item.createdAt)}</span>
+            <span className="text-xs font-semibold text-muted-foreground">
+              {timeAgo(item.createdAt)}
+            </span>
           </div>
 
           <p className="mt-4 text-sm leading-7 text-muted-foreground">{item.body}</p>
@@ -875,11 +906,33 @@ function TimelineCard({
 
           <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border/70 pt-4">
             <div className="flex flex-wrap gap-2">
-              <TimelineAction active={liked} icon={<ThumbsUp className="size-4" />} label={liked ? "Liked" : "Like"} onClick={onLike} />
-              <TimelineAction icon={<MessageCircle className="size-4" />} label={`Comment ${comments.length ? comments.length : ""}`} onClick={onToggleComments} />
-              <TimelineAction icon={<Share2 className="size-4" />} label="Share" onClick={onShare} />
-              <TimelineAction active={saved} icon={<Bookmark className="size-4" />} label={saved ? "Saved" : "Save"} onClick={onSave} />
-              <TimelineAction icon={<Flag className="size-4" />} label="Report" onClick={onReport} />
+              <TimelineAction
+                active={liked}
+                icon={<ThumbsUp className="size-4" />}
+                label={liked ? "Liked" : "Like"}
+                onClick={onLike}
+              />
+              <TimelineAction
+                icon={<MessageCircle className="size-4" />}
+                label={`Comment ${comments.length ? comments.length : ""}`}
+                onClick={onToggleComments}
+              />
+              <TimelineAction
+                icon={<Share2 className="size-4" />}
+                label="Share"
+                onClick={onShare}
+              />
+              <TimelineAction
+                active={saved}
+                icon={<Bookmark className="size-4" />}
+                label={saved ? "Saved" : "Save"}
+                onClick={onSave}
+              />
+              <TimelineAction
+                icon={<Flag className="size-4" />}
+                label="Report"
+                onClick={onReport}
+              />
             </div>
             <a
               href={item.href}
@@ -918,7 +971,10 @@ function TimelineCard({
                 {comments.length > 0 && (
                   <div className="mt-3 space-y-2">
                     {comments.map((comment, commentIndex) => (
-                      <p key={`${comment}-${commentIndex}`} className="rounded-2xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground">
+                      <p
+                        key={`${comment}-${commentIndex}`}
+                        className="rounded-2xl bg-muted/60 px-4 py-3 text-sm text-muted-foreground"
+                      >
                         {comment}
                       </p>
                     ))}

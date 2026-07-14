@@ -42,10 +42,7 @@ type SceneMeta = {
   action: string;
 };
 
-const sceneMeta: Record<
-  SceneKind,
-  SceneMeta
-> = {
+const sceneMeta: Record<SceneKind, SceneMeta> = {
   workers: {
     label: "Worker network",
     icon: Tractor,

@@ -176,7 +176,8 @@ export const transitions = {
   default: "all 200ms cubic-bezier(0.4, 0, 0.2, 1)",
   fast: "all 100ms cubic-bezier(0.4, 0, 0.2, 1)",
   slow: "all 300ms cubic-bezier(0.4, 0, 0.2, 1)",
-  colors: "background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease",
+  colors:
+    "background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease",
   transform: "transform 200ms cubic-bezier(0.4, 0, 0.2, 1)",
   opacity: "opacity 200ms ease",
 } as const;

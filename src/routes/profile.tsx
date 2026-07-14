@@ -56,7 +56,7 @@ import {
 export const Route = createFileRoute("/profile")({
   head: () => ({ meta: [{ title: "Profile - ManaOoru" }] }),
   component: () => (
-    <ProtectedRoute>
+    <ProtectedRoute dealerMustBeApproved={false}>
       <ProfilePage />
     </ProtectedRoute>
   ),

@@ -78,11 +78,7 @@ function ProblemsPage() {
 
       <div className="mb-8 grid gap-3 md:grid-cols-3">
         {urgentContacts.map((contact) => (
-          <SurfaceCard
-            key={contact.id}
-            hover={false}
-            className="border-red-200 bg-red-50/80 p-4"
-          >
+          <SurfaceCard key={contact.id} hover={false} className="border-red-200 bg-red-50/80 p-4">
             <div className="flex items-center gap-3">
               <FeatureIcon
                 icon={<contact.icon className="size-5" />}

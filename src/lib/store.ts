@@ -27,7 +27,14 @@ export type Listing = {
   imageUrl?: string;
   storagePath?: string;
   isPinned?: boolean;
-  status?: "active" | "completed" | "pending" | "accepted" | "in_progress" | "resolved" | "rejected";
+  status?:
+    | "active"
+    | "completed"
+    | "pending"
+    | "accepted"
+    | "in_progress"
+    | "resolved"
+    | "rejected";
   createdAt: number;
   owner_id?: string;
   localOnly?: boolean;
@@ -101,7 +108,7 @@ export function useListings(type?: ListingType) {
         title: item.title,
         hasImage: Boolean(item.imageUrl),
         storagePath: item.storagePath,
-        villageId: profile?.village_id,
+        villageId: item.villageId || profile?.village_id,
       });
       const { data, error } = await supabase
         .from("listings")
@@ -112,14 +119,14 @@ export function useListings(type?: ListingType) {
           description: item.description || null,
           contact: item.contact,
           location: item.location || null,
-          village_id: profile?.village_id || null,
+          village_id: item.villageId || profile?.village_id || null,
           price: item.price || null,
           category: item.category || null,
           image_url: item.imageUrl || null,
           storage_path: item.storagePath || null,
           is_pinned: item.isPinned ?? false,
           status: item.status ?? "active",
-        } as never)
+        })
         .select()
         .single();
       if (error) {
@@ -168,7 +175,10 @@ export function useListings(type?: ListingType) {
       if (typeof patch.isPinned === "boolean") dbPatch.is_pinned = patch.isPinned;
       if (patch.status) dbPatch.status = patch.status;
 
-      const { error } = await supabase.from("listings").update(dbPatch as never).eq("id", id);
+      const { error } = await supabase
+        .from("listings")
+        .update(dbPatch as never)
+        .eq("id", id);
       if (error) {
         toast.error(error.message || "Could not update listing");
         return;
@@ -186,22 +196,66 @@ export function useListings(type?: ListingType) {
   return { items, add, remove, update, total: items.length, loading: query.isLoading };
 }
 
-export function useListingStats() {
+export function useListingStats(filter?: {
+  villageId?: string | null;
+  villageName?: string | null;
+}) {
   return useQuery({
-    queryKey: ["listing-stats"],
+    queryKey: ["listing-stats", filter?.villageId, filter?.villageName],
     queryFn: async () => {
+      let activeVillageId = filter?.villageId;
+
+      // If only village name is provided, try to resolve its UUID from the database
+      if (!activeVillageId && filter?.villageName) {
+        const { data: vData } = await supabase
+          .from("villages")
+          .select("id")
+          .eq("name", filter.villageName)
+          .limit(1)
+          .maybeSingle();
+        if (vData) {
+          activeVillageId = vData.id;
+        }
+      }
+
+      let qAll = supabase.from("listings").select("type", { count: "exact", head: false });
+      let qWorkers = supabase
+        .from("listings")
+        .select("id", { count: "exact", head: true })
+        .eq("type", "worker");
+      let qLand = supabase
+        .from("listings")
+        .select("id", { count: "exact", head: true })
+        .eq("type", "land");
+      let qRecent = supabase
+        .from("listings")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(6);
+      let qProfiles = supabase.from("profiles").select("id", { count: "exact", head: true });
+
+      if (activeVillageId) {
+        qAll = qAll.eq("village_id", activeVillageId);
+        qWorkers = qWorkers.eq("village_id", activeVillageId);
+        qLand = qLand.eq("village_id", activeVillageId);
+        qRecent = qRecent.eq("village_id", activeVillageId);
+        qProfiles = qProfiles.eq("village_id", activeVillageId);
+      }
+
       const [listings, profiles, workers, land, recent] = await Promise.all([
-        supabase.from("listings").select("type", { count: "exact", head: false }),
-        supabase.from("profiles").select("id", { count: "exact", head: true }),
-        supabase.from("listings").select("id", { count: "exact", head: true }).eq("type", "worker"),
-        supabase.from("listings").select("id", { count: "exact", head: true }).eq("type", "land"),
-        supabase.from("listings").select("*").order("created_at", { ascending: false }).limit(6),
+        qAll,
+        qProfiles,
+        qWorkers,
+        qLand,
+        qRecent,
       ]);
+
       const all = ((listings.data as { type: ListingType }[] | null) ?? []) as Listing[];
       const byType = all.reduce<Record<string, number>>((acc, r) => {
         acc[r.type] = (acc[r.type] ?? 0) + 1;
         return acc;
       }, {});
+
       return {
         villagers: profiles.count ?? 0,
         workers: workers.count ?? 0,

@@ -8,20 +8,29 @@ import {
   CloudSun,
   LandPlot,
   Megaphone,
-  Plus,
   ShieldCheck,
+  ShoppingBag,
   ShoppingBasket,
+  Store,
   UserCog,
   Users,
   Wrench,
 } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { DealerApprovalList } from "@/components/DealerApprovalList";
 import { PageLayout } from "@/components/PageLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { AppLinkButton, FeatureIcon, SectionHeader, SurfaceCard } from "@/components/design-system";
+import {
+  AppLinkButton,
+  Card3D,
+  FeatureIcon,
+  SectionHeader,
+  SurfaceCard,
+} from "@/components/design-system";
 import { useAuth } from "@/lib/auth";
 import { subscribeToPush } from "@/lib/push-notifications";
 import { timeAgo, useListingStats } from "@/lib/store";
+import { getRoleDisplayName } from "@/lib/supabase/auth";
 import { formatVillageProfile, useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/dashboard")({
@@ -34,42 +43,77 @@ export const Route = createFileRoute("/dashboard")({
 });
 
 function DashboardPage() {
-  const { role: authRole, user } = useAuth();
+  const { role: authRole, user, profile: authProfile } = useAuth();
   const pushAttemptedForUserRef = useRef<string | null>(null);
   const { profile, weather } = useVillagePreferences();
-  const { data: stats } = useListingStats();
+  const isSuper = authRole === "super_admin";
+  const { data: stats } = useListingStats(
+    isSuper
+      ? undefined
+      : {
+          villageId: authProfile?.village_id,
+          villageName: profile?.village || authProfile?.village,
+        },
+  );
   const role = authRole ?? "citizen";
-  const roleTitle =
-    role === "super_admin"
-      ? "App operations dashboard"
-      : role === "village_admin"
-        ? "Village admin dashboard"
-        : "Citizen dashboard";
-  const roleDescription =
-    role === "super_admin"
-      ? "Supervise platform health, village onboarding, admin approval, and cross-district activity."
-      : role === "village_admin"
-        ? `Operate complaints, notices, works, and alerts for ${formatVillageProfile(profile)}.`
-        : "Track complaints, services, marketplace activity, and important community updates.";
 
-  const roleTasks =
-    role === "super_admin"
-      ? [
-          "Approve village administrators and oversee onboarding.",
+  const roleTitle = (() => {
+    switch (role) {
+      case "super_admin":
+        return "Platform Admin Dashboard";
+      case "village_admin":
+        return "Village Admin Dashboard";
+      case "dealer":
+        return "Dealer Dashboard";
+      case "citizen":
+      default:
+        return "Citizen Dashboard";
+    }
+  })();
+
+  const roleDescription = (() => {
+    switch (role) {
+      case "super_admin":
+        return "Supervise platform health, village onboarding, dealer approvals, and cross-district activity.";
+      case "village_admin":
+        return `Operate complaints, notices, works, dealer approvals, and alerts for ${formatVillageProfile(profile)}.`;
+      case "dealer":
+        return `Manage your shop, upload products, publish offers, and track enquiries${authProfile?.shop_name ? ` for ${authProfile.shop_name}` : ""}.`;
+      case "citizen":
+      default:
+        return "Track complaints, services, marketplace activity, and important community updates.";
+    }
+  })();
+
+  const roleTasks = (() => {
+    switch (role) {
+      case "super_admin":
+        return [
+          "Approve village administrators and manage dealer applications.",
           "Monitor platform-wide complaints, notices, and live activity.",
           "Publish global announcements and enforce platform safety.",
-        ]
-      : role === "village_admin"
-        ? [
-            "Review and update citizen complaints for your village.",
-            "Publish official notices, works, and local alerts.",
-            "Keep village services, listings, and assignments current.",
-          ]
-        : [
-            "Post work requests, find services, and hire trusted workers.",
-            "Browse marketplace listings, land offers, and community updates.",
-            "Report issues, join village conversations, and stay informed.",
-          ];
+        ];
+      case "village_admin":
+        return [
+          "Review and update citizen complaints for your village.",
+          "Approve dealer applications and verify local businesses.",
+          "Publish official notices, works, and local alerts.",
+        ];
+      case "dealer":
+        return [
+          "Keep your shop profile, products, and stock up to date.",
+          "Publish offers and respond to customer enquiries.",
+          "Track your shop analytics and growth.",
+        ];
+      case "citizen":
+      default:
+        return [
+          "Post work requests, find services, and hire trusted workers.",
+          "Browse marketplace listings, land offers, and community updates.",
+          "Report issues, join village conversations, and stay informed.",
+        ];
+    }
+  })();
 
   const metrics = [
     { label: "Workers Available", value: stats?.workers ?? 0, icon: Users },
@@ -99,13 +143,15 @@ function DashboardPage() {
       icon={<Activity className="size-7" />}
     >
       <SectionHeader
-        eyebrow={role === "citizen" ? "Overview" : "Operations"}
+        eyebrow={role === "citizen" ? "Overview" : role === "dealer" ? "Shop" : "Operations"}
         title={
           role === "super_admin"
             ? "Platform-wide controls"
             : role === "village_admin"
               ? "Manage public services"
-              : "Everything happening in your village"
+              : role === "dealer"
+                ? "Your shop at a glance"
+                : "Everything happening in your village"
         }
         description={roleDescription}
         actions={
@@ -117,6 +163,10 @@ function DashboardPage() {
             <AppLinkButton to="/official" icon={<Megaphone className="size-4" />}>
               Official workspace
             </AppLinkButton>
+          ) : role === "dealer" ? (
+            <AppLinkButton to="/marketplace" icon={<Store className="size-4" />}>
+              View marketplace
+            </AppLinkButton>
           ) : (
             <AppLinkButton to="/profile" icon={<UserCog className="size-4" />}>
               Review operators
@@ -124,21 +174,45 @@ function DashboardPage() {
           )
         }
       />
+
+      {/* ── Role hero card ── */}
       <SurfaceCard className="dashboard-hero-card mb-8 overflow-hidden p-6">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.24em] text-primary">
               Your role
             </p>
-            <h3 className="mt-2 text-2xl font-semibold text-clay capitalize">
-              {role.replace("_", " ")}
-            </h3>
+            <h3 className="mt-2 text-2xl font-semibold text-clay">{getRoleDisplayName(role)}</h3>
+            {role === "dealer" && authProfile?.dealer_status && (
+              <span
+                className={`mt-1 inline-block rounded-full px-3 py-0.5 text-xs font-bold ${
+                  authProfile.dealer_status === "approved"
+                    ? "bg-emerald-100 text-emerald-700"
+                    : authProfile.dealer_status === "pending"
+                      ? "bg-amber-100 text-amber-700"
+                      : "bg-red-100 text-red-700"
+                }`}
+              >
+                {authProfile.dealer_status === "approved"
+                  ? "✓ Approved"
+                  : authProfile.dealer_status === "pending"
+                    ? "⏳ Pending Approval"
+                    : `⚠ ${authProfile.dealer_status}`}
+              </span>
+            )}
+            {role === "village_admin" && authProfile?.designation && (
+              <p className="mt-1 text-sm text-primary font-medium">
+                Designation: {authProfile.designation}
+              </p>
+            )}
             <p className="mt-2 max-w-2xl text-sm leading-7 text-muted-foreground">
               {role === "super_admin"
-                ? "You can manage platform operations, approve village admins, and publish global notices."
+                ? "You have full access to all villages, users, dealers, and platform settings."
                 : role === "village_admin"
-                  ? "You can manage village complaints, update local works, and share official announcements."
-                  : "You can browse village listings, post work requests, and stay updated on community activity."}
+                  ? "You can manage village complaints, approve dealers, update local works, and share official announcements."
+                  : role === "dealer"
+                    ? "You can manage your shop profile, upload products, publish offers, and track enquiries."
+                    : "You can browse village listings, post work requests, and stay updated on community activity."}
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -153,76 +227,41 @@ function DashboardPage() {
           </div>
         </div>
       </SurfaceCard>
-      {role !== "citizen" && (
-        <div className="mb-8 grid gap-4 md:grid-cols-3">
-          {(role === "village_admin"
-            ? [
-                {
-                  label: "Update complaints",
-                  detail: "Review citizen complaints and publish status updates for resolution.",
-                  icon: ShieldCheck,
-                  to: "/official",
-                },
-                {
-                  label: "Upload work photos",
-                  detail: "Post government works with progress photos for public transparency.",
-                  icon: Megaphone,
-                  to: "/official",
-                },
-                {
-                  label: "Village support",
-                  detail:
-                    "Track contact issues, duplicate listings, and urgent requests for your village.",
-                  icon: CheckCircle2,
-                  to: "/services",
-                },
-              ]
-            : [
-                {
-                  label: role === "super_admin" ? "Approve village admins" : "Manage profile",
-                  detail:
-                    role === "super_admin"
-                      ? "Review operator accounts and assign responsibility village by village."
-                      : "Keep your local services, products, and contact information current.",
-                  icon: UserCog,
-                  to: role === "super_admin" ? "/official" : "/profile",
-                },
-                {
-                  label: "Monitor all districts",
-                  detail:
-                    "Watch activity volume, listings, services, and notices across the platform.",
-                  icon: BarChart3,
-                  to: "/dashboard",
-                },
-                {
-                  label: "Platform announcements",
-                  detail: "Publish global guidance, moderation policy, and service updates.",
-                  icon: Megaphone,
-                  to: "/announcements",
-                },
-              ]
-          ).map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className="premium-need-card rounded-[20px] p-5 transition hover:border-primary/50 hover:shadow-[var(--shadow-soft)]"
-            >
-              <FeatureIcon icon={<item.icon className="size-5" />} />
-              <p className="mt-4 font-display text-lg font-semibold text-clay">{item.label}</p>
-              <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.detail}</p>
-            </Link>
-          ))}
+
+      {/* ── Role-specific action cards ── */}
+      {role === "super_admin" && <SuperAdminActions />}
+      {role === "village_admin" && <VillageAdminActions />}
+      {role === "dealer" && <DealerActions />}
+      {role === "citizen" && <CitizenActions />}
+
+      {/* ── Dealer approvals section (for admins) ── */}
+      {(role === "super_admin" || role === "village_admin") && (
+        <div className="mt-8">
+          <SectionHeader
+            eyebrow="Dealer Management"
+            title="Dealer Applications"
+            description="Review and manage dealer registrations."
+          />
+          <DealerApprovalSection />
         </div>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+
+      {/* ── Metrics ── */}
+      <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
         {metrics.map((metric) => (
-          <SurfaceCard key={metric.label} className="dashboard-metric-card p-5">
-            <FeatureIcon icon={<metric.icon className="size-5" />} />
-            <p className="mt-5 font-display text-3xl font-semibold text-clay">{metric.value}</p>
-            <p className="text-sm text-muted-foreground">{metric.label}</p>
-          </SurfaceCard>
+          <Card3D key={metric.label} intensity={8}>
+            <SurfaceCard className="dashboard-metric-card h-full p-5" hover={false}>
+              <div style={{ transform: "translateZ(20px)" }} className="flex flex-col h-full">
+                <FeatureIcon icon={<metric.icon className="size-5" />} />
+                <p className="mt-5 font-display text-3xl font-semibold text-clay">{metric.value}</p>
+                <p className="text-sm text-muted-foreground">{metric.label}</p>
+              </div>
+            </SurfaceCard>
+          </Card3D>
         ))}
       </div>
+
+      {/* ── Activity & Weather ── */}
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
         <SurfaceCard className="p-6">
           <h3 className="font-display text-2xl font-semibold text-clay">Live activity</h3>
@@ -279,6 +318,9 @@ function DashboardPage() {
                 { label: "Sell product", to: "/marketplace", icon: ShoppingBasket },
                 { label: "Post notice", to: "/announcements", icon: Megaphone },
                 { label: "Offer service", to: "/services", icon: Briefcase },
+                ...(role === "citizen"
+                  ? [{ label: "Become a Dealer", to: "/dealer-registration", icon: Store }]
+                  : []),
               ].map((item) => (
                 <Link
                   key={item.label}
@@ -293,5 +335,156 @@ function DashboardPage() {
         </div>
       </div>
     </PageLayout>
+  );
+}
+
+// ── Role-specific action card sections ──────────────────────────────────────
+
+function SuperAdminActions() {
+  return (
+    <div className="mb-8 grid gap-4 md:grid-cols-3">
+      {[
+        {
+          label: "Manage Users & Admins",
+          detail: "Review operator accounts, assign village admins, and manage all user roles.",
+          icon: UserCog,
+          to: "/official",
+        },
+        {
+          label: "Monitor All Villages",
+          detail:
+            "Watch activity volume, listings, services, and notices across the entire platform.",
+          icon: BarChart3,
+          to: "/dashboard",
+        },
+        {
+          label: "Platform Announcements",
+          detail: "Publish global guidance, moderation policy, and critical service updates.",
+          icon: Megaphone,
+          to: "/announcements",
+        },
+      ].map((item) => (
+        <Card3D key={item.label} intensity={8}>
+          <Link
+            to={item.to}
+            className="premium-need-card block h-full rounded-[20px] p-5 transition hover:border-primary/50 hover:shadow-[var(--shadow-soft)]"
+          >
+            <div style={{ transform: "translateZ(15px)" }}>
+              <FeatureIcon icon={<item.icon className="size-5" />} />
+              <p className="mt-4 font-display text-lg font-semibold text-clay">{item.label}</p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.detail}</p>
+            </div>
+          </Link>
+        </Card3D>
+      ))}
+    </div>
+  );
+}
+
+function VillageAdminActions() {
+  return (
+    <div className="mb-8 grid gap-4 md:grid-cols-3">
+      {[
+        {
+          label: "Update Complaints",
+          detail: "Review citizen complaints and publish status updates for resolution.",
+          icon: ShieldCheck,
+          to: "/official",
+        },
+        {
+          label: "Manage Works & Notices",
+          detail: "Post government works with progress photos for public transparency.",
+          icon: Megaphone,
+          to: "/official",
+        },
+        {
+          label: "Village Support",
+          detail: "Track contact issues, duplicate listings, and urgent requests for your village.",
+          icon: CheckCircle2,
+          to: "/services",
+        },
+      ].map((item) => (
+        <Card3D key={item.label} intensity={8}>
+          <Link
+            to={item.to}
+            className="premium-need-card block h-full rounded-[20px] p-5 transition hover:border-primary/50 hover:shadow-[var(--shadow-soft)]"
+          >
+            <div style={{ transform: "translateZ(15px)" }}>
+              <FeatureIcon icon={<item.icon className="size-5" />} />
+              <p className="mt-4 font-display text-lg font-semibold text-clay">{item.label}</p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.detail}</p>
+            </div>
+          </Link>
+        </Card3D>
+      ))}
+    </div>
+  );
+}
+
+function DealerActions() {
+  return (
+    <div className="mb-8 grid gap-4 md:grid-cols-3">
+      {[
+        {
+          label: "Manage Shop Profile",
+          detail: "Update your shop name, address, description, and contact details.",
+          icon: Store,
+          to: "/profile",
+        },
+        {
+          label: "Products & Stock",
+          detail: "Upload products, manage inventory, and keep stock levels accurate.",
+          icon: ShoppingBag,
+          to: "/marketplace",
+        },
+        {
+          label: "Publish Offers",
+          detail: "Create special deals and seasonal promotions for your customers.",
+          icon: Megaphone,
+          to: "/marketplace",
+        },
+      ].map((item) => (
+        <Card3D key={item.label} intensity={8}>
+          <Link
+            to={item.to}
+            className="premium-need-card block h-full rounded-[20px] p-5 transition hover:border-primary/50 hover:shadow-[var(--shadow-soft)]"
+          >
+            <div style={{ transform: "translateZ(15px)" }}>
+              <FeatureIcon icon={<item.icon className="size-5" />} />
+              <p className="mt-4 font-display text-lg font-semibold text-clay">{item.label}</p>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{item.detail}</p>
+            </div>
+          </Link>
+        </Card3D>
+      ))}
+    </div>
+  );
+}
+
+function CitizenActions() {
+  return null; // Citizens get quick actions in the sidebar already
+}
+
+function DealerApprovalSection() {
+  const [tab, setTab] = useState<"pending" | "approved" | "all">("pending");
+  return (
+    <div>
+      <div className="mb-4 flex gap-2">
+        {(["pending", "approved", "all"] as const).map((t) => (
+          <button
+            key={t}
+            onClick={() => setTab(t)}
+            className={`rounded-full px-4 py-1.5 text-xs font-semibold transition ${
+              tab === t
+                ? "bg-primary text-primary-foreground"
+                : "bg-muted text-muted-foreground hover:bg-muted/80"
+            }`}
+          >
+            {t === "pending" ? "Pending" : t === "approved" ? "Approved" : "All"}
+          </button>
+        ))}
+      </div>
+      <DealerApprovalList statusFilter={tab} />
+    </div>
   );
 }

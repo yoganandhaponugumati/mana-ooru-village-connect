@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from "react";
+import { type ButtonHTMLAttributes, type HTMLAttributes, type ReactNode, useRef } from "react";
 import clsx from "clsx";
 
 type Variant = "primary" | "secondary" | "ghost";
@@ -290,5 +290,76 @@ export function InlineAction({
       <span>{label}</span>
       <ArrowRight className="size-4" />
     </Link>
+  );
+}
+
+export function Card3D({
+  children,
+  className,
+  intensity = 12,
+}: {
+  children: ReactNode;
+  className?: string;
+  intensity?: number;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const x = useMotionValue(0.5);
+  const y = useMotionValue(0.5);
+
+  const rotateX = useTransform(y, [0, 1], [intensity, -intensity]);
+  const rotateY = useTransform(x, [0, 1], [-intensity, intensity]);
+
+  const shineX = useTransform(x, [0, 1], ["0%", "100%"]);
+  const shineY = useTransform(y, [0, 1], ["0%", "100%"]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const width = rect.width;
+    const height = rect.height;
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    x.set(mouseX / width);
+    y.set(mouseY / height);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0.5);
+    y.set(0.5);
+  };
+
+  return (
+    <div
+      ref={cardRef}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ perspective: 1000 }}
+      className={clsx("relative", className)}
+    >
+      <motion.div
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
+        }}
+        transition={{ type: "spring", stiffness: 350, damping: 25 }}
+        className="relative h-full w-full"
+      >
+        <motion.div
+          style={
+            {
+              background:
+                "radial-gradient(circle at var(--shine-x, 50%) var(--shine-y, 50%), rgba(255,255,255,0.15) 0%, transparent 60%)",
+              "--shine-x": shineX,
+              "--shine-y": shineY,
+              transform: "translateZ(1px)",
+            } as any
+          }
+          className="pointer-events-none absolute inset-0 z-10 rounded-[inherit]"
+        />
+        {children}
+      </motion.div>
+    </div>
   );
 }

@@ -87,9 +87,7 @@ function ServicesPage() {
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "service");
   const [showForm, setShowForm] = useState(false);
-  const [mode, setMode] = useState<"services" | "shops">(
-    kind === "shops" ? "shops" : "services",
-  );
+  const [mode, setMode] = useState<"services" | "shops">(kind === "shops" ? "shops" : "services");
   const visibleCategories = mode === "shops" ? shopCategories : serviceCategories;
   const visibleOptions = mode === "shops" ? shopOptions : serviceOptions;
   const shownItems = displayItems.filter((item) => visibleOptions.includes(item.category || ""));

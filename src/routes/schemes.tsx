@@ -196,16 +196,12 @@ function SchemesPage() {
               <h3 className="mt-4 font-display text-2xl font-semibold text-clay">
                 {service.title}
               </h3>
-              <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                {service.description}
-              </p>
+              <p className="mt-3 text-sm leading-7 text-muted-foreground">{service.description}</p>
               <div className="mt-5 rounded-2xl bg-muted/60 p-4">
                 <p className="flex items-center gap-2 text-sm font-semibold text-clay">
                   <FileText className="size-4 text-primary" /> Keep ready
                 </p>
-                <p className="mt-2 text-sm text-muted-foreground">
-                  {service.documents.join(", ")}
-                </p>
+                <p className="mt-2 text-sm text-muted-foreground">{service.documents.join(", ")}</p>
               </div>
               <a
                 href={service.apply}

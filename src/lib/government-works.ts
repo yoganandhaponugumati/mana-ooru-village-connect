@@ -71,7 +71,6 @@ export function useGovernmentWorks() {
         photoCount: input.photos.length,
         villageId: profile?.village_id,
       });
-      let workId: string | undefined;
       const uploadedPaths: string[] = [];
       const { data: work, error: workError } = await supabase
         .from("government_works")
@@ -94,12 +93,15 @@ export function useGovernmentWorks() {
         console.error("[government-work] create:error", workError);
         throw new Error(`Government work could not be saved: ${workError.message}`);
       }
-      workId = (work as unknown as { id: string }).id;
+      const workId = (work as unknown as { id: string }).id;
       console.info("[government-work] create:success", { workId });
 
       try {
         if (input.photos.length > 0) {
-          console.info("[government-work] photos:upload:start", { workId, count: input.photos.length });
+          console.info("[government-work] photos:upload:start", {
+            workId,
+            count: input.photos.length,
+          });
           const uploaded = await Promise.all(
             input.photos.map((photo) => uploadUserFile("government-works", user.id, photo)),
           );

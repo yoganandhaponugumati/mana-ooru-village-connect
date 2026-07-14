@@ -28,7 +28,7 @@ import {
 export const Route = createFileRoute("/complete-profile")({
   head: () => ({ meta: [{ title: "Complete your profile — ManaOoru" }] }),
   component: () => (
-    <ProtectedRoute requireCompleteProfile={false}>
+    <ProtectedRoute requireCompleteProfile={false} dealerMustBeApproved={false}>
       <CompleteProfilePage />
     </ProtectedRoute>
   ),

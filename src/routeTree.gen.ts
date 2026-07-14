@@ -26,12 +26,14 @@ import { Route as OfficialRouteImport } from './routes/official'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LandRouteImport } from './routes/land'
 import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as DealerRegistrationRouteImport } from './routes/dealer-registration'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CompleteProfileRouteImport } from './routes/complete-profile'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnnouncementsRouteImport } from './routes/announcements'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SuperAdminLoginRouteImport } from './routes/super-admin.login'
 
 const WorkersRoute = WorkersRouteImport.update({
   id: '/workers',
@@ -118,6 +120,11 @@ const EmergencyRoute = EmergencyRouteImport.update({
   path: '/emergency',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DealerRegistrationRoute = DealerRegistrationRouteImport.update({
+  id: '/dealer-registration',
+  path: '/dealer-registration',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -148,6 +155,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuperAdminLoginRoute = SuperAdminLoginRouteImport.update({
+  id: '/super-admin/login',
+  path: '/super-admin/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -156,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
+  '/dealer-registration': typeof DealerRegistrationRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
@@ -173,6 +186,7 @@ export interface FileRoutesByFullPath {
   '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
+  '/super-admin/login': typeof SuperAdminLoginRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -181,6 +195,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
+  '/dealer-registration': typeof DealerRegistrationRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
@@ -198,6 +213,7 @@ export interface FileRoutesByTo {
   '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
+  '/super-admin/login': typeof SuperAdminLoginRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -207,6 +223,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
+  '/dealer-registration': typeof DealerRegistrationRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
@@ -224,6 +241,7 @@ export interface FileRoutesById {
   '/weather': typeof WeatherRoute
   '/work': typeof WorkRoute
   '/workers': typeof WorkersRoute
+  '/super-admin/login': typeof SuperAdminLoginRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -234,6 +252,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/complete-profile'
     | '/dashboard'
+    | '/dealer-registration'
     | '/emergency'
     | '/land'
     | '/marketplace'
@@ -251,6 +270,7 @@ export interface FileRouteTypes {
     | '/weather'
     | '/work'
     | '/workers'
+    | '/super-admin/login'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -259,6 +279,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/complete-profile'
     | '/dashboard'
+    | '/dealer-registration'
     | '/emergency'
     | '/land'
     | '/marketplace'
@@ -276,6 +297,7 @@ export interface FileRouteTypes {
     | '/weather'
     | '/work'
     | '/workers'
+    | '/super-admin/login'
   id:
     | '__root__'
     | '/'
@@ -284,6 +306,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/complete-profile'
     | '/dashboard'
+    | '/dealer-registration'
     | '/emergency'
     | '/land'
     | '/marketplace'
@@ -301,6 +324,7 @@ export interface FileRouteTypes {
     | '/weather'
     | '/work'
     | '/workers'
+    | '/super-admin/login'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -310,6 +334,7 @@ export interface RootRouteChildren {
   AuthRoute: typeof AuthRoute
   CompleteProfileRoute: typeof CompleteProfileRoute
   DashboardRoute: typeof DashboardRoute
+  DealerRegistrationRoute: typeof DealerRegistrationRoute
   EmergencyRoute: typeof EmergencyRoute
   LandRoute: typeof LandRoute
   MarketplaceRoute: typeof MarketplaceRoute
@@ -327,6 +352,7 @@ export interface RootRouteChildren {
   WeatherRoute: typeof WeatherRoute
   WorkRoute: typeof WorkRoute
   WorkersRoute: typeof WorkersRoute
+  SuperAdminLoginRoute: typeof SuperAdminLoginRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -450,6 +476,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EmergencyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dealer-registration': {
+      id: '/dealer-registration'
+      path: '/dealer-registration'
+      fullPath: '/dealer-registration'
+      preLoaderRoute: typeof DealerRegistrationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -492,6 +525,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/super-admin/login': {
+      id: '/super-admin/login'
+      path: '/super-admin/login'
+      fullPath: '/super-admin/login'
+      preLoaderRoute: typeof SuperAdminLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -502,6 +542,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRoute: AuthRoute,
   CompleteProfileRoute: CompleteProfileRoute,
   DashboardRoute: DashboardRoute,
+  DealerRegistrationRoute: DealerRegistrationRoute,
   EmergencyRoute: EmergencyRoute,
   LandRoute: LandRoute,
   MarketplaceRoute: MarketplaceRoute,
@@ -519,6 +560,7 @@ const rootRouteChildren: RootRouteChildren = {
   WeatherRoute: WeatherRoute,
   WorkRoute: WorkRoute,
   WorkersRoute: WorkersRoute,
+  SuperAdminLoginRoute: SuperAdminLoginRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

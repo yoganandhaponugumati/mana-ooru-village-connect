@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village-premium.jpg";
 import { SiteNav } from "@/components/SiteNav";
+import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
@@ -275,12 +276,34 @@ function Hero3DVillage({
     },
   ];
 
+  const [tilt, setTilt] = useState({ x: 12, y: -18 });
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
+    const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
+    setTilt({
+      x: 12 - y * 16,
+      y: -18 + x * 24,
+    });
+  };
+  const handleMouseLeave = () => {
+    setTilt({ x: 12, y: -18 });
+  };
+
   return (
-    <div className="hero-3d-stage" aria-hidden="true">
+    <div
+      className="hero-3d-stage"
+      aria-hidden="true"
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
       <motion.div
-        initial={{ opacity: 0, rotateX: 18, rotateY: -22, y: 30 }}
-        animate={{ opacity: 1, rotateX: 12, rotateY: -18, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
+        animate={{
+          rotateX: tilt.x,
+          rotateY: tilt.y,
+          y: 0,
+        }}
+        transition={{ type: "spring", stiffness: 100, damping: 20 }}
         className="hero-3d-world"
       >
         <div className="hero-3d-orbit hero-3d-orbit-one" />
@@ -304,7 +327,11 @@ function Hero3DVillage({
 
         <motion.div
           animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
+          whileHover={{ translateZ: 220, scale: 1.05, y: -12 }}
+          transition={{
+            y: { duration: 5.5, repeat: Infinity, ease: "easeInOut" },
+            default: { type: "spring", stiffness: 120, damping: 15 },
+          }}
           className="hero-3d-panel hero-3d-panel-main"
         >
           <div className="flex items-center justify-between gap-3">
@@ -322,7 +349,10 @@ function Hero3DVillage({
           </div>
           <div className="mt-5 grid grid-cols-3 gap-2">
             {heroMetrics.map((metric) => (
-              <div key={metric.label} className="rounded-2xl bg-white/72 p-3 shadow-sm">
+              <div
+                key={metric.label}
+                className="rounded-2xl bg-white/72 p-3 shadow-sm hover:bg-white transition-colors duration-200"
+              >
                 <metric.icon className="size-4 text-primary" />
                 <p className="mt-2 font-display text-lg font-bold text-clay">{metric.value}</p>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
@@ -335,7 +365,11 @@ function Hero3DVillage({
 
         <motion.div
           animate={{ y: [0, 10, 0], rotateZ: [0, -1.5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          whileHover={{ translateZ: 260, scale: 1.06, y: 10 }}
+          transition={{
+            y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+            default: { type: "spring", stiffness: 120, damping: 15 },
+          }}
           className="hero-3d-panel hero-3d-panel-weather"
         >
           <CloudSun className="size-6 text-accent" />
@@ -349,7 +383,11 @@ function Hero3DVillage({
 
         <motion.div
           animate={{ y: [0, -9, 0], rotateZ: [0, 2, 0] }}
-          transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
+          whileHover={{ translateZ: 280, scale: 1.06, y: -9 }}
+          transition={{
+            y: { duration: 4.8, repeat: Infinity, ease: "easeInOut" },
+            default: { type: "spring", stiffness: 120, damping: 15 },
+          }}
           className="hero-3d-panel hero-3d-panel-action"
         >
           <ShieldCheck className="size-5 text-primary" />
@@ -362,9 +400,12 @@ function Hero3DVillage({
 
 function Index() {
   const navigate = useNavigate();
-  const { user } = useAuth();
-  const { data: stats } = useListingStats();
+  const { user, profile: authProfile } = useAuth();
   const { t, profile, weather, hasProfile } = useVillagePreferences();
+  const { data: stats } = useListingStats({
+    villageId: authProfile?.village_id,
+    villageName: profile?.village || authProfile?.village,
+  });
   const [searchQuery, setSearchQuery] = useState("");
   const showSignedInVillage = Boolean(user && hasProfile && profile.village);
   const heroWeather = showSignedInVillage
@@ -517,38 +558,40 @@ function Index() {
         <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map((a, i) =>
             a.to.startsWith("#") ? (
-              <a
-                key={a.label}
-                href={a.to}
-                className="premium-action-card hover-lift animate-fade-up group flex min-h-44 items-center gap-5 rounded-[16px] p-6 text-left"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
-                  <a.icon className="size-9" strokeWidth={1.8} />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
-                  <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
-                </div>
-              </a>
+              <Card3D key={a.label} className="hover-lift animate-fade-up" intensity={8}>
+                <a
+                  href={a.to}
+                  className="premium-action-card group flex min-h-44 items-center gap-5 rounded-[22px] p-6 text-left"
+                  style={{ animationDelay: `${i * 60}ms` }}
+                >
+                  <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
+                    <a.icon className="size-9" strokeWidth={1.8} />
+                  </div>
+                  <div className="min-w-0" style={{ transform: "translateZ(20px)" }}>
+                    <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
+                    <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
+                  </div>
+                </a>
+              </Card3D>
             ) : (
-              <Link
-                key={a.label}
-                to={a.to as Exclude<(typeof quickActions)[number]["to"], "#contacts">}
-                search={"search" in a ? a.search : undefined}
-                className="premium-action-card hover-lift animate-fade-up group flex min-h-44 items-center gap-5 rounded-[16px] p-6 text-left"
-                style={{ animationDelay: `${i * 60}ms` }}
-              >
-                <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
-                  <a.icon className="size-9" strokeWidth={1.8} />
-                </div>
-                <div className="min-w-0">
-                  <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
-                  <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
-                </div>
-              </Link>
+              <Card3D key={a.label} className="hover-lift animate-fade-up" intensity={8}>
+                <Link
+                  to={a.to as Exclude<(typeof quickActions)[number]["to"], "#contacts">}
+                  search={"search" in a ? a.search : undefined}
+                  className="premium-action-card group flex min-h-44 items-center gap-5 rounded-[22px] p-6 text-left"
+                  style={{ animationDelay: `${i * 60}ms` }}
+                >
+                  <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
+                    <a.icon className="size-9" strokeWidth={1.8} />
+                  </div>
+                  <div className="min-w-0" style={{ transform: "translateZ(20px)" }}>
+                    <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
+                    <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
+                  </div>
+                </Link>
+              </Card3D>
             ),
           )}
         </div>
