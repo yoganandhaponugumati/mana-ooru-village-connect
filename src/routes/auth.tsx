@@ -29,13 +29,25 @@ import {
   type VillageProfile,
 } from "@/lib/village-preferences";
 
+type AuthSearch = {
+  redirect?: string;
+  message?: string;
+};
+
 export const Route = createFileRoute("/auth")({
   head: () => ({ meta: [{ title: "Sign in — ManaOoru" }] }),
+  validateSearch: (search: Record<string, unknown>): AuthSearch => {
+    return {
+      redirect: typeof search.redirect === "string" ? search.redirect : undefined,
+      message: typeof search.message === "string" ? search.message : undefined,
+    };
+  },
   component: AuthPage,
 });
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { redirect, message } = Route.useSearch();
   const { user, profile: authProfile, refreshProfile } = useAuth();
 
   // Auth state: 'landing' (no choice made), 'signin', or 'signup'
@@ -244,7 +256,7 @@ function AuthPage() {
 
           toast.success(`Demo ${getRoleLabel(targetRole)} account created and logged in!`);
           await refreshProfile();
-          navigate({ to: getRoleDashboardPath(targetRole) });
+          navigate({ to: redirect || getRoleDashboardPath(targetRole) });
           return;
         }
         throw error;
@@ -252,7 +264,7 @@ function AuthPage() {
 
       toast.success("Logged in successfully!");
       await refreshProfile();
-      navigate({ to: getRoleDashboardPath(targetRole) });
+      navigate({ to: redirect || getRoleDashboardPath(targetRole) });
     } catch (err) {
       console.error("[demo-login] failed", err);
       toast.error(getFriendlyAuthError(err));
@@ -341,7 +353,7 @@ function AuthPage() {
         }
 
         toast.success("Welcome to ManaOoru!");
-        navigate({ to: getRoleDashboardPath("citizen") });
+        navigate({ to: redirect || getRoleDashboardPath("citizen") });
       } else {
         // Sign In Flow
         if (!activeRole) {
@@ -374,7 +386,7 @@ function AuthPage() {
 
         toast.success("Welcome back!");
         await refreshProfile();
-        navigate({ to: getRoleDashboardPath(resolvedRole) });
+        navigate({ to: redirect || getRoleDashboardPath(resolvedRole) });
       }
     } catch (err) {
       toast.error(getFriendlyAuthError(err));
@@ -540,6 +552,16 @@ function AuthPage() {
       <div className="relative w-full max-w-4xl grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-center">
         {/* Main interactive area */}
         <SurfaceCard className="w-full p-8 shadow-[var(--shadow-lift)] backdrop-blur-xl">
+          {message === "signin_to_post" && (
+            <div className="mb-6 rounded-2xl border border-amber-200/40 bg-amber-500/10 p-4 text-left">
+              <h4 className="font-display text-sm font-bold text-amber-600 dark:text-amber-400">
+                🔒 Sign in required to post
+              </h4>
+              <p className="mt-1 text-xs font-medium leading-relaxed text-amber-700/90 dark:text-amber-400/80">
+                Only signed-in village members can post jobs, listings, or register services. Please sign in or create an account to continue.
+              </p>
+            </div>
+          )}
           <AnimatePresence mode="wait">
             {user && !dealerRegisteredPending ? (
               /* ALREADY SIGNED IN STATE */

@@ -1,25 +1,23 @@
-import { createFileRoute, useSearch } from "@tanstack/react-router";
+import { createFileRoute, useSearch, useNavigate } from "@tanstack/react-router";
 import {
-  Ambulance,
   Building2,
   Cable,
   Camera,
-  Car,
   Cake,
-  Drill,
   Hammer,
   HeartPulse,
-  Landmark,
-  Paintbrush,
   Plus,
   Router,
-  School,
   Store,
   ShowerHead,
   Tractor,
   Truck,
   Waves,
   Wrench,
+  CupSoda,
+  Leaf,
+  Sprout,
+  Milk,
 } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
@@ -33,6 +31,8 @@ import {
 } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/services")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -47,41 +47,31 @@ const shopCategories = [
   { label: "Medical", icon: HeartPulse },
   { label: "Bakery", icon: Cake },
   { label: "Hotel", icon: Building2 },
-  { label: "Tea Stall", icon: Store },
+  { label: "Tea Stall", icon: CupSoda },
   { label: "Mobile Shop", icon: Router },
   { label: "Hardware", icon: Hammer },
-  { label: "Fertilizer", icon: ShowerHead },
-  { label: "Seeds", icon: Tractor },
-  { label: "Dairy", icon: Store },
-];
+  { label: "Fertilizer", icon: Leaf },
+  { label: "Seeds", icon: Sprout },
+  { label: "Dairy", icon: Milk },
+] as const;
 
 const serviceCategories = [
-  { label: "Tent House", icon: Building2 },
-  { label: "Catering", icon: Cake },
-  { label: "DJ", icon: Router },
-  { label: "Photographer", icon: Camera },
-  { label: "Electrician", icon: Cable },
-  { label: "Plumber", icon: Drill },
-  { label: "Mechanic", icon: Wrench },
-  { label: "Mason", icon: Hammer },
-  { label: "Painter", icon: Paintbrush },
-  { label: "Carpenter", icon: Hammer },
-  { label: "Vehicle Repair", icon: Car },
-  { label: "Water Tank", icon: ShowerHead },
-  { label: "Borewell", icon: Waves },
-  { label: "Internet Services", icon: Router },
-  { label: "Tractor Rental", icon: Tractor },
+  { label: "Tractor", icon: Tractor },
   { label: "Transport", icon: Truck },
-  { label: "Health", icon: HeartPulse },
-  { label: "Education", icon: School },
-  { label: "Panchayat", icon: Landmark },
-  { label: "Emergency", icon: Ambulance },
-];
+  { label: "Electrician", icon: Cable },
+  { label: "Plumbing", icon: ShowerHead },
+  { label: "Borewell", icon: Waves },
+  { label: "Photography", icon: Camera },
+  { label: "Catering", icon: Cake },
+  { label: "Other service", icon: Wrench },
+] as const;
 
 const shopOptions = shopCategories.map((item) => item.label);
 const serviceOptions = serviceCategories.map((item) => item.label);
 
 function ServicesPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { kind } = useSearch({ from: "/services" });
   const { items, remove } = useListings("service");
   const displayItems =
@@ -89,9 +79,24 @@ function ServicesPage() {
   const [showForm, setShowForm] = useState(false);
   const [mode, setMode] = useState<"services" | "shops">(kind === "shops" ? "shops" : "services");
   const visibleCategories = mode === "shops" ? shopCategories : serviceCategories;
-  const visibleOptions = mode === "shops" ? shopOptions : serviceOptions;
+  const visibleOptions = (mode === "shops" ? shopOptions : serviceOptions) as string[];
   const shownItems = displayItems.filter((item) => visibleOptions.includes(item.category || ""));
   const hasShownItems = shownItems.length > 0;
+
+  const handlePostClick = () => {
+    if (!user) {
+      toast.error("Sign in required to post.");
+      navigate({
+        to: "/auth",
+        search: {
+          redirect: window.location.pathname,
+          message: "signin_to_post",
+        },
+      });
+      return;
+    }
+    setShowForm((v) => !v);
+  };
 
   return (
     <PageLayout
@@ -111,7 +116,7 @@ function ServicesPage() {
           <AppButton
             variant="primary"
             icon={<Plus className="size-4" />}
-            onClick={() => setShowForm((v) => !v)}
+            onClick={handlePostClick}
           >
             {showForm ? "Cancel" : mode === "shops" ? "Add a shop" : "Offer a service"}
           </AppButton>
@@ -222,7 +227,7 @@ function ServicesPage() {
             <AppButton
               variant="primary"
               icon={<Plus className="size-4" />}
-              onClick={() => setShowForm(true)}
+              onClick={handlePostClick}
             >
               {mode === "shops" ? "Add a shop" : "Offer a service"}
             </AppButton>

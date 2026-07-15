@@ -30,7 +30,17 @@ export function ProtectedRoute({
   }
 
   if (!user) {
-    return <Navigate to="/auth" replace />;
+    const isPostingRoute = typeof window !== "undefined" && window.location.pathname.includes("post");
+    return (
+      <Navigate
+        to="/auth"
+        search={{
+          redirect: typeof window !== "undefined" ? window.location.pathname : undefined,
+          message: isPostingRoute ? "signin_to_post" : undefined,
+        }}
+        replace
+      />
+    );
   }
 
   if (requireCompleteProfile && needsProfileCompletion) {

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Building2,
   CheckCircle2,
@@ -27,6 +27,7 @@ import {
 import { fallbackListings } from "@/lib/app-data";
 import { useAuth } from "@/lib/auth";
 import { useListings, timeAgo } from "@/lib/store";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/announcements")({
   head: () => ({ meta: [{ title: "Announcements — ManaOoru" }] }),
@@ -34,12 +35,32 @@ export const Route = createFileRoute("/announcements")({
 });
 
 function AnnPage() {
+  const navigate = useNavigate();
   const { items, remove, update } = useListings("announcement");
   const { user, role } = useAuth();
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "announcement");
   const [showForm, setShowForm] = useState(false);
   const canManageNotices = role === "village_admin" || role === "super_admin";
+
+  const handlePostClick = () => {
+    if (!user) {
+      toast.error("Sign in required to post.");
+      navigate({
+        to: "/auth",
+        search: {
+          redirect: window.location.pathname,
+          message: "signin_to_post",
+        },
+      });
+      return;
+    }
+    if (!canManageNotices) {
+      toast.error("Only Village Admins or Super Admins can post official notices.");
+      return;
+    }
+    setShowForm((v) => !v);
+  };
   const pinnedNotice =
     displayItems.find((item) => item.isPinned) ??
     displayItems.find((item) =>
@@ -82,7 +103,7 @@ function AnnPage() {
           <AppButton
             variant="primary"
             icon={<Plus className="size-4" />}
-            onClick={() => setShowForm((v) => !v)}
+            onClick={handlePostClick}
           >
             {showForm ? "Cancel" : "Post a notice"}
           </AppButton>
@@ -171,7 +192,7 @@ function AnnPage() {
             <AppButton
               variant="primary"
               icon={<Plus className="size-4" />}
-              onClick={() => setShowForm(true)}
+              onClick={handlePostClick}
             >
               Post a notice
             </AppButton>

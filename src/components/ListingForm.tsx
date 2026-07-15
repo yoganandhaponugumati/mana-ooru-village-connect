@@ -148,7 +148,14 @@ export function ListingForm({
     }
 
     if (!user) {
-      toast.error("Please sign in before posting. Posts are saved only to Supabase.");
+      toast.error("Sign in required. Only signed-in users can post.");
+      navigate({
+        to: "/auth",
+        search: {
+          redirect: window.location.pathname,
+          message: "signin_to_post",
+        },
+      });
       return;
     }
 

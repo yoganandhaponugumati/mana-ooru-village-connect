@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   CheckCircle2,
   Clock3,
@@ -24,6 +24,7 @@ import {
 } from "@/components/design-system";
 import { citizenServices, schemes } from "@/lib/app-data";
 import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 import {
   applicationStatusLabels,
   schemeCategoryLabels,
@@ -56,6 +57,7 @@ const statusIcon: Record<ApplicationStatus, typeof Clock3> = {
 };
 
 function SchemesPage() {
+  const navigate = useNavigate();
   const { profile } = useVillagePreferences();
   const { user, role } = useAuth();
   const canManage = role === "village_admin" || role === "super_admin";
@@ -162,9 +164,22 @@ function SchemesPage() {
                 ) : (
                   <AppButton
                     className="mt-5 w-full"
-                    disabled={!user || applyMutation.isPending}
+                    disabled={applyMutation.isPending}
                     loading={applyMutation.isPending}
-                    onClick={() => applyMutation.mutate(scheme.id)}
+                    onClick={() => {
+                      if (!user) {
+                        toast.error("Sign in required to apply.");
+                        navigate({
+                          to: "/auth",
+                          search: {
+                            redirect: window.location.pathname,
+                            message: "signin_to_post",
+                          },
+                        });
+                        return;
+                      }
+                      applyMutation.mutate(scheme.id);
+                    }}
                   >
                     {user ? "Apply now" : "Sign in to apply"}
                   </AppButton>

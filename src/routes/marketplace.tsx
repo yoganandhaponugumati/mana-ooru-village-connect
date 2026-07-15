@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Apple,
   Beef,
@@ -23,6 +23,8 @@ import {
 } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace")({
   head: () => ({ meta: [{ title: "Marketplace — ManaOoru" }] }),
@@ -42,7 +44,7 @@ const CATS = [
   "Animals",
   "Tools",
   "Other",
-];
+] as const;
 const categoryIcons = {
   Vegetables: ShoppingBasket,
   Fruits: Apple,
@@ -58,12 +60,30 @@ const categoryIcons = {
 };
 
 function MarketPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { items, remove } = useListings("market");
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "market");
   const [showForm, setShowForm] = useState(false);
   const [cat, setCat] = useState("All");
   const filtered = cat === "All" ? displayItems : displayItems.filter((i) => i.category === cat);
+
+  const handlePostClick = () => {
+    if (!user) {
+      toast.error("Sign in required to post.");
+      navigate({
+        to: "/auth",
+        search: {
+          redirect: window.location.pathname,
+          message: "signin_to_post",
+        },
+      });
+      return;
+    }
+    setShowForm((v) => !v);
+  };
+
   return (
     <PageLayout
       title="Village Marketplace"
@@ -78,7 +98,7 @@ function MarketPage() {
           <AppButton
             variant="primary"
             icon={<Plus className="size-4" />}
-            onClick={() => setShowForm((v) => !v)}
+            onClick={handlePostClick}
           >
             {showForm ? "Cancel" : "Sell something"}
           </AppButton>
@@ -161,7 +181,7 @@ function MarketPage() {
             <AppButton
               variant="primary"
               icon={<Plus className="size-4" />}
-              onClick={() => setShowForm(true)}
+              onClick={handlePostClick}
             >
               Sell something
             </AppButton>

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Droplets, Map, Milestone, Plus, Sprout, SunMedium, Wheat } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
@@ -12,6 +12,8 @@ import {
 } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/land")({
   head: () => ({ meta: [{ title: "Land for Lease — ManaOoru" }] }),
@@ -19,10 +21,28 @@ export const Route = createFileRoute("/land")({
 });
 
 function LandPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const { items, remove } = useListings("land");
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "land");
   const [showForm, setShowForm] = useState(false);
+
+  const handlePostClick = () => {
+    if (!user) {
+      toast.error("Sign in required to post.");
+      navigate({
+        to: "/auth",
+        search: {
+          redirect: window.location.pathname,
+          message: "signin_to_post",
+        },
+      });
+      return;
+    }
+    setShowForm((v) => !v);
+  };
+
   return (
     <PageLayout
       title="Lease Farmland"
@@ -37,7 +57,7 @@ function LandPage() {
           <AppButton
             variant="primary"
             icon={<Plus className="size-4" />}
-            onClick={() => setShowForm((v) => !v)}
+            onClick={handlePostClick}
           >
             {showForm ? "Cancel" : "List your land"}
           </AppButton>
@@ -116,7 +136,7 @@ function LandPage() {
             <AppButton
               variant="primary"
               icon={<Plus className="size-4" />}
-              onClick={() => setShowForm(true)}
+              onClick={handlePostClick}
             >
               List your land
             </AppButton>
