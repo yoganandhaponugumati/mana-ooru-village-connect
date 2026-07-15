@@ -60,7 +60,7 @@ function AuthPage() {
   const [shopAddress, setShopAddress] = useState("");
   const [shopDescription, setShopDescription] = useState("");
 
-  const { profile, setProfile, hasProfile } = useVillagePreferences();
+  const { profile, setProfile, hasProfile, t } = useVillagePreferences();
   const [villageProfile, setVillageProfile] = useState<VillageProfile>({
     ...profile,
     village: hasProfile ? profile.village : "",
@@ -82,7 +82,7 @@ function AuthPage() {
 
   useEffect(() => {
     if (!user || busy || dealerRegisteredPending) return;
-    navigate({ to: getRoleDashboardPath(authProfile?.role) });
+    // We do not force redirect on /auth so users can switch accounts or verify login status
   }, [user, authProfile, busy, navigate, dealerRegisteredPending]);
 
   useEffect(() => {
@@ -159,6 +159,106 @@ function AuthPage() {
       });
     }
     return data;
+  };
+
+  const handleDemoLogin = async (targetRole: AppRole) => {
+    if (!import.meta.env.DEV) {
+      toast.error("Demo login is only available in development mode.");
+      return;
+    }
+    setBusy(true);
+    const demoEmails = {
+      citizen: "citizen@manaooru.com",
+      dealer: "dealer@manaooru.com",
+      village_admin: "admin@manaooru.com",
+      super_admin: "superadmin@manaooru.com",
+    };
+    const demoNames = {
+      citizen: "Ramesh Kumar (Citizen)",
+      dealer: "Laxman Rao (Kirana Dealer)",
+      village_admin: "Venkatesh R. (Sarpanch)",
+      super_admin: "Super Admin",
+    };
+    const email = demoEmails[targetRole];
+    const password = "password123";
+
+    try {
+      console.info("[demo-login] trying sign in", { email });
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (error) {
+        if (error.message.toLowerCase().includes("invalid login credentials")) {
+          console.info("[demo-login] account not found, registering on-the-fly", { email });
+
+          const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: {
+                full_name: demoNames[targetRole],
+                display_name: demoNames[targetRole],
+                phone: "9876543210",
+                occupation: targetRole === "dealer" ? "Business" : "Other",
+                role: targetRole,
+                state: "Telangana",
+                district: "Rangareddy",
+                mandal: "Kandukur",
+                village: "Kothur",
+                account_type:
+                  targetRole === "village_admin"
+                    ? "village_admin"
+                    : targetRole === "super_admin"
+                      ? "app_admin"
+                      : "villager",
+              },
+            },
+          });
+
+          if (signUpError) throw signUpError;
+
+          const userId = signUpData.user?.id;
+          if (userId) {
+            await supabase.from("profiles").upsert({
+              id: userId,
+              full_name: demoNames[targetRole],
+              display_name: demoNames[targetRole],
+              role: targetRole,
+              account_type:
+                targetRole === "village_admin"
+                  ? "village_admin"
+                  : targetRole === "super_admin"
+                    ? "app_admin"
+                    : "villager",
+              state: "Telangana",
+              district: "Rangareddy",
+              mandal: "Kandukur",
+              village: "Kothur",
+              phone: "9876543210",
+              dealer_status: targetRole === "dealer" ? "approved" : null,
+              profile_completed_at: new Date().toISOString(),
+            });
+          }
+
+          const { error: retryError } = await supabase.auth.signInWithPassword({ email, password });
+          if (retryError) throw retryError;
+
+          toast.success(`Demo ${getRoleLabel(targetRole)} account created and logged in!`);
+          await refreshProfile();
+          navigate({ to: getRoleDashboardPath(targetRole) });
+          return;
+        }
+        throw error;
+      }
+
+      toast.success("Logged in successfully!");
+      await refreshProfile();
+      navigate({ to: getRoleDashboardPath(targetRole) });
+    } catch (err) {
+      console.error("[demo-login] failed", err);
+      toast.error(getFriendlyAuthError(err));
+    } finally {
+      setBusy(false);
+    }
   };
 
   const submit = async (e: React.FormEvent) => {
@@ -441,7 +541,48 @@ function AuthPage() {
         {/* Main interactive area */}
         <SurfaceCard className="w-full p-8 shadow-[var(--shadow-lift)] backdrop-blur-xl">
           <AnimatePresence mode="wait">
-            {mode === "landing" ? (
+            {user && !dealerRegisteredPending ? (
+              /* ALREADY SIGNED IN STATE */
+              <motion.div
+                key="already-signed-in"
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -15 }}
+                transition={{ duration: 0.3 }}
+                className="flex flex-col items-center text-center py-6"
+              >
+                <div className="grid size-14 place-items-center rounded-2xl bg-primary font-display text-2xl font-bold text-primary-foreground mb-6 shadow-lg shadow-primary/20">
+                  <User className="size-6" />
+                </div>
+                <h2 className="font-display text-2xl font-bold text-clay mb-2">
+                  {t.alreadySignedIn || "You are signed in as"} {authProfile?.full_name || authProfile?.username || user.email?.split("@")[0]}
+                </h2>
+                <p className="text-sm text-muted-foreground mb-8">
+                  Role: {authProfile?.role ? authProfile.role.replace("_", " ") : "citizen"} • Village: {authProfile?.village || profile.village || "Not selected"}
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
+                  <motion.button
+                    whileHover={{ scale: 1.03, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={() => navigate({ to: getRoleDashboardPath(authProfile?.role) })}
+                    className="flex-1 py-4 px-6 rounded-2xl bg-primary font-bold text-sm text-primary-foreground shadow-lg shadow-primary/15 transition hover:brightness-110"
+                  >
+                    {t.goToDashboard || "Go to Portal Dashboard"}
+                  </motion.button>
+                  <motion.button
+                    whileHover={{ scale: 1.03, y: -2 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      toast.success("Signed out successfully.");
+                    }}
+                    className="flex-1 py-4 px-6 rounded-2xl border border-destructive/30 bg-destructive/5 font-bold text-sm text-destructive hover:bg-destructive/10 transition"
+                  >
+                    {t.switchAccount || "Sign out & Switch Account"}
+                  </motion.button>
+                </div>
+              </motion.div>
+            ) : mode === "landing" ? (
               /* LANDING STATE: Dual CTA entrance screen */
               <motion.div
                 key="landing"
@@ -456,7 +597,7 @@ function AuthPage() {
                   M
                 </div>
                 <h1 className="font-display text-3xl font-extrabold tracking-tight text-clay mb-3">
-                  Welcome to ManaOoru
+                  {t.welcomeToManaOoru || "Welcome to ManaOoru"}
                 </h1>
                 <p className="text-sm text-muted-foreground max-w-md mb-8 leading-relaxed">
                   Join the trusted digital gateway connecting farmers, local dealers, citizens, and
@@ -474,7 +615,7 @@ function AuthPage() {
                     }}
                     className="flex-1 py-4 px-6 rounded-2xl bg-primary font-bold text-sm text-primary-foreground shadow-lg shadow-primary/15 transition hover:brightness-110"
                   >
-                    Sign In
+                    {t.signIn || "Sign In"}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.03, y: -2 }}
@@ -485,9 +626,59 @@ function AuthPage() {
                     }}
                     className="flex-1 py-4 px-6 rounded-2xl border border-border bg-white/50 backdrop-blur-md font-bold text-sm text-clay hover:border-primary hover:bg-white transition"
                   >
-                    Create Account
+                    {t.createAccount || "Create Account"}
                   </motion.button>
                 </div>
+
+                {import.meta.env.DEV && (
+                  <>
+                    {/* Visual Divider */}
+                    <div className="relative my-6 w-full flex items-center justify-center">
+                      <div className="absolute inset-0 flex items-center">
+                        <div className="w-full border-t border-border" />
+                      </div>
+                      <span className="relative px-3 bg-card text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                        Or Quick Demo Login (Dev Only)
+                      </span>
+                    </div>
+
+                    {/* 3 Clickable Demo Profiles */}
+                    <div className="grid grid-cols-3 gap-2.5 w-full">
+                      {[
+                        {
+                          id: "citizen",
+                          label: "Citizen",
+                          color:
+                            "from-rose-500/10 to-orange-500/10 hover:border-orange-500/40 text-orange-700 hover:bg-orange-50/50",
+                        },
+                        {
+                          id: "dealer",
+                          label: "Dealer",
+                          color:
+                            "from-emerald-500/10 to-teal-500/10 hover:border-teal-500/40 text-teal-700 hover:bg-teal-50/50",
+                        },
+                        {
+                          id: "village_admin",
+                          label: "Sarpanch",
+                          color:
+                            "from-violet-500/10 to-purple-500/10 hover:border-purple-500/40 text-purple-700 hover:bg-purple-50/50",
+                        },
+                      ].map((item) => (
+                        <motion.button
+                          key={item.id}
+                          type="button"
+                          whileHover={{ scale: 1.03, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                          onClick={() => handleDemoLogin(item.id as AppRole)}
+                          className={`flex flex-col items-center justify-center p-3 rounded-2xl border border-border bg-gradient-to-b ${item.color} transition shadow-sm`}
+                        >
+                          <span className="text-xs font-black">{item.label}</span>
+                          <span className="text-[9px] font-bold opacity-75 mt-0.5">One-click</span>
+                        </motion.button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </motion.div>
             ) : (
               /* FORM / PORTAL STATE */
@@ -507,18 +698,18 @@ function AuthPage() {
                   }}
                   className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground hover:text-primary mb-6 transition"
                 >
-                  <ArrowLeft className="size-3.5" /> Back to welcome screen
+                  <ArrowLeft className="size-3.5" /> {t.backToWelcome || "Back to welcome screen"}
                 </button>
 
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h2 className="font-display text-2xl font-extrabold text-clay tracking-tight">
-                      {mode === "signin" ? "Portal Sign In" : "Register Profile"}
+                      {mode === "signin" ? t.portalSignIn || "Portal Sign In" : t.registerProfile || "Register Profile"}
                     </h2>
                     <p className="text-xs text-muted-foreground mt-1">
                       {mode === "signin"
-                        ? "Choose your destination portal below."
-                        : "Select your village identity type below."}
+                        ? t.chooseDestination || "Choose your destination portal below."
+                        : t.selectIdentity || "Select your village identity type below."}
                     </p>
                   </div>
                   <span className="text-[10px] font-black uppercase tracking-wider bg-primary/10 text-primary px-3 py-1 rounded-full">
@@ -530,13 +721,13 @@ function AuthPage() {
                 {mode === "signin" && (
                   <div className="grid gap-3 grid-cols-3 mb-6">
                     {[
-                      { id: "citizen", label: "Citizen", icon: User, desc: "Access network" },
-                      { id: "dealer", label: "Dealer", icon: Store, desc: "Sell & trade" },
+                      { id: "citizen", label: t.citizen || "Citizen", icon: User, desc: t.accessNetwork || "Access network" },
+                      { id: "dealer", label: t.dealer || "Dealer", icon: Store, desc: t.sellAndTrade || "Sell & trade" },
                       {
                         id: "village_admin",
-                        label: "Village Admin",
+                        label: t.villageAdmin || "Village Admin",
                         icon: ShieldCheck,
-                        desc: "Manage ops",
+                        desc: t.manageOps || "Manage ops",
                       },
                     ].map((item) => {
                       const isSelected = signInRole === item.id;
@@ -578,23 +769,23 @@ function AuthPage() {
                     {[
                       {
                         id: "citizen",
-                        label: "Citizen",
+                        label: t.citizen || "Citizen",
                         icon: User,
-                        desc: "Local updates",
+                        desc: t.localUpdates || "Local updates",
                         disabled: false,
                       },
                       {
                         id: "dealer",
-                        label: "Dealer",
+                        label: t.dealer || "Dealer",
                         icon: Store,
-                        desc: "Register shop",
+                        desc: t.registerShop || "Register shop",
                         disabled: false,
                       },
                       {
                         id: "village_admin",
-                        label: "Village Admin",
+                        label: t.villageAdmin || "Village Admin",
                         icon: ShieldCheck,
-                        desc: "Official only",
+                        desc: t.officialOnly || "Official only",
                         disabled: true,
                       },
                     ].map((item) => {
@@ -653,7 +844,7 @@ function AuthPage() {
                             htmlFor="auth-name"
                             className="block text-xs font-bold text-clay uppercase tracking-wider mb-1.5"
                           >
-                            Full Name
+                            {t.fullName || "Full Name"}
                           </label>
                           <input
                             id="auth-name"
@@ -671,7 +862,7 @@ function AuthPage() {
                               htmlFor="auth-occupation"
                               className="block text-xs font-bold text-clay uppercase tracking-wider mb-1.5"
                             >
-                              Occupation
+                              {t.occupation || "Occupation"}
                             </label>
                             <select
                               id="auth-occupation"
@@ -690,7 +881,7 @@ function AuthPage() {
 
                         <div className="space-y-2">
                           <label className="block text-xs font-bold text-clay uppercase tracking-wider">
-                            Select Village
+                            {t.selectVillage || "Select Village"}
                           </label>
                           <VillageLocationPicker
                             value={villageProfile}
@@ -793,7 +984,7 @@ function AuthPage() {
                         htmlFor="auth-email-field"
                         className="block text-xs font-bold text-clay uppercase tracking-wider mb-1.5"
                       >
-                        Email Address
+                        {t.emailAddress || "Email Address"}
                       </label>
                       <input
                         id="auth-email-field"
@@ -812,7 +1003,7 @@ function AuthPage() {
                         htmlFor="auth-phone-field"
                         className="block text-xs font-bold text-clay uppercase tracking-wider mb-1.5"
                       >
-                        Phone Number (Future Ready)
+                        {t.phoneNumber || "Phone Number"}
                       </label>
                       <div className="flex gap-2">
                         <input
@@ -831,7 +1022,7 @@ function AuthPage() {
                           disabled={busy || !phone}
                           className="rounded-2xl border border-primary/20 bg-background px-4 text-xs font-semibold text-primary transition hover:border-primary disabled:opacity-50"
                         >
-                          Send OTP
+                          {t.sendOtp || "Send OTP"}
                         </button>
                       </div>
                     </div>
@@ -841,7 +1032,7 @@ function AuthPage() {
                         <input
                           value={phoneOtpCode}
                           onChange={(e) => setPhoneOtpCode(e.target.value)}
-                          placeholder="Verification Code"
+                          placeholder={t.verificationCode || "Verification Code"}
                           className="premium-input w-full rounded-2xl px-4 py-3 text-sm text-foreground bg-background"
                         />
                         <button
@@ -850,7 +1041,7 @@ function AuthPage() {
                           disabled={busy}
                           className="rounded-2xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition hover:brightness-110 disabled:opacity-50"
                         >
-                          Verify
+                          {t.verify || "Verify"}
                         </button>
                       </div>
                     )}
@@ -861,7 +1052,7 @@ function AuthPage() {
                         htmlFor="auth-password-field"
                         className="block text-xs font-bold text-clay uppercase tracking-wider mb-1.5"
                       >
-                        Password
+                        {t.password || "Password"}
                       </label>
                       <div className="relative">
                         <input
@@ -924,7 +1115,7 @@ function AuthPage() {
                           htmlFor="auth-confirm-field"
                           className="block text-xs font-bold text-clay uppercase tracking-wider mb-1.5"
                         >
-                          Confirm Password
+                          {t.confirmPassword || "Confirm Password"}
                         </label>
                         <input
                           id="auth-confirm-field"
@@ -947,11 +1138,11 @@ function AuthPage() {
                       {busy && <Loader2 className="size-4 animate-spin" />}
                       {busy
                         ? mode === "signin"
-                          ? "Authenticating..."
-                          : "Registering Profile..."
+                          ? t.authenticating || "Authenticating..."
+                          : t.registering || "Registering..."
                         : mode === "signin"
-                          ? `Sign In as ${getRoleLabel(signInRole)}`
-                          : `Register as ${getRoleLabel(signUpRole)}`}
+                          ? `${t.signInAs || "Sign in:"} ${signInRole === "dealer" ? (t.dealer || "Dealer") : signInRole === "village_admin" ? (t.villageAdmin || "Village Admin") : (t.citizen || "Citizen")}`
+                          : `${t.registerAs || "Register:"} ${signUpRole === "dealer" ? (t.dealer || "Dealer") : signUpRole === "village_admin" ? (t.villageAdmin || "Village Admin") : (t.citizen || "Citizen")}`}
                     </button>
 
                     {/* Auxiliary controls */}

@@ -2803,3 +2803,73 @@ footer {
     height: 86px;
   }
 }
+
+/* --- Infinite Scrolling Marquee --- */
+@keyframes marquee-slide-left {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.marquee-container {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent, white 8%, white 92%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, white 8%, white 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 1.25rem;
+  padding: 1.5rem 0.5rem;
+  animation: marquee-slide-left 42s linear infinite;
+  will-change: transform;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
+/* --- Hero Actions Sliding Cards --- */
+@keyframes hero-actions-slide {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+.hero-actions-slider {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent 0%, white 6%, white 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    white 6%,
+    white 94%,
+    transparent 100%
+  );
+}
+
+.hero-actions-track {
+  display: flex;
+  width: max-content;
+  gap: 1rem;
+  padding: 0.75rem 0;
+  animation: hero-actions-slide 25s linear infinite;
+  will-change: transform;
+}
+
+.hero-actions-track:hover {
+  animation-play-state: paused;
+}

@@ -433,7 +433,7 @@ function Index() {
       <SiteNav />
 
       {/* Hero */}
-      <header className="relative min-h-screen overflow-hidden bg-[#06140d]">
+      <header className="relative z-0 min-h-screen overflow-hidden bg-[#06140d] isolate">
         <img
           src={heroVillage}
           alt="Beautiful Indian village with green fields at sunrise"

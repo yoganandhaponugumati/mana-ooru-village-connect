@@ -309,3 +309,8 @@ CREATE POLICY "villages_select_public" ON public.villages FOR SELECT USING (true
 CREATE POLICY "villages_insert_authenticated" ON public.villages FOR INSERT TO authenticated WITH CHECK (true);
 CREATE POLICY "villages_super_admin_update" ON public.villages FOR UPDATE TO authenticated USING (public.is_super_admin()) WITH CHECK (public.is_super_admin());
 CREATE POLICY "villages_super_admin_delete" ON public.villages FOR DELETE TO authenticated USING (public.is_super_admin());
+
+-- K. Resolve partial unique index constraint match issue for ON CONFLICT (dedupe_key)
+DROP INDEX IF EXISTS public.idx_notifications_dedupe_key;
+CREATE UNIQUE INDEX idx_notifications_dedupe_key ON public.notifications (dedupe_key);
+

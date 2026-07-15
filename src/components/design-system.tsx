@@ -354,12 +354,96 @@ export function Card3D({
               "--shine-x": shineX,
               "--shine-y": shineY,
               transform: "translateZ(1px)",
-            } as any
+            } as React.CSSProperties & Record<string, unknown>
           }
           className="pointer-events-none absolute inset-0 z-10 rounded-[inherit]"
         />
         {children}
       </motion.div>
     </div>
+  );
+}
+
+export function Button3D({
+  children,
+  to,
+  onClick,
+  className,
+  variant = "primary",
+}: {
+  children: ReactNode;
+  to?: string;
+  onClick?: () => void;
+  className?: string;
+  variant?: "primary" | "secondary" | "success" | "warning";
+}) {
+  const classes = {
+    primary: {
+      top: "bg-gradient-to-r from-primary via-emerald-500 to-emerald-600 text-white shadow-[0_8px_30px_rgba(16,185,129,0.35)] hover:shadow-[0_12px_40px_rgba(16,185,129,0.5)] border border-emerald-500/20",
+      base: "bg-gradient-to-r from-emerald-800 to-emerald-900 border-b-[6px] border-emerald-950",
+    },
+    secondary: {
+      top: "bg-gradient-to-r from-slate-700 via-slate-650 to-slate-800 text-white shadow-[0_8px_30px_rgba(51,65,85,0.35)] hover:shadow-[0_12px_40px_rgba(51,65,85,0.5)] border border-slate-600/20",
+      base: "bg-gradient-to-r from-slate-800 to-slate-900 border-b-[6px] border-slate-950",
+    },
+    success: {
+      top: "bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-[0_8px_32px_rgba(16,185,129,0.42)] hover:shadow-[0_12px_44px_rgba(16,185,129,0.58)] border border-emerald-400/20",
+      base: "bg-gradient-to-r from-emerald-700 to-teal-800 border-b-[6px] border-emerald-900",
+    },
+    warning: {
+      top: "bg-gradient-to-r from-rose-500 via-orange-500 to-amber-500 text-white shadow-[0_8px_32px_rgba(244,63,94,0.42)] hover:shadow-[0_12px_44px_rgba(244,63,94,0.58)] border border-rose-400/20",
+      base: "bg-gradient-to-r from-rose-700 to-orange-800 border-b-[6px] border-rose-900",
+    },
+  };
+
+  const c = classes[variant];
+
+  const content = (
+    <span className="relative block h-full w-full select-none">
+      {/* 3D Base layer (depth/shadow) */}
+      <span
+        className={clsx(
+          "absolute inset-0 rounded-2xl transform translate-y-2 transition-transform duration-200",
+          c.base,
+        )}
+      />
+      {/* 3D Top layer (floating action) */}
+      <span
+        className={clsx(
+          "relative block overflow-hidden rounded-2xl px-8 py-4 text-center font-display text-lg font-bold tracking-wide transition-all duration-200 active:translate-y-2 active:shadow-inner hover:-translate-y-0.5",
+          c.top,
+        )}
+      >
+        {/* Glossy glass reflection overlay */}
+        <span className="absolute inset-x-0 top-0 h-[42%] bg-gradient-to-b from-white/22 to-transparent pointer-events-none" />
+        <span className="relative z-10 flex items-center justify-center gap-2">{children}</span>
+      </span>
+    </span>
+  );
+
+  if (to) {
+    return (
+      <Link
+        to={to}
+        className={clsx(
+          "relative inline-block cursor-pointer select-none outline-none focus-visible:ring-4 focus-visible:ring-primary/20 rounded-2xl",
+          className,
+        )}
+      >
+        {content}
+      </Link>
+    );
+  }
+
+  return (
+    <button
+      onClick={onClick}
+      className={clsx(
+        "relative inline-block cursor-pointer select-none outline-none border-none bg-transparent p-0 focus-visible:ring-4 focus-visible:ring-primary/20 rounded-2xl",
+        className,
+      )}
+    >
+      {content}
+    </button>
   );
 }

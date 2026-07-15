@@ -21,7 +21,7 @@ import { useThemePreference } from "@/lib/local-actions";
 import { useNotifications } from "@/lib/notifications";
 import { timeAgo } from "@/lib/store";
 import { languageOptions, useVillagePreferences, type Language } from "@/lib/village-preferences";
-
+import { getRoleDisplayName } from "@/lib/supabase/auth";
 const links = [
   { to: "/", key: "home" },
   { to: "/timeline", key: "timeline" },
@@ -39,6 +39,7 @@ export function SiteNav() {
   const [open, setOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { user, role, signOut, profile: authProfile } = useAuth();
   const { language, setLanguage, t, profile, weather, hasProfile } = useVillagePreferences();
@@ -57,10 +58,36 @@ export function SiteNav() {
   const isHeroTop = location.pathname === "/" && !scrolled;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 8);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 8);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest(".nav-menu-container")) {
+        setUserMenuOpen(false);
+        setLanguageOpen(false);
+        setNotificationsOpen(false);
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setUserMenuOpen(false);
+        setLanguageOpen(false);
+        setNotificationsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
   }, []);
 
   const chooseLanguage = (next: Language) => {
@@ -100,10 +127,10 @@ export function SiteNav() {
       initial={{ y: -16, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className={`fixed inset-x-0 top-0 z-50 border-b backdrop-blur-2xl transition-all duration-300 ${isHeroTop ? "border-white/10 bg-black/12 text-white" : "border-white/80 bg-background/84 text-foreground shadow-[0_18px_54px_-40px_rgba(20,49,32,0.82)]"}`}
+      className={`fixed inset-x-0 top-0 z-[9999] border-b transition-all duration-300 ${isHeroTop ? "border-white/15 bg-black/45 text-white shadow-lg" : "border-white/80 bg-background/85 text-foreground shadow-[0_18px_54px_-40px_rgba(20,49,32,0.82)] backdrop-blur-2xl"}`}
     >
-      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-2 px-4 py-2 sm:px-6">
-        <Link to="/" className="group flex min-w-0 shrink-0 items-center gap-2">
+      <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
+        <Link to="/" className="group flex min-w-0 shrink-0 items-center gap-2 mr-6">
           <motion.div
             whileHover={{ rotate: -4, scale: 1.03 }}
             className="grid size-9 place-items-center rounded-[14px] bg-[var(--gradient-village)] text-white shadow-[var(--shadow-glow)]"
@@ -136,50 +163,99 @@ export function SiteNav() {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {user ? (
-            <div className="hidden items-center gap-2 md:flex">
-              {(role === "village_admin" || role === "super_admin") && (
-                <Link
-                  to="/official"
-                  className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
-                >
-                  <ShieldCheck className="size-3.5" /> Official
-                </Link>
-              )}
-              <Link
-                to="/dashboard"
-                className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
-              >
-                <LayoutDashboard className="size-3.5" /> Dashboard
-              </Link>
-              <Link
-                to="/profile"
-                className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+            <div className="nav-menu-container relative block">
+              <button
+                type="button"
+                onClick={() => {
+                  setUserMenuOpen(!userMenuOpen);
+                  setLanguageOpen(false);
+                  setNotificationsOpen(false);
+                }}
+                className={`flex h-10 items-center gap-2 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${
+                  isHeroTop
+                    ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
+                    : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"
+                }`}
               >
                 {authProfile?.photo_url ? (
                   <img
                     src={authProfile.photo_url}
                     alt=""
-                    className="size-4 rounded-full object-cover"
+                    className="size-5 rounded-full object-cover"
                   />
                 ) : (
-                  <UserRound className="size-3.5" />
+                  <div className="grid size-5 place-items-center rounded-full bg-primary/10 text-primary">
+                    <UserRound className="size-3" />
+                  </div>
                 )}
-                Profile
-              </Link>
-              <button
-                onClick={() => signOut()}
-                className={`inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-semibold transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
-              >
-                <LogOut className="size-3.5" /> Sign out
+                <span className="max-w-[90px] truncate">
+                  {authProfile?.full_name ||
+                    authProfile?.username ||
+                    (role ? getRoleDisplayName(role) : "") ||
+                    "User"}
+                </span>
+                <ChevronDown
+                  className="size-3 transition-transform duration-200"
+                  style={{ transform: userMenuOpen ? "rotate(180deg)" : "none" }}
+                />
               </button>
+              <AnimatePresence>
+                {userMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                    transition={{ duration: 0.18 }}
+                    className="absolute right-0 z-[99999] mt-2 w-52 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1.5 text-sm !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)]"
+                  >
+                    <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800/60 mb-1 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                      Village: {profile.village || "Not selected"}
+                    </div>
+                    {(role === "village_admin" || role === "super_admin") && (
+                      <Link
+                        to="/official"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
+                      >
+                        <ShieldCheck className="size-4 text-emerald-600" /> {t.officialWorkspace || "Official Workspace"}
+                      </Link>
+                    )}
+                    <Link
+                      to="/dashboard"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
+                    >
+                      <LayoutDashboard className="size-4 text-blue-600" /> {t.dashboard || "Dashboard"}
+                    </Link>
+                    <Link
+                      to="/profile"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
+                    >
+                      <UserRound className="size-4 text-amber-600" /> {t.profileDetails || "Profile Details"}
+                    </Link>
+                    <div className="my-1 border-t border-zinc-100 dark:border-zinc-800/60" />
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        signOut();
+                      }}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red-600 dark:text-red-400 transition hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40"
+                    >
+                      <LogOut className="size-4" /> {t.signOut || "Sign out"}
+                    </button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
             </div>
           ) : (
             <Link
               to="/auth"
-              className="inline-flex h-10 items-center gap-2 rounded-[15px] bg-primary px-4 text-sm font-semibold text-primary-foreground shadow-[0_12px_30px_-12px_rgba(34,197,94,0.9)] transition hover:-translate-y-0.5 hover:brightness-110"
+              className="relative inline-flex h-10 items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-emerald-500 via-primary to-teal-500 px-5 text-sm font-bold text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] ring-2 ring-white/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:ring-white/60"
             >
-              <UserRound className="size-4" />
-              {t.signIn}
+              <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/25 to-transparent" />
+              <UserRound className="relative z-10 size-4" />
+              <span className="relative z-10">{t.signIn}</span>
             </Link>
           )}
           <Link
@@ -191,18 +267,18 @@ export function SiteNav() {
               {selectedVillage || "Choose your village"}
             </span>
           </Link>
-          <div className="relative">
+          <div className="nav-menu-container relative">
             <button
               onClick={() => setLanguageOpen((value) => !value)}
-              className={`inline-flex h-10 w-10 items-center justify-center gap-2 rounded-full border px-0 text-xs font-semibold shadow-sm transition lg:w-auto lg:px-3 ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+              className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-full border px-2.5 sm:px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
               aria-label="Language selector"
               aria-expanded={languageOpen}
             >
-              <Globe2 className="size-4" />
-              <span className="hidden lg:inline">
+              <Globe2 className="size-4 shrink-0" />
+              <span className="inline font-bold">
                 {languageOptions.find((item) => item.code === language)?.label}
               </span>
-              <ChevronDown className="hidden size-3.5 lg:block" />
+              <ChevronDown className="hidden size-3.5 sm:block shrink-0" />
             </button>
             <AnimatePresence>
               {languageOpen && (
@@ -211,13 +287,13 @@ export function SiteNav() {
                   animate={{ opacity: 1, y: 0, scale: 1 }}
                   exit={{ opacity: 0, y: 8, scale: 0.98 }}
                   transition={{ duration: 0.18 }}
-                  className="absolute right-0 z-[80] mt-2 w-40 overflow-hidden rounded-2xl border border-white/70 bg-white/95 p-1 text-sm text-foreground shadow-[var(--shadow-lift)] backdrop-blur-xl"
+                  className="absolute right-0 z-[99999] mt-2 w-40 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1 text-sm !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)]"
                 >
                   {languageOptions.map((item) => (
                     <button
                       key={item.code}
                       onClick={() => chooseLanguage(item.code)}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2 font-semibold transition hover:bg-primary/10 hover:text-primary"
+                      className="flex w-full items-center justify-between rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
                     >
                       {item.label}
                       {item.code === language && <Check className="size-4 text-primary" />}
@@ -235,7 +311,7 @@ export function SiteNav() {
             <Search className="size-4" />
           </button>
           {user && (
-            <div className="relative hidden 2xl:block">
+            <div className="nav-menu-container relative hidden 2xl:block">
               <button
                 type="button"
                 onClick={openNotifications}
@@ -257,14 +333,14 @@ export function SiteNav() {
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 8, scale: 0.98 }}
                     transition={{ duration: 0.18 }}
-                    className="absolute right-0 z-[90] mt-2 w-[360px] overflow-hidden rounded-3xl border border-white/70 bg-white/96 text-foreground shadow-[var(--shadow-lift)] backdrop-blur-xl"
+                    className="absolute right-0 z-[99999] mt-2 w-[360px] overflow-hidden rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)]"
                   >
-                    <div className="flex items-center justify-between gap-3 border-b border-border/70 p-4">
+                    <div className="flex items-center justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800/60 p-4">
                       <div>
-                        <p className="font-display text-lg font-semibold text-clay">
-                          Notifications
+                        <p className="font-display text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                          {t.notifications || "Notifications"}
                         </p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
                           {unreadCount > 0
                             ? `${unreadCount} unread village update${unreadCount === 1 ? "" : "s"}`
                             : "All caught up"}
@@ -276,22 +352,22 @@ export function SiteNav() {
                           onClick={() => markAllRead()}
                           className="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-primary hover:text-primary-foreground"
                         >
-                          Mark read
+                          {t.markRead || "Mark read"}
                         </button>
                       )}
                       {notifications.length > 0 && (
                         <button
                           type="button"
                           onClick={() => clearAll()}
-                          className="rounded-full border border-border px-3 py-1.5 text-xs font-bold text-muted-foreground transition hover:border-destructive hover:text-destructive"
+                          className="rounded-full border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 transition hover:border-destructive hover:text-destructive"
                         >
-                          Clear
+                          {t.clear || "Clear"}
                         </button>
                       )}
                     </div>
                     <div className="max-h-[420px] overflow-y-auto p-2">
                       {notificationsLoading ? (
-                        <p className="p-5 text-center text-sm text-muted-foreground">
+                        <p className="p-5 text-center text-sm text-zinc-500 dark:text-zinc-400">
                           Loading notifications...
                         </p>
                       ) : notifications.length === 0 ? (
@@ -299,10 +375,10 @@ export function SiteNav() {
                           <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
                             <Bell className="size-5" />
                           </div>
-                          <p className="mt-3 text-sm font-semibold text-clay">
+                          <p className="mt-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                             No notifications yet
                           </p>
-                          <p className="mt-1 text-xs leading-5 text-muted-foreground">
+                          <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
                             New posts, notices, problems, services, and market updates will appear
                             here after sign-in.
                           </p>
@@ -328,10 +404,10 @@ export function SiteNav() {
                               }}
                               className="min-w-0 flex-1 text-left"
                             >
-                              <span className="block truncate text-sm font-bold text-clay">
+                              <span className="block truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
                                 {item.title}
                               </span>
-                              <span className="mt-1 line-clamp-2 block text-xs leading-5 text-muted-foreground">
+                              <span className="mt-1 line-clamp-2 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">
                                 {item.body}
                               </span>
                               <span className="mt-2 block text-[10px] font-bold uppercase tracking-[0.16em] text-primary/70">
@@ -354,7 +430,7 @@ export function SiteNav() {
                     <Link
                       to="/announcements"
                       onClick={() => setNotificationsOpen(false)}
-                      className="flex items-center justify-center border-t border-border/70 px-4 py-3 text-sm font-bold text-primary transition hover:bg-primary/8"
+                      className="flex items-center justify-center border-t border-zinc-100 dark:border-zinc-800/60 px-4 py-3 text-sm font-bold text-primary transition hover:bg-primary/8"
                     >
                       Open village notices
                     </Link>
@@ -379,7 +455,7 @@ export function SiteNav() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.24, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border/60 bg-background/92 shadow-[var(--shadow-soft)] backdrop-blur-2xl lg:hidden"
+            className="overflow-hidden border-t border-border/60 bg-background/92 shadow-[var(--shadow-soft)] backdrop-blur-2xl xl:hidden"
           >
             <motion.div
               initial="closed"
@@ -401,7 +477,7 @@ export function SiteNav() {
                   <Link
                     to={l.to}
                     onClick={() => setOpen(false)}
-                    className="rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted"
+                    className="block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted"
                   >
                     {t[l.key]}
                   </Link>
@@ -434,40 +510,40 @@ export function SiteNav() {
                     <Link
                       to="/official"
                       onClick={() => setOpen(false)}
-                      className="mt-2 rounded-xl border border-primary/20 bg-primary/10 px-3 py-2.5 text-center text-sm font-semibold text-primary"
+                      className="block mt-2 rounded-xl border border-primary/20 bg-primary/10 px-3 py-2.5 text-center text-sm font-semibold text-primary"
                     >
-                      Official workspace
+                      {t.officialWorkspace || "Official workspace"}
                     </Link>
                   )}
                   <Link
                     to="/dashboard"
                     onClick={() => setOpen(false)}
-                    className="mt-2 rounded-xl border border-border px-3 py-2.5 text-center text-sm font-semibold text-foreground"
+                    className="block mt-2 rounded-xl border border-border px-3 py-2.5 text-center text-sm font-semibold text-foreground"
                   >
-                    Dashboard
+                    {t.dashboard || "Dashboard"}
                   </Link>
                   <Link
                     to="/profile"
                     onClick={() => setOpen(false)}
-                    className="mt-2 rounded-xl bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground"
+                    className="block mt-2 rounded-xl bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground"
                   >
-                    Profile
+                    {t.profileDetails || "Profile"}
                   </Link>
                   <button
                     onClick={() => {
                       signOut();
                       setOpen(false);
                     }}
-                    className="mt-2 rounded-xl border border-border px-3 py-2.5 text-center text-sm font-semibold text-foreground"
+                    className="block w-full mt-2 rounded-xl border border-border px-3 py-2.5 text-center text-sm font-semibold text-foreground"
                   >
-                    Sign out ({user.email?.split("@")[0]})
+                    {t.signOut || "Sign out"} ({user.email?.split("@")[0]})
                   </button>
                 </>
               ) : (
                 <Link
                   to="/auth"
                   onClick={() => setOpen(false)}
-                  className="mt-2 rounded-xl bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground"
+                  className="block mt-2 rounded-xl bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground"
                 >
                   {t.signIn}
                 </Link>
