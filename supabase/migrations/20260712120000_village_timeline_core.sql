@@ -247,16 +247,19 @@ WITH CHECK (
 );
 
 DROP POLICY IF EXISTS "announcements_select_public" ON public.announcements;
+DROP POLICY IF EXISTS "announcements_select_same_village" ON public.announcements;
 CREATE POLICY "announcements_select_same_village" ON public.announcements
 FOR SELECT TO authenticated
 USING (public.same_village_or_super_admin(village_id));
 
 DROP POLICY IF EXISTS "government_works_select_public" ON public.government_works;
+DROP POLICY IF EXISTS "government_works_select_same_village" ON public.government_works;
 CREATE POLICY "government_works_select_same_village" ON public.government_works
 FOR SELECT TO authenticated
 USING (public.same_village_or_super_admin(village_id));
 
 DROP POLICY IF EXISTS "events_select_public" ON public.events;
+DROP POLICY IF EXISTS "events_select_same_village" ON public.events;
 CREATE POLICY "events_select_same_village" ON public.events
 FOR SELECT TO authenticated
 USING (public.same_village_or_super_admin(village_id));

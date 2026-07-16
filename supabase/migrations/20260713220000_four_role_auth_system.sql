@@ -379,6 +379,7 @@ CREATE POLICY "complaints_citizen_insert_own" ON public.complaints
   FOR INSERT TO authenticated
   WITH CHECK (citizen_id = auth.uid());
 
+DROP POLICY IF EXISTS "complaints_update_own_or_village_admin" ON public.complaints;
 CREATE POLICY "complaints_update_own_or_village_admin" ON public.complaints
   FOR UPDATE TO authenticated
   USING (
@@ -392,6 +393,7 @@ CREATE POLICY "complaints_update_own_or_village_admin" ON public.complaints
     OR (public.current_user_role() = 'village_admin'::public.app_role AND public.same_village_as_caller(village_id))
   );
 
+DROP POLICY IF EXISTS "complaints_delete_owner_or_super_admin" ON public.complaints;
 CREATE POLICY "complaints_delete_owner_or_super_admin" ON public.complaints
   FOR DELETE TO authenticated
   USING (citizen_id = auth.uid() OR public.is_super_admin());
@@ -414,10 +416,12 @@ CREATE POLICY "complaint_images_select_related" ON public.complaint_images
         ))
   );
 
+DROP POLICY IF EXISTS "complaint_images_insert_owner" ON public.complaint_images;
 CREATE POLICY "complaint_images_insert_owner" ON public.complaint_images
   FOR INSERT TO authenticated
   WITH CHECK (uploaded_by = auth.uid());
 
+DROP POLICY IF EXISTS "complaint_images_delete_owner_or_super_admin" ON public.complaint_images;
 CREATE POLICY "complaint_images_delete_owner_or_super_admin" ON public.complaint_images
   FOR DELETE TO authenticated
   USING (uploaded_by = auth.uid() OR public.is_super_admin());
@@ -431,6 +435,7 @@ DROP POLICY IF EXISTS "announcements_admin_write" ON public.announcements;
 CREATE POLICY "announcements_select_public" ON public.announcements
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "announcements_admin_insert" ON public.announcements;
 CREATE POLICY "announcements_admin_insert" ON public.announcements
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -441,6 +446,7 @@ CREATE POLICY "announcements_admin_insert" ON public.announcements
     )
   );
 
+DROP POLICY IF EXISTS "announcements_admin_update" ON public.announcements;
 CREATE POLICY "announcements_admin_update" ON public.announcements
   FOR UPDATE TO authenticated
   USING (
@@ -452,6 +458,7 @@ CREATE POLICY "announcements_admin_update" ON public.announcements
     OR public.is_super_admin()
   );
 
+DROP POLICY IF EXISTS "announcements_super_admin_delete" ON public.announcements;
 CREATE POLICY "announcements_super_admin_delete" ON public.announcements
   FOR DELETE TO authenticated
   USING (public.is_super_admin() OR (author_id = auth.uid() AND public.is_admin()));
@@ -464,6 +471,7 @@ DROP POLICY IF EXISTS "government_works_admin_write" ON public.government_works;
 CREATE POLICY "government_works_select_public" ON public.government_works
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "government_works_admin_insert" ON public.government_works;
 CREATE POLICY "government_works_admin_insert" ON public.government_works
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -474,6 +482,7 @@ CREATE POLICY "government_works_admin_insert" ON public.government_works
     )
   );
 
+DROP POLICY IF EXISTS "government_works_admin_update" ON public.government_works;
 CREATE POLICY "government_works_admin_update" ON public.government_works
   FOR UPDATE TO authenticated
   USING (
@@ -485,6 +494,7 @@ CREATE POLICY "government_works_admin_update" ON public.government_works
     OR public.is_super_admin()
   );
 
+DROP POLICY IF EXISTS "government_works_super_admin_delete" ON public.government_works;
 CREATE POLICY "government_works_super_admin_delete" ON public.government_works
   FOR DELETE TO authenticated
   USING (public.is_super_admin() OR (created_by = auth.uid() AND public.is_admin()));
@@ -497,6 +507,7 @@ DROP POLICY IF EXISTS "government_work_images_admin_write" ON public.government_
 CREATE POLICY "government_work_images_select_public" ON public.government_work_images
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "government_work_images_admin_insert" ON public.government_work_images;
 CREATE POLICY "government_work_images_admin_insert" ON public.government_work_images
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -504,6 +515,7 @@ CREATE POLICY "government_work_images_admin_insert" ON public.government_work_im
     AND public.is_admin()
   );
 
+DROP POLICY IF EXISTS "government_work_images_admin_update" ON public.government_work_images;
 CREATE POLICY "government_work_images_admin_update" ON public.government_work_images
   FOR UPDATE TO authenticated
   USING (
@@ -515,6 +527,7 @@ CREATE POLICY "government_work_images_admin_update" ON public.government_work_im
     OR public.is_super_admin()
   );
 
+DROP POLICY IF EXISTS "government_work_images_super_admin_delete" ON public.government_work_images;
 CREATE POLICY "government_work_images_super_admin_delete" ON public.government_work_images
   FOR DELETE TO authenticated
   USING (uploaded_by = auth.uid() OR public.is_super_admin());
@@ -556,6 +569,7 @@ DROP POLICY IF EXISTS "events_manage_own_or_admin" ON public.events;
 CREATE POLICY "events_select_public" ON public.events
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "events_admin_insert" ON public.events;
 CREATE POLICY "events_admin_insert" ON public.events
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -566,6 +580,7 @@ CREATE POLICY "events_admin_insert" ON public.events
     )
   );
 
+DROP POLICY IF EXISTS "events_admin_update" ON public.events;
 CREATE POLICY "events_admin_update" ON public.events
   FOR UPDATE TO authenticated
   USING (
@@ -577,6 +592,7 @@ CREATE POLICY "events_admin_update" ON public.events
     OR public.is_super_admin()
   );
 
+DROP POLICY IF EXISTS "events_delete_owner_or_super_admin" ON public.events;
 CREATE POLICY "events_delete_owner_or_super_admin" ON public.events
   FOR DELETE TO authenticated
   USING (created_by = auth.uid() OR public.is_super_admin());
@@ -598,11 +614,13 @@ CREATE POLICY "listings_insert_authenticated" ON public.listings
   FOR INSERT TO authenticated
   WITH CHECK (auth.uid() = owner_id);
 
+DROP POLICY IF EXISTS "listings_update_owner_or_super_admin" ON public.listings;
 CREATE POLICY "listings_update_owner_or_super_admin" ON public.listings
   FOR UPDATE TO authenticated
   USING (auth.uid() = owner_id OR public.is_super_admin())
   WITH CHECK (auth.uid() = owner_id OR public.is_super_admin());
 
+DROP POLICY IF EXISTS "listings_delete_owner_or_super_admin" ON public.listings;
 CREATE POLICY "listings_delete_owner_or_super_admin" ON public.listings
   FOR DELETE TO authenticated
   USING (auth.uid() = owner_id OR public.is_super_admin());
@@ -615,6 +633,7 @@ DROP POLICY IF EXISTS "products_farmer_manage_own" ON public.products;
 CREATE POLICY "products_select_public" ON public.products
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "products_dealer_insert" ON public.products;
 CREATE POLICY "products_dealer_insert" ON public.products
   FOR INSERT TO authenticated
   WITH CHECK (
@@ -622,11 +641,13 @@ CREATE POLICY "products_dealer_insert" ON public.products
     AND (public.is_approved_dealer() OR public.is_super_admin())
   );
 
+DROP POLICY IF EXISTS "products_dealer_update" ON public.products;
 CREATE POLICY "products_dealer_update" ON public.products
   FOR UPDATE TO authenticated
   USING (farmer_id = auth.uid() OR public.is_super_admin())
   WITH CHECK (farmer_id = auth.uid() OR public.is_super_admin());
 
+DROP POLICY IF EXISTS "products_delete_owner_or_super_admin" ON public.products;
 CREATE POLICY "products_delete_owner_or_super_admin" ON public.products
   FOR DELETE TO authenticated
   USING (farmer_id = auth.uid() OR public.is_super_admin());
@@ -638,15 +659,18 @@ DROP POLICY IF EXISTS "jobs_manage_own_or_admin" ON public.jobs;
 CREATE POLICY "jobs_select_public" ON public.jobs
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "jobs_insert_owner" ON public.jobs;
 CREATE POLICY "jobs_insert_owner" ON public.jobs
   FOR INSERT TO authenticated
   WITH CHECK (posted_by = auth.uid());
 
+DROP POLICY IF EXISTS "jobs_update_owner_or_super_admin" ON public.jobs;
 CREATE POLICY "jobs_update_owner_or_super_admin" ON public.jobs
   FOR UPDATE TO authenticated
   USING (posted_by = auth.uid() OR public.is_super_admin())
   WITH CHECK (posted_by = auth.uid() OR public.is_super_admin());
 
+DROP POLICY IF EXISTS "jobs_delete_owner_or_super_admin" ON public.jobs;
 CREATE POLICY "jobs_delete_owner_or_super_admin" ON public.jobs
   FOR DELETE TO authenticated
   USING (posted_by = auth.uid() OR public.is_super_admin());
@@ -659,15 +683,18 @@ DROP POLICY IF EXISTS "comments_manage_own_or_super_admin" ON public.comments;
 CREATE POLICY "comments_select_public" ON public.comments
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "comments_insert_authenticated" ON public.comments;
 CREATE POLICY "comments_insert_authenticated" ON public.comments
   FOR INSERT TO authenticated
   WITH CHECK (author_id = auth.uid());
 
+DROP POLICY IF EXISTS "comments_update_own" ON public.comments;
 CREATE POLICY "comments_update_own" ON public.comments
   FOR UPDATE TO authenticated
   USING (author_id = auth.uid() OR public.is_super_admin())
   WITH CHECK (author_id = auth.uid() OR public.is_super_admin());
 
+DROP POLICY IF EXISTS "comments_delete_own_or_super_admin" ON public.comments;
 CREATE POLICY "comments_delete_own_or_super_admin" ON public.comments
   FOR DELETE TO authenticated
   USING (author_id = auth.uid() OR public.is_super_admin());
@@ -680,10 +707,12 @@ DROP POLICY IF EXISTS "likes_manage_own_or_super_admin" ON public.likes;
 CREATE POLICY "likes_select_public" ON public.likes
   FOR SELECT USING (true);
 
+DROP POLICY IF EXISTS "likes_insert_own" ON public.likes;
 CREATE POLICY "likes_insert_own" ON public.likes
   FOR INSERT TO authenticated
   WITH CHECK (user_id = auth.uid());
 
+DROP POLICY IF EXISTS "likes_delete_own_or_super_admin" ON public.likes;
 CREATE POLICY "likes_delete_own_or_super_admin" ON public.likes
   FOR DELETE TO authenticated
   USING (user_id = auth.uid() OR public.is_super_admin());
