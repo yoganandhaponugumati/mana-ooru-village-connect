@@ -573,11 +573,23 @@ export function SiteFooter() {
           </p>
         </div>
         <div>
-          <p className="text-sm font-semibold text-clay">About</p>
+          <p className="text-sm font-semibold text-clay">About & Legal</p>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
-            <li>Community-led marketplace</li>
-            <li>Village-first support</li>
-            <li>Trusted local connections</li>
+            <li>
+              <Link to="/privacy" className="transition hover:text-primary">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms" className="transition hover:text-primary">
+                Terms of Service
+              </Link>
+            </li>
+            <li>
+              <Link to="/delete-account" className="transition hover:text-primary font-medium text-red-600/90">
+                Delete Account
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
@@ -598,6 +610,11 @@ export function SiteFooter() {
                 Marketplace
               </Link>
             </li>
+            <li>
+              <Link to="/dealer-registration" className="transition hover:text-primary">
+                Dealer Storefronts
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
@@ -611,21 +628,30 @@ export function SiteFooter() {
         <div>
           <p className="text-sm font-semibold text-clay">Contact</p>
           <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
+            <li>privacy@manaooru.org</li>
             <li>hello@manaooru.org</li>
             <li>+91 98765 43210</li>
-            <li>Village support desk</li>
           </ul>
         </div>
       </div>
       <div className="border-t border-border/60 bg-white/62">
         <div className="mx-auto flex max-w-7xl flex-col gap-3 px-4 py-4 text-sm text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <p>© {new Date().getFullYear()} ManaOoru · Built for our villages.</p>
-          <div className="flex gap-4">
+          <div className="flex flex-wrap gap-4">
             <Link to="/" className="transition hover:text-primary">
               Home
             </Link>
             <Link to="/announcements" className="transition hover:text-primary">
               Notices
+            </Link>
+            <Link to="/privacy" className="transition hover:text-primary">
+              Privacy
+            </Link>
+            <Link to="/terms" className="transition hover:text-primary">
+              Terms
+            </Link>
+            <Link to="/delete-account" className="transition hover:text-primary text-red-600/90">
+              Data Wiping
             </Link>
           </div>
         </div>

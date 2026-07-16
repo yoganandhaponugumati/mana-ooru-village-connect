@@ -15,17 +15,21 @@ import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as TransportRouteImport } from './routes/transport'
 import { Route as TimelineRouteImport } from './routes/timeline'
+import { Route as TermsRouteImport } from './routes/terms'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SchemesRouteImport } from './routes/schemes'
 import { Route as ProfileRouteImport } from './routes/profile'
 import { Route as ProblemsRouteImport } from './routes/problems'
+import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PostWorkerRouteImport } from './routes/post-worker'
 import { Route as PostWorkRouteImport } from './routes/post-work'
 import { Route as OfficialRouteImport } from './routes/official'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LandRouteImport } from './routes/land'
 import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as DeleteAccountRouteImport } from './routes/delete-account'
 import { Route as DealerRegistrationRouteImport } from './routes/dealer-registration'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as CompleteProfileRouteImport } from './routes/complete-profile'
@@ -65,6 +69,11 @@ const TimelineRoute = TimelineRouteImport.update({
   path: '/timeline',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesRoute = ServicesRouteImport.update({
   id: '/services',
   path: '/services',
@@ -88,6 +97,16 @@ const ProfileRoute = ProfileRouteImport.update({
 const ProblemsRoute = ProblemsRouteImport.update({
   id: '/problems',
   path: '/problems',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyPolicyRoute = PrivacyPolicyRouteImport.update({
+  id: '/privacy-policy',
+  path: '/privacy-policy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PostWorkerRoute = PostWorkerRouteImport.update({
@@ -118,6 +137,11 @@ const LandRoute = LandRouteImport.update({
 const EmergencyRoute = EmergencyRouteImport.update({
   id: '/emergency',
   path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DeleteAccountRoute = DeleteAccountRouteImport.update({
+  id: '/delete-account',
+  path: '/delete-account',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DealerRegistrationRoute = DealerRegistrationRouteImport.update({
@@ -169,17 +193,21 @@ export interface FileRoutesByFullPath {
   '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
   '/dealer-registration': typeof DealerRegistrationRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/official': typeof OfficialRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/problems': typeof ProblemsRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
   '/unauthorized': typeof UnauthorizedRoute
@@ -196,17 +224,21 @@ export interface FileRoutesByTo {
   '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
   '/dealer-registration': typeof DealerRegistrationRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/official': typeof OfficialRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/problems': typeof ProblemsRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
   '/unauthorized': typeof UnauthorizedRoute
@@ -224,17 +256,21 @@ export interface FileRoutesById {
   '/complete-profile': typeof CompleteProfileRoute
   '/dashboard': typeof DashboardRoute
   '/dealer-registration': typeof DealerRegistrationRoute
+  '/delete-account': typeof DeleteAccountRoute
   '/emergency': typeof EmergencyRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/official': typeof OfficialRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
+  '/privacy': typeof PrivacyRoute
+  '/privacy-policy': typeof PrivacyPolicyRoute
   '/problems': typeof ProblemsRoute
   '/profile': typeof ProfileRoute
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
   '/unauthorized': typeof UnauthorizedRoute
@@ -253,17 +289,21 @@ export interface FileRouteTypes {
     | '/complete-profile'
     | '/dashboard'
     | '/dealer-registration'
+    | '/delete-account'
     | '/emergency'
     | '/land'
     | '/marketplace'
     | '/official'
     | '/post-work'
     | '/post-worker'
+    | '/privacy'
+    | '/privacy-policy'
     | '/problems'
     | '/profile'
     | '/schemes'
     | '/search'
     | '/services'
+    | '/terms'
     | '/timeline'
     | '/transport'
     | '/unauthorized'
@@ -280,17 +320,21 @@ export interface FileRouteTypes {
     | '/complete-profile'
     | '/dashboard'
     | '/dealer-registration'
+    | '/delete-account'
     | '/emergency'
     | '/land'
     | '/marketplace'
     | '/official'
     | '/post-work'
     | '/post-worker'
+    | '/privacy'
+    | '/privacy-policy'
     | '/problems'
     | '/profile'
     | '/schemes'
     | '/search'
     | '/services'
+    | '/terms'
     | '/timeline'
     | '/transport'
     | '/unauthorized'
@@ -307,17 +351,21 @@ export interface FileRouteTypes {
     | '/complete-profile'
     | '/dashboard'
     | '/dealer-registration'
+    | '/delete-account'
     | '/emergency'
     | '/land'
     | '/marketplace'
     | '/official'
     | '/post-work'
     | '/post-worker'
+    | '/privacy'
+    | '/privacy-policy'
     | '/problems'
     | '/profile'
     | '/schemes'
     | '/search'
     | '/services'
+    | '/terms'
     | '/timeline'
     | '/transport'
     | '/unauthorized'
@@ -335,17 +383,21 @@ export interface RootRouteChildren {
   CompleteProfileRoute: typeof CompleteProfileRoute
   DashboardRoute: typeof DashboardRoute
   DealerRegistrationRoute: typeof DealerRegistrationRoute
+  DeleteAccountRoute: typeof DeleteAccountRoute
   EmergencyRoute: typeof EmergencyRoute
   LandRoute: typeof LandRoute
   MarketplaceRoute: typeof MarketplaceRoute
   OfficialRoute: typeof OfficialRoute
   PostWorkRoute: typeof PostWorkRoute
   PostWorkerRoute: typeof PostWorkerRoute
+  PrivacyRoute: typeof PrivacyRoute
+  PrivacyPolicyRoute: typeof PrivacyPolicyRoute
   ProblemsRoute: typeof ProblemsRoute
   ProfileRoute: typeof ProfileRoute
   SchemesRoute: typeof SchemesRoute
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRoute
+  TermsRoute: typeof TermsRoute
   TimelineRoute: typeof TimelineRoute
   TransportRoute: typeof TransportRoute
   UnauthorizedRoute: typeof UnauthorizedRoute
@@ -399,6 +451,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TimelineRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services': {
       id: '/services'
       path: '/services'
@@ -432,6 +491,20 @@ declare module '@tanstack/react-router' {
       path: '/problems'
       fullPath: '/problems'
       preLoaderRoute: typeof ProblemsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy-policy': {
+      id: '/privacy-policy'
+      path: '/privacy-policy'
+      fullPath: '/privacy-policy'
+      preLoaderRoute: typeof PrivacyPolicyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/post-worker': {
@@ -474,6 +547,13 @@ declare module '@tanstack/react-router' {
       path: '/emergency'
       fullPath: '/emergency'
       preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/delete-account': {
+      id: '/delete-account'
+      path: '/delete-account'
+      fullPath: '/delete-account'
+      preLoaderRoute: typeof DeleteAccountRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dealer-registration': {
@@ -543,17 +623,21 @@ const rootRouteChildren: RootRouteChildren = {
   CompleteProfileRoute: CompleteProfileRoute,
   DashboardRoute: DashboardRoute,
   DealerRegistrationRoute: DealerRegistrationRoute,
+  DeleteAccountRoute: DeleteAccountRoute,
   EmergencyRoute: EmergencyRoute,
   LandRoute: LandRoute,
   MarketplaceRoute: MarketplaceRoute,
   OfficialRoute: OfficialRoute,
   PostWorkRoute: PostWorkRoute,
   PostWorkerRoute: PostWorkerRoute,
+  PrivacyRoute: PrivacyRoute,
+  PrivacyPolicyRoute: PrivacyPolicyRoute,
   ProblemsRoute: ProblemsRoute,
   ProfileRoute: ProfileRoute,
   SchemesRoute: SchemesRoute,
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRoute,
+  TermsRoute: TermsRoute,
   TimelineRoute: TimelineRoute,
   TransportRoute: TransportRoute,
   UnauthorizedRoute: UnauthorizedRoute,

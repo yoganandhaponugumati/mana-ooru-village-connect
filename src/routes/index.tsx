@@ -1305,10 +1305,10 @@ function Index() {
             </div>
             <span className="font-display text-lg font-semibold text-clay">ManaOoru</span>
           </div>
-          <p className="text-xs uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground text-center">
             © {new Date().getFullYear()} ManaOoru · Built with care for our villages.
           </p>
-          <div className="flex gap-6 text-sm text-muted-foreground">
+          <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
             <Link to="/announcements" className="transition hover:text-primary">
               Notices
             </Link>
@@ -1319,8 +1319,14 @@ function Index() {
             >
               Support
             </Link>
-            <Link to="/search" search={{ q: "" }} className="transition hover:text-primary">
-              Search
+            <Link to="/privacy" className="transition hover:text-primary">
+              Privacy
+            </Link>
+            <Link to="/terms" className="transition hover:text-primary">
+              Terms
+            </Link>
+            <Link to="/delete-account" className="transition hover:text-primary text-red-600/90 font-medium">
+              Data Safety
             </Link>
           </div>
         </div>

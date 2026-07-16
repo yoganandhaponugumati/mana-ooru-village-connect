@@ -1,0 +1,42 @@
+{
+  "name": "ManaOoru — India's Digital Village Platform",
+  "short_name": "ManaOoru",
+  "description": "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and AI support.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FFFDF9",
+  "theme_color": "#0E2317",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/site-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["social", "productivity", "shopping", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Marketplace",
+      "short_name": "Market",
+      "description": "Browse village trade listings",
+      "url": "/marketplace",
+      "icons": [{ "src": "/site-icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Find Workers",
+      "short_name": "Workers",
+      "description": "Find local agricultural & skilled workers",
+      "url": "/workers",
+      "icons": [{ "src": "/site-icon.svg", "sizes": "any" }]
+    },
+    {
+      "name": "Notices & Announcements",
+      "short_name": "Notices",
+      "description": "Read local Gram Panchayat announcements",
+      "url": "/announcements",
+      "icons": [{ "src": "/site-icon.svg", "sizes": "any" }]
+    }
+  ]
+}
