@@ -434,115 +434,23 @@ function Index() {
       <SiteNav />
 
       {/* Hero */}
-      <header className="relative z-0 min-h-screen overflow-hidden bg-[#06140d] isolate">
-        <img
-          src={heroVillage}
-          alt="Beautiful Indian village with green fields at sunrise"
-          loading="eager"
-          className="absolute inset-0 z-0 h-full w-full object-cover opacity-60"
-        />
-        <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_72%_28%,rgba(24,169,153,0.36),transparent_30%),radial-gradient(circle_at_18%_16%,rgba(242,184,75,0.34),transparent_25%),linear-gradient(90deg,rgba(4,18,10,0.92)_0%,rgba(8,31,18,0.72)_45%,rgba(8,41,33,0.28)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 z-10 h-52 bg-gradient-to-t from-[#eef8ed] via-[#eef8ed]/78 to-transparent" />
-        <div className="pointer-events-none absolute left-0 top-28 z-10 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
-        <div className="hero-life-layer pointer-events-none absolute inset-0 z-10" />
-
-        <div className="relative z-20 mx-auto grid min-h-screen max-w-7xl items-center gap-10 px-4 pb-32 pt-28 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:pb-28">
-          <div className="max-w-3xl text-left">
-            <motion.h1
-              initial={{ opacity: 0, y: 22 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.08, ease: [0.32, 0.72, 0, 1] }}
-              className="max-w-4xl text-balance font-display text-5xl font-black leading-[0.95] text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.48)] sm:text-7xl lg:text-8xl"
-            >
-              ManaOoru
-              <span className="block bg-gradient-to-r from-accent via-white to-secondary bg-clip-text text-transparent">
-                Village in your hands
-              </span>
-            </motion.h1>
-
-            <motion.p
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.16, ease: "easeOut" }}
-              className="mt-6 max-w-2xl text-pretty text-lg font-medium leading-8 text-white/84 sm:text-xl"
-            >
-              {heroTitle}. {t.subtitle1} {t.subtitle2}
-            </motion.p>
-
-            <motion.form
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.24, ease: "easeOut" }}
-              onSubmit={submitSearch}
-              className="mt-8 w-full max-w-2xl"
-            >
-              <div className="group flex items-center gap-2 rounded-[24px] border border-white/22 bg-white/92 p-2 shadow-[0_34px_110px_-42px_rgba(0,0,0,0.72)] backdrop-blur-2xl transition focus-within:ring-4 focus-within:ring-secondary/25">
-                <div className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
-                  <Search className="size-5" />
-                </div>
-                <input
-                  id="hero-search"
-                  type="text"
-                  value={searchQuery}
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                  placeholder={t.search}
-                  className="min-w-0 flex-1 bg-transparent text-base font-semibold text-foreground outline-none placeholder:text-muted-foreground"
-                />
-                <button
-                  type="submit"
-                  className="rounded-[18px] bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5 hover:bg-secondary sm:px-8"
-                >
-                  Search
-                </button>
-              </div>
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-white">
-                <span className="font-semibold">{t.popular}</span>
-                {["Tractor Driver", "Paddy Land", "Electrician", "Milk", "Harvesting"].map((t) => (
-                  <button
-                    type="button"
-                    key={t}
-                    onClick={() => {
-                      setSearchQuery(t);
-                      navigate({ to: "/search", search: { q: t } });
-                    }}
-                    className="rounded-full border border-white/22 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/20"
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </motion.form>
-
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.32, ease: "easeOut" }}
-              className="mt-8 flex flex-wrap gap-4"
-            >
-              <Link
-                to="/timeline"
-                className="inline-flex items-center gap-2 rounded-[20px] bg-primary px-7 py-4 text-base font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-1 hover:bg-secondary"
-              >
-                <Compass className="size-5" /> {t.explore}
-              </Link>
-              <Link
-                to="/post-work"
-                className="inline-flex items-center gap-2 rounded-[20px] border border-white/28 bg-white/92 px-7 py-4 text-base font-bold text-primary shadow-[0_22px_70px_-34px_rgba(0,0,0,0.72)] transition hover:-translate-y-1 hover:bg-white"
-              >
-                <Plus className="size-5" /> {t.post}
-              </Link>
-            </motion.div>
-
-            {!hasRealActivity && (
-              <p className="mt-8 max-w-xl rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-semibold text-white/78 backdrop-blur-xl">
-                New village workspace: post first, connect faster, and make local activity visible.
-              </p>
-            )}
-          </div>
-
-          <Hero3DVillage villageName={villageName} heroWeather={heroWeather} stats={stats} />
-        </div>
-      </header>
+      <CinemaHero
+        heroTitle={heroTitle}
+        villageName={villageName}
+        heroWeather={heroWeather}
+        stats={stats}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        submitSearch={submitSearch}
+        navigate={navigate}
+        hasRealActivity={hasRealActivity}
+        subtitle={`${t.subtitle1} ${t.subtitle2}`}
+        searchPlaceholder={t.search}
+        popularLabel={t.popular}
+        exploreLabel={t.explore}
+        postLabel={t.post}
+        announcement={announcementItems[0]}
+      />
 
       {/* Quick Actions */}
       <section
