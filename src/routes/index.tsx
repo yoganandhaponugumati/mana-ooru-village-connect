@@ -256,145 +256,302 @@ const contacts = [
   { name: "Agriculture Officer", role: "Crop & Subsidy Help", num: "98481 12443" },
 ];
 
-function Hero3DVillage({
+type HeroListing = {
+  id: string;
+  title: string;
+  category?: string | null;
+  description?: string | null;
+};
+
+function CinemaHero({
+  heroTitle,
   villageName,
   heroWeather,
   stats,
+  searchQuery,
+  setSearchQuery,
+  submitSearch,
+  navigate,
+  hasRealActivity,
+  subtitle,
+  searchPlaceholder,
+  popularLabel,
+  exploreLabel,
+  postLabel,
+  announcement,
 }: {
+  heroTitle: string;
   villageName: string;
   heroWeather: string;
   stats?: ReturnType<typeof useListingStats>["data"];
+  searchQuery: string;
+  setSearchQuery: (v: string) => void;
+  submitSearch: (e?: FormEvent) => void;
+  navigate: ReturnType<typeof useNavigate>;
+  hasRealActivity: boolean;
+  subtitle: string;
+  searchPlaceholder: string;
+  popularLabel: string;
+  exploreLabel: string;
+  postLabel: string;
+  announcement?: HeroListing;
 }) {
-  const heroMetrics = [
-    { label: "Workers", value: stats?.workers ? `${stats.workers}+` : "0", icon: Users },
-    { label: "Land", value: stats?.land ? `${stats.land}+` : "0", icon: Wheat },
-    {
-      label: "Services",
-      value: stats?.byType.service ? `${stats.byType.service}+` : "0",
-      icon: Wrench,
-    },
-  ];
+  const workers = stats?.workers ?? 0;
+  const land = stats?.land ?? 0;
+  const services = stats?.byType.service ?? 0;
+  const marketCount = stats?.byType.market ?? 0;
 
-  const [tilt, setTilt] = useState({ x: 12, y: -18 });
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    const rect = e.currentTarget.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width - 0.5; // -0.5 to 0.5
-    const y = (e.clientY - rect.top) / rect.height - 0.5; // -0.5 to 0.5
-    setTilt({
-      x: 12 - y * 16,
-      y: -18 + x * 24,
-    });
-  };
-  const handleMouseLeave = () => {
-    setTilt({ x: 12, y: -18 });
-  };
+  const widgets = [
+    {
+      key: "weather",
+      icon: CloudSun,
+      tag: "Today",
+      title: heroWeather.split("·")[0]?.trim() || "Live weather",
+      sub: heroWeather.includes("·") ? heroWeather.split("·")[1].trim() : "Set your village",
+      accent: "from-amber-300/70 to-orange-500/40",
+      float: "widget-float-a",
+      pos: "top-[6%] left-[2%]",
+      size: "w-[220px]",
+    },
+    {
+      key: "workers",
+      icon: Users,
+      tag: "Workers online",
+      title: workers ? `${workers}+ ready` : "Be the first",
+      sub: "Drivers, farm, skilled",
+      accent: "from-emerald-300/70 to-emerald-600/40",
+      float: "widget-float-b",
+      pos: "top-[8%] right-[3%]",
+      size: "w-[240px]",
+    },
+    {
+      key: "land",
+      icon: Wheat,
+      tag: "Land for lease",
+      title: land ? `${land} plots` : "List your land",
+      sub: "Paddy · Dry · Wet",
+      accent: "from-lime-300/70 to-green-700/40",
+      float: "widget-float-c",
+      pos: "top-[38%] left-[4%]",
+      size: "w-[210px]",
+    },
+    {
+      key: "prices",
+      icon: Sprout,
+      tag: "Crop mandi",
+      title: `${marketCount} listings`,
+      sub: "Live buyers nearby",
+      accent: "from-teal-300/70 to-cyan-600/40",
+      float: "widget-float-a",
+      pos: "top-[44%] right-[6%]",
+      size: "w-[220px]",
+    },
+    {
+      key: "notice",
+      icon: Megaphone,
+      tag: "Panchayat notice",
+      title: announcement?.title?.slice(0, 46) || "No notice today",
+      sub: announcement?.category || "Water · Power · School",
+      accent: "from-sky-300/70 to-indigo-600/40",
+      float: "widget-float-b",
+      pos: "bottom-[24%] left-[8%]",
+      size: "w-[260px]",
+    },
+    {
+      key: "emergency",
+      icon: Siren,
+      tag: "Emergency",
+      title: "108 · 100 · 101",
+      sub: `${services} services on standby`,
+      accent: "from-rose-400/70 to-red-700/40",
+      float: "widget-float-c",
+      pos: "bottom-[26%] right-[4%]",
+      size: "w-[230px]",
+      glow: true,
+    },
+  ] as const;
 
   return (
-    <div
-      className="hero-3d-stage"
-      aria-hidden="true"
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-    >
-      <motion.div
-        animate={{
-          rotateX: tilt.x,
-          rotateY: tilt.y,
-          y: 0,
-        }}
-        transition={{ type: "spring", stiffness: 100, damping: 20 }}
-        className="hero-3d-world"
-      >
-        <div className="hero-3d-orbit hero-3d-orbit-one" />
-        <div className="hero-3d-orbit hero-3d-orbit-two" />
+    <header className="cinema-hero relative isolate min-h-[100vh]">
+      <div className="cinema-sky" />
+      <div className="cinema-sun" />
 
-        <div className="hero-3d-base">
-          <div className="hero-3d-field hero-3d-field-a" />
-          <div className="hero-3d-field hero-3d-field-b" />
-          <div className="hero-3d-field hero-3d-field-c" />
-          <div className="hero-3d-road" />
-          <div className="hero-3d-house hero-3d-house-a">
-            <span />
-          </div>
-          <div className="hero-3d-house hero-3d-house-b">
-            <span />
-          </div>
-          <div className="hero-3d-tower">
-            <span />
-          </div>
-        </div>
+      {/* Clouds */}
+      <div className="cinema-cloud cinema-cloud-1" />
+      <div className="cinema-cloud cinema-cloud-2" />
+      <div className="cinema-cloud cinema-cloud-3" />
+      <div className="cinema-cloud cinema-cloud-4" />
 
-        <motion.div
-          animate={{ y: [0, -12, 0] }}
-          whileHover={{ translateZ: 220, scale: 1.05, y: -12 }}
-          transition={{
-            y: { duration: 5.5, repeat: Infinity, ease: "easeInOut" },
-            default: { type: "spring", stiffness: 120, damping: 15 },
-          }}
-          className="hero-3d-panel hero-3d-panel-main"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-primary/70">
-                Live village OS
-              </p>
-              <p className="mt-1 font-display text-xl font-bold text-clay">
-                {villageName || "Choose your village"}
-              </p>
-            </div>
-            <div className="grid size-12 place-items-center rounded-2xl bg-primary text-white shadow-[var(--shadow-glow)]">
-              <Leaf className="size-6" />
-            </div>
-          </div>
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            {heroMetrics.map((metric) => (
-              <div
-                key={metric.label}
-                className="rounded-2xl bg-white/72 p-3 shadow-sm hover:bg-white transition-colors duration-200"
-              >
-                <metric.icon className="size-4 text-primary" />
-                <p className="mt-2 font-display text-lg font-bold text-clay">{metric.value}</p>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  {metric.label}
-                </p>
+      {/* Birds */}
+      <div className="cinema-bird-track"><div className="cinema-bird" /></div>
+      <div className="cinema-bird-track b2"><div className="cinema-bird" /></div>
+      <div className="cinema-bird-track b3"><div className="cinema-bird" /></div>
+
+      {/* Waving fields */}
+      <div className="cinema-fields">
+        <div className="cinema-field-layer cinema-field-back" />
+        <div className="cinema-field-layer cinema-field-mid" />
+        <div className="cinema-field-layer cinema-field-front" />
+      </div>
+
+      {/* Mist */}
+      <div className="cinema-mist" />
+
+      {/* Soft page bleed at bottom */}
+      <div className="pointer-events-none absolute inset-x-0 bottom-0 z-[5] h-40 bg-gradient-to-t from-[#eef8ed] via-[#eef8ed]/60 to-transparent" />
+
+      {/* Floating widget constellation (desktop) */}
+      <div className="pointer-events-none absolute inset-0 z-10 hidden lg:block">
+        {widgets.map((w, i) => (
+          <motion.div
+            key={w.key}
+            initial={{ opacity: 0, y: 30, scale: 0.9 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ delay: 0.4 + i * 0.09, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+            className={`absolute ${w.pos} ${w.size} pointer-events-auto`}
+          >
+            <div className={`widget-glass ${w.float} ${w.glow ? "glow-emergency" : ""} p-4`}>
+              <div className={`absolute -top-3 -left-3 grid size-11 place-items-center rounded-2xl bg-gradient-to-br ${w.accent} shadow-lg backdrop-blur-md`}>
+                <w.icon className="size-5 text-white" strokeWidth={2.2} />
               </div>
+              <div className="pl-9">
+                <p className="text-[10px] font-black uppercase tracking-[0.22em] text-white/70">{w.tag}</p>
+                <p className="mt-1 font-display text-base font-bold leading-tight text-white">{w.title}</p>
+                <p className="mt-1 text-xs font-medium text-white/70">{w.sub}</p>
+              </div>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Hero copy + spotlight */}
+      <div className="relative z-20 mx-auto flex min-h-[100vh] max-w-6xl flex-col items-center justify-center gap-8 px-4 pb-40 pt-32 text-center sm:px-6">
+        <motion.p
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.24em] text-white/90 backdrop-blur-xl"
+        >
+          <span className="size-1.5 rounded-full bg-emerald-300 shadow-[0_0_12px_rgba(110,231,183,0.9)]" />
+          {villageName ? `Live · ${villageName}` : "India's Digital Village"}
+        </motion.p>
+
+        <motion.h1
+          initial={{ opacity: 0, y: 30, filter: "blur(12px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          className="font-display text-6xl font-black leading-[0.9] text-white drop-shadow-[0_20px_50px_rgba(0,0,0,0.6)] sm:text-8xl lg:text-[10rem]"
+        >
+          మన ఊరు
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.25, duration: 0.7 }}
+          className="max-w-2xl font-display text-2xl font-medium leading-tight text-white/95 sm:text-3xl lg:text-4xl"
+        >
+          Your Village,{" "}
+          <span className="bg-gradient-to-r from-amber-200 via-orange-200 to-emerald-200 bg-clip-text text-transparent">
+            Digitally Alive.
+          </span>
+        </motion.p>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4, duration: 0.7 }}
+          className="max-w-xl text-sm font-medium text-white/75 sm:text-base"
+        >
+          {heroTitle}. {subtitle}
+        </motion.p>
+
+        {/* Spotlight search */}
+        <motion.form
+          initial={{ opacity: 0, y: 24, scale: 0.96 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+          onSubmit={submitSearch}
+          className="w-full max-w-2xl"
+        >
+          <div className="spotlight-search group flex items-center gap-2 rounded-[26px] p-2 focus-within:ring-2 focus-within:ring-white/40">
+            <div className="grid size-12 place-items-center rounded-2xl bg-white/10 text-white">
+              <Search className="size-5" />
+            </div>
+            <input
+              id="hero-search"
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder={searchPlaceholder}
+              className="min-w-0 flex-1 bg-transparent text-base font-semibold outline-none"
+            />
+            <button
+              type="submit"
+              className="magnetic-btn rounded-[18px] bg-white px-6 py-3 text-sm font-bold text-neutral-900 shadow-[0_18px_50px_-10px_rgba(255,255,255,0.4)] sm:px-8"
+            >
+              Search
+            </button>
+          </div>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm text-white">
+            <span className="font-semibold text-white/70">{popularLabel}</span>
+            {["Tractor Driver", "Paddy Land", "Electrician", "Milk", "Harvesting"].map((tag) => (
+              <button
+                type="button"
+                key={tag}
+                onClick={() => {
+                  setSearchQuery(tag);
+                  navigate({ to: "/search", search: { q: tag } });
+                }}
+                className="rounded-full border border-white/22 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/20"
+              >
+                {tag}
+              </button>
             ))}
           </div>
-        </motion.div>
+        </motion.form>
 
         <motion.div
-          animate={{ y: [0, 10, 0], rotateZ: [0, -1.5, 0] }}
-          whileHover={{ translateZ: 260, scale: 1.06, y: 10 }}
-          transition={{
-            y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
-            rotateZ: { duration: 6, repeat: Infinity, ease: "easeInOut" },
-            default: { type: "spring", stiffness: 120, damping: 15 },
-          }}
-          className="hero-3d-panel hero-3d-panel-weather"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.65, duration: 0.6 }}
+          className="flex flex-wrap items-center justify-center gap-4"
         >
-          <CloudSun className="size-6 text-accent" />
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/60">
-              Weather
-            </p>
-            <p className="font-display text-lg font-bold text-white">{heroWeather}</p>
-          </div>
+          <Link
+            to="/timeline"
+            className="magnetic-btn inline-flex items-center gap-2 rounded-[20px] bg-gradient-to-r from-emerald-500 to-teal-600 px-7 py-4 text-base font-bold text-white shadow-[0_24px_60px_-20px_rgba(16,185,129,0.7)]"
+          >
+            <Compass className="size-5" /> {exploreLabel}
+          </Link>
+          <Link
+            to="/post-work"
+            className="magnetic-btn inline-flex items-center gap-2 rounded-[20px] border border-white/30 bg-white/10 px-7 py-4 text-base font-bold text-white backdrop-blur-xl"
+          >
+            <Plus className="size-5" /> {postLabel}
+          </Link>
         </motion.div>
 
-        <motion.div
-          animate={{ y: [0, -9, 0], rotateZ: [0, 2, 0] }}
-          whileHover={{ translateZ: 280, scale: 1.06, y: -9 }}
-          transition={{
-            y: { duration: 4.8, repeat: Infinity, ease: "easeInOut" },
-            default: { type: "spring", stiffness: 120, damping: 15 },
-          }}
-          className="hero-3d-panel hero-3d-panel-action"
-        >
-          <ShieldCheck className="size-5 text-primary" />
-          <span>Verified village network</span>
-        </motion.div>
+        {!hasRealActivity && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.9 }}
+            className="max-w-lg rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-xs font-semibold text-white/80 backdrop-blur-xl"
+          >
+            New village workspace — post first, connect faster, and make local activity visible.
+          </motion.p>
+        )}
+      </div>
+
+      {/* Scroll cue */}
+      <motion.div
+        animate={{ y: [0, 8, 0] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+        className="pointer-events-none absolute bottom-8 left-1/2 z-30 -translate-x-1/2 text-[10px] font-bold uppercase tracking-[0.3em] text-white/70"
+      >
+        Scroll · గ్రామం లోకి
       </motion.div>
-    </div>
+    </header>
   );
 }
 
