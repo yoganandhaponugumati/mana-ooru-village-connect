@@ -368,6 +368,7 @@ function Hero3DVillage({
           whileHover={{ translateZ: 260, scale: 1.06, y: 10 }}
           transition={{
             y: { duration: 6, repeat: Infinity, ease: "easeInOut" },
+            rotateZ: { duration: 6, repeat: Infinity, ease: "easeInOut" },
             default: { type: "spring", stiffness: 120, damping: 15 },
           }}
           className="hero-3d-panel hero-3d-panel-weather"
