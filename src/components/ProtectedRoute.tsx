@@ -30,7 +30,8 @@ export function ProtectedRoute({
   }
 
   if (!user) {
-    const isPostingRoute = typeof window !== "undefined" && window.location.pathname.includes("post");
+    const isPostingRoute =
+      typeof window !== "undefined" && window.location.pathname.includes("post");
     return (
       <Navigate
         to="/auth"

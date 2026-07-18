@@ -54,11 +54,7 @@ function LandPage() {
         title="Available farmland"
         description="Post your field or browse plots that match your crop plans."
         actions={
-          <AppButton
-            variant="primary"
-            icon={<Plus className="size-4" />}
-            onClick={handlePostClick}
-          >
+          <AppButton variant="primary" icon={<Plus className="size-4" />} onClick={handlePostClick}>
             {showForm ? "Cancel" : "List your land"}
           </AppButton>
         }

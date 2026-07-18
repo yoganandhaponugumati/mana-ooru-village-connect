@@ -42,7 +42,7 @@ export const Route = createFileRoute("/announcements")({
 function AnnPage() {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<"notices" | "sarpanch_works">("notices");
-  
+
   // Notice board data
   const { items, remove, update } = useListings("announcement");
   const { user, role } = useAuth();
@@ -222,7 +222,10 @@ function AnnPage() {
               { label: "Festival / Temple", icon: Church },
               { label: "Ration & Schemes", icon: GraduationCap },
             ].map((item) => (
-              <SurfaceCard key={item.label} className="p-4 bg-gradient-to-br from-card to-primary/5 border-primary/10">
+              <SurfaceCard
+                key={item.label}
+                className="p-4 bg-gradient-to-br from-card to-primary/5 border-primary/10"
+              >
                 <div className="flex items-center gap-3">
                   <FeatureIcon icon={<item.icon className="size-5 text-primary" />} />
                   <div>
@@ -302,7 +305,10 @@ function AnnPage() {
           ) : (
             <div className="space-y-7">
               {pinnedNotice && (
-                <SurfaceCard hover={false} className="overflow-hidden border-2 border-primary bg-card p-0 shadow-lg">
+                <SurfaceCard
+                  hover={false}
+                  className="overflow-hidden border-2 border-primary bg-card p-0 shadow-lg"
+                >
                   <div className="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
                     <div className="bg-gradient-to-br from-primary via-primary/95 to-primary/80 p-6 text-primary-foreground sm:p-8 flex flex-col justify-between">
                       <div>
@@ -327,7 +333,9 @@ function AnnPage() {
                       <div className="mt-6 pt-4 border-t border-white/20 flex items-center justify-between">
                         <button
                           type="button"
-                          onClick={() => shareToWhatsApp(pinnedNotice.title, pinnedNotice.description || "")}
+                          onClick={() =>
+                            shareToWhatsApp(pinnedNotice.title, pinnedNotice.description || "")
+                          }
                           className="inline-flex items-center gap-2 rounded-full bg-white text-primary px-4 py-2 text-xs font-bold transition hover:bg-amber-100"
                         >
                           <Share2 className="size-3.5" /> Share to Village WhatsApp
@@ -343,7 +351,9 @@ function AnnPage() {
                         />
                       ) : (
                         <div className="mb-5 aspect-[16/6] w-full rounded-2xl bg-primary/5 flex items-center justify-center border border-dashed border-primary/30">
-                          <p className="text-sm font-semibold text-primary">Public Notice Circular</p>
+                          <p className="text-sm font-semibold text-primary">
+                            Public Notice Circular
+                          </p>
                         </div>
                       )}
                       <div className="grid gap-3 sm:grid-cols-2">
@@ -351,7 +361,10 @@ function AnnPage() {
                           ["Date", timeAgo(pinnedNotice.createdAt)],
                           ["Contact", pinnedNotice.contact],
                           ["Category", pinnedNotice.category || "Notice"],
-                          ["Status", pinnedNotice.status === "completed" ? "Completed" : "Active Alert"],
+                          [
+                            "Status",
+                            pinnedNotice.status === "completed" ? "Completed" : "Active Alert",
+                          ],
                         ].map(([label, value]) => (
                           <div key={label} className="rounded-2xl bg-muted/60 p-3.5">
                             <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary">
@@ -365,7 +378,9 @@ function AnnPage() {
                         <div className="mt-5 flex flex-wrap gap-2 border-t border-border pt-4">
                           <button
                             type="button"
-                            onClick={() => update(pinnedNotice.id, { isPinned: !pinnedNotice.isPinned })}
+                            onClick={() =>
+                              update(pinnedNotice.id, { isPinned: !pinnedNotice.isPinned })
+                            }
                             className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-semibold text-primary-foreground"
                           >
                             <Pin className="size-3.5" />
@@ -375,7 +390,8 @@ function AnnPage() {
                             type="button"
                             onClick={() =>
                               update(pinnedNotice.id, {
-                                status: pinnedNotice.status === "completed" ? "active" : "completed",
+                                status:
+                                  pinnedNotice.status === "completed" ? "active" : "completed",
                               })
                             }
                             className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-white px-4 py-2 text-xs font-semibold text-primary"
@@ -443,7 +459,9 @@ function AnnPage() {
                               >
                                 <Share2 className="size-3.5" /> Share
                               </button>
-                              {(canManageNotices || a.localOnly || (!!user && user.id === a.owner_id)) && (
+                              {(canManageNotices ||
+                                a.localOnly ||
+                                (!!user && user.id === a.owner_id)) && (
                                 <button
                                   type="button"
                                   onClick={() => remove(a.id)}
@@ -490,14 +508,18 @@ function AnnPage() {
           {showWorkForm && canManageNotices && (
             <SurfaceCard className="mb-8 p-6 sm:p-8 border-2 border-primary/30 bg-gradient-to-br from-card to-primary/5">
               <h3 className="font-display text-xl font-bold text-clay flex items-center gap-2">
-                <ShieldCheck className="size-5 text-primary" /> Publish New Panchayat Development Work
+                <ShieldCheck className="size-5 text-primary" /> Publish New Panchayat Development
+                Work
               </h3>
               <p className="mt-1 text-sm text-muted-foreground">
-                Upload road repairs, water line setups, solar streetlights, or school building updates so all villagers can see the progress.
+                Upload road repairs, water line setups, solar streetlights, or school building
+                updates so all villagers can see the progress.
               </p>
               <form onSubmit={handleWorkSubmit} className="mt-6 space-y-4">
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Work Title</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                    Work Title
+                  </label>
                   <input
                     value={workValues.title}
                     onChange={(e) => setWorkValues((cur) => ({ ...cur, title: e.target.value }))}
@@ -507,10 +529,14 @@ function AnnPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Description & Progress Details</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                    Description & Progress Details
+                  </label>
                   <textarea
                     value={workValues.description}
-                    onChange={(e) => setWorkValues((cur) => ({ ...cur, description: e.target.value }))}
+                    onChange={(e) =>
+                      setWorkValues((cur) => ({ ...cur, description: e.target.value }))
+                    }
                     placeholder="Provide details on contractor, materials used, budget allocation, and current completion percentage..."
                     rows={4}
                     required
@@ -519,16 +545,22 @@ function AnnPage() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-3">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Department / Scheme</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                      Department / Scheme
+                    </label>
                     <input
                       value={workValues.department}
-                      onChange={(e) => setWorkValues((cur) => ({ ...cur, department: e.target.value }))}
+                      onChange={(e) =>
+                        setWorkValues((cur) => ({ ...cur, department: e.target.value }))
+                      }
                       placeholder="e.g. MGNREGA / Gram Panchayat Fund"
                       className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary"
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Budget Allocation</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                      Budget Allocation
+                    </label>
                     <input
                       value={workValues.budget}
                       onChange={(e) => setWorkValues((cur) => ({ ...cur, budget: e.target.value }))}
@@ -537,10 +569,17 @@ function AnnPage() {
                     />
                   </div>
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Current Status</label>
+                    <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                      Current Status
+                    </label>
                     <select
                       value={workValues.status}
-                      onChange={(e) => setWorkValues((cur) => ({ ...cur, status: e.target.value as GovernmentWorkInput["status"] }))}
+                      onChange={(e) =>
+                        setWorkValues((cur) => ({
+                          ...cur,
+                          status: e.target.value as GovernmentWorkInput["status"],
+                        }))
+                      }
                       className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm outline-none focus:border-primary font-semibold"
                     >
                       <option value="planned">Planned / Sanctioned</option>
@@ -550,7 +589,9 @@ function AnnPage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Location / Ward</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                    Location / Ward
+                  </label>
                   <input
                     value={workValues.location}
                     onChange={(e) => setWorkValues((cur) => ({ ...cur, location: e.target.value }))}
@@ -559,7 +600,9 @@ function AnnPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Attach Proof Photos (Up to 3)</label>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+                    Attach Proof Photos (Up to 3)
+                  </label>
                   <input
                     type="file"
                     accept="image/*"
@@ -582,7 +625,9 @@ function AnnPage() {
 
           {worksLoading ? (
             <div className="py-16 text-center">
-              <p className="text-sm font-semibold text-muted-foreground">Loading village development works...</p>
+              <p className="text-sm font-semibold text-muted-foreground">
+                Loading village development works...
+              </p>
             </div>
           ) : works.length === 0 ? (
             <EmptyState
@@ -600,7 +645,11 @@ function AnnPage() {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2">
               {works.map((work) => (
-                <SurfaceCard key={work.id} hover={false} className="p-6 flex flex-col justify-between border-primary/15 bg-card/95 shadow-sm">
+                <SurfaceCard
+                  key={work.id}
+                  hover={false}
+                  className="p-6 flex flex-col justify-between border-primary/15 bg-card/95 shadow-sm"
+                >
                   <div>
                     {work.government_work_images && work.government_work_images.length > 0 && (
                       <div className="mb-4 overflow-hidden rounded-2xl border border-border/80">
@@ -615,11 +664,19 @@ function AnnPage() {
                       <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                         <ShieldCheck className="size-3.5" /> {work.department || "Gram Panchayat"}
                       </span>
-                      <StatusBadge tone={work.status === "completed" ? "success" : work.status === "active" ? "primary" : "secondary"}>{work.status}</StatusBadge>
+                      <StatusBadge
+                        tone={
+                          work.status === "completed"
+                            ? "success"
+                            : work.status === "active"
+                              ? "primary"
+                              : "secondary"
+                        }
+                      >
+                        {work.status}
+                      </StatusBadge>
                     </div>
-                    <h3 className="mt-3 font-display text-xl font-bold text-clay">
-                      {work.title}
-                    </h3>
+                    <h3 className="mt-3 font-display text-xl font-bold text-clay">{work.title}</h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">
                       {work.description}
                     </p>
@@ -629,7 +686,9 @@ function AnnPage() {
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       {work.budget && (
                         <div className="rounded-xl bg-muted/60 p-2.5">
-                          <span className="block text-[10px] uppercase font-bold text-muted-foreground">Sanctioned Budget</span>
+                          <span className="block text-[10px] uppercase font-bold text-muted-foreground">
+                            Sanctioned Budget
+                          </span>
                           <span className="font-bold text-clay text-sm flex items-center gap-1 mt-0.5">
                             <BadgeIndianRupee className="size-3.5 text-emerald-600" /> {work.budget}
                           </span>
@@ -637,7 +696,9 @@ function AnnPage() {
                       )}
                       {work.location && (
                         <div className="rounded-xl bg-muted/60 p-2.5">
-                          <span className="block text-[10px] uppercase font-bold text-muted-foreground">Location</span>
+                          <span className="block text-[10px] uppercase font-bold text-muted-foreground">
+                            Location
+                          </span>
                           <span className="font-bold text-clay text-sm flex items-center gap-1 mt-0.5 truncate">
                             <MapPin className="size-3.5 text-primary" /> {work.location}
                           </span>
@@ -650,7 +711,12 @@ function AnnPage() {
                       </span>
                       <button
                         type="button"
-                        onClick={() => shareToWhatsApp(work.title, `Panchayat Work: ${work.description}\nStatus: ${work.status}`)}
+                        onClick={() =>
+                          shareToWhatsApp(
+                            work.title,
+                            `Panchayat Work: ${work.description}\nStatus: ${work.status}`,
+                          )
+                        }
                         className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
                       >
                         <Share2 className="size-3.5" /> Share Work Proof

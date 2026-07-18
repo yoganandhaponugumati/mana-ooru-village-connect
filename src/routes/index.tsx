@@ -40,6 +40,7 @@ import {
 import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
+import { ConceptShowcase } from "@/components/ConceptShowcase";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
 import voice1 from "@/assets/voice-1.jpg";
@@ -585,9 +586,6 @@ function Index() {
   };
   return (
     <div className="village-site-bg min-h-screen text-foreground">
-      {/* Nav */}
-      <SiteNav />
-
       {/* Hero */}
       <CinemaHero
         heroTitle={heroTitle}
@@ -607,10 +605,14 @@ function Index() {
         announcement={announcementItems[0]}
       />
 
+      <SiteNav />
+
+      <ConceptShowcase />
+
       {/* Quick Actions */}
       <section
         id="actions"
-        className="relative z-30 mx-auto -mt-20 max-w-[calc(100%-2rem)] overflow-hidden rounded-t-[32px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(232,247,239,0.82)_48%,rgba(255,246,222,0.8))] px-4 py-9 shadow-[0_-24px_80px_-50px_rgba(0,0,0,0.8)] backdrop-blur-2xl sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-t-[40px]"
+        className="relative z-30 mx-auto mt-8 max-w-[calc(100%-2rem)] overflow-hidden rounded-[32px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(232,247,239,0.82)_48%,rgba(255,246,222,0.8))] px-4 py-9 shadow-[0_16px_56px_-24px_rgba(20,49,32,0.3)] backdrop-blur-2xl sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-[40px]"
       >
         <div className="pointer-events-none absolute inset-0 village-pattern opacity-80" />
         <div className="mx-auto mb-7 max-w-7xl text-center">
@@ -1389,7 +1391,10 @@ function Index() {
             <Link to="/terms" className="transition hover:text-primary">
               Terms
             </Link>
-            <Link to="/delete-account" className="transition hover:text-primary text-red-600/90 font-medium">
+            <Link
+              to="/delete-account"
+              className="transition hover:text-primary text-red-600/90 font-medium"
+            >
               Data Safety
             </Link>
           </div>

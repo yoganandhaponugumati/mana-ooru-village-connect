@@ -135,7 +135,11 @@ function ProblemsPage() {
       {/* Emergency quick cards */}
       <div className="mb-8 grid gap-3 md:grid-cols-3">
         {urgentContacts.map((contact) => (
-          <SurfaceCard key={contact.id} hover={false} className="border-red-200 bg-red-50/90 p-4 shadow-sm">
+          <SurfaceCard
+            key={contact.id}
+            hover={false}
+            className="border-red-200 bg-red-50/90 p-4 shadow-sm"
+          >
             <div className="flex items-center gap-3">
               <FeatureIcon
                 icon={<contact.icon className="size-5" />}
@@ -161,7 +165,10 @@ function ProblemsPage() {
       {/* Category selection chips */}
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {issueTypes.map((issue) => (
-          <SurfaceCard key={issue.label} className="p-4 border-accent/60 bg-gradient-to-br from-card to-accent/5">
+          <SurfaceCard
+            key={issue.label}
+            className="p-4 border-accent/60 bg-gradient-to-br from-card to-accent/5"
+          >
             <button
               type="button"
               onClick={handleOpenFormClick}
@@ -205,7 +212,8 @@ function ProblemsPage() {
               {
                 name: "description",
                 label: "Detailed Description",
-                placeholder: "Explain exactly how long this issue has existed, who is affected, and why urgent repair is needed...",
+                placeholder:
+                  "Explain exactly how long this issue has existed, who is affected, and why urgent repair is needed...",
                 textarea: true,
                 required: true,
               },
@@ -253,9 +261,7 @@ function ProblemsPage() {
                 key={item.id}
                 hover={false}
                 className={`p-6 flex flex-col justify-between transition-all rounded-[1.5rem] shadow-sm border-l-4 ${
-                  isResolved
-                    ? "border-emerald-500 bg-emerald-50/30"
-                    : "border-amber-500 bg-card/95"
+                  isResolved ? "border-emerald-500 bg-emerald-50/30" : "border-amber-500 bg-card/95"
                 }`}
               >
                 <div>
@@ -267,7 +273,8 @@ function ProblemsPage() {
                         className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-105"
                       />
                       <div className="absolute top-3 right-3 rounded-full bg-black/65 backdrop-blur-md px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5">
-                        <MapPin className="size-3 text-amber-300" /> {item.location || "Village Street"}
+                        <MapPin className="size-3 text-amber-300" />{" "}
+                        {item.location || "Village Street"}
                       </div>
                     </div>
                   )}
@@ -285,7 +292,8 @@ function ProblemsPage() {
                     >
                       {isResolved ? (
                         <>
-                          <CheckCircle2 className="size-3.5 text-emerald-600" /> Resolved by Panchayat
+                          <CheckCircle2 className="size-3.5 text-emerald-600" /> Resolved by
+                          Panchayat
                         </>
                       ) : (
                         <>
@@ -295,12 +303,8 @@ function ProblemsPage() {
                     </span>
                   </div>
 
-                  <h3 className="mt-3 font-display text-xl font-bold text-clay">
-                    {item.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {item.description}
-                  </p>
+                  <h3 className="mt-3 font-display text-xl font-bold text-clay">{item.title}</h3>
+                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
                 </div>
 
                 <div className="mt-6 border-t border-border/70 pt-4 space-y-4">
@@ -310,7 +314,9 @@ function ProblemsPage() {
                       <span className="flex size-7 items-center justify-center rounded-full bg-primary/15 text-primary font-black text-xs">
                         +{votesCount}
                       </span>
-                      <span className="text-xs font-bold text-clay">Villagers verified this issue</span>
+                      <span className="text-xs font-bold text-clay">
+                        Villagers verified this issue
+                      </span>
                     </div>
                     <button
                       type="button"
@@ -333,7 +339,9 @@ function ProblemsPage() {
                     <div className="flex items-center gap-3">
                       <button
                         type="button"
-                        onClick={() => shareToWhatsApp(item.title, item.description || "", item.location || "")}
+                        onClick={() =>
+                          shareToWhatsApp(item.title, item.description || "", item.location || "")
+                        }
                         className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
                       >
                         <Share2 className="size-3.5" /> Share

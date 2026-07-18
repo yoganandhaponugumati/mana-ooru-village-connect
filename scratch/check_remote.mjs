@@ -17,7 +17,10 @@ async function check() {
     }
 
     // Check if there are duplicate dedupe_keys right now
-    const { data: allNotifs, error: err2 } = await supabase.from("notifications").select("id, dedupe_key").not("dedupe_key", "is", null);
+    const { data: allNotifs, error: err2 } = await supabase
+      .from("notifications")
+      .select("id, dedupe_key")
+      .not("dedupe_key", "is", null);
     if (!err2 && allNotifs) {
       const seen = new Set();
       let dups = 0;
@@ -25,7 +28,9 @@ async function check() {
         if (seen.has(n.dedupe_key)) dups++;
         seen.add(n.dedupe_key);
       }
-      console.log(`Total notifications with dedupe_key: ${allNotifs.length}, duplicates found: ${dups}`);
+      console.log(
+        `Total notifications with dedupe_key: ${allNotifs.length}, duplicates found: ${dups}`,
+      );
     }
   } catch (err) {
     console.error("Exception:", err);

@@ -50,7 +50,12 @@ export function PrivacyPolicyPage() {
             </p>
           </div>
           <p className="mt-6 text-sm sm:text-base leading-7 text-muted-foreground">
-            Welcome to <strong className="text-foreground">ManaOoru</strong> (the &ldquo;Platform&rdquo;), India&rsquo;s living digital village ecosystem connecting rural citizens, farmers, local dealers, and Gram Panchayats. This Privacy Policy applies to our website, mobile application (`Android APK/AAB`), and Trusted Web Activities. By using ManaOoru, you trust us with your local identity. We never sell your personal data to third-party ad brokers or data aggregators.
+            Welcome to <strong className="text-foreground">ManaOoru</strong> (the
+            &ldquo;Platform&rdquo;), India&rsquo;s living digital village ecosystem connecting rural
+            citizens, farmers, local dealers, and Gram Panchayats. This Privacy Policy applies to
+            our website, mobile application (`Android APK/AAB`), and Trusted Web Activities. By
+            using ManaOoru, you trust us with your local identity. We never sell your personal data
+            to third-party ad brokers or data aggregators.
           </p>
         </SurfaceCard>
 
@@ -68,7 +73,10 @@ export function PrivacyPolicyPage() {
                 <span>Account & Profile Data</span>
               </div>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                When you sign in (`/auth`), we store your <strong className="text-foreground">Name, Phone Number, Email, Occupation</strong>, and selected <strong className="text-foreground">Village / Mandal</strong> to verify your identity within your local community.
+                When you sign in (`/auth`), we store your{" "}
+                <strong className="text-foreground">Name, Phone Number, Email, Occupation</strong>,
+                and selected <strong className="text-foreground">Village / Mandal</strong> to verify
+                your identity within your local community.
               </p>
             </SurfaceCard>
 
@@ -78,7 +86,10 @@ export function PrivacyPolicyPage() {
                 <span>User-Generated Content</span>
               </div>
               <p className="mt-3 text-sm leading-6 text-muted-foreground">
-                We store the text descriptions, pricing, and <strong className="text-foreground">Photos / Documents</strong> you upload when creating Marketplace listings (`/marketplace`), Land leases, or Citizen problem reports (`/problems`).
+                We store the text descriptions, pricing, and{" "}
+                <strong className="text-foreground">Photos / Documents</strong> you upload when
+                creating Marketplace listings (`/marketplace`), Land leases, or Citizen problem
+                reports (`/problems`).
               </p>
             </SurfaceCard>
           </div>
@@ -97,9 +108,15 @@ export function PrivacyPolicyPage() {
                 <Camera className="size-6" />
               </div>
               <div>
-                <h3 className="font-display font-bold text-lg text-clay">Camera & Photo Gallery (`READ_EXTERNAL_STORAGE` / `CAMERA`)</h3>
+                <h3 className="font-display font-bold text-lg text-clay">
+                  Camera & Photo Gallery (`READ_EXTERNAL_STORAGE` / `CAMERA`)
+                </h3>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  <strong className="text-foreground">Why required:</strong> Allows you to snap and upload real-time pictures of crops, tractors, dairy products, or village infrastructure issues directly into your listings. Photos are stored securely on our cloud storage buckets and are never accessed without your explicit upload action.
+                  <strong className="text-foreground">Why required:</strong> Allows you to snap and
+                  upload real-time pictures of crops, tractors, dairy products, or village
+                  infrastructure issues directly into your listings. Photos are stored securely on
+                  our cloud storage buckets and are never accessed without your explicit upload
+                  action.
                 </p>
               </div>
             </div>
@@ -109,9 +126,14 @@ export function PrivacyPolicyPage() {
                 <MapPin className="size-6" />
               </div>
               <div>
-                <h3 className="font-display font-bold text-lg text-clay">Location (`ACCESS_COORDS` / Village Preference)</h3>
+                <h3 className="font-display font-bold text-lg text-clay">
+                  Location (`ACCESS_COORDS` / Village Preference)
+                </h3>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  <strong className="text-foreground">Why required:</strong> Used exclusively to auto-detect or filter local village data, connecting you with nearby workers, local weather updates (`/weather`), and panchayat announcements within your exact district and mandal.
+                  <strong className="text-foreground">Why required:</strong> Used exclusively to
+                  auto-detect or filter local village data, connecting you with nearby workers,
+                  local weather updates (`/weather`), and panchayat announcements within your exact
+                  district and mandal.
                 </p>
               </div>
             </div>
@@ -121,9 +143,14 @@ export function PrivacyPolicyPage() {
                 <Bell className="size-6" />
               </div>
               <div>
-                <h3 className="font-display font-bold text-lg text-clay">Push Notifications (`POST_NOTIFICATIONS`)</h3>
+                <h3 className="font-display font-bold text-lg text-clay">
+                  Push Notifications (`POST_NOTIFICATIONS`)
+                </h3>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  <strong className="text-foreground">Why required:</strong> Delivers instant, critical alerts regarding emergency calls, government schemes deadlines (`/schemes`), weather warnings, and direct buyer inquiries on your active listings.
+                  <strong className="text-foreground">Why required:</strong> Delivers instant,
+                  critical alerts regarding emergency calls, government schemes deadlines
+                  (`/schemes`), weather warnings, and direct buyer inquiries on your active
+                  listings.
                 </p>
               </div>
             </div>
@@ -137,9 +164,17 @@ export function PrivacyPolicyPage() {
             <span>Row-Level Security (`RLS`) & Zero-Brokerage Commerce</span>
           </div>
           <p className="mt-3 text-sm sm:text-base leading-7 text-muted-foreground">
-            All user profiles and listings are protected by strict <strong className="text-foreground">Postgres Row-Level Security (`RLS`)</strong> policies directly at the database layer (`Supabase`). Only signed-in users can publish content, and you can only update or delete your own records. 
-            <br /><br />
-            Because ManaOoru operates as a <strong className="text-foreground">100% Zero-Brokerage (`0% commission`)</strong> digital commons, when you post a listing with your contact number, your neighbours contact you directly. We do not intercept transactions, charge commission cuts, or share your contact data with outside telemarketers.
+            All user profiles and listings are protected by strict{" "}
+            <strong className="text-foreground">Postgres Row-Level Security (`RLS`)</strong>{" "}
+            policies directly at the database layer (`Supabase`). Only signed-in users can publish
+            content, and you can only update or delete your own records.
+            <br />
+            <br />
+            Because ManaOoru operates as a{" "}
+            <strong className="text-foreground">100% Zero-Brokerage (`0% commission`)</strong>{" "}
+            digital commons, when you post a listing with your contact number, your neighbours
+            contact you directly. We do not intercept transactions, charge commission cuts, or share
+            your contact data with outside telemarketers.
           </p>
         </SurfaceCard>
 
@@ -150,18 +185,28 @@ export function PrivacyPolicyPage() {
             <span>Your Right to Wiping Data & Account Deletion</span>
           </div>
           <p className="mt-3 text-sm sm:text-base leading-7 text-muted-foreground">
-            In compliance with <strong className="text-foreground">Google Play Store policies (2024–2026)</strong>, you retain complete sovereignty over your account. You can request or execute permanent deletion of your profile at any time:
+            In compliance with{" "}
+            <strong className="text-foreground">Google Play Store policies (2024–2026)</strong>, you
+            retain complete sovereignty over your account. You can request or execute permanent
+            deletion of your profile at any time:
           </p>
           <ul className="mt-4 list-disc list-inside space-y-2 text-sm text-muted-foreground">
             <li>
-              <strong className="text-foreground">In-App Deletion:</strong> Open your <strong className="text-foreground">Profile (`/profile`)</strong>, scroll to Account Settings, enter your password, and click &ldquo;Delete Account & All Data&rdquo;.
+              <strong className="text-foreground">In-App Deletion:</strong> Open your{" "}
+              <strong className="text-foreground">Profile (`/profile`)</strong>, scroll to Account
+              Settings, enter your password, and click &ldquo;Delete Account & All Data&rdquo;.
             </li>
             <li>
-              <strong className="text-foreground">Web Deletion Portal (No App Required):</strong> Visit our dedicated <strong className="text-foreground">Account Deletion Page (`/delete-account`)</strong> from any browser to initiate instant wiping.
+              <strong className="text-foreground">Web Deletion Portal (No App Required):</strong>{" "}
+              Visit our dedicated{" "}
+              <strong className="text-foreground">Account Deletion Page (`/delete-account`)</strong>{" "}
+              from any browser to initiate instant wiping.
             </li>
           </ul>
           <p className="mt-4 text-xs font-semibold text-red-600/90">
-            Note: Deleting your account immediately cascades (`ON DELETE CASCADE`) to erase your authentication row, profile details, active listings, complaint photos, and push subscriptions permanently.
+            Note: Deleting your account immediately cascades (`ON DELETE CASCADE`) to erase your
+            authentication row, profile details, active listings, complaint photos, and push
+            subscriptions permanently.
           </p>
           <div className="mt-6 flex flex-wrap gap-4">
             <AppLinkButton to="/delete-account" variant="secondary" size="sm">
@@ -180,12 +225,21 @@ export function PrivacyPolicyPage() {
             <span>Contact & Grievance Officer</span>
           </div>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            If you have any questions, privacy concerns, or requests regarding this Privacy Policy or your personal data across the ManaOoru network, please reach out directly to our dedicated support desk:
+            If you have any questions, privacy concerns, or requests regarding this Privacy Policy
+            or your personal data across the ManaOoru network, please reach out directly to our
+            dedicated support desk:
           </p>
           <div className="mt-4 rounded-2xl bg-muted/60 p-4 text-sm space-y-1">
-            <p><strong className="text-foreground">Grievance Email:</strong> privacy@manaooru.org</p>
-            <p><strong className="text-foreground">Support Desk:</strong> hello@manaooru.org</p>
-            <p><strong className="text-foreground">Platform Scope:</strong> Rural India Digital Village Ecosystem</p>
+            <p>
+              <strong className="text-foreground">Grievance Email:</strong> privacy@manaooru.org
+            </p>
+            <p>
+              <strong className="text-foreground">Support Desk:</strong> hello@manaooru.org
+            </p>
+            <p>
+              <strong className="text-foreground">Platform Scope:</strong> Rural India Digital
+              Village Ecosystem
+            </p>
           </div>
         </SurfaceCard>
       </div>

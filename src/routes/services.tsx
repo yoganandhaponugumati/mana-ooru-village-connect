@@ -113,11 +113,7 @@ function ServicesPage() {
             : "Find workers and providers for repairs, transport, farming, events, and urgent needs."
         }
         actions={
-          <AppButton
-            variant="primary"
-            icon={<Plus className="size-4" />}
-            onClick={handlePostClick}
-          >
+          <AppButton variant="primary" icon={<Plus className="size-4" />} onClick={handlePostClick}>
             {showForm ? "Cancel" : mode === "shops" ? "Add a shop" : "Offer a service"}
           </AppButton>
         }

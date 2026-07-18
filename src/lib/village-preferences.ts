@@ -534,6 +534,182 @@ const knownVillageCoordinates: Record<string, GeoResult> = {
     admin2: "Khammam",
     admin1: "Telangana",
   },
+  "telangana|khammam|kallur|kallur": {
+    latitude: 17.2023,
+    longitude: 80.5516,
+    name: "Kallur",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|peruvancha": {
+    latitude: 17.2287,
+    longitude: 80.5694,
+    name: "Peruvancha",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|lokavaram": {
+    latitude: 17.1681,
+    longitude: 80.5186,
+    name: "Lokavaram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|chennuru": {
+    latitude: 17.1812,
+    longitude: 80.5843,
+    name: "Chennuru",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|kappalabandham": {
+    latitude: 17.2415,
+    longitude: 80.6012,
+    name: "Kappalabandham",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|mucharam": {
+    latitude: 17.2104,
+    longitude: 80.4908,
+    name: "Mucharam",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|vennavalli": {
+    latitude: 17.1205,
+    longitude: 80.6402,
+    name: "Vennavalli",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|narayanapuram": {
+    latitude: 17.1994,
+    longitude: 80.5303,
+    name: "Narayanapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|peddakorukondi": {
+    latitude: 17.2514,
+    longitude: 80.5482,
+    name: "Peddakorukondi",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|chinnakorukondi": {
+    latitude: 17.2405,
+    longitude: 80.5412,
+    name: "Chinnakorukondi",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|bathulapalli": {
+    latitude: 17.1541,
+    longitude: 80.5312,
+    name: "Bathulapalli",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|kistapuram": {
+    latitude: 17.2145,
+    longitude: 80.5612,
+    name: "Kistapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|lakshmipuram": {
+    latitude: 17.1802,
+    longitude: 80.5103,
+    name: "Lakshmipuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|madhapuram": {
+    latitude: 17.2001,
+    longitude: 80.6121,
+    name: "Madhapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|mittapalli": {
+    latitude: 17.2291,
+    longitude: 80.5312,
+    name: "Mittapalli",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|narlapuram": {
+    latitude: 17.2202,
+    longitude: 80.5882,
+    name: "Narlapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|payapuram": {
+    latitude: 17.2341,
+    longitude: 80.5121,
+    name: "Payapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|raghunadhapalem": {
+    latitude: 17.1895,
+    longitude: 80.4678,
+    name: "Raghunadhapalem",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|thalluru": {
+    latitude: 17.2512,
+    longitude: 80.6212,
+    name: "Thalluru",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|rangareddy|kandukur|kothur": {
+    latitude: 17.1437,
+    longitude: 78.4311,
+    name: "Kothur",
+    admin3: "Kandukur",
+    admin2: "Rangareddy",
+    admin1: "Telangana",
+  },
+  "telangana|rangareddy|kandukur|dasarlapally": {
+    latitude: 17.0863,
+    longitude: 78.4902,
+    name: "Dasarlapally",
+    admin3: "Kandukur",
+    admin2: "Rangareddy",
+    admin1: "Telangana",
+  },
+  "telangana|rangareddy|kandukur|lemoor": {
+    latitude: 17.1517,
+    longitude: 78.6015,
+    name: "Lemoor",
+    admin3: "Kandukur",
+    admin2: "Rangareddy",
+    admin1: "Telangana",
+  },
 };
 
 const prefKey = "manaooru-preferences";
@@ -691,34 +867,71 @@ async function fetchLiveWeather(
 
 const typedLocationTree = locationTree as LocationTree;
 
+function findCaseInsensitiveKey(
+  obj: Record<string, unknown> | undefined,
+  key: string,
+): string | undefined {
+  if (!obj || !key) return undefined;
+  const target = key.trim().toLowerCase();
+  return Object.keys(obj).find((k) => k.toLowerCase() === target);
+}
+
 export function getStates() {
   return Object.keys(locationTree);
 }
 
 export function getDistricts(state: string) {
-  return Object.keys(typedLocationTree[state] ?? {});
+  const stateKey = findCaseInsensitiveKey(typedLocationTree, state);
+  if (!stateKey) return [];
+  return Object.keys(typedLocationTree[stateKey] ?? {});
 }
 
 export function getMandals(state: string, district: string) {
-  return Object.keys(typedLocationTree[state]?.[district] ?? {});
+  const stateKey = findCaseInsensitiveKey(typedLocationTree, state);
+  if (!stateKey) return [];
+  const districtKey = findCaseInsensitiveKey(typedLocationTree[stateKey], district);
+  if (!districtKey) return [];
+  return Object.keys(typedLocationTree[stateKey]?.[districtKey] ?? {});
 }
 
 export function getVillages(state: string, district: string, mandal: string): string[] {
-  return typedLocationTree[state]?.[district]?.[mandal] ?? [];
+  const stateKey = findCaseInsensitiveKey(typedLocationTree, state);
+  if (!stateKey) return [];
+  const districtKey = findCaseInsensitiveKey(typedLocationTree[stateKey], district);
+  if (!districtKey) return [];
+  const mandalKey = findCaseInsensitiveKey(typedLocationTree[stateKey]?.[districtKey], mandal);
+  if (!mandalKey) return [];
+  return typedLocationTree[stateKey]?.[districtKey]?.[mandalKey] ?? [];
 }
 
 export function normalizeProfile(profile: Partial<VillageProfile> | undefined): VillageProfile {
   if (!profile) return defaultProfile;
 
+  const stateInput = profile.state?.trim() || defaultProfile.state;
+  const stateKey = findCaseInsensitiveKey(typedLocationTree, stateInput);
+  const state = stateKey || stateInput;
+
+  const districts = getDistricts(state);
+  const districtInput = profile.district?.trim() || districts[0] || defaultProfile.district;
+  const districtKey = findCaseInsensitiveKey(typedLocationTree[state], districtInput);
+  const district = districtKey || districtInput;
+
+  const mandals = getMandals(state, district);
+  const mandalInput = profile.mandal?.trim() || mandals[0] || defaultProfile.mandal;
+  const mandalKey = findCaseInsensitiveKey(typedLocationTree[state]?.[district], mandalInput);
+  const mandal = mandalKey || mandalInput;
+
+  const villages = getVillages(state, district, mandal);
   const hasVillageInput = typeof profile?.village === "string";
   const villageName = profile?.village?.split(",")[0]?.trim();
-  const state = profile?.state?.trim() || defaultProfile.state;
-  const districts = getDistricts(state);
-  const district = profile?.district?.trim() || districts[0] || defaultProfile.district;
-  const mandals = getMandals(state, district);
-  const mandal = profile?.mandal?.trim() || mandals[0] || defaultProfile.mandal;
-  const villages = getVillages(state, district, mandal);
-  const village = hasVillageInput ? (villageName ?? "") : (villages[0] ?? defaultProfile.village);
+
+  let village = "";
+  if (hasVillageInput && villageName) {
+    const villageKey = villages.find((v) => v.toLowerCase() === villageName.toLowerCase());
+    village = villageKey || villageName;
+  } else {
+    village = villages[0] || defaultProfile.village;
+  }
 
   return { state, district, mandal, village };
 }

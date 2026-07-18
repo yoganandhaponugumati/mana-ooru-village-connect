@@ -94,8 +94,21 @@ function AuthPage() {
 
   useEffect(() => {
     if (!user || busy || dealerRegisteredPending) return;
-    // We do not force redirect on /auth so users can switch accounts or verify login status
-  }, [user, authProfile, busy, navigate, dealerRegisteredPending]);
+
+    // Automatically redirect active sessions to their respective dashboards
+    const resolvedRole = normalizeRole(authProfile?.role ?? authProfile?.account_type);
+    let targetPath = redirect || getRoleDashboardPath(resolvedRole);
+    if (resolvedRole === "dealer") {
+      if (
+        authProfile?.dealer_status === "pending" ||
+        authProfile?.dealer_status === "rejected" ||
+        authProfile?.dealer_status === "suspended"
+      ) {
+        targetPath = "/dealer-registration";
+      }
+    }
+    navigate({ to: targetPath });
+  }, [user, authProfile, busy, navigate, dealerRegisteredPending, redirect]);
 
   useEffect(() => {
     setVillageProfile({ ...normalizeProfile(profile), village: hasProfile ? profile.village : "" });
@@ -251,12 +264,29 @@ function AuthPage() {
             });
           }
 
+          const userObj = signUpData.user;
           const { error: retryError } = await supabase.auth.signInWithPassword({ email, password });
           if (retryError) throw retryError;
 
           toast.success(`Demo ${getRoleLabel(targetRole)} account created and logged in!`);
           await refreshProfile();
-          navigate({ to: redirect || getRoleDashboardPath(targetRole) });
+
+          let targetPath = redirect || getRoleDashboardPath(targetRole);
+          if (userObj) {
+            const dbProfile = await loadSignedInProfile(userObj.id);
+            const resolvedRole = normalizeRole(dbProfile?.role ?? dbProfile?.account_type);
+            if (targetRole === "dealer") {
+              if (resolvedRole === "citizen" && dbProfile?.dealer_status === "pending") {
+                targetPath = "/dealer-registration";
+              }
+            } else if (targetRole === "village_admin" && resolvedRole === "citizen") {
+              targetPath = "/timeline";
+              toast.error(
+                "This demo account is registered as a Citizen. Ask a Super Admin to promote you.",
+              );
+            }
+          }
+          navigate({ to: targetPath });
           return;
         }
         throw error;
@@ -264,7 +294,26 @@ function AuthPage() {
 
       toast.success("Logged in successfully!");
       await refreshProfile();
-      navigate({ to: redirect || getRoleDashboardPath(targetRole) });
+
+      let targetPath = redirect || getRoleDashboardPath(targetRole);
+      const {
+        data: { user: currentUser },
+      } = await supabase.auth.getUser();
+      if (currentUser) {
+        const dbProfile = await loadSignedInProfile(currentUser.id);
+        const resolvedRole = normalizeRole(dbProfile?.role ?? dbProfile?.account_type);
+        if (targetRole === "dealer") {
+          if (resolvedRole === "citizen" && dbProfile?.dealer_status === "pending") {
+            targetPath = "/dealer-registration";
+          }
+        } else if (targetRole === "village_admin" && resolvedRole === "citizen") {
+          targetPath = "/timeline";
+          toast.error(
+            "This demo account is registered as a Citizen. Ask a Super Admin to promote you.",
+          );
+        }
+      }
+      navigate({ to: targetPath });
     } catch (err) {
       console.error("[demo-login] failed", err);
       toast.error(getFriendlyAuthError(err));
@@ -328,6 +377,12 @@ function AuthPage() {
             mandal: selectedProfile.mandal,
             village: selectedProfile.village,
             role: activeRole,
+            // Include dealer fields in the metadata for handle_new_user trigger
+            dealer_status: activeRole === "dealer" ? "pending" : undefined,
+            dealer_category: activeRole === "dealer" ? shopCategory : undefined,
+            shop_name: activeRole === "dealer" ? shopName : undefined,
+            shop_address: activeRole === "dealer" ? shopAddress : undefined,
+            shop_description: activeRole === "dealer" ? shopDescription : undefined,
           },
         });
         if (error) throw error;
@@ -373,7 +428,26 @@ function AuthPage() {
         const signedInProfile = data.user ? await loadSignedInProfile(data.user.id) : null;
         const resolvedRole = normalizeRole(signedInProfile?.role ?? signedInProfile?.account_type);
 
-        if (resolvedRole !== activeRole && resolvedRole !== "super_admin") {
+        // Adjust role gate checks to accommodate pending/suspended/rejected dealer statuses
+        if (activeRole === "dealer") {
+          const isPendingOrSuspendedOrRejected =
+            signedInProfile?.dealer_status === "pending" ||
+            signedInProfile?.dealer_status === "suspended" ||
+            signedInProfile?.dealer_status === "rejected";
+
+          if (
+            resolvedRole !== "dealer" &&
+            !isPendingOrSuspendedOrRejected &&
+            resolvedRole !== "super_admin"
+          ) {
+            await supabase.auth.signOut();
+            toast.error(
+              "Account not authorized for Dealer access. Please apply as a dealer first.",
+            );
+            setBusy(false);
+            return;
+          }
+        } else if (resolvedRole !== activeRole && resolvedRole !== "super_admin") {
           await supabase.auth.signOut();
           toast.error(`Account not authorized for ${activeRole.replace("_", " ")} access.`);
           setBusy(false);
@@ -386,7 +460,19 @@ function AuthPage() {
 
         toast.success("Welcome back!");
         await refreshProfile();
-        navigate({ to: redirect || getRoleDashboardPath(resolvedRole) });
+
+        // Redirect pending dealers to the status screen, others to their portal dashboard
+        let targetPath = redirect || getRoleDashboardPath(resolvedRole);
+        if (activeRole === "dealer") {
+          if (resolvedRole === "citizen" && signedInProfile?.dealer_status === "pending") {
+            targetPath = "/dealer-registration";
+          } else if (resolvedRole === "citizen" && signedInProfile?.dealer_status === "rejected") {
+            targetPath = "/dealer-registration";
+          } else if (resolvedRole === "citizen" && signedInProfile?.dealer_status === "suspended") {
+            targetPath = "/dealer-registration";
+          }
+        }
+        navigate({ to: targetPath });
       }
     } catch (err) {
       toast.error(getFriendlyAuthError(err));
@@ -558,7 +644,8 @@ function AuthPage() {
                 🔒 Sign in required to post
               </h4>
               <p className="mt-1 text-xs font-medium leading-relaxed text-amber-700/90 dark:text-amber-400/80">
-                Only signed-in village members can post jobs, listings, or register services. Please sign in or create an account to continue.
+                Only signed-in village members can post jobs, listings, or register services. Please
+                sign in or create an account to continue.
               </p>
             </div>
           )}
@@ -577,16 +664,27 @@ function AuthPage() {
                   <User className="size-6" />
                 </div>
                 <h2 className="font-display text-2xl font-bold text-clay mb-2">
-                  {t.alreadySignedIn || "You are signed in as"} {authProfile?.full_name || authProfile?.username || user.email?.split("@")[0]}
+                  {t.alreadySignedIn || "You are signed in as"}{" "}
+                  {authProfile?.full_name || authProfile?.username || user.email?.split("@")[0]}
                 </h2>
                 <p className="text-sm text-muted-foreground mb-8">
-                  Role: {authProfile?.role ? authProfile.role.replace("_", " ") : "citizen"} • Village: {authProfile?.village || profile.village || "Not selected"}
+                  Role: {authProfile?.role ? authProfile.role.replace("_", " ") : "citizen"} •
+                  Village: {authProfile?.village || profile.village || "Not selected"}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
                   <motion.button
                     whileHover={{ scale: 1.03, y: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => navigate({ to: getRoleDashboardPath(authProfile?.role) })}
+                    onClick={() => {
+                      if (
+                        authProfile?.role === "citizen" &&
+                        authProfile?.dealer_status === "pending"
+                      ) {
+                        navigate({ to: "/dealer-registration" });
+                      } else {
+                        navigate({ to: getRoleDashboardPath(authProfile?.role) });
+                      }
+                    }}
                     className="flex-1 py-4 px-6 rounded-2xl bg-primary font-bold text-sm text-primary-foreground shadow-lg shadow-primary/15 transition hover:brightness-110"
                   >
                     {t.goToDashboard || "Go to Portal Dashboard"}
@@ -726,7 +824,9 @@ function AuthPage() {
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h2 className="font-display text-2xl font-extrabold text-clay tracking-tight">
-                      {mode === "signin" ? t.portalSignIn || "Portal Sign In" : t.registerProfile || "Register Profile"}
+                      {mode === "signin"
+                        ? t.portalSignIn || "Portal Sign In"
+                        : t.registerProfile || "Register Profile"}
                     </h2>
                     <p className="text-xs text-muted-foreground mt-1">
                       {mode === "signin"
@@ -743,8 +843,18 @@ function AuthPage() {
                 {mode === "signin" && (
                   <div className="grid gap-3 grid-cols-3 mb-6">
                     {[
-                      { id: "citizen", label: t.citizen || "Citizen", icon: User, desc: t.accessNetwork || "Access network" },
-                      { id: "dealer", label: t.dealer || "Dealer", icon: Store, desc: t.sellAndTrade || "Sell & trade" },
+                      {
+                        id: "citizen",
+                        label: t.citizen || "Citizen",
+                        icon: User,
+                        desc: t.accessNetwork || "Access network",
+                      },
+                      {
+                        id: "dealer",
+                        label: t.dealer || "Dealer",
+                        icon: Store,
+                        desc: t.sellAndTrade || "Sell & trade",
+                      },
                       {
                         id: "village_admin",
                         label: t.villageAdmin || "Village Admin",
@@ -1163,8 +1273,8 @@ function AuthPage() {
                           ? t.authenticating || "Authenticating..."
                           : t.registering || "Registering..."
                         : mode === "signin"
-                          ? `${t.signInAs || "Sign in:"} ${signInRole === "dealer" ? (t.dealer || "Dealer") : signInRole === "village_admin" ? (t.villageAdmin || "Village Admin") : (t.citizen || "Citizen")}`
-                          : `${t.registerAs || "Register:"} ${signUpRole === "dealer" ? (t.dealer || "Dealer") : signUpRole === "village_admin" ? (t.villageAdmin || "Village Admin") : (t.citizen || "Citizen")}`}
+                          ? `${t.signInAs || "Sign in:"} ${signInRole === "dealer" ? t.dealer || "Dealer" : signInRole === "village_admin" ? t.villageAdmin || "Village Admin" : t.citizen || "Citizen"}`
+                          : `${t.registerAs || "Register:"} ${signUpRole === "dealer" ? t.dealer || "Dealer" : signUpRole === "village_admin" ? t.villageAdmin || "Village Admin" : t.citizen || "Citizen"}`}
                     </button>
 
                     {/* Auxiliary controls */}

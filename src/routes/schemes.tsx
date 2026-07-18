@@ -88,9 +88,11 @@ function SchemesPage() {
   const filterScheme = (cat: string, title: string, desc: string) => {
     if (selectedProfile === "all") return true;
     const text = `${cat} ${title} ${desc}`.toLowerCase();
-    if (selectedProfile === "agriculture") return /agri|farm|rythu|crop|kisan|land|seed/i.test(text);
+    if (selectedProfile === "agriculture")
+      return /agri|farm|rythu|crop|kisan|land|seed/i.test(text);
     if (selectedProfile === "women") return /women|mahila|shg|kalyana|lakshmi|mother/i.test(text);
-    if (selectedProfile === "education") return /student|school|scholar|youth|skill|vidya/i.test(text);
+    if (selectedProfile === "education")
+      return /student|school|scholar|youth|skill|vidya/i.test(text);
     if (selectedProfile === "housing") return /house|awas|indiramma|home|shelter/i.test(text);
     if (selectedProfile === "pension") return /pension|senior|aasara|old age|widow/i.test(text);
     return true;
@@ -108,19 +110,26 @@ function SchemesPage() {
       icon={<Landmark className="size-7 text-primary" />}
     >
       {/* Interactive Profile Matcher Bar */}
-      <SurfaceCard hover={false} className="mb-8 p-6 bg-gradient-to-br from-primary/10 via-card to-card border-2 border-primary/25 shadow-sm">
+      <SurfaceCard
+        hover={false}
+        className="mb-8 p-6 bg-gradient-to-br from-primary/10 via-card to-card border-2 border-primary/25 shadow-sm"
+      >
         <div className="flex items-center justify-between gap-4 mb-4">
           <div className="flex items-center gap-2.5">
             <div className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground shadow">
               <Sparkles className="size-5" />
             </div>
             <div>
-              <h3 className="font-display text-lg font-bold text-clay">Find Schemes For Your Profile (`1-Tap Matcher`)</h3>
-              <p className="text-xs text-muted-foreground">Select who you are below to instantly filter eligible state and national benefits:</p>
+              <h3 className="font-display text-lg font-bold text-clay">
+                Find Schemes For Your Profile (`1-Tap Matcher`)
+              </h3>
+              <p className="text-xs text-muted-foreground">
+                Select who you are below to instantly filter eligible state and national benefits:
+              </p>
             </div>
           </div>
         </div>
-        
+
         <div className="flex flex-wrap gap-2.5 pt-2">
           {PROFILE_CHIPS.map((chip) => {
             const Icon = chip.icon;
@@ -191,7 +200,10 @@ function SchemesPage() {
               const myApplication = myApplications?.[scheme.id];
               const StatusIcon = myApplication ? statusIcon[myApplication.status] : null;
               return (
-                <SurfaceCard key={scheme.id} className="p-6 flex flex-col justify-between border-primary/20 bg-card/95 shadow-sm">
+                <SurfaceCard
+                  key={scheme.id}
+                  className="p-6 flex flex-col justify-between border-primary/20 bg-card/95 shadow-sm"
+                >
                   <div>
                     <div className="flex items-center justify-between gap-2">
                       <StatusBadge tone="accent">
@@ -204,10 +216,13 @@ function SchemesPage() {
                     <h3 className="mt-4 font-display text-2xl font-bold text-clay">
                       {scheme.title}
                     </h3>
-                    <p className="mt-3 text-sm leading-7 text-muted-foreground">{scheme.description}</p>
+                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                      {scheme.description}
+                    </p>
                     {scheme.eligibility && (
                       <p className="mt-4 text-sm leading-6 text-muted-foreground bg-muted/50 p-3 rounded-xl border border-border/60">
-                        <strong className="text-clay block mb-0.5">Eligibility Criteria:</strong> {scheme.eligibility}
+                        <strong className="text-clay block mb-0.5">Eligibility Criteria:</strong>{" "}
+                        {scheme.eligibility}
                       </p>
                     )}
                     {scheme.benefit_amount ? (
@@ -220,7 +235,8 @@ function SchemesPage() {
                   <div className="mt-6 border-t border-border/70 pt-4 space-y-3">
                     {scheme.deadline && (
                       <p className="text-xs text-muted-foreground font-semibold">
-                        ⏰ Application Deadline: {new Date(scheme.deadline).toLocaleDateString("en-IN")}
+                        ⏰ Application Deadline:{" "}
+                        {new Date(scheme.deadline).toLocaleDateString("en-IN")}
                       </p>
                     )}
 
@@ -287,15 +303,17 @@ function SchemesPage() {
                   </div>
                   <StatusBadge tone="secondary">{service.category}</StatusBadge>
                 </div>
-                <h3 className="mt-4 font-display text-xl font-bold text-clay">
-                  {service.title}
-                </h3>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">{service.description}</p>
+                <h3 className="mt-4 font-display text-xl font-bold text-clay">{service.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                  {service.description}
+                </p>
                 <div className="mt-5 rounded-2xl bg-muted/60 p-4 border border-border/60">
                   <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
                     <FileText className="size-3.5" /> Required Documents
                   </p>
-                  <p className="mt-1.5 text-xs text-muted-foreground font-medium">{service.documents.join(", ")}</p>
+                  <p className="mt-1.5 text-xs text-muted-foreground font-medium">
+                    {service.documents.join(", ")}
+                  </p>
                 </div>
               </div>
               <a
@@ -321,21 +339,28 @@ function SchemesPage() {
       />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {schemes
-          .filter((scheme) => filterScheme(scheme.category, scheme.title, `${scheme.benefit} ${scheme.eligibility}`))
+          .filter((scheme) =>
+            filterScheme(scheme.category, scheme.title, `${scheme.benefit} ${scheme.eligibility}`),
+          )
           .map((scheme) => (
-            <SurfaceCard key={scheme.id} className="p-6 flex flex-col justify-between border-border/80 shadow-sm hover:shadow-md transition-all">
+            <SurfaceCard
+              key={scheme.id}
+              className="p-6 flex flex-col justify-between border-border/80 shadow-sm hover:shadow-md transition-all"
+            >
               <div>
                 <StatusBadge tone="accent">{scheme.category}</StatusBadge>
                 <h3 className="mt-4 font-display text-2xl font-bold text-clay">{scheme.title}</h3>
                 <p className="mt-3 text-sm leading-7 text-muted-foreground">{scheme.benefit}</p>
-                
+
                 <div className="mt-5 rounded-2xl bg-muted/70 p-4 border border-border/60">
                   <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
                     <FileText className="size-3.5" /> Mandatory Documents
                   </p>
-                  <p className="mt-1.5 text-xs text-muted-foreground font-medium">{scheme.documents.join(", ")}</p>
+                  <p className="mt-1.5 text-xs text-muted-foreground font-medium">
+                    {scheme.documents.join(", ")}
+                  </p>
                 </div>
-                
+
                 <p className="mt-4 text-sm leading-6 text-muted-foreground">
                   <strong className="text-clay">Eligibility:</strong> {scheme.eligibility}
                 </p>
@@ -406,8 +431,13 @@ function CreateSchemeForm({
 
   return (
     <SurfaceCard className="mb-8 p-6 border-2 border-primary/30 bg-card shadow-md">
-      <h3 className="font-display text-xl font-bold text-clay mb-2">Publish New Panchayat Scheme</h3>
-      <p className="text-sm text-muted-foreground mb-6">Create a custom welfare scheme or local subsidy so citizens can apply and track status online.</p>
+      <h3 className="font-display text-xl font-bold text-clay mb-2">
+        Publish New Panchayat Scheme
+      </h3>
+      <p className="text-sm text-muted-foreground mb-6">
+        Create a custom welfare scheme or local subsidy so citizens can apply and track status
+        online.
+      </p>
       <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
         <input
           value={title}
@@ -425,7 +455,9 @@ function CreateSchemeForm({
           className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 sm:col-span-2"
         />
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Category</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+            Category
+          </label>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value as SchemeCategory)}
@@ -439,7 +471,9 @@ function CreateSchemeForm({
           </select>
         </div>
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Benefit Amount (₹)</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+            Benefit Amount (₹)
+          </label>
           <input
             value={benefitAmount}
             onChange={(e) => setBenefitAmount(e.target.value)}
@@ -450,7 +484,9 @@ function CreateSchemeForm({
           />
         </div>
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Eligibility Criteria</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+            Eligibility Criteria
+          </label>
           <input
             value={eligibility}
             onChange={(e) => setEligibility(e.target.value)}
@@ -459,7 +495,9 @@ function CreateSchemeForm({
           />
         </div>
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">Application Deadline</label>
+          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
+            Application Deadline
+          </label>
           <input
             value={deadline}
             onChange={(e) => setDeadline(e.target.value)}

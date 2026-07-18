@@ -155,6 +155,14 @@ export function getDealerStatusDisplayName(status: DealerStatus | null | undefin
 
 // ── Auth redirect ───────────────────────────────────────────────────────────
 export function getAuthRedirectUrl(path = "/") {
+  if (typeof window !== "undefined") {
+    // In local development, dynamically redirect to the active page origin
+    // to prevent port mismatch issues (e.g. running on 8080 vs configured 5173).
+    if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+      return `${window.location.origin}${path}`;
+    }
+  }
+
   const configuredUrl =
     import.meta.env.VITE_AUTH_REDIRECT_URL ||
     import.meta.env.VITE_SITE_URL ||

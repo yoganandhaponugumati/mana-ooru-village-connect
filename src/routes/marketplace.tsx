@@ -15,7 +15,7 @@ import {
   Tag,
   ShieldCheck,
 } from "lucide-react";
-import { useState } from "react";
+import { useState, type ComponentType } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
 import {
@@ -49,7 +49,7 @@ const CATS = [
   "Handicrafts",
 ] as const;
 
-const categoryIcons: Record<string, any> = {
+const categoryIcons: Record<string, ComponentType<{ className?: string }>> = {
   Vegetables: ShoppingBasket,
   Fruits: Apple,
   "Rice & Grains": Wheat,
@@ -70,7 +70,16 @@ function MarketPage() {
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "market");
   const [showForm, setShowForm] = useState(false);
   const [cat, setCat] = useState("All");
-  const filtered = cat === "All" ? displayItems : displayItems.filter((i) => i.category === cat || (cat === "Rice & Grains" && i.category === "Rice") || (cat === "Cattle & Livestock" && i.category === "Animals") || (cat === "Tractors & Machinery" && i.category === "Machinery"));
+  const filtered =
+    cat === "All"
+      ? displayItems
+      : displayItems.filter(
+          (i) =>
+            i.category === cat ||
+            (cat === "Rice & Grains" && i.category === "Rice") ||
+            (cat === "Cattle & Livestock" && i.category === "Animals") ||
+            (cat === "Tractors & Machinery" && i.category === "Machinery"),
+        );
   const canManage = role === "village_admin" || role === "super_admin";
 
   const handlePostClick = () => {
@@ -91,7 +100,10 @@ function MarketPage() {
   const contactWhatsApp = (phone: string, title: string, price: string) => {
     const cleanPhone = phone.replace(/\D/g, "");
     const msg = `🙏 Namaste! I saw your ManaOoru listing:\n*Item:* ${title}\n*Price:* ${price || "As listed"}\n\nIs this currently available for immediate trade?`;
-    window.open(`https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(msg)}`, "_blank");
+    window.open(
+      `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(msg)}`,
+      "_blank",
+    );
   };
 
   return (
@@ -105,26 +117,28 @@ function MarketPage() {
         title="100% Direct Village Haat"
         description="Filter by category below or list your own harvest, livestock, or machinery in 30 seconds."
         actions={
-          <AppButton
-            variant="primary"
-            icon={<Plus className="size-4" />}
-            onClick={handlePostClick}
-          >
+          <AppButton variant="primary" icon={<Plus className="size-4" />} onClick={handlePostClick}>
             {showForm ? "Cancel" : "Sell Item Right Now"}
           </AppButton>
         }
       />
 
       {/* Zero Brokerage Banner */}
-      <SurfaceCard hover={false} className="mb-8 p-5 bg-gradient-to-r from-emerald-600/15 via-emerald-500/10 to-card border-emerald-500/30 flex items-center justify-between gap-4">
+      <SurfaceCard
+        hover={false}
+        className="mb-8 p-5 bg-gradient-to-r from-emerald-600/15 via-emerald-500/10 to-card border-emerald-500/30 flex items-center justify-between gap-4"
+      >
         <div className="flex items-center gap-3.5">
           <div className="flex size-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md">
             <ShieldCheck className="size-6" />
           </div>
           <div>
-            <h3 className="font-display text-base font-bold text-clay">Zero Middlemen · Zero Commission (`0% Brokerage`)</h3>
+            <h3 className="font-display text-base font-bold text-clay">
+              Zero Middlemen · Zero Commission (`0% Brokerage`)
+            </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              ManaOoru connects buyers and sellers directly. Call or WhatsApp the seller directly to agree on price and pickup.
+              ManaOoru connects buyers and sellers directly. Call or WhatsApp the seller directly to
+              agree on price and pickup.
             </p>
           </div>
         </div>
@@ -152,9 +166,17 @@ function MarketPage() {
                 onClick={() => setCat(c)}
               >
                 <div className="flex items-center gap-3">
-                  <FeatureIcon icon={<Icon className={`size-5 ${active ? "text-emerald-700" : "text-primary"}`} />} />
+                  <FeatureIcon
+                    icon={
+                      <Icon className={`size-5 ${active ? "text-emerald-700" : "text-primary"}`} />
+                    }
+                  />
                   <div className="min-w-0">
-                    <p className={`text-sm font-bold truncate ${active ? "text-emerald-900" : "text-clay"}`}>{c}</p>
+                    <p
+                      className={`text-sm font-bold truncate ${active ? "text-emerald-900" : "text-clay"}`}
+                    >
+                      {c}
+                    </p>
                     <p className="text-[11px] text-muted-foreground truncate">Instant inquiry</p>
                   </div>
                 </div>
@@ -204,12 +226,26 @@ function MarketPage() {
               {
                 name: "description",
                 label: "Quality & Details",
-                placeholder: "Explain crop freshness, tractor model year, or cattle breed & daily milk yield...",
+                placeholder:
+                  "Explain crop freshness, tractor model year, or cattle breed & daily milk yield...",
                 textarea: true,
               },
-              { name: "price", label: "Price / Unit", placeholder: "e.g. ₹1,200/Bag or ₹45,000 Total" },
-              { name: "location", label: "Pickup Location / Village", placeholder: "Exact village or farm address" },
-              { name: "contact", label: "Direct Phone / WhatsApp", placeholder: "10-digit mobile number", required: true },
+              {
+                name: "price",
+                label: "Price / Unit",
+                placeholder: "e.g. ₹1,200/Bag or ₹45,000 Total",
+              },
+              {
+                name: "location",
+                label: "Pickup Location / Village",
+                placeholder: "Exact village or farm address",
+              },
+              {
+                name: "contact",
+                label: "Direct Phone / WhatsApp",
+                placeholder: "10-digit mobile number",
+                required: true,
+              },
             ]}
           />
         </SurfaceCard>
@@ -254,7 +290,9 @@ function MarketPage() {
                   </div>
                 ) : (
                   <div className="mb-4 aspect-[16/6] w-full rounded-2xl bg-emerald-500/10 flex items-center justify-center border border-dashed border-emerald-500/30">
-                    <p className="text-sm font-bold text-emerald-800">{i.price || "Direct Trade Item"}</p>
+                    <p className="text-sm font-bold text-emerald-800">
+                      {i.price || "Direct Trade Item"}
+                    </p>
                   </div>
                 )}
 
@@ -267,9 +305,7 @@ function MarketPage() {
                   </span>
                 </div>
 
-                <h3 className="mt-3 font-display text-lg font-bold text-clay">
-                  {i.title}
-                </h3>
+                <h3 className="mt-3 font-display text-lg font-bold text-clay">{i.title}</h3>
                 {i.description && (
                   <p className="mt-2 text-sm leading-6 text-muted-foreground line-clamp-2">
                     {i.description}

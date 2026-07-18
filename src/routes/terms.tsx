@@ -40,7 +40,11 @@ function TermsOfServicePage() {
             </p>
           </div>
           <p className="mt-6 text-sm sm:text-base leading-7 text-muted-foreground">
-            By creating an account (`/auth`) or accessing <strong className="text-foreground">ManaOoru</strong> across our web portal or mobile apps (`Android APK/AAB`), you agree to abide by these Terms of Service. ManaOoru is built to empower rural India with trustworthy, direct commerce. We treat every participant as a respected neighbour.
+            By creating an account (`/auth`) or accessing{" "}
+            <strong className="text-foreground">ManaOoru</strong> across our web portal or mobile
+            apps (`Android APK/AAB`), you agree to abide by these Terms of Service. ManaOoru is
+            built to empower rural India with trustworthy, direct commerce. We treat every
+            participant as a respected neighbour.
           </p>
         </SurfaceCard>
 
@@ -51,11 +55,17 @@ function TermsOfServicePage() {
             <span>100% Zero-Brokerage (`0% Commission`) Disclaimer</span>
           </div>
           <p className="mt-3 text-sm sm:text-base leading-7 text-muted-foreground">
-            ManaOoru operates strictly as an open digital directory and communication portal. 
-            <br /><br />
-            1. <strong className="text-foreground">No Intermediary Cuts:</strong> We never charge commission fees on land leases (`/land`), agricultural produce sales (`/marketplace`), worker daily wages (`/workers`), or local service bookings (`/services`).
+            ManaOoru operates strictly as an open digital directory and communication portal.
             <br />
-            2. <strong className="text-foreground">Direct Peer-to-Peer Verification:</strong> All transactions, financial exchanges, crop quality inspections, and wage agreements occur directly between the buyer and seller or citizen and service provider. ManaOoru does not escrow funds or act as a financial guarantor.
+            <br />
+            1. <strong className="text-foreground">No Intermediary Cuts:</strong> We never charge
+            commission fees on land leases (`/land`), agricultural produce sales (`/marketplace`),
+            worker daily wages (`/workers`), or local service bookings (`/services`).
+            <br />
+            2. <strong className="text-foreground">Direct Peer-to-Peer Verification:</strong> All
+            transactions, financial exchanges, crop quality inspections, and wage agreements occur
+            directly between the buyer and seller or citizen and service provider. ManaOoru does not
+            escrow funds or act as a financial guarantor.
           </p>
         </SurfaceCard>
 
@@ -68,31 +78,50 @@ function TermsOfServicePage() {
           />
           <SurfaceCard className="overflow-hidden divide-y divide-border/60">
             <div className="p-5 sm:p-6 flex gap-4 items-start">
-              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary font-bold">1</div>
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary font-bold">
+                1
+              </div>
               <div>
-                <h3 className="font-display font-bold text-lg text-clay">Authentic & Truthful Listings</h3>
+                <h3 className="font-display font-bold text-lg text-clay">
+                  Authentic & Truthful Listings
+                </h3>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Every marketplace item, land lease description, worker profile, and pricing estimate must be truthful and accurate. Misleading pictures or intentionally false crop quantities will result in listing removal.
+                  Every marketplace item, land lease description, worker profile, and pricing
+                  estimate must be truthful and accurate. Misleading pictures or intentionally false
+                  crop quantities will result in listing removal.
                 </p>
               </div>
             </div>
 
             <div className="p-5 sm:p-6 flex gap-4 items-start">
-              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary font-bold">2</div>
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary font-bold">
+                2
+              </div>
               <div>
-                <h3 className="font-display font-bold text-lg text-clay">Respectful Village Communication</h3>
+                <h3 className="font-display font-bold text-lg text-clay">
+                  Respectful Village Communication
+                </h3>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Hate speech, political harassment, caste-based discrimination, obscene uploads, or abusive language in citizen problem reports (`/problems`) or timeline announcements (`/announcements`) is prohibited and leads to instant account suspension.
+                  Hate speech, political harassment, caste-based discrimination, obscene uploads, or
+                  abusive language in citizen problem reports (`/problems`) or timeline
+                  announcements (`/announcements`) is prohibited and leads to instant account
+                  suspension.
                 </p>
               </div>
             </div>
 
             <div className="p-5 sm:p-6 flex gap-4 items-start">
-              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary font-bold">3</div>
+              <div className="grid size-10 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary font-bold">
+                3
+              </div>
               <div>
-                <h3 className="font-display font-bold text-lg text-clay">Dealer & Merchant Responsibilities</h3>
+                <h3 className="font-display font-bold text-lg text-clay">
+                  Dealer & Merchant Responsibilities
+                </h3>
                 <p className="mt-1 text-sm leading-6 text-muted-foreground">
-                  Registered commercial dealers (`/dealer-registration`) must honor posted prices, maintain valid local shop permits where applicable, and respect consumer warranty laws on seeds, fertilizers, and hardware.
+                  Registered commercial dealers (`/dealer-registration`) must honor posted prices,
+                  maintain valid local shop permits where applicable, and respect consumer warranty
+                  laws on seeds, fertilizers, and hardware.
                 </p>
               </div>
             </div>
@@ -106,7 +135,10 @@ function TermsOfServicePage() {
             <span>Moderation & Account Termination</span>
           </div>
           <p className="mt-3 text-sm leading-7 text-muted-foreground">
-            Gram Panchayat officials, Sarpanch administrators, and platform moderators reserve the right to flag, hide, or delete listings that violate these community standards. If an account repeatedly abuses community trust or engages in fraud, we reserve the right to revoke access without notice.
+            Gram Panchayat officials, Sarpanch administrators, and platform moderators reserve the
+            right to flag, hide, or delete listings that violate these community standards. If an
+            account repeatedly abuses community trust or engages in fraud, we reserve the right to
+            revoke access without notice.
           </p>
         </SurfaceCard>
       </div>

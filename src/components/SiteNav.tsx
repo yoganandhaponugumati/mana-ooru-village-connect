@@ -123,11 +123,8 @@ export function SiteNav() {
     : "Select village";
 
   return (
-    <motion.nav
-      initial={{ y: -16, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      className={`fixed inset-x-0 top-0 z-[9999] border-b transition-all duration-300 ${isHeroTop ? "border-white/15 bg-black/45 text-white shadow-lg" : "border-white/80 bg-background/85 text-foreground shadow-[0_18px_54px_-40px_rgba(20,49,32,0.82)] backdrop-blur-2xl"}`}
+    <nav
+      className={`fixed inset-x-0 top-0 z-[9999] border-b transition-all duration-300 ${isHeroTop ? "border-white/15 bg-black/45 text-white shadow-lg" : "border-[#dfeae2]/80 bg-[#f7fbf2]/92 text-foreground shadow-[0_18px_54px_-40px_rgba(20,49,32,0.82)] backdrop-blur-2xl"}`}
     >
       <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
         <Link to="/" className="group flex min-w-0 shrink-0 items-center gap-2 mr-6">
@@ -199,54 +196,49 @@ export function SiteNav() {
                   style={{ transform: userMenuOpen ? "rotate(180deg)" : "none" }}
                 />
               </button>
-              <AnimatePresence>
-                {userMenuOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.18 }}
-                    className="absolute right-0 z-[99999] mt-2 w-52 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1.5 text-sm !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)]"
+              {userMenuOpen && (
+                <div className="absolute right-0 z-[99999] mt-2 w-52 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1.5 text-sm !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)] animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800/60 mb-1 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
+                    Village: {profile.village || "Not selected"}
+                  </div>
+                  {(role === "village_admin" || role === "super_admin") && (
+                    <Link
+                      to="/official"
+                      onClick={() => setUserMenuOpen(false)}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
+                    >
+                      <ShieldCheck className="size-4 text-emerald-600" />{" "}
+                      {t.officialWorkspace || "Official Workspace"}
+                    </Link>
+                  )}
+                  <Link
+                    to="/dashboard"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
                   >
-                    <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800/60 mb-1 text-[10px] font-bold text-zinc-500 dark:text-zinc-400 uppercase tracking-wider">
-                      Village: {profile.village || "Not selected"}
-                    </div>
-                    {(role === "village_admin" || role === "super_admin") && (
-                      <Link
-                        to="/official"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
-                      >
-                        <ShieldCheck className="size-4 text-emerald-600" /> {t.officialWorkspace || "Official Workspace"}
-                      </Link>
-                    )}
-                    <Link
-                      to="/dashboard"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
-                    >
-                      <LayoutDashboard className="size-4 text-blue-600" /> {t.dashboard || "Dashboard"}
-                    </Link>
-                    <Link
-                      to="/profile"
-                      onClick={() => setUserMenuOpen(false)}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
-                    >
-                      <UserRound className="size-4 text-amber-600" /> {t.profileDetails || "Profile Details"}
-                    </Link>
-                    <div className="my-1 border-t border-zinc-100 dark:border-zinc-800/60" />
-                    <button
-                      onClick={() => {
-                        setUserMenuOpen(false);
-                        signOut();
-                      }}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red-600 dark:text-red-400 transition hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40"
-                    >
-                      <LogOut className="size-4" /> {t.signOut || "Sign out"}
-                    </button>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                    <LayoutDashboard className="size-4 text-blue-600" />{" "}
+                    {t.dashboard || "Dashboard"}
+                  </Link>
+                  <Link
+                    to="/profile"
+                    onClick={() => setUserMenuOpen(false)}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
+                  >
+                    <UserRound className="size-4 text-amber-600" />{" "}
+                    {t.profileDetails || "Profile Details"}
+                  </Link>
+                  <div className="my-1 border-t border-zinc-100 dark:border-zinc-800/60" />
+                  <button
+                    onClick={() => {
+                      setUserMenuOpen(false);
+                      signOut();
+                    }}
+                    className="flex w-full items-center gap-2 rounded-xl px-3 py-2 font-semibold text-red-600 dark:text-red-400 transition hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-950/40"
+                  >
+                    <LogOut className="size-4" /> {t.signOut || "Sign out"}
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <Link
@@ -280,28 +272,20 @@ export function SiteNav() {
               </span>
               <ChevronDown className="hidden size-3.5 sm:block shrink-0" />
             </button>
-            <AnimatePresence>
-              {languageOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                  transition={{ duration: 0.18 }}
-                  className="absolute right-0 z-[99999] mt-2 w-40 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1 text-sm !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)]"
-                >
-                  {languageOptions.map((item) => (
-                    <button
-                      key={item.code}
-                      onClick={() => chooseLanguage(item.code)}
-                      className="flex w-full items-center justify-between rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
-                    >
-                      {item.label}
-                      {item.code === language && <Check className="size-4 text-primary" />}
-                    </button>
-                  ))}
-                </motion.div>
-              )}
-            </AnimatePresence>
+            {languageOpen && (
+              <div className="absolute right-0 z-[99999] mt-2 w-40 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1 text-sm !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)] animate-in fade-in slide-in-from-top-2 duration-150">
+                {languageOptions.map((item) => (
+                  <button
+                    key={item.code}
+                    onClick={() => chooseLanguage(item.code)}
+                    className="flex w-full items-center justify-between rounded-xl px-3 py-2 font-semibold text-zinc-700 dark:text-zinc-200 transition hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
+                  >
+                    {item.label}
+                    {item.code === language && <Check className="size-4 text-primary" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
           <button
             onClick={focusSearch}
@@ -326,117 +310,109 @@ export function SiteNav() {
                   </span>
                 )}
               </button>
-              <AnimatePresence>
-                {notificationsOpen && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                    transition={{ duration: 0.18 }}
-                    className="absolute right-0 z-[99999] mt-2 w-[360px] overflow-hidden rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)]"
-                  >
-                    <div className="flex items-center justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800/60 p-4">
-                      <div>
-                        <p className="font-display text-lg font-semibold text-zinc-900 dark:text-zinc-100">
-                          {t.notifications || "Notifications"}
+              {notificationsOpen && (
+                <div className="absolute right-0 z-[99999] mt-2 w-[360px] overflow-hidden rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 !text-zinc-900 dark:!text-zinc-100 shadow-[0_24px_68px_-12px_rgba(0,0,0,0.75)] animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="flex items-center justify-between gap-3 border-b border-zinc-100 dark:border-zinc-800/60 p-4">
+                    <div>
+                      <p className="font-display text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                        {t.notifications || "Notifications"}
+                      </p>
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                        {unreadCount > 0
+                          ? `${unreadCount} unread village update${unreadCount === 1 ? "" : "s"}`
+                          : "All caught up"}
+                      </p>
+                    </div>
+                    {unreadCount > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => markAllRead()}
+                        className="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-primary hover:text-primary-foreground"
+                      >
+                        {t.markRead || "Mark read"}
+                      </button>
+                    )}
+                    {notifications.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => clearAll()}
+                        className="rounded-full border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 transition hover:border-destructive hover:text-destructive"
+                      >
+                        {t.clear || "Clear"}
+                      </button>
+                    )}
+                  </div>
+                  <div className="max-h-[420px] overflow-y-auto p-2">
+                    {notificationsLoading ? (
+                      <p className="p-5 text-center text-sm text-zinc-500 dark:text-zinc-400">
+                        Loading notifications...
+                      </p>
+                    ) : notifications.length === 0 ? (
+                      <div className="p-6 text-center">
+                        <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+                          <Bell className="size-5" />
+                        </div>
+                        <p className="mt-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+                          No notifications yet
                         </p>
-                        <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                          {unreadCount > 0
-                            ? `${unreadCount} unread village update${unreadCount === 1 ? "" : "s"}`
-                            : "All caught up"}
+                        <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+                          New posts, notices, problems, services, and market updates will appear
+                          here after sign-in.
                         </p>
                       </div>
-                      {unreadCount > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => markAllRead()}
-                          className="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-bold text-primary transition hover:bg-primary hover:text-primary-foreground"
+                    ) : (
+                      notifications.map((item) => (
+                        <div
+                          key={item.id}
+                          className={`group flex w-full gap-3 rounded-2xl p-3 text-left transition hover:bg-primary/8 ${
+                            item.read_at ? "opacity-72" : "bg-primary/6"
+                          }`}
                         >
-                          {t.markRead || "Mark read"}
-                        </button>
-                      )}
-                      {notifications.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => clearAll()}
-                          className="rounded-full border border-zinc-200 dark:border-zinc-800 px-3 py-1.5 text-xs font-bold text-zinc-500 dark:text-zinc-400 transition hover:border-destructive hover:text-destructive"
-                        >
-                          {t.clear || "Clear"}
-                        </button>
-                      )}
-                    </div>
-                    <div className="max-h-[420px] overflow-y-auto p-2">
-                      {notificationsLoading ? (
-                        <p className="p-5 text-center text-sm text-zinc-500 dark:text-zinc-400">
-                          Loading notifications...
-                        </p>
-                      ) : notifications.length === 0 ? (
-                        <div className="p-6 text-center">
-                          <div className="mx-auto grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
-                            <Bell className="size-5" />
-                          </div>
-                          <p className="mt-3 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                            No notifications yet
-                          </p>
-                          <p className="mt-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
-                            New posts, notices, problems, services, and market updates will appear
-                            here after sign-in.
-                          </p>
-                        </div>
-                      ) : (
-                        notifications.map((item) => (
-                          <div
-                            key={item.id}
-                            className={`group flex w-full gap-3 rounded-2xl p-3 text-left transition hover:bg-primary/8 ${
-                              item.read_at ? "opacity-72" : "bg-primary/6"
+                          <span
+                            className={`mt-1 size-2.5 shrink-0 rounded-full ${
+                              item.read_at ? "bg-border" : "bg-red-500"
                             }`}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => {
+                              markRead(item.id);
+                              if (item.action_url) window.location.assign(item.action_url);
+                            }}
+                            className="min-w-0 flex-1 text-left"
                           >
-                            <span
-                              className={`mt-1 size-2.5 shrink-0 rounded-full ${
-                                item.read_at ? "bg-border" : "bg-red-500"
-                              }`}
-                            />
-                            <button
-                              type="button"
-                              onClick={() => {
-                                markRead(item.id);
-                                if (item.action_url) window.location.assign(item.action_url);
-                              }}
-                              className="min-w-0 flex-1 text-left"
-                            >
-                              <span className="block truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                                {item.title}
-                              </span>
-                              <span className="mt-1 line-clamp-2 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">
-                                {item.body}
-                              </span>
-                              <span className="mt-2 block text-[10px] font-bold uppercase tracking-[0.16em] text-primary/70">
-                                {item.type.replaceAll("_", " ")} -{" "}
-                                {timeAgo(new Date(item.created_at).getTime())}
-                              </span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => deleteNotification(item.id)}
-                              className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
-                              aria-label="Delete notification"
-                            >
-                              <Trash2 className="size-3.5" />
-                            </button>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                    <Link
-                      to="/announcements"
-                      onClick={() => setNotificationsOpen(false)}
-                      className="flex items-center justify-center border-t border-zinc-100 dark:border-zinc-800/60 px-4 py-3 text-sm font-bold text-primary transition hover:bg-primary/8"
-                    >
-                      Open village notices
-                    </Link>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+                            <span className="block truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                              {item.title}
+                            </span>
+                            <span className="mt-1 line-clamp-2 block text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+                              {item.body}
+                            </span>
+                            <span className="mt-2 block text-[10px] font-bold uppercase tracking-[0.16em] text-primary/70">
+                              {item.type.replaceAll("_", " ")} -{" "}
+                              {timeAgo(new Date(item.created_at).getTime())}
+                            </span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => deleteNotification(item.id)}
+                            className="grid size-8 shrink-0 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+                            aria-label="Delete notification"
+                          >
+                            <Trash2 className="size-3.5" />
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                  <Link
+                    to="/announcements"
+                    onClick={() => setNotificationsOpen(false)}
+                    className="flex items-center justify-center border-t border-zinc-100 dark:border-zinc-800/60 px-4 py-3 text-sm font-bold text-primary transition hover:bg-primary/8"
+                  >
+                    Open village notices
+                  </Link>
+                </div>
+              )}
             </div>
           )}
           <button
@@ -552,7 +528,7 @@ export function SiteNav() {
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </nav>
   );
 }
 
@@ -586,7 +562,10 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link to="/delete-account" className="transition hover:text-primary font-medium text-red-600/90">
+              <Link
+                to="/delete-account"
+                className="transition hover:text-primary font-medium text-red-600/90"
+              >
                 Delete Account
               </Link>
             </li>

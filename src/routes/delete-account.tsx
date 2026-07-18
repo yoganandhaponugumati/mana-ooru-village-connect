@@ -1,13 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import {
-  Trash2,
-  AlertTriangle,
-  CheckCircle2,
-  Lock,
-  ArrowRight,
-  UserRoundX,
-} from "lucide-react";
+import { Trash2, AlertTriangle, CheckCircle2, Lock, ArrowRight, UserRoundX } from "lucide-react";
 import { toast } from "sonner";
 import { PageLayout } from "@/components/PageLayout";
 import { AppButton, AppLinkButton, SectionHeader, SurfaceCard } from "@/components/design-system";
@@ -52,7 +45,9 @@ function DeleteAccountPortalPage() {
       navigate({ to: "/auth" });
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Could not delete your account. Please check your password and try again.",
+        err instanceof Error
+          ? err.message
+          : "Could not delete your account. Please check your password and try again.",
       );
       setDeleting(false);
     }
@@ -81,7 +76,9 @@ function DeleteAccountPortalPage() {
             <span>Permanent Data Wiping Notice (Google Play Data Safety)</span>
           </div>
           <p className="mt-3 text-sm sm:text-base leading-7 text-muted-foreground">
-            Whether you use our Android mobile app (`APK/AAB`) or web portal, you have the absolute right to erase all your personal data. Deleting your account triggers an irreversible cascading wipe (`ON DELETE CASCADE`) across:
+            Whether you use our Android mobile app (`APK/AAB`) or web portal, you have the absolute
+            right to erase all your personal data. Deleting your account triggers an irreversible
+            cascading wipe (`ON DELETE CASCADE`) across:
           </p>
           <div className="mt-4 grid gap-2 sm:grid-cols-2 text-xs sm:text-sm font-semibold text-foreground">
             <div className="flex items-center gap-2 rounded-xl bg-card p-3 border border-border/80">
@@ -113,7 +110,10 @@ function DeleteAccountPortalPage() {
             />
             <form onSubmit={handleAuthenticatedDelete} className="mt-6 max-w-md space-y-4">
               <div>
-                <label htmlFor="delete-password" className="block text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <label
+                  htmlFor="delete-password"
+                  className="block text-xs font-bold uppercase tracking-wider text-muted-foreground"
+                >
                   Current Password
                 </label>
                 <div className="relative mt-1">
@@ -152,9 +152,13 @@ function DeleteAccountPortalPage() {
             {submittedRequest ? (
               <div className="mt-6 rounded-[24px] border border-emerald-500/20 bg-emerald-500/10 p-6 text-center">
                 <CheckCircle2 className="mx-auto size-12 text-emerald-600" />
-                <h3 className="mt-3 font-display text-xl font-bold text-clay">Verification Ticket Created</h3>
+                <h3 className="mt-3 font-display text-xl font-bold text-clay">
+                  Verification Ticket Created
+                </h3>
                 <p className="mt-2 text-sm text-muted-foreground max-w-md mx-auto">
-                  We have logged your deletion request for <strong className="text-foreground">{reqEmail || reqPhone}</strong>. You will receive an automated verification email/SMS to finalize the permanent wipe.
+                  We have logged your deletion request for{" "}
+                  <strong className="text-foreground">{reqEmail || reqPhone}</strong>. You will
+                  receive an automated verification email/SMS to finalize the permanent wipe.
                 </p>
               </div>
             ) : (
@@ -210,7 +214,8 @@ function DeleteAccountPortalPage() {
             )}
             <div className="mt-8 border-t border-border/70 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <p className="text-xs text-muted-foreground">
-                Prefer sending an email? Contact our data privacy officer directly: <strong className="text-foreground">privacy@manaooru.org</strong>
+                Prefer sending an email? Contact our data privacy officer directly:{" "}
+                <strong className="text-foreground">privacy@manaooru.org</strong>
               </p>
               <AppLinkButton to="/auth" variant="ghost" size="sm">
                 Sign In to Delete Instantly
