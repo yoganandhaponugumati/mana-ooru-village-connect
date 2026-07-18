@@ -14,6 +14,159 @@ export type Database = {
   }
   public: {
     Tables: {
+      government_schemes: {
+        Row: {
+          application_url: string | null
+          benefit_amount: number | null
+          category: string
+          created_at: string
+          created_by: string
+          deadline: string | null
+          department: string | null
+          description: string
+          document_url: string | null
+          eligibility: string | null
+          id: string
+          status: string
+          title: string
+          updated_at: string
+          village_id: string | null
+        }
+        Insert: {
+          application_url?: string | null
+          benefit_amount?: number | null
+          category?: string
+          created_at?: string
+          created_by: string
+          deadline?: string | null
+          department?: string | null
+          description: string
+          document_url?: string | null
+          eligibility?: string | null
+          id?: string
+          status?: string
+          title: string
+          updated_at?: string
+          village_id?: string | null
+        }
+        Update: {
+          application_url?: string | null
+          benefit_amount?: number | null
+          category?: string
+          created_at?: string
+          created_by?: string
+          deadline?: string | null
+          department?: string | null
+          description?: string
+          document_url?: string | null
+          eligibility?: string | null
+          id?: string
+          status?: string
+          title?: string
+          updated_at?: string
+          village_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "government_schemes_village_id_fkey"
+            columns: ["village_id"]
+            isOneToOne: false
+            referencedRelation: "villages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      government_work_images: {
+        Row: {
+          created_at: string
+          government_work_id: string
+          id: string
+          image_url: string
+          storage_path: string | null
+          uploaded_by: string
+        }
+        Insert: {
+          created_at?: string
+          government_work_id: string
+          id?: string
+          image_url: string
+          storage_path?: string | null
+          uploaded_by: string
+        }
+        Update: {
+          created_at?: string
+          government_work_id?: string
+          id?: string
+          image_url?: string
+          storage_path?: string | null
+          uploaded_by?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "government_work_images_government_work_id_fkey"
+            columns: ["government_work_id"]
+            isOneToOne: false
+            referencedRelation: "government_works"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      government_works: {
+        Row: {
+          budget: number | null
+          created_at: string
+          created_by: string
+          department: string | null
+          description: string | null
+          end_date: string | null
+          id: string
+          location: string | null
+          start_date: string | null
+          status: string
+          title: string
+          updated_at: string
+          village_id: string | null
+        }
+        Insert: {
+          budget?: number | null
+          created_at?: string
+          created_by: string
+          department?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          location?: string | null
+          start_date?: string | null
+          status?: string
+          title: string
+          updated_at?: string
+          village_id?: string | null
+        }
+        Update: {
+          budget?: number | null
+          created_at?: string
+          created_by?: string
+          department?: string | null
+          description?: string | null
+          end_date?: string | null
+          id?: string
+          location?: string | null
+          start_date?: string | null
+          status?: string
+          title?: string
+          updated_at?: string
+          village_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "government_works_village_id_fkey"
+            columns: ["village_id"]
+            isOneToOne: false
+            referencedRelation: "villages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       listings: {
         Row: {
           category: string | null
@@ -72,6 +225,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "listings_village_id_fkey"
+            columns: ["village_id"]
+            isOneToOne: false
+            referencedRelation: "villages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notifications: {
+        Row: {
+          action_url: string | null
+          body: string
+          created_at: string
+          created_by: string | null
+          dedupe_key: string | null
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          read_at: string | null
+          recipient_id: string | null
+          title: string
+          type: string
+          village_id: string | null
+        }
+        Insert: {
+          action_url?: string | null
+          body: string
+          created_at?: string
+          created_by?: string | null
+          dedupe_key?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          read_at?: string | null
+          recipient_id?: string | null
+          title: string
+          type?: string
+          village_id?: string | null
+        }
+        Update: {
+          action_url?: string | null
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          dedupe_key?: string | null
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          read_at?: string | null
+          recipient_id?: string | null
+          title?: string
+          type?: string
+          village_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notifications_village_id_fkey"
             columns: ["village_id"]
             isOneToOne: false
             referencedRelation: "villages"
@@ -233,6 +442,44 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      scheme_applications: {
+        Row: {
+          applicant_id: string
+          created_at: string
+          id: string
+          notes: string | null
+          scheme_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          scheme_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          created_at?: string
+          id?: string
+          notes?: string | null
+          scheme_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheme_applications_scheme_id_fkey"
+            columns: ["scheme_id"]
+            isOneToOne: false
+            referencedRelation: "government_schemes"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
