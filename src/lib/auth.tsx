@@ -115,7 +115,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             preferred_language: (data.preferred_language as Language) ?? "en",
             profileCompletedAt: data.profile_completed_at,
             // ── Dealer fields ──
-            dealer_status: data.dealer_status ?? null,
+            dealer_status: (data.dealer_status as DealerStatus | null) ?? null,
             dealer_category: data.dealer_category ?? null,
             shop_name: data.shop_name ?? null,
             shop_description: data.shop_description ?? null,
