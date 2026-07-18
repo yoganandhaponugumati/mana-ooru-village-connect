@@ -133,7 +133,7 @@ async function sendWebPush(
 
 export const savePushSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(pushSubscriptionSchema)
+  .inputValidator(pushSubscriptionSchema)
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.from("push_subscriptions").upsert(
@@ -154,7 +154,7 @@ export const savePushSubscription = createServerFn({ method: "POST" })
 
 export const deletePushSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(z.object({ endpoint: z.string().url() }))
+  .inputValidator(z.object({ endpoint: z.string().url() }))
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin
@@ -215,7 +215,7 @@ export const sendTestPushNotification = createServerFn({ method: "POST" })
 
 export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .validator(newPostSchema)
+  .inputValidator(newPostSchema)
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: listing, error: listingError } = await supabaseAdmin
