@@ -2872,3 +2872,143 @@ footer {
 .hero-actions-track:hover {
   animation-play-state: paused;
 }
+
+/* ============================================================
+   3D village depth kit (claymorphic + tilt + float + sheen)
+   ============================================================ */
+@keyframes clay-bob {
+  0%, 100% { transform: translate3d(0, 0, 0) rotateX(0deg); }
+  50%      { transform: translate3d(0, -6px, 0) rotateX(1.2deg); }
+}
+@keyframes clay-sheen {
+  0%   { transform: translateX(-120%) skewX(-14deg); opacity: 0; }
+  35%  { opacity: 0.55; }
+  100% { transform: translateX(220%) skewX(-14deg); opacity: 0; }
+}
+@keyframes clay-tilt-idle {
+  0%, 100% { transform: rotateX(0deg) rotateY(0deg); }
+  50%      { transform: rotateX(1deg) rotateY(-1.4deg); }
+}
+@keyframes iso-drift {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(4px, -8px, 0) rotate(0.6deg); }
+}
+
+/* Global depth stage: adds perspective to any grid this wraps */
+.stage-3d {
+  perspective: 1400px;
+  perspective-origin: 50% 30%;
+  transform-style: preserve-3d;
+}
+
+/* Clay layered shadow — makes any card feel pressed out of clay */
+.premium-action-card,
+.premium-need-card,
+.premium-step-card,
+.premium-market-tile {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 2px 0 rgba(20, 49, 32, 0.06),
+    0 6px 0 -2px rgba(24, 169, 153, 0.14),
+    0 14px 0 -6px rgba(242, 184, 75, 0.12),
+    0 30px 60px -30px rgba(20, 49, 32, 0.55),
+    0 46px 90px -46px rgba(23, 99, 58, 0.45);
+  transition:
+    transform 380ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    box-shadow 380ms cubic-bezier(0.2, 0.9, 0.25, 1);
+  animation: clay-tilt-idle 9s ease-in-out infinite;
+  will-change: transform;
+}
+
+.premium-action-card:hover,
+.premium-need-card:hover,
+.premium-step-card:hover,
+.premium-market-tile:hover {
+  transform: translateY(-6px) translateZ(24px) rotateX(4deg) rotateY(-4deg);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.95) inset,
+    0 4px 0 rgba(20, 49, 32, 0.08),
+    0 10px 0 -2px rgba(24, 169, 153, 0.22),
+    0 22px 0 -6px rgba(242, 184, 75, 0.2),
+    0 48px 90px -30px rgba(20, 49, 32, 0.65),
+    0 70px 120px -40px rgba(23, 99, 58, 0.55);
+  animation-play-state: paused;
+}
+
+/* Diagonal light sheen that sweeps across the card on hover */
+.premium-action-card,
+.premium-need-card,
+.premium-step-card,
+.premium-market-tile {
+  overflow: hidden;
+}
+.premium-action-card > .clay-sheen,
+.premium-need-card > .clay-sheen,
+.premium-step-card > .clay-sheen,
+.premium-market-tile > .clay-sheen {
+  display: none;
+}
+.premium-action-card:hover::before,
+.premium-need-card:hover::before,
+.premium-step-card:hover::before,
+.premium-market-tile:hover::before {
+  background:
+    linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.55) 50%, transparent 60%),
+    linear-gradient(135deg, rgba(255, 255, 255, 0.58), transparent 34%),
+    linear-gradient(315deg, rgba(24, 169, 153, 0.16), transparent 42%);
+  background-size: 220% 100%, 100% 100%, 100% 100%;
+  animation: clay-sheen 1400ms ease-out;
+}
+
+/* Icon tile gets its own extruded platform */
+.premium-action-icon {
+  transform: translateZ(30px);
+  box-shadow:
+    0 14px 34px -20px rgba(20, 49, 32, 0.8),
+    0 6px 0 -2px rgba(24, 169, 153, 0.28),
+    0 12px 0 -6px rgba(242, 184, 75, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  transition:
+    transform 380ms cubic-bezier(0.2, 0.9, 0.25, 1),
+    box-shadow 380ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.premium-action-card:hover .premium-action-icon,
+.premium-need-card:hover .premium-action-icon,
+.premium-step-card:hover .premium-action-icon {
+  transform: translateZ(60px) rotateX(-8deg) rotateY(6deg) scale(1.08);
+}
+
+/* Reusable helpers */
+.float-3d { animation: clay-bob 6s ease-in-out infinite; will-change: transform; }
+.iso-drift { animation: iso-drift 8s ease-in-out infinite; will-change: transform; }
+
+/* Extrude a "clay slab" behind any surface — put on the wrapper */
+.clay-extrude {
+  position: relative;
+  isolation: isolate;
+}
+.clay-extrude::before {
+  content: "";
+  position: absolute;
+  inset: 8px -6px -14px 6px;
+  border-radius: inherit;
+  background: linear-gradient(160deg, rgba(24, 169, 153, 0.28), rgba(242, 184, 75, 0.22));
+  filter: blur(2px);
+  z-index: -1;
+  transition: transform 380ms cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+.clay-extrude:hover::before {
+  transform: translate(4px, 8px) scale(1.02);
+}
+
+/* Respect reduced motion for all clay animations */
+@media (prefers-reduced-motion: reduce) {
+  .premium-action-card,
+  .premium-need-card,
+  .premium-step-card,
+  .premium-market-tile,
+  .float-3d,
+  .iso-drift {
+    animation: none !important;
+  }
+}
