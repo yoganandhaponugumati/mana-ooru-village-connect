@@ -409,7 +409,7 @@ function CinemaHero({
             transition={{ delay: 0.4 + i * 0.09, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
             className={`absolute ${w.pos} ${w.size} pointer-events-auto`}
           >
-            <div className={`widget-glass ${w.float} ${w.glow ? "glow-emergency" : ""} p-4`}>
+            <div className={`widget-glass ${w.float} ${"glow" in w && w.glow ? "glow-emergency" : ""} p-4`}>
               <div className={`absolute -top-3 -left-3 grid size-11 place-items-center rounded-2xl bg-gradient-to-br ${w.accent} shadow-lg backdrop-blur-md`}>
                 <w.icon className="size-5 text-white" strokeWidth={2.2} />
               </div>
