@@ -21,12 +21,17 @@ export type Database = {
           created_at: string
           description: string | null
           id: string
+          image_url: string | null
+          is_pinned: boolean
           location: string | null
           owner_id: string
           price: string | null
+          status: string
+          storage_path: string | null
           title: string
           type: Database["public"]["Enums"]["listing_type"]
           updated_at: string
+          village_id: string | null
         }
         Insert: {
           category?: string | null
@@ -34,12 +39,17 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
+          is_pinned?: boolean
           location?: string | null
           owner_id: string
           price?: string | null
+          status?: string
+          storage_path?: string | null
           title: string
           type: Database["public"]["Enums"]["listing_type"]
           updated_at?: string
+          village_id?: string | null
         }
         Update: {
           category?: string | null
@@ -47,42 +57,180 @@ export type Database = {
           created_at?: string
           description?: string | null
           id?: string
+          image_url?: string | null
+          is_pinned?: boolean
           location?: string | null
           owner_id?: string
           price?: string | null
+          status?: string
+          storage_path?: string | null
           title?: string
           type?: Database["public"]["Enums"]["listing_type"]
           updated_at?: string
+          village_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "listings_village_id_fkey"
+            columns: ["village_id"]
+            isOneToOne: false
+            referencedRelation: "villages"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
+          account_type: string
+          approved_at: string | null
+          approved_by: string | null
           avatar_url: string | null
           created_at: string
+          dealer_category: string | null
+          dealer_status: string | null
+          designation: string | null
           display_name: string | null
+          district: string | null
+          email: string | null
+          full_name: string | null
           id: string
+          mandal: string | null
+          occupation: string | null
           phone: string | null
+          photo_url: string | null
+          preferred_language: string | null
+          profile_completed_at: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          shop_address: string | null
+          shop_description: string | null
+          shop_name: string | null
+          state: string | null
           updated_at: string
+          username: string | null
           village: string | null
+          village_id: string | null
         }
         Insert: {
+          account_type?: string
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           created_at?: string
+          dealer_category?: string | null
+          dealer_status?: string | null
+          designation?: string | null
           display_name?: string | null
+          district?: string | null
+          email?: string | null
+          full_name?: string | null
           id: string
+          mandal?: string | null
+          occupation?: string | null
           phone?: string | null
+          photo_url?: string | null
+          preferred_language?: string | null
+          profile_completed_at?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          shop_address?: string | null
+          shop_description?: string | null
+          shop_name?: string | null
+          state?: string | null
           updated_at?: string
+          username?: string | null
           village?: string | null
+          village_id?: string | null
         }
         Update: {
+          account_type?: string
+          approved_at?: string | null
+          approved_by?: string | null
           avatar_url?: string | null
           created_at?: string
+          dealer_category?: string | null
+          dealer_status?: string | null
+          designation?: string | null
           display_name?: string | null
+          district?: string | null
+          email?: string | null
+          full_name?: string | null
           id?: string
+          mandal?: string | null
+          occupation?: string | null
           phone?: string | null
+          photo_url?: string | null
+          preferred_language?: string | null
+          profile_completed_at?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          shop_address?: string | null
+          shop_description?: string | null
+          shop_name?: string | null
+          state?: string | null
           updated_at?: string
+          username?: string | null
           village?: string | null
+          village_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_village_id_fkey"
+            columns: ["village_id"]
+            isOneToOne: false
+            referencedRelation: "villages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      push_events: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          event_key: string
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          event_key: string
+          id?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          event_key?: string
+          id?: string
+        }
+        Relationships: []
+      }
+      push_subscriptions: {
+        Row: {
+          auth: string
+          created_at: string
+          endpoint: string
+          id: string
+          p256dh: string
+          updated_at: string
+          user_agent: string | null
+          user_id: string
+        }
+        Insert: {
+          auth: string
+          created_at?: string
+          endpoint: string
+          id?: string
+          p256dh: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id: string
+        }
+        Update: {
+          auth?: string
+          created_at?: string
+          endpoint?: string
+          id?: string
+          p256dh?: string
+          updated_at?: string
+          user_agent?: string | null
+          user_id?: string
         }
         Relationships: []
       }
@@ -104,6 +252,36 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      villages: {
+        Row: {
+          created_at: string
+          district: string | null
+          id: string
+          mandal: string | null
+          name: string
+          state: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          district?: string | null
+          id?: string
+          mandal?: string | null
+          name: string
+          state?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          district?: string | null
+          id?: string
+          mandal?: string | null
+          name?: string
+          state?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
