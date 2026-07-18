@@ -112,7 +112,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             mandal: data.mandal,
             village: data.village,
             village_id: data.village_id,
-            preferred_language: data.preferred_language,
+            preferred_language: (data.preferred_language as Language) ?? "en",
             profileCompletedAt: data.profile_completed_at,
             // ── Dealer fields ──
             dealer_status: data.dealer_status ?? null,
