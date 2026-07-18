@@ -38,7 +38,6 @@ import {
   Leaf,
   Landmark,
 } from "lucide-react";
-import heroVillage from "@/assets/hero-village-premium.jpg";
 import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
