@@ -106,7 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             username: data.username,
             full_name: data.full_name,
             photo_url: data.photo_url,
-            occupation: data.occupation,
+            occupation: (data.occupation as Occupation | null) ?? null,
             state: data.state,
             district: data.district,
             mandal: data.mandal,
