@@ -556,10 +556,10 @@ function Index() {
             What do you need today?
           </h2>
         </div>
-        <div className="mx-auto grid max-w-7xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="stage-3d mx-auto grid max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map((a, i) =>
             a.to.startsWith("#") ? (
-              <Card3D key={a.label} className="hover-lift animate-fade-up" intensity={8}>
+              <Card3D key={a.label} className="clay-extrude animate-fade-up" intensity={16}>
                 <a
                   href={a.to}
                   className="premium-action-card group flex min-h-44 items-center gap-5 rounded-[22px] p-6 text-left"
@@ -568,7 +568,7 @@ function Index() {
                   <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
                     <a.icon className="size-9" strokeWidth={1.8} />
                   </div>
-                  <div className="min-w-0" style={{ transform: "translateZ(20px)" }}>
+                  <div className="min-w-0" style={{ transform: "translateZ(40px)" }}>
                     <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
                     <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
@@ -576,7 +576,7 @@ function Index() {
                 </a>
               </Card3D>
             ) : (
-              <Card3D key={a.label} className="hover-lift animate-fade-up" intensity={8}>
+              <Card3D key={a.label} className="clay-extrude animate-fade-up" intensity={16}>
                 <Link
                   to={a.to as Exclude<(typeof quickActions)[number]["to"], "#contacts">}
                   search={"search" in a ? a.search : undefined}
@@ -586,7 +586,7 @@ function Index() {
                   <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
                     <a.icon className="size-9" strokeWidth={1.8} />
                   </div>
-                  <div className="min-w-0" style={{ transform: "translateZ(20px)" }}>
+                  <div className="min-w-0" style={{ transform: "translateZ(40px)" }}>
                     <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
                     <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
