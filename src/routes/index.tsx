@@ -35,7 +35,6 @@ import {
   Plus,
   AlertTriangle,
   ImagePlus,
-  Leaf,
   Landmark,
 } from "lucide-react";
 import { SiteNav } from "@/components/SiteNav";
