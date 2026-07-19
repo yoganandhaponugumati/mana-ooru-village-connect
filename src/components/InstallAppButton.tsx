@@ -96,7 +96,7 @@ export function InstallAppButton({
           className={`relative inline-flex h-9 items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-600 via-primary to-teal-600 px-3.5 text-xs font-extrabold text-white shadow-[0_0_15px_rgba(16,185,129,0.4)] transition hover:-translate-y-0.5 hover:brightness-110 active:scale-95 ${className}`}
         >
           <Smartphone className="size-3.5 animate-pulse" />
-          <span>📲 Install App / డౌన్‌లోడ్</span>
+          <span className="whitespace-nowrap">📲 Install App</span>
         </button>
       )}
 

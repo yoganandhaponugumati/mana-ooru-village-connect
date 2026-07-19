@@ -36,6 +36,16 @@ const links = [
   { to: "/ai-assistant", key: "ai", wide: true },
 ] as const;
 
+const headerLinks = [
+  { to: "/timeline", key: "timeline" },
+  { to: "/workers", key: "workers" },
+  { to: "/land", key: "land" },
+  { to: "/marketplace", key: "marketplace" },
+  { to: "/services", key: "services" },
+  { to: "/problems", key: "problems" },
+  { to: "/announcements", key: "notices" },
+] as const;
+
 export function SiteNav() {
   const [open, setOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
@@ -142,17 +152,17 @@ export function SiteNav() {
           </span>
         </Link>
         <div
-          className={`hidden min-w-0 flex-1 items-center justify-center gap-1 text-xs font-extrabold xl:flex 2xl:gap-1.5 2xl:text-sm ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
+          className={`hidden min-w-0 flex-1 items-center justify-center gap-1 text-xs font-extrabold lg:flex xl:gap-2 xl:text-sm ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
         >
-          {links.map((l) => (
+          {headerLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className={`rounded-xl px-2 py-1.5 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
+              className={`whitespace-nowrap rounded-xl px-2 py-1.5 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
               activeProps={{
                 className: isHeroTop
-                  ? "text-white font-black border-b-2 border-emerald-400 text-emerald-300"
-                  : "text-primary font-black border-b-2 border-primary bg-primary/10",
+                  ? "text-white font-black bg-white/20 rounded-xl"
+                  : "text-primary font-black bg-primary/12 rounded-xl",
               }}
             >
               {t[l.key]}

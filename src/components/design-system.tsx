@@ -39,22 +39,20 @@ export function AppButton({
   iconPosition?: "left" | "right";
 }) {
   return (
-    <motion.span whileTap={{ scale: 0.98 }} className="inline-flex">
-      <button
-        className={clsx(
-          "inline-flex items-center justify-center gap-2 rounded-full font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 disabled:pointer-events-none",
-          buttonStyles[variant],
-          buttonSizes[size],
-          loading && "cursor-progress opacity-80",
-          className,
-        )}
-        {...props}
-      >
-        {icon && iconPosition === "left" && !loading && <span>{icon}</span>}
-        {loading ? <Loader2 className="size-4 animate-spin" /> : children}
-        {icon && iconPosition === "right" && !loading && <span>{icon}</span>}
-      </button>
-    </motion.span>
+    <button
+      className={clsx(
+        "inline-flex items-center justify-center gap-2 rounded-full font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-95 disabled:pointer-events-none transition-transform duration-150",
+        buttonStyles[variant],
+        buttonSizes[size],
+        loading && "cursor-progress opacity-80",
+        className,
+      )}
+      {...props}
+    >
+      {icon && iconPosition === "left" && !loading && <span>{icon}</span>}
+      {loading ? <Loader2 className="size-4 animate-spin" /> : children}
+      {icon && iconPosition === "right" && !loading && <span>{icon}</span>}
+    </button>
   );
 }
 
