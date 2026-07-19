@@ -275,13 +275,15 @@ function DashboardPage() {
                   to={
                     item.type === "announcement"
                       ? "/announcements"
-                      : item.type === "market"
-                        ? "/marketplace"
-                        : item.type === "land"
-                          ? "/land"
-                          : item.type === "service"
-                            ? "/services"
-                            : "/workers"
+                      : item.type === "complaint" || item.type === "problem"
+                        ? "/problems"
+                        : item.type === "market"
+                          ? "/marketplace"
+                          : item.type === "land"
+                            ? "/land"
+                            : item.type === "service"
+                              ? "/services"
+                              : "/workers"
                   }
                   className="flex items-center gap-3 rounded-2xl border border-white/70 bg-white/66 p-4 shadow-sm backdrop-blur-xl transition hover:border-primary/40 hover:bg-primary/5"
                 >

@@ -103,13 +103,22 @@ function OfficialPage() {
         title="Government work updates"
         description="Create public work records with photos so villagers can see what is planned, active, and completed."
         actions={
-          <AppLinkButton
-            to="/announcements"
-            variant="secondary"
-            icon={<Megaphone className="size-4" />}
-          >
-            Post notice
-          </AppLinkButton>
+          <div className="flex flex-wrap gap-2">
+            <AppLinkButton
+              to="/problems"
+              variant="secondary"
+              icon={<ShieldCheck className="size-4" />}
+            >
+              Complaint Status Desk
+            </AppLinkButton>
+            <AppLinkButton
+              to="/announcements"
+              variant="secondary"
+              icon={<Megaphone className="size-4" />}
+            >
+              Post notice
+            </AppLinkButton>
+          </div>
         }
       />
 

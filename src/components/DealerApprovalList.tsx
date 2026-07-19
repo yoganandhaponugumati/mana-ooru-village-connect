@@ -56,14 +56,26 @@ export function DealerApprovalList({ statusFilter = "pending" }: DealerApprovalL
         );
       }
 
-      // Village isolation: village_admin only sees their village
-      if (role === "village_admin" && profile?.village_id) {
-        query = query.eq("village_id", profile.village_id);
+      // Execute primary query
+      const { data, error } = await query;
+      if (error) {
+        console.error("Dealer query error:", error);
+        throw error;
       }
 
-      const { data, error } = await query;
-      if (error) throw error;
-      return data as DealerApplication[];
+      let results = (data || []) as DealerApplication[];
+
+      // If village_admin is viewing, prioritize village matches but don't hide unassigned dealers
+      if (role === "village_admin" && profile?.village_id) {
+        const villageMatched = results.filter(
+          (d) => d.village_id === profile.village_id || d.village === profile.village || !d.village_id
+        );
+        if (villageMatched.length > 0) {
+          results = villageMatched;
+        }
+      }
+
+      return results;
     },
     enabled: role === "super_admin" || role === "village_admin",
   });

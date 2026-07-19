@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { motion } from "framer-motion";
-import { useState, type FormEvent } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { useListingStats, timeAgo } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
@@ -257,6 +257,109 @@ const contacts = [
   { name: "Agriculture Officer", role: "Crop & Subsidy Help", num: "98481 12443" },
 ];
 
+function HeroFeatureCarousel() {
+  const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const carouselItems = [
+    {
+      icon: AlertTriangle,
+      title: "Report Problem",
+      telugu: "సమస్య చెప్పండి",
+      desc: "Road damage, water leaks & streetlights photo proof",
+      to: "/problems",
+      badge: "Citizen Action",
+      gradient: "from-red-600 to-rose-700",
+      accentBg: "bg-red-400/25 text-red-100",
+    },
+    {
+      icon: Megaphone,
+      title: "Post Notice",
+      telugu: "గ్రామ నోటీసు",
+      desc: "Panchayat announcements, power cuts & local updates",
+      to: "/announcements",
+      badge: "Official Notice",
+      gradient: "from-emerald-600 to-teal-700",
+      accentBg: "bg-emerald-400/25 text-emerald-100",
+    },
+    {
+      icon: Users,
+      title: "Hire Workers",
+      telugu: "పనివారు కావలెను",
+      desc: "Daily wage, tractor drivers & skilled farm helpers",
+      to: "/workers",
+      badge: "Labour & Work",
+      gradient: "from-amber-600 to-orange-700",
+      accentBg: "bg-amber-400/25 text-amber-100",
+    },
+    {
+      icon: ShoppingBasket,
+      title: "Village Marketplace",
+      telugu: "కొనుగోలు అమ్మకం",
+      desc: "Buy & sell crops, milk, seeds & store products",
+      to: "/marketplace",
+      badge: "Local Trade",
+      gradient: "from-teal-600 to-cyan-700",
+      accentBg: "bg-teal-400/25 text-teal-100",
+    },
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentIndex((prev) => (prev + 1) % carouselItems.length);
+    }, 2500); // 2.5s duration
+    return () => clearInterval(timer);
+  }, [carouselItems.length]);
+
+  const activeItem = carouselItems[currentIndex];
+
+  return (
+    <div className="relative overflow-hidden rounded-[24px] border border-white/25 bg-black/40 p-1.5 backdrop-blur-xl shadow-2xl w-full max-w-sm sm:max-w-md">
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={currentIndex}
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          onClick={() => navigate({ to: activeItem.to })}
+          className={`cursor-pointer rounded-[20px] bg-gradient-to-r ${activeItem.gradient} p-4 text-white shadow-lg flex items-center justify-between gap-3 transition hover:scale-[1.01]`}
+        >
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2 mb-1">
+              <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${activeItem.accentBg}`}>
+                {activeItem.badge}
+              </span>
+              <span className="text-[11px] font-semibold text-white/80">{activeItem.telugu}</span>
+            </div>
+            <h4 className="font-display text-lg font-bold text-white flex items-center gap-1.5">
+              <activeItem.icon className="size-5 shrink-0" />
+              {activeItem.title}
+            </h4>
+            <p className="mt-1 text-xs text-white/90 truncate">{activeItem.desc}</p>
+          </div>
+          <div className="grid size-9 shrink-0 place-items-center rounded-full bg-white/20 backdrop-blur-md">
+            <ArrowRight className="size-4 text-white" />
+          </div>
+        </motion.div>
+      </AnimatePresence>
+      <div className="flex justify-center gap-1.5 pt-2 pb-0.5">
+        {carouselItems.map((_, idx) => (
+          <button
+            key={idx}
+            type="button"
+            onClick={() => setCurrentIndex(idx)}
+            className={`h-1.5 rounded-full transition-all duration-300 ${
+              idx === currentIndex ? "w-6 bg-white" : "w-1.5 bg-white/35"
+            }`}
+            aria-label={`Slide ${idx + 1}`}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function Hero3DVillage({
   villageName,
   heroWeather,
@@ -476,20 +579,15 @@ function Index() {
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.32, ease: "easeOut" }}
-              className="mt-8 flex flex-wrap gap-4"
+              className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4"
             >
               <Link
                 to="/timeline"
-                className="inline-flex items-center gap-2 rounded-[20px] bg-primary px-7 py-4 text-base font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-1 hover:bg-secondary"
+                className="inline-flex h-14 items-center justify-center gap-2 rounded-[20px] bg-primary px-7 text-base font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-1 hover:bg-secondary shrink-0"
               >
                 <Compass className="size-5" /> {t.explore}
               </Link>
-              <Link
-                to="/post-work"
-                className="inline-flex items-center gap-2 rounded-[20px] border border-white/28 bg-white/92 px-7 py-4 text-base font-bold text-primary shadow-[0_22px_70px_-34px_rgba(0,0,0,0.72)] transition hover:-translate-y-1 hover:bg-white"
-              >
-                <Plus className="size-5" /> {t.post}
-              </Link>
+              <HeroFeatureCarousel />
             </motion.div>
 
             {!hasRealActivity && (
@@ -504,6 +602,158 @@ function Index() {
       </header>
 
       <SiteNav />
+
+      {/* Prominent Eye-Catching Showcase: Notices & Citizen Complaints */}
+      <section className="relative z-30 mx-auto mt-6 max-w-7xl px-4 sm:px-6">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-primary">
+              <Megaphone className="size-3.5" /> Village Pulse & Civic Accountability
+            </span>
+            <h2 className="mt-1 font-display text-2xl sm:text-3xl font-extrabold text-clay">
+              Official Notices & Citizen Problems
+            </h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              to="/announcements"
+              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:brightness-110 transition"
+            >
+              <Megaphone className="size-3.5" /> + Post Notice
+            </Link>
+            <Link
+              to="/problems"
+              className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-xs font-bold text-red-700 shadow-sm hover:bg-red-100 transition"
+            >
+              <AlertTriangle className="size-3.5" /> + Report Problem
+            </Link>
+          </div>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* Top Announcement Notice Card */}
+          <div className="overflow-hidden rounded-[28px] border-2 border-primary/30 bg-gradient-to-br from-primary via-primary/95 to-emerald-900 text-primary-foreground shadow-xl transition hover:shadow-2xl">
+            <div className="flex flex-col gap-4 p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-3">
+                <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur-md">
+                  <Megaphone className="size-3.5" /> Latest Announcement
+                </span>
+                <Link
+                  to="/announcements"
+                  className="text-xs font-bold text-white/90 underline hover:text-white"
+                >
+                  All Notices →
+                </Link>
+              </div>
+              {announcementItems[0] ? (
+                <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_12rem] md:items-end">
+                  <div>
+                    <span className="rounded-full bg-emerald-400/20 px-3 py-0.5 text-xs font-semibold text-emerald-200">
+                      {announcementItems[0].category || "Panchayat Notice"}
+                    </span>
+                    <h3 className="mt-2 font-display text-2xl font-bold leading-tight sm:text-3xl text-white">
+                      {announcementItems[0].title}
+                    </h3>
+                    {announcementItems[0].description && (
+                      <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 line-clamp-3">
+                        {announcementItems[0].description}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    {announcementItems[0].imageUrl ? (
+                      <img
+                        src={announcementItems[0].imageUrl}
+                        alt={announcementItems[0].title}
+                        className="aspect-[4/3] w-full rounded-2xl border border-white/20 object-cover shadow-md"
+                      />
+                    ) : (
+                      <div className="grid aspect-[4/3] w-full place-items-center rounded-2xl border border-white/20 bg-white/10 text-white/80">
+                        <Megaphone className="size-8" />
+                      </div>
+                    )}
+                    <p className="rounded-full bg-white/15 px-3 py-1.5 text-center text-xs font-bold text-white">
+                      {timeAgo(announcementItems[0].createdAt)}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <h3 className="font-display text-2xl font-bold text-white">No official notices posted yet</h3>
+                  <p className="mt-2 text-sm text-white/80">
+                    Be the first to post a Panchayat, school, health, power, or water update for your village.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Citizen Problem Reports Card */}
+          <div className="rounded-[28px] border-2 border-red-200/80 bg-card p-6 shadow-xl flex flex-col justify-between">
+            <div>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-[0.18em] text-red-600">
+                    <AlertTriangle className="size-3.5" /> Action Required
+                  </span>
+                  <h3 className="mt-1 font-display text-2xl font-bold text-clay">
+                    Citizen Problem Reports
+                  </h3>
+                </div>
+                <Link
+                  to="/problems"
+                  className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200 transition"
+                >
+                  View All ({problemItems.length}) →
+                </Link>
+              </div>
+
+              {problemItems.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-red-200 bg-red-50/50 p-6 text-center text-sm text-muted-foreground">
+                  <AlertTriangle className="mx-auto mb-2 size-8 text-red-400" />
+                  No road, drainage, or water problems posted yet.
+                  <p className="mt-2">
+                    <Link to="/problems" className="font-bold text-red-600 hover:underline">
+                      + Report a problem with photo proof
+                    </Link>
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {problemItems.slice(0, 3).map((item) => (
+                    <Link
+                      key={item.id}
+                      to="/problems"
+                      className="flex gap-3 rounded-2xl border border-border bg-white p-3 shadow-sm transition hover:border-red-300 hover:bg-red-50/40"
+                    >
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="size-16 rounded-xl object-cover shrink-0"
+                        />
+                      ) : (
+                        <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-red-100 text-red-600 font-bold">
+                          <AlertTriangle className="size-6" />
+                        </span>
+                      )}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-bold text-clay text-base">{item.title}</span>
+                        <span className="mt-1 block truncate text-xs text-muted-foreground">
+                          📍 {item.location || item.category || "Village issue"} · {timeAgo(item.createdAt)}
+                        </span>
+                        <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">
+                          {item.status === "completed" ? "✅ Resolved" : item.status === "in_progress" ? "🛠️ In Progress" : "⏳ Pending"}
+                        </span>
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <ConceptShowcase />
 

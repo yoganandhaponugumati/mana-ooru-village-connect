@@ -22,6 +22,7 @@ import { useNotifications } from "@/lib/notifications";
 import { timeAgo } from "@/lib/store";
 import { languageOptions, useVillagePreferences, type Language } from "@/lib/village-preferences";
 import { getRoleDisplayName } from "@/lib/supabase/auth";
+import { InstallAppButton } from "@/components/InstallAppButton";
 const links = [
   { to: "/", key: "home" },
   { to: "/timeline", key: "timeline" },
@@ -259,6 +260,7 @@ export function SiteNav() {
               {selectedVillage || "Choose your village"}
             </span>
           </Link>
+          <InstallAppButton variant="pill" className="hidden sm:inline-flex" />
           <div className="nav-menu-container relative">
             <button
               onClick={() => setLanguageOpen((value) => !value)}
@@ -431,99 +433,146 @@ export function SiteNav() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.24, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border/60 bg-background/92 shadow-[var(--shadow-soft)] backdrop-blur-2xl xl:hidden"
+            className="overflow-hidden border-t border-border/60 bg-[#f7fbf2] dark:bg-zinc-950 text-foreground shadow-2xl xl:hidden max-h-[85vh] overflow-y-auto"
           >
             <motion.div
               initial="closed"
               animate="open"
               variants={{
-                open: { transition: { staggerChildren: 0.035 } },
+                open: { transition: { staggerChildren: 0.03 } },
                 closed: {},
               }}
-              className="mx-auto flex max-w-7xl flex-col px-4 py-3 sm:px-6"
+              className="mx-auto flex max-w-7xl flex-col px-4 py-4 sm:px-6 space-y-4"
             >
-              {links.map((l) => (
-                <motion.div
-                  key={l.to}
-                  variants={{
-                    closed: { opacity: 0, x: -8 },
-                    open: { opacity: 1, x: 0 },
-                  }}
-                >
-                  <Link
-                    to={l.to}
-                    onClick={() => setOpen(false)}
-                    className="block rounded-xl px-3 py-2.5 text-sm font-medium text-foreground transition hover:bg-muted"
+              {/* Home & Quick Links Grid */}
+              <div className="grid grid-cols-2 gap-2">
+                {links.map((l) => (
+                  <motion.div
+                    key={l.to}
+                    variants={{
+                      closed: { opacity: 0, x: -8 },
+                      open: { opacity: 1, x: 0 },
+                    }}
                   >
-                    {t[l.key]}
-                  </Link>
-                </motion.div>
-              ))}
-              <div className="mt-3 rounded-2xl border border-border/70 bg-white/70 p-2 shadow-sm">
-                <div className="mb-2 flex items-center gap-2 px-2 text-xs font-bold uppercase tracking-[0.16em] text-muted-foreground">
-                  <Globe2 className="size-3.5" />
-                  Language
+                    <Link
+                      to={l.to}
+                      onClick={() => setOpen(false)}
+                      className="flex items-center gap-2 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 px-3 py-2.5 text-xs font-bold text-foreground shadow-sm transition hover:border-primary hover:text-primary active:scale-95"
+                      activeProps={{
+                        className: "bg-primary text-primary-foreground font-black shadow-md border-primary",
+                      }}
+                    >
+                      {l.key === "home" && "🏠 "}
+                      {l.key === "timeline" && "🌐 "}
+                      {l.key === "workers" && "👷 "}
+                      {l.key === "land" && "🌾 "}
+                      {l.key === "marketplace" && "🛒 "}
+                      {l.key === "services" && "🛠️ "}
+                      {l.key === "problems" && "🚨 "}
+                      {l.key === "notices" && "📢 "}
+                      {l.key === "weather" && "☀️ "}
+                      {l.key === "ai" && "🤖 "}
+                      <span className="truncate">{t[l.key]}</span>
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Language Selection Card */}
+              <div className="rounded-2xl border border-border/80 bg-white dark:bg-zinc-900 p-3 shadow-sm">
+                <div className="mb-2 flex items-center justify-between px-1">
+                  <span className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-[0.14em] text-primary">
+                    <Globe2 className="size-3.5" /> Select Language / భాష
+                  </span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                    Active: {language.toUpperCase()}
+                  </span>
                 </div>
                 <div className="grid grid-cols-3 gap-2">
                   {languageOptions.map((item) => (
                     <button
                       key={item.code}
+                      type="button"
                       onClick={() => chooseMobileLanguage(item.code)}
-                      className={`inline-flex h-10 items-center justify-center rounded-xl border px-2 text-xs font-bold transition ${
+                      className={`flex flex-col items-center justify-center rounded-xl border py-2 px-1 text-xs font-bold transition active:scale-95 ${
                         item.code === language
-                          ? "border-primary bg-primary text-primary-foreground shadow-[var(--shadow-glow)]"
-                          : "border-border bg-background text-foreground hover:border-primary hover:text-primary"
+                          ? "border-primary bg-primary text-primary-foreground shadow-md ring-2 ring-primary/30"
+                          : "border-border/80 bg-muted/40 text-foreground hover:border-primary hover:text-primary"
                       }`}
                     >
-                      {item.label}
+                      <span>{item.label}</span>
                     </button>
                   ))}
                 </div>
               </div>
-              {user ? (
-                <>
-                  {(role === "village_admin" || role === "super_admin") && (
-                    <Link
-                      to="/official"
-                      onClick={() => setOpen(false)}
-                      className="block mt-2 rounded-xl border border-primary/20 bg-primary/10 px-3 py-2.5 text-center text-sm font-semibold text-primary"
+
+              {/* App Installation Option */}
+              <InstallAppButton variant="drawer" />
+
+              {/* User Account Section */}
+              <div className="border-t border-border/60 pt-3">
+                {user ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-2 px-2 py-1 text-xs font-semibold text-muted-foreground">
+                      <UserRound className="size-3.5 text-primary" />
+                      <span className="truncate">
+                        Signed in as {authProfile?.full_name || user.email?.split("@")[0]}
+                      </span>
+                    </div>
+
+                    {(role === "village_admin" || role === "super_admin") && (
+                      <Link
+                        to="/official"
+                        onClick={() => setOpen(false)}
+                        className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white shadow-md transition hover:bg-emerald-700"
+                      >
+                        <ShieldCheck className="size-4" />
+                        {t.officialWorkspace || "Official Workspace"}
+                      </Link>
+                    )}
+
+                    <div className="grid grid-cols-2 gap-2">
+                      <Link
+                        to="/dashboard"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-white dark:bg-zinc-900 px-3 py-2.5 text-xs font-bold text-clay shadow-sm"
+                      >
+                        <LayoutDashboard className="size-3.5 text-blue-600" />
+                        {t.dashboard || "Dashboard"}
+                      </Link>
+                      <Link
+                        to="/profile"
+                        onClick={() => setOpen(false)}
+                        className="flex items-center justify-center gap-1.5 rounded-xl border border-border bg-white dark:bg-zinc-900 px-3 py-2.5 text-xs font-bold text-clay shadow-sm"
+                      >
+                        <UserRound className="size-3.5 text-amber-600" />
+                        {t.profileDetails || "Profile"}
+                      </Link>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        signOut();
+                        setOpen(false);
+                      }}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 text-red-700 dark:bg-red-950/40 dark:text-red-300 px-4 py-2.5 text-xs font-bold transition hover:bg-red-100"
                     >
-                      {t.officialWorkspace || "Official workspace"}
-                    </Link>
-                  )}
+                      <LogOut className="size-3.5" />
+                      {t.signOut || "Sign Out"}
+                    </button>
+                  </div>
+                ) : (
                   <Link
-                    to="/dashboard"
+                    to="/auth"
                     onClick={() => setOpen(false)}
-                    className="block mt-2 rounded-xl border border-border px-3 py-2.5 text-center text-sm font-semibold text-foreground"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-primary px-4 py-3 text-sm font-bold text-white shadow-lg transition hover:brightness-110"
                   >
-                    {t.dashboard || "Dashboard"}
+                    <UserRound className="size-4" />
+                    {t.signIn || "Sign In / Register"}
                   </Link>
-                  <Link
-                    to="/profile"
-                    onClick={() => setOpen(false)}
-                    className="block mt-2 rounded-xl bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground"
-                  >
-                    {t.profileDetails || "Profile"}
-                  </Link>
-                  <button
-                    onClick={() => {
-                      signOut();
-                      setOpen(false);
-                    }}
-                    className="block w-full mt-2 rounded-xl border border-border px-3 py-2.5 text-center text-sm font-semibold text-foreground"
-                  >
-                    {t.signOut || "Sign out"} ({user.email?.split("@")[0]})
-                  </button>
-                </>
-              ) : (
-                <Link
-                  to="/auth"
-                  onClick={() => setOpen(false)}
-                  className="block mt-2 rounded-xl bg-primary px-3 py-2.5 text-center text-sm font-semibold text-primary-foreground"
-                >
-                  {t.signIn}
-                </Link>
-              )}
+                )}
+              </div>
             </motion.div>
           </motion.div>
         )}

@@ -18,7 +18,7 @@ import {
   ShieldCheck,
   Award,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
 import {
@@ -51,10 +51,12 @@ const issueTypes = [
 function ProblemsPage() {
   const { user, role } = useAuth();
   const navigate = useNavigate();
+  const formRef = useRef<HTMLDivElement>(null);
   const { items, remove, update } = useListings("complaint");
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "complaint");
   const [showForm, setShowForm] = useState(false);
+  const [statusTab, setStatusTab] = useState<"all" | "pending" | "in_progress" | "completed">("all");
   const [upvotes, setUpvotes] = useState<Record<string, number>>({});
   const urgentContacts = emergencyContacts.filter((item) => item.urgent).slice(0, 3);
   const canManage = role === "village_admin" || role === "super_admin";
@@ -71,7 +73,13 @@ function ProblemsPage() {
       });
       return;
     }
-    setShowForm((value) => !value);
+    setShowForm((prev) => {
+      const next = !prev;
+      if (next) {
+        setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+      }
+      return next;
+    });
   };
 
   const handleOpenFormClick = () => {
@@ -87,6 +95,7 @@ function ProblemsPage() {
       return;
     }
     setShowForm(true);
+    setTimeout(() => formRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
   };
 
   const handleUpvote = (id: string) => {
@@ -187,52 +196,92 @@ function ProblemsPage() {
       </div>
 
       {showForm && (
-        <SurfaceCard className="mb-8 p-6 sm:p-8 border-2 border-primary/30 shadow-md bg-card">
-          <ListingForm
-            type="complaint"
-            title="Problem Details & Photo Proof"
-            redirectTo="/problems"
-            photoRequired
-            photoLabel="Take / Upload Problem Photo"
-            photoHint="Camera proof is mandatory for road damage, drainage clogs, garbage dumps, or broken infrastructure."
-            fields={[
-              {
-                name: "title",
-                label: "Problem Title",
-                placeholder: "e.g. CC Road cracked & drainage blocked near temple",
-                required: true,
-              },
-              {
-                name: "category",
-                label: "Issue Category",
-                placeholder: "",
-                options: issueTypes.map((item) => item.label),
-                required: true,
-              },
-              {
-                name: "description",
-                label: "Detailed Description",
-                placeholder:
-                  "Explain exactly how long this issue has existed, who is affected, and why urgent repair is needed...",
-                textarea: true,
-                required: true,
-              },
-              {
-                name: "location",
-                label: "Exact Location / Ward / Street",
-                placeholder: "Ward No., Street name, or nearby landmark",
-                required: true,
-              },
-              {
-                name: "contact",
-                label: "Your Contact Number",
-                placeholder: "10-digit mobile (for Panchayat clarification)",
-                required: true,
-              },
-            ]}
-          />
-        </SurfaceCard>
+        <div ref={formRef}>
+          <SurfaceCard className="mb-8 p-6 sm:p-8 border-2 border-primary/30 shadow-md bg-card ring-2 ring-primary/20">
+            <ListingForm
+              type="complaint"
+              title="Problem Details & Photo Proof"
+              redirectTo="/problems"
+              photoRequired
+              photoLabel="Take / Upload Problem Photo"
+              photoHint="Camera proof is mandatory for road damage, drainage clogs, garbage dumps, or broken infrastructure."
+              fields={[
+                {
+                  name: "title",
+                  label: "Problem Title",
+                  placeholder: "e.g. CC Road cracked & drainage blocked near temple",
+                  required: true,
+                },
+                {
+                  name: "category",
+                  label: "Issue Category",
+                  placeholder: "",
+                  options: issueTypes.map((item) => item.label),
+                  required: true,
+                },
+                {
+                  name: "description",
+                  label: "Detailed Description",
+                  placeholder:
+                    "Explain exactly how long this issue has existed, who is affected, and why urgent repair is needed...",
+                  textarea: true,
+                  required: true,
+                },
+                {
+                  name: "location",
+                  label: "Exact Location / Ward / Street",
+                  placeholder: "Ward No., Street name, or nearby landmark",
+                  required: true,
+                },
+                {
+                  name: "contact",
+                  label: "Your Contact Number",
+                  placeholder: "10-digit mobile (for Panchayat clarification)",
+                  required: true,
+                },
+              ]}
+            />
+          </SurfaceCard>
+        </div>
       )}
+
+      {/* Status Filter Tabs */}
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4">
+        <div className="flex flex-wrap gap-2">
+          {(
+            [
+              { id: "all", label: "All Reports" },
+              { id: "pending", label: "⏳ Pending" },
+              { id: "in_progress", label: "🛠️ In Progress" },
+              { id: "completed", label: "✅ Resolved" },
+            ] as const
+          ).map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setStatusTab(t.id)}
+              className={`rounded-full px-4 py-1.5 text-xs font-bold transition ${
+                statusTab === t.id
+                  ? "bg-primary text-primary-foreground shadow-sm"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+        <span className="text-xs font-semibold text-muted-foreground">
+          Showing {
+            displayItems.filter((i) => {
+              const st = i.status || "pending";
+              if (statusTab === "pending") return st === "pending" || st === "active";
+              if (statusTab === "in_progress") return st === "in_progress";
+              if (statusTab === "completed") return st === "completed" || st === "resolved";
+              return true;
+            }).length
+          } report(s)
+        </span>
+      </div>
 
       {displayItems.length === 0 ? (
         <EmptyState
@@ -251,124 +300,166 @@ function ProblemsPage() {
         />
       ) : (
         <div className="grid gap-6 sm:grid-cols-2">
-          {displayItems.map((item) => {
-            const votesCount = (upvotes[item.id] || 0) + 12; // Base citizen interest + live upvotes
-            const status = item.status || "active";
-            const isResolved = status === "completed";
+          {displayItems
+            .filter((item) => {
+              const st = item.status || "pending";
+              if (statusTab === "pending") return st === "pending" || st === "active";
+              if (statusTab === "in_progress") return st === "in_progress";
+              if (statusTab === "completed") return st === "completed" || st === "resolved";
+              return true;
+            })
+            .map((item) => {
+              const votesCount = (upvotes[item.id] || 0) + 12;
+              const status = item.status || "pending";
+              const isResolved = status === "completed" || status === "resolved";
+              const isInProgress = status === "in_progress";
 
-            return (
-              <SurfaceCard
-                key={item.id}
-                hover={false}
-                className={`p-6 flex flex-col justify-between transition-all rounded-[1.5rem] shadow-sm border-l-4 ${
-                  isResolved ? "border-emerald-500 bg-emerald-50/30" : "border-amber-500 bg-card/95"
-                }`}
-              >
-                <div>
-                  {item.imageUrl && (
-                    <div className="mb-4 overflow-hidden rounded-2xl border border-border/80 relative group">
-                      <img
-                        src={item.imageUrl}
-                        alt={item.title}
-                        className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-105"
-                      />
-                      <div className="absolute top-3 right-3 rounded-full bg-black/65 backdrop-blur-md px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5">
-                        <MapPin className="size-3 text-amber-300" />{" "}
-                        {item.location || "Village Street"}
+              return (
+                <SurfaceCard
+                  key={item.id}
+                  hover={false}
+                  className={`p-6 flex flex-col justify-between transition-all rounded-[1.5rem] shadow-sm border-l-4 ${
+                    isResolved
+                      ? "border-emerald-500 bg-emerald-50/30"
+                      : isInProgress
+                        ? "border-blue-500 bg-blue-50/20"
+                        : "border-amber-500 bg-card/95"
+                  }`}
+                >
+                  <div>
+                    {item.imageUrl && (
+                      <div className="mb-4 overflow-hidden rounded-2xl border border-border/80 relative group">
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-105"
+                        />
+                        <div className="absolute top-3 right-3 rounded-full bg-black/65 backdrop-blur-md px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5">
+                          <MapPin className="size-3 text-amber-300" />{" "}
+                          {item.location || "Village Street"}
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    )}
 
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                      <Award className="size-3.5 text-primary" /> {item.category || "Civic Report"}
-                    </span>
-                    <span
-                      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
-                        isResolved
-                          ? "bg-emerald-100 text-emerald-800"
-                          : "bg-amber-100 text-amber-800"
-                      }`}
-                    >
-                      {isResolved ? (
-                        <>
-                          <CheckCircle2 className="size-3.5 text-emerald-600" /> Resolved by
-                          Panchayat
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="size-3.5 text-amber-600 animate-pulse" /> Action Pending
-                        </>
-                      )}
-                    </span>
+                    <div className="flex items-center justify-between gap-2">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
+                        <Award className="size-3.5 text-primary" /> {item.category || "Civic Report"}
+                      </span>
+                      <span
+                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
+                          isResolved
+                            ? "bg-emerald-100 text-emerald-800"
+                            : isInProgress
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-amber-100 text-amber-800"
+                        }`}
+                      >
+                        {isResolved ? (
+                          <>
+                            <CheckCircle2 className="size-3.5 text-emerald-600" /> Resolved by Panchayat
+                          </>
+                        ) : isInProgress ? (
+                          <>
+                            <Clock className="size-3.5 text-blue-600 animate-pulse" /> Work In Progress
+                          </>
+                        ) : (
+                          <>
+                            <Clock className="size-3.5 text-amber-600 animate-pulse" /> Pending Review
+                          </>
+                        )}
+                      </span>
+                    </div>
+
+                    <h3 className="mt-3 font-display text-xl font-bold text-clay">{item.title}</h3>
+                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
                   </div>
 
-                  <h3 className="mt-3 font-display text-xl font-bold text-clay">{item.title}</h3>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
-                </div>
-
-                <div className="mt-6 border-t border-border/70 pt-4 space-y-4">
-                  {/* Community Upvoting Bar */}
-                  <div className="flex items-center justify-between rounded-2xl bg-muted/70 p-3">
-                    <div className="flex items-center gap-2">
-                      <span className="flex size-7 items-center justify-center rounded-full bg-primary/15 text-primary font-black text-xs">
-                        +{votesCount}
-                      </span>
-                      <span className="text-xs font-bold text-clay">
-                        Villagers verified this issue
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => handleUpvote(item.id)}
-                      className="inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-bold shadow-sm hover:brightness-110 transition active:scale-95"
-                    >
-                      <ThumbsUp className="size-3.5" /> I Face This Too (+1)
-                    </button>
-                  </div>
-
-                  {/* Admin controls and sharing */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-                    <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-                      <span className="inline-flex items-center gap-1">
-                        <Phone className="size-3" /> {item.contact}
-                      </span>
-                      <span>· {timeAgo(item.createdAt)}</span>
-                    </div>
-
-                    <div className="flex items-center gap-3">
+                  <div className="mt-6 border-t border-border/70 pt-4 space-y-4">
+                    {/* Community Upvoting Bar */}
+                    <div className="flex items-center justify-between rounded-2xl bg-muted/70 p-3">
+                      <div className="flex items-center gap-2">
+                        <span className="flex size-7 items-center justify-center rounded-full bg-primary/15 text-primary font-black text-xs">
+                          +{votesCount}
+                        </span>
+                        <span className="text-xs font-bold text-clay">
+                          Villagers verified this issue
+                        </span>
+                      </div>
                       <button
                         type="button"
-                        onClick={() =>
-                          shareToWhatsApp(item.title, item.description || "", item.location || "")
-                        }
-                        className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
+                        onClick={() => handleUpvote(item.id)}
+                        className="inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-bold shadow-sm hover:brightness-110 transition active:scale-95"
                       >
-                        <Share2 className="size-3.5" /> Share
+                        <ThumbsUp className="size-3.5" /> I Face This Too (+1)
                       </button>
+                    </div>
 
-                      {canManage && (
+                    {/* Admin controls and sharing */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+                      <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
+                          <Phone className="size-3" /> {item.contact}
+                        </span>
+                        <span>· {timeAgo(item.createdAt)}</span>
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-2">
                         <button
                           type="button"
                           onClick={() =>
-                            update(item.id, {
-                              status: isResolved ? "active" : "completed",
-                            })
+                            shareToWhatsApp(item.title, item.description || "", item.location || "")
                           }
-                          className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold border transition ${
-                            isResolved
-                              ? "border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
-                              : "border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
-                          }`}
+                          className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline mr-1"
                         >
-                          <ShieldCheck className="size-3.5" />
-                          {isResolved ? "Reopen Issue" : "Mark Resolved 🟢"}
+                          <Share2 className="size-3.5" /> Share
                         </button>
-                      )}
 
-                      {(canManage || item.localOnly || (!!user && user.id === item.owner_id)) && (
-                        <button
-                          type="button"
+                        {canManage && (
+                          <div className="flex flex-wrap gap-1.5">
+                            {status !== "pending" && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  update(item.id, { status: "pending" });
+                                  toast.info("Status set to Pending");
+                                }}
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold border border-amber-300 bg-amber-50 text-amber-800 hover:bg-amber-100"
+                              >
+                                ⏳ Pending
+                              </button>
+                            )}
+
+                            {status !== "in_progress" && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  update(item.id, { status: "in_progress" });
+                                  toast.success("Status set to In Progress 🛠️");
+                                }}
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold border border-blue-300 bg-blue-50 text-blue-800 hover:bg-blue-100"
+                              >
+                                🛠️ In Progress
+                              </button>
+                            )}
+
+                            {status !== "completed" && status !== "resolved" && (
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  update(item.id, { status: "completed" });
+                                  toast.success("Status set to Resolved 🟢");
+                                }}
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold border border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100"
+                              >
+                                <ShieldCheck className="size-3.5" /> Resolved 🟢
+                              </button>
+                            )}
+                          </div>
+                        )}
+
+                        {(canManage || item.localOnly || (!!user && user.id === item.owner_id)) && (
+                          <button
+                            type="button"
                           onClick={() => remove(item.id)}
                           className="text-xs font-semibold text-red-600 hover:underline"
                         >

@@ -17,7 +17,7 @@ import {
   MapPin,
   BadgeIndianRupee,
 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useRef, useState, type FormEvent } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
 import {
@@ -41,6 +41,7 @@ export const Route = createFileRoute("/announcements")({
 
 function AnnPage() {
   const navigate = useNavigate();
+  const noticeFormRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"notices" | "sarpanch_works">("notices");
 
   // Notice board data
@@ -83,7 +84,13 @@ function AnnPage() {
       toast.error("Only Village Admins or Sarpanch officials can post official notices.");
       return;
     }
-    setShowNoticeForm((v) => !v);
+    setShowNoticeForm((v) => {
+        const next = !v;
+        if (next) {
+          setTimeout(() => noticeFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
+        }
+        return next;
+    });
   };
 
   const handleWorkSubmit = async (event: FormEvent) => {
@@ -238,7 +245,8 @@ function AnnPage() {
           </div>
 
           {showNoticeForm && (
-            <SurfaceCard className="mb-8 p-6 sm:p-8 border-primary/20">
+            <div ref={noticeFormRef}>
+              <SurfaceCard className="mb-8 p-6 sm:p-8 border-primary/20 ring-2 ring-primary/20">
               <ListingForm
                 type="announcement"
                 title="Notice details"
@@ -285,6 +293,7 @@ function AnnPage() {
                 ]}
               />
             </SurfaceCard>
+          </div>
           )}
 
           {displayItems.length === 0 ? (
