@@ -37,6 +37,7 @@ const links = [
 ] as const;
 
 const headerLinks = [
+  { to: "/", key: "home" },
   { to: "/timeline", key: "timeline" },
   { to: "/workers", key: "workers" },
   { to: "/land", key: "land" },
@@ -152,17 +153,18 @@ export function SiteNav() {
           </span>
         </Link>
         <div
-          className={`hidden min-w-0 flex-1 items-center justify-center gap-1 text-xs font-extrabold lg:flex xl:gap-2 xl:text-sm ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
+          className={`hidden min-w-0 flex-1 items-center justify-center gap-0.5 text-xs font-bold xl:flex xl:gap-1.5 2xl:text-sm ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
         >
           {headerLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className={`whitespace-nowrap rounded-xl px-2 py-1.5 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
+              activeOptions={{ exact: l.to === "/" }}
+              className={`whitespace-nowrap rounded-xl px-2 py-1 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
               activeProps={{
                 className: isHeroTop
-                  ? "text-white font-black bg-white/20 rounded-xl"
-                  : "text-primary font-black bg-primary/12 rounded-xl",
+                  ? "text-white font-black bg-white/20 shadow-sm"
+                  : "text-primary font-black bg-primary/12 shadow-sm",
               }}
             >
               {t[l.key]}
@@ -693,6 +695,50 @@ export function SiteFooter() {
             </Link>
           </div>
         </div>
+      </div>
+      {/* Mobile Bottom Dock Bar */}
+      <div className="fixed bottom-0 inset-x-0 z-[9995] xl:hidden border-t border-border/80 bg-white/95 dark:bg-zinc-950/95 px-2 py-1.5 backdrop-blur-xl shadow-2xl flex items-center justify-around text-foreground">
+        <Link
+          to="/"
+          activeOptions={{ exact: true }}
+          className="flex flex-col items-center gap-0.5 px-2 py-1 text-[10px] font-bold text-muted-foreground transition hover:text-primary"
+          activeProps={{ className: "text-primary font-black" }}
+        >
+          <span className="text-base">🏠</span>
+          <span>Home</span>
+        </Link>
+        <Link
+          to="/problems"
+          className="flex flex-col items-center gap-0.5 px-2 py-1 text-[10px] font-bold text-muted-foreground transition hover:text-primary"
+          activeProps={{ className: "text-red-600 font-black" }}
+        >
+          <span className="text-base">🚨</span>
+          <span>Problems</span>
+        </Link>
+        <Link
+          to="/announcements"
+          className="flex flex-col items-center gap-0.5 px-2 py-1 text-[10px] font-bold text-muted-foreground transition hover:text-primary"
+          activeProps={{ className: "text-primary font-black" }}
+        >
+          <span className="text-base">📢</span>
+          <span>Notices</span>
+        </Link>
+        <Link
+          to="/marketplace"
+          className="flex flex-col items-center gap-0.5 px-2 py-1 text-[10px] font-bold text-muted-foreground transition hover:text-primary"
+          activeProps={{ className: "text-teal-600 font-black" }}
+        >
+          <span className="text-base">🛒</span>
+          <span>Market</span>
+        </Link>
+        <button
+          type="button"
+          onClick={() => setOpen((v) => !v)}
+          className="flex flex-col items-center gap-0.5 px-2 py-1 text-[10px] font-bold text-muted-foreground transition hover:text-primary"
+        >
+          <Menu className="size-4 text-primary" />
+          <span>Menu</span>
+        </button>
       </div>
     </footer>
   );
