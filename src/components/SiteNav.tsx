@@ -142,13 +142,13 @@ export function SiteNav() {
           </span>
         </Link>
         <div
-          className={`hidden min-w-0 flex-1 items-center justify-center gap-1.5 text-xs font-bold 2xl:flex ${isHeroTop ? "text-white/88" : "text-muted-foreground"}`}
+          className={`hidden min-w-0 flex-1 items-center justify-center gap-1 text-xs font-extrabold xl:flex 2xl:gap-1.5 2xl:text-sm ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
         >
           {links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className={`rounded-xl px-2.5 py-1.5 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
+              className={`rounded-xl px-2 py-1.5 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
               activeProps={{
                 className: isHeroTop
                   ? "text-white font-black border-b-2 border-emerald-400 text-emerald-300"
