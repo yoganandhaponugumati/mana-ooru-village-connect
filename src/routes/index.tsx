@@ -639,16 +639,16 @@ function Index() {
         <div className="pointer-events-none absolute left-0 top-28 z-10 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div className="hero-life-layer pointer-events-none absolute inset-0 z-10" />
 
-        <div className="relative z-20 mx-auto grid min-h-screen max-w-7xl items-center gap-10 px-4 pb-32 pt-28 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:pb-28">
-          <div className="max-w-3xl text-left">
-            {/* Small Animated Pinned Notice Card inside 1st Hero Page */}
-            {announcementItems[0] && (
+        <div className="relative z-20 mx-auto max-w-7xl px-4 pt-24 sm:px-6">
+          {/* Small Animated Pinned Notice Card on the RIGHT SIDE inside 1st Hero Page */}
+          {announcementItems[0] && (
+            <div className="flex justify-end">
               <motion.div
-                initial={{ opacity: 0, x: -24 }}
+                initial={{ opacity: 0, x: 24 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.04 }}
                 onClick={() => navigate({ to: "/announcements" })}
-                className="mb-4 inline-flex cursor-pointer items-center gap-2.5 rounded-full border border-emerald-400/40 bg-emerald-950/80 px-4 py-2 text-xs font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] backdrop-blur-md transition hover:border-emerald-300 hover:scale-[1.02] active:scale-95"
+                className="inline-flex cursor-pointer items-center gap-2.5 rounded-full border border-emerald-400/40 bg-emerald-950/85 px-4 py-2 text-xs font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.4)] backdrop-blur-md transition hover:border-emerald-300 hover:scale-[1.02] active:scale-95"
               >
                 <span className="relative flex size-2.5">
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -657,12 +657,17 @@ function Index() {
                 <span className="rounded-full bg-emerald-500/25 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-300">
                   📌 Pinned Notice
                 </span>
-                <span className="max-w-[200px] truncate font-semibold text-white/95 sm:max-w-[320px]">
+                <span className="max-w-[180px] truncate font-semibold text-white/95 sm:max-w-[300px]">
                   {announcementItems[0].title}
                 </span>
                 <ArrowRight className="size-3.5 shrink-0 text-emerald-300" />
               </motion.div>
-            )}
+            </div>
+          )}
+        </div>
+
+        <div className="relative z-20 mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl items-center gap-10 px-4 pb-32 pt-6 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:pb-28">
+          <div className="max-w-3xl text-left">
 
             <motion.h1
               initial={{ opacity: 0, y: 22 }}

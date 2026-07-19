@@ -128,31 +128,31 @@ export function SiteNav() {
       className={`fixed inset-x-0 top-0 z-[9999] border-b transition-all duration-300 ${isHeroTop ? "border-white/15 bg-black/45 text-white shadow-lg" : "border-[#dfeae2]/80 bg-[#f7fbf2]/92 text-foreground shadow-[0_18px_54px_-40px_rgba(20,49,32,0.82)] backdrop-blur-2xl"}`}
     >
       <div className="mx-auto flex min-h-16 max-w-7xl items-center justify-between gap-4 px-4 py-2 sm:px-6">
-        <Link to="/" className="group flex min-w-0 shrink-0 items-center gap-2 mr-6">
+        <Link to="/" className="group flex shrink-0 items-center gap-2 mr-6 lg:mr-8">
           <motion.div
             whileHover={{ rotate: -4, scale: 1.03 }}
-            className="grid size-9 place-items-center rounded-[14px] bg-[var(--gradient-village)] text-white shadow-[var(--shadow-glow)]"
+            className="grid size-9 place-items-center rounded-[14px] bg-[var(--gradient-village)] text-white shadow-[var(--shadow-glow)] shrink-0"
           >
             <Leaf className="size-5" />
           </motion.div>
           <span
-            className={`truncate font-display text-xl font-semibold tracking-tight ${isHeroTop ? "text-white" : "text-clay"}`}
+            className={`font-display text-xl font-bold tracking-tight shrink-0 ${isHeroTop ? "text-white" : "text-clay"}`}
           >
             ManaOoru
           </span>
         </Link>
         <div
-          className={`hidden min-w-0 flex-1 items-center justify-center gap-1 text-xs font-semibold xl:flex 2xl:text-sm ${isHeroTop ? "text-white/88" : "text-muted-foreground"}`}
+          className={`hidden min-w-0 flex-1 items-center justify-center gap-1.5 text-xs font-bold 2xl:flex ${isHeroTop ? "text-white/88" : "text-muted-foreground"}`}
         >
           {links.map((l) => (
             <Link
               key={l.to}
               to={l.to}
-              className={`rounded-[14px] px-2.5 py-2 transition-all 2xl:px-3 ${"wide" in l ? "hidden 2xl:inline-flex" : ""} ${isHeroTop ? "hover:bg-white/10 hover:text-white" : "hover:-translate-y-0.5 hover:bg-primary/8 hover:text-primary"}`}
+              className={`rounded-xl px-2.5 py-1.5 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
               activeProps={{
                 className: isHeroTop
-                  ? "text-white underline decoration-secondary decoration-2 underline-offset-8"
-                  : "bg-white/72 text-primary font-semibold shadow-sm ring-1 ring-primary/10",
+                  ? "text-white font-black border-b-2 border-emerald-400 text-emerald-300"
+                  : "text-primary font-black border-b-2 border-primary bg-primary/10",
               }}
             >
               {t[l.key]}
