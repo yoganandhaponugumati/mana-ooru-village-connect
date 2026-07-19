@@ -77,9 +77,13 @@ export function InstallAppButton({
 
   if (isInstalled) {
     return (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-xs font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
-        <Check className="size-3.5" /> App Installed
-      </span>
+      <a
+        href="/"
+        className="inline-flex items-center gap-1.5 rounded-full bg-emerald-100 dark:bg-emerald-950/60 px-3.5 py-1.5 text-xs font-bold text-emerald-800 dark:text-emerald-200 border border-emerald-300 shadow-sm transition hover:scale-105 active:scale-95"
+      >
+        <Check className="size-3.5 text-emerald-600" />
+        <span>✅ App Installed (Open App)</span>
+      </a>
     );
   }
 
@@ -92,7 +96,7 @@ export function InstallAppButton({
           className={`relative inline-flex h-9 items-center gap-1.5 rounded-full bg-gradient-to-r from-emerald-600 via-primary to-teal-600 px-3.5 text-xs font-extrabold text-white shadow-[0_0_15px_rgba(16,185,129,0.4)] transition hover:-translate-y-0.5 hover:brightness-110 active:scale-95 ${className}`}
         >
           <Smartphone className="size-3.5 animate-pulse" />
-          <span>Install App</span>
+          <span>📲 Install App / డౌన్‌లోడ్</span>
         </button>
       )}
 
@@ -100,10 +104,13 @@ export function InstallAppButton({
         <button
           type="button"
           onClick={handleClick}
-          className={`flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 via-primary to-teal-600 px-4 py-3 text-xs font-extrabold text-white shadow-md transition hover:brightness-110 active:scale-95 ${className}`}
+          className={`flex w-full flex-col items-center justify-center gap-1 rounded-2xl bg-gradient-to-r from-emerald-600 via-primary to-teal-600 px-4 py-3 text-xs font-extrabold text-white shadow-lg transition hover:brightness-110 active:scale-95 ${className}`}
         >
-          <Smartphone className="size-4 animate-bounce" />
-          <span>Install ManaOoru App / యాప్ డౌన్‌లోడ్</span>
+          <div className="flex items-center gap-2">
+            <Smartphone className="size-4 animate-bounce" />
+            <span>📲 How to Download & Install App</span>
+          </div>
+          <span className="text-[10px] font-medium opacity-95">మా ఊరు యాప్ ఇన్స్టాల్ చేయండి</span>
         </button>
       )}
 

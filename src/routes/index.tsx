@@ -360,6 +360,137 @@ function HeroFeatureCarousel() {
   );
 }
 
+function NoticeCarouselCard({ items }: { items: typeof fallbackListings }) {
+  const navigate = useNavigate();
+  const [index, setIndex] = useState(0);
+
+  useEffect(() => {
+    if (items.length <= 1) return;
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % items.length);
+    }, 4000); // 4-second auto cycle
+    return () => clearInterval(interval);
+  }, [items.length]);
+
+  if (items.length === 0) {
+    return (
+      <div className="overflow-hidden rounded-[28px] border-2 border-primary/30 bg-gradient-to-br from-primary via-primary/95 to-emerald-900 p-6 text-white shadow-xl">
+        <h3 className="font-display text-2xl font-bold">No official notices posted yet</h3>
+        <p className="mt-2 text-sm text-white/80">
+          Be the first to post a Panchayat, school, health, power, or water update for your village.
+        </p>
+      </div>
+    );
+  }
+
+  const current = items[index];
+
+  return (
+    <div className="relative overflow-hidden rounded-[28px] border-2 border-primary/30 bg-gradient-to-br from-primary via-primary/95 to-emerald-900 text-primary-foreground shadow-xl transition hover:shadow-2xl">
+      <div className="flex flex-col gap-4 p-6 sm:p-7">
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur-md text-white">
+              <Megaphone className="size-3.5" /> Latest Notice
+            </span>
+            {items.length > 1 && (
+              <span className="rounded-full bg-emerald-400/20 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-200">
+                {index + 1} of {items.length} Notices
+              </span>
+            )}
+          </div>
+          <Link
+            to="/announcements"
+            className="text-xs font-bold text-white/90 underline hover:text-white"
+          >
+            All Notices ({items.length}) →
+          </Link>
+        </div>
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={current.id}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            transition={{ duration: 0.3 }}
+            className="cursor-pointer"
+            onClick={() => navigate({ to: "/announcements" })}
+          >
+            <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_12rem] md:items-end">
+              <div>
+                <span className="rounded-full bg-emerald-400/20 px-3 py-0.5 text-xs font-semibold text-emerald-200">
+                  {current.category || "Panchayat Notice"}
+                </span>
+                <h3 className="mt-2 font-display text-2xl font-bold leading-tight sm:text-3xl text-white">
+                  {current.title}
+                </h3>
+                {current.description && (
+                  <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 line-clamp-3">
+                    {current.description}
+                  </p>
+                )}
+              </div>
+              <div className="space-y-2">
+                {current.imageUrl ? (
+                  <img
+                    src={current.imageUrl}
+                    alt={current.title}
+                    className="aspect-[4/3] w-full rounded-2xl border border-white/20 object-cover shadow-md"
+                  />
+                ) : (
+                  <div className="grid aspect-[4/3] w-full place-items-center rounded-2xl border border-white/20 bg-white/10 text-white/80">
+                    <Megaphone className="size-8" />
+                  </div>
+                )}
+                <p className="rounded-full bg-white/15 px-3 py-1.5 text-center text-xs font-bold text-white">
+                  {timeAgo(current.createdAt)}
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {items.length > 1 && (
+          <div className="flex items-center justify-between pt-3 border-t border-white/15">
+            <div className="flex gap-1.5">
+              {items.map((_, i) => (
+                <button
+                  key={i}
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    i === index ? "w-6 bg-white" : "w-1.5 bg-white/40"
+                  }`}
+                  aria-label={`Notice ${i + 1}`}
+                />
+              ))}
+            </div>
+            <div className="flex items-center gap-1.5 text-white">
+              <button
+                type="button"
+                onClick={() => setIndex((prev) => (prev - 1 + items.length) % items.length)}
+                className="grid size-7 place-items-center rounded-full bg-white/15 hover:bg-white/30 text-xs font-bold transition"
+                aria-label="Previous notice"
+              >
+                ←
+              </button>
+              <button
+                type="button"
+                onClick={() => setIndex((prev) => (prev + 1) % items.length)}
+                className="grid size-7 place-items-center rounded-full bg-white/15 hover:bg-white/30 text-xs font-bold transition"
+                aria-label="Next notice"
+              >
+                →
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function Hero3DVillage({
   villageName,
   heroWeather,
@@ -510,6 +641,29 @@ function Index() {
 
         <div className="relative z-20 mx-auto grid min-h-screen max-w-7xl items-center gap-10 px-4 pb-32 pt-28 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:pb-28">
           <div className="max-w-3xl text-left">
+            {/* Small Animated Pinned Notice Card inside 1st Hero Page */}
+            {announcementItems[0] && (
+              <motion.div
+                initial={{ opacity: 0, x: -24 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.04 }}
+                onClick={() => navigate({ to: "/announcements" })}
+                className="mb-4 inline-flex cursor-pointer items-center gap-2.5 rounded-full border border-emerald-400/40 bg-emerald-950/80 px-4 py-2 text-xs font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] backdrop-blur-md transition hover:border-emerald-300 hover:scale-[1.02] active:scale-95"
+              >
+                <span className="relative flex size-2.5">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex size-2.5 rounded-full bg-emerald-400" />
+                </span>
+                <span className="rounded-full bg-emerald-500/25 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-300">
+                  📌 Pinned Notice
+                </span>
+                <span className="max-w-[200px] truncate font-semibold text-white/95 sm:max-w-[320px]">
+                  {announcementItems[0].title}
+                </span>
+                <ArrowRight className="size-3.5 shrink-0 text-emerald-300" />
+              </motion.div>
+            )}
+
             <motion.h1
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
@@ -614,79 +768,33 @@ function Index() {
               Official Notices & Citizen Problems
             </h2>
           </div>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 sm:justify-end">
             <Link
               to="/announcements"
-              className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-2 text-xs font-bold text-primary-foreground shadow-sm hover:brightness-110 transition"
+              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-xs font-black text-primary-foreground shadow-md transition hover:scale-[1.03] active:scale-95"
             >
-              <Megaphone className="size-3.5" /> + Post Notice
+              <Plus className="size-4 animate-bounce" />
+              <span>+ Post Official Notice</span>
             </Link>
             <Link
               to="/problems"
-              className="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-xs font-bold text-red-700 shadow-sm hover:bg-red-100 transition"
+              className="inline-flex items-center gap-2 rounded-2xl border-2 border-red-300 bg-red-50 dark:bg-red-950/40 px-5 py-2.5 text-xs font-black text-red-700 dark:text-red-300 shadow-md transition hover:scale-[1.03] active:scale-95"
             >
-              <AlertTriangle className="size-3.5" /> + Report Problem
+              <AlertTriangle className="size-4 animate-pulse text-red-600" />
+              <span>+ Report Problem</span>
             </Link>
           </div>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
-          {/* Top Announcement Notice Card */}
-          <div className="overflow-hidden rounded-[28px] border-2 border-primary/30 bg-gradient-to-br from-primary via-primary/95 to-emerald-900 text-primary-foreground shadow-xl transition hover:shadow-2xl">
-            <div className="flex flex-col gap-4 p-6 sm:p-7">
-              <div className="flex items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur-md">
-                  <Megaphone className="size-3.5" /> Latest Announcement
-                </span>
-                <Link
-                  to="/announcements"
-                  className="text-xs font-bold text-white/90 underline hover:text-white"
-                >
-                  All Notices →
-                </Link>
-              </div>
-              {announcementItems[0] ? (
-                <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_12rem] md:items-end">
-                  <div>
-                    <span className="rounded-full bg-emerald-400/20 px-3 py-0.5 text-xs font-semibold text-emerald-200">
-                      {announcementItems[0].category || "Panchayat Notice"}
-                    </span>
-                    <h3 className="mt-2 font-display text-2xl font-bold leading-tight sm:text-3xl text-white">
-                      {announcementItems[0].title}
-                    </h3>
-                    {announcementItems[0].description && (
-                      <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 line-clamp-3">
-                        {announcementItems[0].description}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    {announcementItems[0].imageUrl ? (
-                      <img
-                        src={announcementItems[0].imageUrl}
-                        alt={announcementItems[0].title}
-                        className="aspect-[4/3] w-full rounded-2xl border border-white/20 object-cover shadow-md"
-                      />
-                    ) : (
-                      <div className="grid aspect-[4/3] w-full place-items-center rounded-2xl border border-white/20 bg-white/10 text-white/80">
-                        <Megaphone className="size-8" />
-                      </div>
-                    )}
-                    <p className="rounded-full bg-white/15 px-3 py-1.5 text-center text-xs font-bold text-white">
-                      {timeAgo(announcementItems[0].createdAt)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <h3 className="font-display text-2xl font-bold text-white">No official notices posted yet</h3>
-                  <p className="mt-2 text-sm text-white/80">
-                    Be the first to post a Panchayat, school, health, power, or water update for your village.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
+          {/* Multi-Notice Auto Carousel Card */}
+          <NoticeCarouselCard
+            items={
+              announcementItems.length > 0
+                ? announcementItems
+                : fallbackListings.filter((i) => i.type === "announcement")
+            }
+          />
 
           {/* Citizen Problem Reports Card */}
           <div className="rounded-[28px] border-2 border-red-200/80 bg-card p-6 shadow-xl flex flex-col justify-between">
@@ -808,121 +916,6 @@ function Index() {
               </Card3D>
             ),
           )}
-        </div>
-      </section>
-
-      <section className="mx-auto mt-12 max-w-7xl px-4 sm:px-6">
-        <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
-          <div className="overflow-hidden rounded-[24px] border border-primary/20 bg-primary text-primary-foreground shadow-[var(--shadow-soft)]">
-            <div className="flex flex-col gap-5 p-6 sm:p-7">
-              <div className="flex items-center justify-between gap-3">
-                <span className="inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-bold uppercase tracking-[0.18em]">
-                  <Megaphone className="size-3.5" /> Top notice
-                </span>
-                <Link
-                  to="/announcements"
-                  className="text-xs font-semibold text-white/80 hover:text-white"
-                >
-                  View all
-                </Link>
-              </div>
-              {announcementItems[0] ? (
-                <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_13rem] md:items-end">
-                  <div>
-                    <p className="text-sm text-white/72">
-                      {announcementItems[0].category || "Village Notice"}
-                    </p>
-                    <h2 className="mt-2 font-display text-2xl font-semibold leading-tight sm:text-3xl">
-                      {announcementItems[0].title}
-                    </h2>
-                    {announcementItems[0].description && (
-                      <p className="mt-3 max-w-2xl text-sm leading-7 text-white/82">
-                        {announcementItems[0].description}
-                      </p>
-                    )}
-                  </div>
-                  <div className="space-y-3">
-                    {announcementItems[0].imageUrl ? (
-                      <img
-                        src={announcementItems[0].imageUrl}
-                        alt={announcementItems[0].title}
-                        className="aspect-[4/3] w-full rounded-2xl border border-white/15 object-cover shadow-sm"
-                      />
-                    ) : (
-                      <div className="grid aspect-[4/3] w-full place-items-center rounded-2xl border border-white/15 bg-white/10 text-white/80">
-                        <Megaphone className="size-8" />
-                      </div>
-                    )}
-                    <p className="rounded-full bg-white/15 px-4 py-2 text-center text-xs font-semibold text-white">
-                      {timeAgo(announcementItems[0].createdAt)}
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                <div>
-                  <h2 className="font-display text-2xl font-semibold">No notice posted yet</h2>
-                  <p className="mt-2 text-sm text-white/75">
-                    Post a Panchayat, school, health, water, or power notice.
-                  </p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          <div className="rounded-[24px] border border-border bg-card p-6 shadow-sm">
-            <div className="mb-4 flex items-center justify-between gap-3">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.18em] text-red-600">
-                  Needs attention
-                </p>
-                <h2 className="mt-1 font-display text-2xl font-semibold text-clay">
-                  Citizen problem reports
-                </h2>
-              </div>
-              <Link
-                to="/problems"
-                className="inline-flex size-11 items-center justify-center rounded-full bg-red-50 text-red-600 transition hover:bg-red-100"
-                aria-label="Report problem"
-              >
-                <ImagePlus className="size-5" />
-              </Link>
-            </div>
-            {problemItems.length === 0 ? (
-              <p className="rounded-2xl border border-dashed border-border bg-muted/50 p-5 text-sm leading-7 text-muted-foreground">
-                No road, drainage, water, or streetlight issues posted yet. Add a photo report to
-                make it visible.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {problemItems.map((item) => (
-                  <Link
-                    key={item.id}
-                    to="/problems"
-                    className="flex gap-3 rounded-2xl border border-border bg-white p-3 transition hover:border-red-200 hover:bg-red-50/40"
-                  >
-                    {item.imageUrl ? (
-                      <img
-                        src={item.imageUrl}
-                        alt={item.title}
-                        className="size-16 rounded-xl object-cover"
-                      />
-                    ) : (
-                      <span className="grid size-16 place-items-center rounded-xl bg-red-50 text-red-600">
-                        <AlertTriangle className="size-5" />
-                      </span>
-                    )}
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate font-semibold text-clay">{item.title}</span>
-                      <span className="mt-1 block truncate text-xs text-muted-foreground">
-                        {item.location || item.category || "Village issue"} -{" "}
-                        {timeAgo(item.createdAt)}
-                      </span>
-                    </span>
-                  </Link>
-                ))}
-              </div>
-            )}
-          </div>
         </div>
       </section>
 
