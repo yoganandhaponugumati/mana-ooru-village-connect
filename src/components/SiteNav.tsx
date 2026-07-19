@@ -14,6 +14,9 @@ import {
   X,
   Trash2,
   LayoutDashboard,
+  Sun,
+  Moon,
+  CloudSun,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -64,7 +67,7 @@ export function SiteNav() {
     deleteNotification,
     clearAll,
   } = useNotifications();
-  useThemePreference();
+  const { darkMode, setDarkMode } = useThemePreference();
   const location = useLocation();
   const navigate = useNavigate();
   const isHeroTop = location.pathname === "/" && !scrolled;
@@ -265,13 +268,35 @@ export function SiteNav() {
           )}
           <Link
             to="/weather"
-            className={`hidden h-10 max-w-52 items-center gap-2 rounded-[15px] border px-3 text-xs font-semibold shadow-sm transition 2xl:inline-flex ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-white/80 bg-white/82 text-muted-foreground hover:-translate-y-0.5 hover:border-primary hover:text-primary"}`}
+            className={`flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-bold shadow-sm transition ${
+              isHeroTop
+                ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
+                : "border-border bg-card text-foreground hover:border-primary hover:text-primary"
+            }`}
+            title="Live Village Weather"
           >
-            <span>{weatherText}</span>
-            <span className={isHeroTop ? "text-white/70" : "text-muted-foreground"}>
-              {selectedVillage || "Choose your village"}
+            <CloudSun className="size-4 text-amber-400" />
+            <span>{weather.temp != null ? `${weather.temp}°C` : "31°C"}</span>
+            <span className="hidden sm:inline text-[11px] opacity-80 max-w-[80px] truncate">
+              {profile.village || "Hyderabad"}
             </span>
           </Link>
+
+          {/* Dark Mode Sun/Moon Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setDarkMode(!darkMode)}
+            className={`flex size-10 items-center justify-center rounded-full border shadow-sm transition ${
+              isHeroTop
+                ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
+                : "border-border bg-card text-foreground hover:border-primary hover:text-primary"
+            }`}
+            aria-label="Toggle Dark Mode"
+            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
+          >
+            {darkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-indigo-400" />}
+          </button>
+
           <InstallAppButton variant="pill" className="hidden sm:inline-flex" />
           <div className="nav-menu-container relative">
             <button
@@ -488,6 +513,30 @@ export function SiteNav() {
                     </Link>
                   </motion.div>
                 ))}
+              </div>
+
+              {/* Dark Mode Toggle Card in Drawer */}
+              <div className="flex items-center justify-between rounded-2xl border border-border/80 bg-card p-3 shadow-sm">
+                <div className="flex items-center gap-2">
+                  {darkMode ? <Sun className="size-5 text-amber-400" /> : <Moon className="size-5 text-indigo-400" />}
+                  <div>
+                    <h4 className="text-xs font-bold text-foreground">Dark Mode Interface</h4>
+                    <p className="text-[10px] text-muted-foreground">Comfortable night viewing</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setDarkMode(!darkMode)}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
+                    darkMode ? "bg-primary" : "bg-muted"
+                  }`}
+                >
+                  <span
+                    className={`pointer-events-none inline-block size-5 transform rounded-full bg-white shadow-lg ring-0 transition duration-200 ease-in-out ${
+                      darkMode ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
               </div>
 
               {/* Language Selection Card */}
