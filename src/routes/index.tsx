@@ -674,42 +674,98 @@ function Index() {
 
         <div className="relative z-20 mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl items-center gap-10 px-4 pb-32 pt-6 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:pb-28">
           <div className="max-w-3xl text-left">
-            {/* DOMINANT CALL-TO-ACTION CARD: Join Your Village / Start Here */}
+            {/* FULL-WIDTH HERO SHOWCASE CARD: Learn How to Use & Core Features */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
-              className="mb-6 rounded-3xl border-2 border-emerald-400/60 bg-gradient-to-r from-emerald-950/95 via-teal-950/90 to-emerald-900/95 p-5 sm:p-6 text-white shadow-[0_0_50px_rgba(16,185,129,0.4)] backdrop-blur-2xl ring-2 ring-emerald-500/30"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              className="mb-8 rounded-3xl border-2 border-emerald-400/60 bg-gradient-to-br from-emerald-950/95 via-teal-950/90 to-emerald-900/95 p-6 sm:p-7 text-white shadow-[0_0_60px_rgba(16,185,129,0.35)] backdrop-blur-2xl ring-1 ring-emerald-400/30 overflow-hidden relative"
             >
-              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/25 px-3 py-1 text-xs font-black uppercase tracking-widest text-emerald-300">
-                    <Sparkles className="size-3.5" /> Start Here · మీ గ్రామాన్ని ఎంచుకోండి
-                  </span>
-                  <h2 className="mt-2 font-display text-2xl sm:text-3xl font-black text-white leading-tight">
-                    Join Your Village Network
-                  </h2>
-                  <p className="mt-1 text-xs sm:text-sm text-emerald-100/90 font-medium">
-                    Hire workers, lease farmland, buy local produce & report civic problems.
-                  </p>
+              {/* Glow Accents */}
+              <div className="pointer-events-none absolute -right-12 -top-12 size-64 rounded-full bg-emerald-500/20 blur-3xl" />
+              <div className="pointer-events-none absolute -left-12 -bottom-12 size-64 rounded-full bg-teal-500/20 blur-3xl" />
+
+              <div className="relative z-10 grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+                {/* Left Column: Heading, Subtitle & Action Buttons */}
+                <div className="space-y-4 text-left">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/25 px-3 py-1 text-xs font-black uppercase tracking-widest text-emerald-300 border border-emerald-400/30">
+                      <Sparkles className="size-3.5" /> Start Here · గ్రామీణ సేవలు
+                    </span>
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-400/20 px-2.5 py-0.5 text-[11px] font-bold text-amber-200 border border-amber-400/30">
+                      🔊 తెలుగు వాయిస్ గైడ్
+                    </span>
+                  </div>
+
+                  <div>
+                    <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
+                      Learn How to Use <span className="text-emerald-400">ManaOoru</span>
+                    </h2>
+                    <p className="mt-1.5 text-xs sm:text-sm font-semibold text-emerald-100/90 leading-relaxed">
+                      1 నిమిషంలో నేర్చుకోండి — రైతులు, కూలీలు, వ్యాపారులు మరియు గ్రామ ప్రజలందరి కోసం రూపొందించబడిన డిజిటల్ వేదిక!
+                    </p>
+                  </div>
+
+                  <div className="flex flex-col sm:flex-row gap-3 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowVideoModal(true)}
+                      className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 px-6 py-3.5 text-sm font-black text-white shadow-xl shadow-emerald-500/40 transition hover:scale-[1.03] active:scale-95 ring-2 ring-white/40"
+                    >
+                      <Play className="size-4 text-white fill-white animate-pulse" />
+                      <span>Watch Telugu Video Guide (వీడియో చూడండి)</span>
+                    </button>
+
+                    <Link
+                      to="/auth"
+                      className="inline-flex items-center justify-center gap-2 rounded-2xl border-2 border-emerald-400/50 bg-white/10 px-5 py-3.5 text-xs font-extrabold text-white backdrop-blur-md transition hover:bg-white/20 hover:border-emerald-300"
+                    >
+                      <span>Join Your Village (స్టార్ట్ చేయండి) →</span>
+                    </Link>
+                  </div>
                 </div>
 
-                <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto shrink-0">
-                  <Link
-                    to="/auth"
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 px-6 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-500/40 transition hover:scale-[1.04] active:scale-95 ring-2 ring-white/30"
-                  >
-                    <span>Join Your Village Now →</span>
-                  </Link>
+                {/* Right Column: 4 Vibrant Feature Grid Cards (Fills the right side completely!) */}
+                <div className="grid grid-cols-2 gap-2.5 text-left">
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-md space-y-1 transition hover:bg-white/15">
+                    <div className="flex items-center gap-2 text-emerald-300 font-bold text-xs">
+                      <Users className="size-4 shrink-0 text-emerald-400" />
+                      <span>కూలీలు & పనివారు</span>
+                    </div>
+                    <p className="text-[11px] text-white/80 font-medium leading-tight">
+                      ట్రాక్టర్ డ్రైవర్లు & వ్యవసాయ కూలీలను నేరుగా సంప్రదించండి
+                    </p>
+                  </div>
 
-                  <button
-                    type="button"
-                    onClick={() => setShowVideoModal(true)}
-                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-4 py-3.5 text-xs font-bold text-white backdrop-blur-md transition hover:bg-white/20"
-                  >
-                    <Play className="size-4 text-emerald-300 fill-emerald-300" />
-                    <span>Watch Video (వీడియో)</span>
-                  </button>
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-md space-y-1 transition hover:bg-white/15">
+                    <div className="flex items-center gap-2 text-amber-300 font-bold text-xs">
+                      <Wheat className="size-4 shrink-0 text-amber-400" />
+                      <span>పొలాలు & కౌలు</span>
+                    </div>
+                    <p className="text-[11px] text-white/80 font-medium leading-tight">
+                      పంట పొలాలు అమ్మకం మరియు కౌలు వివరాలు
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-md space-y-1 transition hover:bg-white/15">
+                    <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs">
+                      <ShoppingBasket className="size-4 shrink-0 text-cyan-400" />
+                      <span>గ్రామ మార్కెట్</span>
+                    </div>
+                    <p className="text-[11px] text-white/80 font-medium leading-tight">
+                      ధాన్యం, పాలు, విత్తనాలు మరియు దుకాణాల ఉత్పత్తులు
+                    </p>
+                  </div>
+
+                  <div className="rounded-2xl border border-white/15 bg-white/10 p-3 backdrop-blur-md space-y-1 transition hover:bg-white/15">
+                    <div className="flex items-center gap-2 text-rose-300 font-bold text-xs">
+                      <AlertTriangle className="size-4 shrink-0 text-rose-400" />
+                      <span>రోడ్డు & సమస్యలు</span>
+                    </div>
+                    <p className="text-[11px] text-white/80 font-medium leading-tight">
+                      రోడ్లు, కరెంట్ సమస్యలపై ఫొటో ప్రూఫ్‌తో ఫిర్యాదు చేయండి
+                    </p>
+                  </div>
                 </div>
               </div>
             </motion.div>
