@@ -134,6 +134,7 @@ export const fallbackListings: Listing[] = [
     location: "Kothur",
     price: "₹900/day",
     category: "Tractor Driver",
+    imageUrl: "https://images.unsplash.com/photo-1592982537447-6f2a6a0c7c18?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 8,
   },
   {
@@ -145,6 +146,7 @@ export const fallbackListings: Listing[] = [
     location: "Kandukur",
     price: "₹500 visit",
     category: "Electrician",
+    imageUrl: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 22,
   },
   {
@@ -156,6 +158,7 @@ export const fallbackListings: Listing[] = [
     location: "Dasarlapally",
     price: "₹18,000/season",
     category: "Lease",
+    imageUrl: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 28,
   },
   {
@@ -167,6 +170,7 @@ export const fallbackListings: Listing[] = [
     location: "Kothur",
     price: "₹2,250/quintal",
     category: "Rice",
+    imageUrl: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 34,
   },
   {
@@ -178,6 +182,7 @@ export const fallbackListings: Listing[] = [
     location: "Maheshwaram",
     price: "Call for rate",
     category: "Borewell",
+    imageUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 44,
   },
   {
@@ -188,6 +193,7 @@ export const fallbackListings: Listing[] = [
     contact: "Village Secretary",
     location: "Kothur Panchayat",
     category: "Medical Camp",
+    imageUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 52,
   },
   {
@@ -199,6 +205,7 @@ export const fallbackListings: Listing[] = [
     contact: "9876543210",
     location: "Kothur bus stop",
     category: "Drainage",
+    imageUrl: "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 3,
   },
 ];

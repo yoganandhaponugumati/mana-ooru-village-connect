@@ -316,6 +316,21 @@ export function ListingForm({
           </div>
         );
       })}
+      {/* Photo Incentive Banner */}
+      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 flex items-center gap-3">
+        <div className="grid size-9 place-items-center rounded-xl bg-emerald-600 text-white shrink-0">
+          <Camera className="size-5" />
+        </div>
+        <div>
+          <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
+            📸 Pro Tip: Listings with photos get 5x more responses!
+          </h4>
+          <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
+            ఫోటో ఉన్న ప్రకటనలకు 5 రెట్లు ఎక్కువ గ్రామస్తుల స్పందన లభిస్తుంది!
+          </p>
+        </div>
+      </div>
+
       <div className="space-y-2">
         <label className="text-sm font-semibold text-foreground">
           {photoLabel} {photoRequired && <span className="text-primary">*</span>}

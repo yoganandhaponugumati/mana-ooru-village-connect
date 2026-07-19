@@ -37,12 +37,15 @@ import {
   ImagePlus,
   Landmark,
   Leaf,
+  Play,
+  Sparkles,
 } from "lucide-react";
 import heroVillage from "@/assets/hero-village-premium.jpg";
 import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
 import { ConceptShowcase } from "@/components/ConceptShowcase";
+import { VideoGuideModal } from "@/components/VideoGuideModal";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
 import voice1 from "@/assets/voice-1.jpg";
@@ -604,6 +607,7 @@ function Index() {
     villageName: profile?.village || authProfile?.village,
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [showVideoModal, setShowVideoModal] = useState(false);
   const showSignedInVillage = Boolean(user && hasProfile && profile.village);
   const heroWeather = showSignedInVillage
     ? weather.live && weather.temp !== null
@@ -626,6 +630,8 @@ function Index() {
   };
   return (
     <div className="village-site-bg min-h-screen text-foreground">
+      <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
+
       {/* Hero */}
       <header className="relative min-h-screen overflow-hidden bg-[#06140d]">
         <img
@@ -668,6 +674,45 @@ function Index() {
 
         <div className="relative z-20 mx-auto grid min-h-[calc(100vh-6rem)] max-w-7xl items-center gap-10 px-4 pb-32 pt-6 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:pb-28">
           <div className="max-w-3xl text-left">
+            {/* DOMINANT CALL-TO-ACTION CARD: Join Your Village / Start Here */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.4 }}
+              className="mb-6 rounded-3xl border-2 border-emerald-400/60 bg-gradient-to-r from-emerald-950/95 via-teal-950/90 to-emerald-900/95 p-5 sm:p-6 text-white shadow-[0_0_50px_rgba(16,185,129,0.4)] backdrop-blur-2xl ring-2 ring-emerald-500/30"
+            >
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-400/25 px-3 py-1 text-xs font-black uppercase tracking-widest text-emerald-300">
+                    <Sparkles className="size-3.5" /> Start Here · మీ గ్రామాన్ని ఎంచుకోండి
+                  </span>
+                  <h2 className="mt-2 font-display text-2xl sm:text-3xl font-black text-white leading-tight">
+                    Join Your Village Network
+                  </h2>
+                  <p className="mt-1 text-xs sm:text-sm text-emerald-100/90 font-medium">
+                    Hire workers, lease farmland, buy local produce & report civic problems.
+                  </p>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-2.5 w-full sm:w-auto shrink-0">
+                  <Link
+                    to="/auth"
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 px-6 py-3.5 text-sm font-black text-white shadow-lg shadow-emerald-500/40 transition hover:scale-[1.04] active:scale-95 ring-2 ring-white/30"
+                  >
+                    <span>Join Your Village Now →</span>
+                  </Link>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowVideoModal(true)}
+                    className="inline-flex items-center justify-center gap-2 rounded-2xl border border-white/30 bg-white/10 px-4 py-3.5 text-xs font-bold text-white backdrop-blur-md transition hover:bg-white/20"
+                  >
+                    <Play className="size-4 text-emerald-300 fill-emerald-300" />
+                    <span>Watch Video (వీడియో)</span>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
 
             <motion.h1
               initial={{ opacity: 0, y: 22 }}
