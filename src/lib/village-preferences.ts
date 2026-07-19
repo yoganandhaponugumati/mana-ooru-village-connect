@@ -274,6 +274,13 @@ export const locationTree = {
       Bapatla: ["Bapatla", "Karlapalem", "Pittalavanipalem", "Vetapalem"],
       Narasaraopet: ["Narasaraopet", "Rompicherla", "Nekarikallu", "Vinukonda"],
     },
+    Srikakulam: {
+      Srikakulam: ["Srikakulam", "Arasavalli", "Gara", "Ampolu", "Kallepalli"],
+      Tekkali: ["Tekkali", "Nandigam", "Kotabommali", "Santhabommali"],
+      Palasa: ["Palasa", "Kasibugga", "Mandi", "Vajrapukotturu"],
+      Amadalavalasa: ["Amadalavalasa", "Ponduru", "Burja", "Sarubujjili"],
+      Ichchapuram: ["Ichchapuram", "Kaviti", "Sompeta", "Kanchili"],
+    },
     Visakhapatnam: {
       Bheemunipatnam: ["Bheemunipatnam", "Kapuluppada", "Tagarapuvalasa", "Narisipatnam"],
       Padmanabham: ["Padmanabham", "Pandrangapuram", "Revidi"],
