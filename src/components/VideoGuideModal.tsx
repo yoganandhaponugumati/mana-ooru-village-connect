@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, X, ChevronRight, ChevronLeft, Volume2, VolumeX, MapPin, PlusCircle, PhoneCall, AlertTriangle, ShieldCheck, Sparkles, Maximize2, Minimize2, Radio } from "lucide-react";
+import { Play, Pause, X, ChevronRight, ChevronLeft, Volume2, VolumeX, MapPin, Megaphone, AlertTriangle, Landmark, PhoneCall, Sparkles, Maximize2, Minimize2, Radio, CheckCircle2, Award } from "lucide-react";
 
 export function VideoGuideModal({
   isOpen,
@@ -13,127 +13,160 @@ export function VideoGuideModal({
   const [muted, setMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(true); // Default to Fullscreen for immersion
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Soft Web Audio API Sound Chime when step changes
+  const playChimeSound = () => {
+    try {
+      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5 note
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.15); // A5 note
+      gain.gain.setValueAtTime(0.08, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.35);
+    } catch (e) {
+      console.debug("Audio chime skipped", e);
+    }
+  };
 
   const guideSteps = [
     {
       step: "01",
-      title: "Select Your Village & Mandal",
-      titleTe: "1. మీ గ్రామాన్ని ఎంచుకోండి",
-      desc: "Instant access to local workers, land leases, and Panchayat notices in your exact village.",
-      descTe: "మొదట మీ తెలంగాణ లేదా ఆంధ్రప్రదేశ్ జిల్లా, మండలం మరియు గ్రామాన్ని ఎంచుకోండి.",
-      teluguSpeech: "స్వాగతం! మొదట మీ తెలంగాణ లేదా ఆంధ్రప్రదేశ్ జిల్లా, మండలం మరియు గ్రామాన్ని ఎంచుకోండి. దీనితో మీ ఊరి పనివారు, పొలాలు మరియు నోటీసులు ఉచితంగా చూడవచ్చు.",
-      icon: MapPin,
-      badge: "Step 1 · గ్రామం ఎంపిక",
-      bgGradient: "from-emerald-700 via-teal-800 to-emerald-950",
+      title: "Why Should You Use ManaOoru?",
+      titleTe: "1. మన ఊరు ఎందుకు ఉపయోగించాలి?",
+      desc: "Free digital home for your village. Get notices, report problems, check schemes, and connect without middlemen.",
+      descTe: "మన గ్రామంలోని నోటీసులు, రోడ్ల సమస్యలు, ప్రభుత్వ పథకాలు మరియు పనివారి వివరాలు దళారులు లేకుండా ఉచితంగా తెలుసుకోవడానికి మన ఊరు ఉపయోగపడుతుంది.",
+      teluguSpeech: "మన ఊరు యాప్ ఎందుకు ఉపయోగించాలి? మన గ్రామంలోని నోటీసులు, రోడ్ల సమస్యలు, ప్రభుత్వ పథకాలు మరియు పనివారి వివరాలు దళారులు లేకుండా ఉచితంగా తెలుసుకోవడానికి మన ఊరు ఉపయోగపడుతుంది.",
+      icon: Sparkles,
+      badge: "Why ManaOoru · ఎందుకు ఉపయోగించాలి?",
+      bgGradient: "from-emerald-800 via-teal-900 to-emerald-950",
       animElements: (
-        <div className="rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur-md text-white space-y-2.5">
-          <div className="flex items-center gap-2 text-xs font-bold text-emerald-400">
-            <MapPin className="size-4 animate-bounce" />
-            <span>📍 Telangana & Andhra Pradesh 100% Mandals</span>
+        <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-3">
+          <div className="flex items-center justify-between text-xs font-bold text-emerald-300">
+            <span>🏡 100% Free Village Platform</span>
+            <span className="rounded-full bg-emerald-500/30 px-2.5 py-0.5 text-emerald-200">Zero Middlemen</span>
           </div>
-          <div className="rounded-xl bg-emerald-500/20 border border-emerald-400/40 p-3 text-sm font-black text-white">
-            🏡 Selected: Kothur Village, Rangareddy District
-          </div>
-          <div className="grid grid-cols-3 gap-2 text-[11px] font-bold text-center">
-            <span className="rounded-lg bg-emerald-500/30 px-2 py-1.5 border border-emerald-400/30">🌾 18 Workers</span>
-            <span className="rounded-lg bg-amber-500/30 px-2 py-1.5 border border-amber-400/30">🚜 8 Tractors</span>
-            <span className="rounded-lg bg-blue-500/30 px-2 py-1.5 border border-blue-400/30">📢 5 Notices</span>
+          <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+            <div className="rounded-xl bg-white/10 p-2.5 flex items-center gap-2">
+              <Megaphone className="size-4 text-emerald-400" /> 📢 Panchayat Notices
+            </div>
+            <div className="rounded-xl bg-white/10 p-2.5 flex items-center gap-2">
+              <AlertTriangle className="size-4 text-rose-400" /> 🚨 Report Problems
+            </div>
+            <div className="rounded-xl bg-white/10 p-2.5 flex items-center gap-2">
+              <Landmark className="size-4 text-amber-400" /> 🏛️ Govt Schemes
+            </div>
+            <div className="rounded-xl bg-white/10 p-2.5 flex items-center gap-2">
+              <PhoneCall className="size-4 text-cyan-400" /> 📞 Direct Calls
+            </div>
           </div>
         </div>
       ),
     },
     {
       step: "02",
-      title: "Hire Workers & Tractor Drivers",
-      titleTe: "2. కూలీలు & ట్రాక్టర్ డ్రైవర్లను వెతకండి",
-      desc: "Need daily wage farm helpers, tractor drivers, or electricians? Call directly without middleman fees.",
-      descTe: "వ్యవసాయ పనులకు కూలీలు లేదా ట్రాక్టర్ డ్రైవర్ కావాలా? వర్కర్స్ విభాగానికి వెళ్లి నేరుగా మాట్లాడండి.",
-      teluguSpeech: "వ్యవసాయ పనులకు కూలీలు లేదా ట్రాక్టర్ డ్రైవర్ కావాలా? వర్కర్స్ విభాగానికి వెళ్లి నేరుగా ఫోన్ చేసి మాట్లాడండి.",
-      icon: PlusCircle,
-      badge: "Step 2 · పనివారు & ట్రాక్టర్లు",
-      bgGradient: "from-indigo-700 via-purple-800 to-indigo-950",
+      title: "Check & Post Village Notices",
+      titleTe: "2. గ్రామ నోటీసులు చూడడం & పోస్ట్ చేయడం",
+      desc: "Stay updated on water cuts, power outages, health camps, and Panchayat announcements. Anyone can post local updates.",
+      descTe: "గ్రామ నోటీసులు విభాగానికి వెళ్లి పంచాయతీ ప్రచారాలు, కరెంట్ కోతలు, మరియు ఆరోగ్య శిబిరాల నోటీసులు చూడవచ్చు. మీరు కూడా గ్రామ సమాచారాన్ని పోస్ట్ చేయవచ్చు.",
+      teluguSpeech: "గ్రామ నోటీసులు విభాగానికి వెళ్లి పంచాయతీ ప్రచారాలు, కరెంట్ కోతలు, మరియు ఆరోగ్య శిబిరాల నోటీసులు చూడవచ్చు. మీరు కూడా గ్రామ సమాచారాన్ని సులభంగా పోస్ట్ చేయవచ్చు.",
+      icon: Megaphone,
+      badge: "Notices · గ్రామ నోటీసులు",
+      bgGradient: "from-teal-800 via-emerald-900 to-teal-950",
       animElements: (
-        <div className="rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur-md text-white space-y-2.5">
-          <div className="flex items-center justify-between text-xs font-bold text-indigo-300">
-            <span>🚜 Tractor Driver Available</span>
-            <span className="rounded-full bg-emerald-500/30 px-2 py-0.5 text-emerald-300 font-extrabold">₹900/day</span>
+        <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-2.5">
+          <div className="flex items-center justify-between text-xs font-bold text-teal-300">
+            <span>📌 Pinned Official Panchayat Notice</span>
+            <span className="text-emerald-400">Panchayat Office</span>
           </div>
-          <div className="rounded-xl bg-white/10 p-2.5 text-xs font-bold text-white flex items-center justify-between">
-            <span>👨‍🌾 Ramesh (Experienced Rotavator Driver)</span>
-            <span className="text-emerald-400 font-black">📞 Call Direct</span>
+          <div className="rounded-xl bg-emerald-500/20 border border-emerald-400/30 p-3 text-xs font-bold text-white">
+            📢 "Free Medical Health Camp this Sunday at Panchayat Office (9 AM - 1 PM)"
           </div>
-          <p className="text-[10px] text-indigo-200">Zero commission fees · Direct neighbour connection</p>
+          <div className="flex justify-end">
+            <span className="rounded-xl bg-white/20 px-3 py-1 text-xs font-bold text-white">+ Post Village Notice</span>
+          </div>
         </div>
       ),
     },
     {
       step: "03",
-      title: "Land Lease & Grain Marketplace",
-      titleTe: "3. పొలం కౌలు & ధాన్యం అమ్మకాలు",
-      desc: "Post farmland for lease or list paddy, milk, and seeds with photos for 5x response.",
-      descTe: "మీ పంట పొలాలు కౌలుకు ఇవ్వడానికి లేదా ధాన్యం అమ్మడానికి ఒక ఫొటో ప్రూఫ్‌తో ఉచితంగా పోస్ట్ చేయండి.",
-      teluguSpeech: "మీ పంట పొలాలు కౌలుకు ఇవ్వడానికి లేదా ధాన్యం అమ్మడానికి ఒక ఫొటో ప్రూఫ్‌తో ఉచితంగా ప్రకటన పోస్ట్ చేయండి.",
-      icon: ShieldCheck,
-      badge: "Step 3 · మార్కెట్ & కౌలు",
-      bgGradient: "from-amber-700 via-orange-800 to-amber-950",
+      title: "Report Civic Problems with Photo Proof",
+      titleTe: "3. ఫొటో ప్రూఫ్‌తో సమస్యలపై ఫిర్యాదు",
+      desc: "Road damage, broken streetlights, or drainage overflow? Take a photo, upload proof, and get Sarpanch action.",
+      descTe: "మీ గ్రామంలో పాడైపోయిన రోడ్లు, డ్రైనేజీ లేదా వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి ఫిర్యాదు చేయండి. పంచాయతీ అధికారులు చర్యలు తీసుకుంటారు.",
+      teluguSpeech: "మీ గ్రామంలో పాడైపోయిన రోడ్లు, డ్రైనేజీ లేదా వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి ఫిర్యాదు చేయండి. గ్రామ పంచాయతీ అధికారులు వెంటనే చర్యలు తీసుకుంటారు.",
+      icon: AlertTriangle,
+      badge: "Report Issue · సమస్యలపై ఫిర్యాదు",
+      bgGradient: "from-rose-800 via-red-900 to-rose-950",
       animElements: (
-        <div className="rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur-md text-white space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-amber-300">
-            <span>🌾 3 Acres Black Soil Farmland for Lease</span>
-            <span className="text-emerald-400 font-black">📸 Photo Proof</span>
+        <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-2.5">
+          <div className="flex items-center justify-between text-xs font-bold text-rose-300">
+            <span>📸 Photo Proof Attached (Road Damage)</span>
+            <span className="rounded-full bg-rose-500/30 px-2 py-0.5 text-rose-200">Action Pending</span>
           </div>
-          <div className="rounded-xl bg-white/10 p-2 text-xs font-bold text-white">
-            💧 Borewell water + Road access · Dasarlapally
+          <div className="rounded-xl bg-white/10 p-2.5 text-xs font-bold text-white">
+            🚨 "CC Road cracked & drainage water near Bus Stop"
           </div>
+          <p className="text-[10px] text-rose-200">👍 18 Village Upvotes · Sent to Sarpanch Desk</p>
         </div>
       ),
     },
     {
       step: "04",
-      title: "Report Village Problems with Photo Proof",
-      titleTe: "4. రోడ్లు & కరెంట్ సమస్యలపై ఫిర్యాదు",
-      desc: "Upload photo proof of damaged CC roads, overflowing drainage, or broken streetlights.",
-      descTe: "పాడైపోయిన రోడ్లు, డ్రైనేజీ లేదా కరెంట్ సమస్యలను ఫొటో తీసి గ్రామ పంచాయతీ దృష్టికి తీసుకెళ్లండి.",
-      teluguSpeech: "పాడైపోయిన రోడ్లు, డ్రైనేజీ లేదా కరెంట్ సమస్యలను ఫొటో తీసి గ్రామ పంచాయతీ అధికారుల దృష్టికి తీసుకెళ్లండి.",
-      icon: AlertTriangle,
-      badge: "Step 4 · గ్రామ సమస్యలు",
-      bgGradient: "from-rose-700 via-red-800 to-rose-950",
+      title: "Check Government Schemes & Services",
+      titleTe: "4. ప్రభుత్వ పథకాలు & సేవలు తనిఖీ",
+      desc: "Check Rythu Bharosa, PM-Kisan, PM-Fasal, pensions, and Aadhaar update services directly with official links.",
+      descTe: "రైతు భరోసా, పీఎం కిసాన్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలను పథకాల విభాగంలో ఉచితంగా తనిఖీ చేసి దరఖాస్తు చేసుకోవచ్చు.",
+      teluguSpeech: "రైతు భరోసా, పీఎం కిసాన్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలను పథకాల విభాగంలో ఉచితంగా తనిఖీ చేసి దరఖాస్తు చేసుకోవచ్చు.",
+      icon: Landmark,
+      badge: "Government Schemes · పథకాలు",
+      bgGradient: "from-amber-800 via-orange-900 to-amber-950",
       animElements: (
-        <div className="rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur-md text-white space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-rose-300">
-            <span>🚨 Civic Complaint Posted</span>
-            <span className="text-amber-300 font-extrabold">👍 14 Village Upvotes</span>
+        <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-2.5">
+          <div className="flex items-center justify-between text-xs font-bold text-amber-300">
+            <span>🏛️ Official Government Schemes Desk</span>
+            <span className="text-emerald-400 font-extrabold">Verified Links</span>
           </div>
-          <div className="rounded-xl bg-white/10 p-2 text-xs font-bold text-white">
-            🚰 Water leakage near main bus stop
+          <div className="grid grid-cols-2 gap-2 text-xs font-bold text-white">
+            <div className="rounded-xl bg-white/10 p-2">🌾 PM-KISAN ₹6,000/yr</div>
+            <div className="rounded-xl bg-white/10 p-2">🛡️ PM Fasal Bima</div>
+            <div className="rounded-xl bg-white/10 p-2">☀️ Solar Pump KUSUM</div>
+            <div className="rounded-xl bg-white/10 p-2">💳 Aadhaar & Ration</div>
           </div>
         </div>
       ),
     },
     {
       step: "05",
-      title: "100% Free & No Middlemen",
-      titleTe: "5. పూర్తిగా ఉచితం & ఎలాంటి దళారులు లేరు",
-      desc: "Direct phone connection with neighbours. Built specifically for Telangana & AP villages.",
-      descTe: "మన ఊరు యాప్ పూర్తిగా ఉచితం! ఎలాంటి దళారులు లేకుండా మీ గ్రామస్తులతో నేరుగా కనెక్ట్ అవ్వండి.",
-      teluguSpeech: "మన ఊరు యాప్ పూర్తిగా ఉచితం! ఎలాంటి దళారులు లేకుండా మీ గ్రామస్తులతో నేరుగా కనెక్ట్ అవ్వండి.",
+      title: "Direct Connect & How to Post",
+      titleTe: "5. నేరుగా మాట్లాడడం & పోస్ట్ చేయడం",
+      desc: "Call workers, land owners, or shopkeepers directly. Post your requirements in 1 minute.",
+      descTe: "కూలీలు, పొలాలు కౌలు లేదా మార్కెట్ ఉత్పత్తుల కోసం ఎలాంటి కమీషన్లు లేకుండా మీ గ్రామస్తులతో నేరుగా ఫోన్ చేసి మాట్లాడండి.",
+      teluguSpeech: "కూలీలు, పొలాలు కౌలు లేదా మార్కెట్ ఉత్పత్తుల కోసం ఎలాంటి కమీషన్లు లేకుండా మీ గ్రామస్తులతో నేరుగా ఫోన్ చేసి మాట్లాడండి.",
       icon: PhoneCall,
-      badge: "Step 5 · 100% ఉచిత సేవ",
-      bgGradient: "from-teal-700 via-emerald-800 to-teal-950",
+      badge: "Direct Call · నేరుగా మాట్లాడండి",
+      bgGradient: "from-indigo-800 via-purple-900 to-indigo-950",
       animElements: (
-        <div className="rounded-2xl border border-white/20 bg-black/40 p-4 backdrop-blur-md text-white text-center space-y-2">
-          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/30 px-3 py-1 text-xs font-bold text-emerald-300">
-            <PhoneCall className="size-4 animate-bounce" /> Direct Call Connected
+        <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white text-center space-y-3">
+          <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-300 border border-emerald-400/30">
+            <PhoneCall className="size-4 animate-bounce" /> Direct Phone Connection Enabled
           </div>
-          <p className="text-xs font-bold text-white">📞 Connect with Gram Panchayat & Village Neighbours</p>
+          <p className="text-xs font-bold text-white">📞 Connect Directly with Village Neighbours & Officers</p>
         </div>
       ),
     },
   ];
 
-  // Speech Synthesis Helper
+  // Speech Synthesis Helper with Clean Pronunciation
   const speakStepTelugu = (stepIdx: number) => {
     if (muted || !("speechSynthesis" in window)) return;
     try {
@@ -141,7 +174,6 @@ export function VideoGuideModal({
       const textToSpeak = guideSteps[stepIdx].teluguSpeech;
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
       
-      // Try finding Telugu or Indian English/Hindi fallback voices
       const voices = window.speechSynthesis.getVoices();
       const teluguVoice = voices.find(
         (v) => v.lang.includes("te") || v.name.toLowerCase().includes("telugu")
@@ -153,7 +185,7 @@ export function VideoGuideModal({
       else if (indianVoice) utterance.voice = indianVoice;
 
       utterance.lang = "te-IN";
-      utterance.rate = 0.88; // Slower pace for rural comprehension
+      utterance.rate = 0.82; // Slower, clear, natural pace for villagers
       utterance.pitch = 1.0;
 
       utterance.onstart = () => setIsSpeaking(true);
@@ -174,12 +206,13 @@ export function VideoGuideModal({
       return;
     }
 
+    playChimeSound();
     speakStepTelugu(activeStep);
 
     if (!isPaused) {
       timerRef.current = setTimeout(() => {
         setActiveStep((prev) => (prev + 1) % guideSteps.length);
-      }, 7000); // 7s per step
+      }, 7500); // 7.5s per step
     }
 
     return () => {
@@ -206,31 +239,31 @@ export function VideoGuideModal({
 
   return (
     <AnimatePresence>
-      <div className={`fixed inset-0 z-[99999] grid place-items-center bg-black/90 p-2 sm:p-4 backdrop-blur-2xl animate-in fade-in duration-200 overflow-y-auto ${isFullscreen ? "p-0" : ""}`}>
+      <div className={`fixed inset-0 z-[99999] grid place-items-center bg-black/95 p-2 sm:p-4 backdrop-blur-2xl animate-in fade-in duration-200 overflow-y-auto ${isFullscreen ? "p-0" : ""}`}>
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className={`relative w-full ${isFullscreen ? "h-screen rounded-none" : "max-w-4xl rounded-3xl min-h-[600px]"} overflow-hidden border border-white/20 bg-card text-foreground shadow-2xl flex flex-col justify-between`}
+          className={`relative w-full ${isFullscreen ? "h-screen rounded-none" : "max-w-5xl rounded-3xl min-h-[640px]"} overflow-hidden border border-white/20 bg-card text-foreground shadow-2xl flex flex-col justify-between`}
         >
           {/* Header Bar */}
-          <div className="flex items-center justify-between border-b border-border px-4 py-3 bg-muted/40 shrink-0">
+          <div className="flex items-center justify-between border-b border-border px-5 py-3.5 bg-muted/50 shrink-0">
             <div className="flex items-center gap-3">
-              <div className="grid size-9 place-items-center rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black text-sm shadow-md">
+              <div className="grid size-10 place-items-center rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 text-white font-black text-base shadow-lg">
                 🎬
               </div>
               <div>
-                <h3 className="font-display text-base font-extrabold text-clay flex items-center gap-2">
+                <h3 className="font-display text-base sm:text-lg font-extrabold text-clay flex items-center gap-2">
                   ManaOoru Video Guide · ఎలా ఉపయోగించాలి?
                   {isSpeaking && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-black text-emerald-400 border border-emerald-500/30">
-                      <Radio className="size-3 animate-pulse text-emerald-400" />
-                      🔊 Telugu Voice Speaking
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-black text-emerald-400 border border-emerald-500/30">
+                      <Radio className="size-3.5 animate-pulse text-emerald-400" />
+                      🔊 Clear Telugu Voice Audio
                     </span>
                   )}
                 </h3>
                 <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                  మన ఊరు డిజిటల్ సేవలు (Learn Core Features)
+                  మన ఊరు డిజిటల్ సేవలు (Notices, Problems, Schemes & How to Use)
                 </p>
               </div>
             </div>
@@ -239,7 +272,7 @@ export function VideoGuideModal({
               <button
                 type="button"
                 onClick={toggleMute}
-                className={`flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs font-bold transition ${
+                className={`flex items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-bold transition ${
                   muted
                     ? "border-destructive/40 bg-destructive/10 text-destructive"
                     : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
@@ -252,8 +285,8 @@ export function VideoGuideModal({
               <button
                 type="button"
                 onClick={() => setIsFullscreen((v) => !v)}
-                className="hidden sm:grid size-9 place-items-center rounded-full bg-background border border-border text-muted-foreground hover:text-primary transition"
-                title="Fullscreen Toggle"
+                className="hidden sm:grid size-10 place-items-center rounded-full bg-background border border-border text-muted-foreground hover:text-primary transition"
+                title="Toggle Fullscreen Mode"
               >
                 {isFullscreen ? <Minimize2 className="size-4" /> : <Maximize2 className="size-4" />}
               </button>
@@ -261,7 +294,7 @@ export function VideoGuideModal({
               <button
                 type="button"
                 onClick={onClose}
-                className="grid size-9 place-items-center rounded-full bg-background border border-border text-muted-foreground hover:text-destructive transition"
+                className="grid size-10 place-items-center rounded-full bg-background border border-border text-muted-foreground hover:text-destructive transition"
               >
                 <X className="size-5" />
               </button>
@@ -269,12 +302,12 @@ export function VideoGuideModal({
           </div>
 
           {/* Main Animated Cinema Stage */}
-          <div className={`relative bg-gradient-to-br ${current.bgGradient} p-6 sm:p-10 text-white flex-1 flex flex-col justify-between transition-colors duration-700 overflow-hidden`}>
+          <div className={`relative bg-gradient-to-br ${current.bgGradient} p-6 sm:p-12 text-white flex-1 flex flex-col justify-between transition-colors duration-700 overflow-hidden`}>
             {/* Background Glows */}
-            <div className="pointer-events-none absolute -right-20 -top-20 size-80 rounded-full bg-white/10 blur-3xl" />
-            <div className="pointer-events-none absolute -left-20 -bottom-20 size-80 rounded-full bg-black/30 blur-3xl" />
+            <div className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-white/10 blur-3xl" />
+            <div className="pointer-events-none absolute -left-24 -bottom-24 size-96 rounded-full bg-black/40 blur-3xl" />
 
-            {/* Top Bar inside Stage */}
+            {/* Top Bar inside Cinema Stage */}
             <div className="relative z-10 flex items-center justify-between">
               <span className="rounded-full bg-white/20 px-4 py-1.5 text-xs font-black uppercase tracking-wider backdrop-blur-md border border-white/20">
                 {current.badge}
@@ -290,14 +323,14 @@ export function VideoGuideModal({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.4 }}
-                className="relative z-10 my-6 grid gap-6 md:grid-cols-2 md:items-center"
+                className="relative z-10 my-6 grid gap-8 md:grid-cols-2 md:items-center"
               >
                 <div className="space-y-4">
                   <div>
-                    <h2 className="font-display text-2xl sm:text-4xl font-black text-white leading-tight">
+                    <h2 className="font-display text-3xl sm:text-5xl font-black text-white leading-tight">
                       {current.titleTe}
                     </h2>
-                    <p className="text-base font-bold text-white/90 mt-1">
+                    <p className="text-base sm:text-lg font-bold text-white/90 mt-1.5">
                       {current.title}
                     </p>
                   </div>
@@ -308,12 +341,12 @@ export function VideoGuideModal({
 
                   {/* Audio Visualizer Waves */}
                   {!muted && isSpeaking && (
-                    <div className="flex items-center gap-1.5 pt-2 text-emerald-300 font-bold text-xs">
+                    <div className="flex items-center gap-2 pt-2 text-emerald-300 font-bold text-xs bg-black/30 rounded-xl px-3 py-2 border border-emerald-400/30 w-fit">
                       <span className="relative flex size-3">
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                         <span className="relative inline-flex size-3 rounded-full bg-emerald-400" />
                       </span>
-                      <span>🔊 Speaking Telugu voice narration...</span>
+                      <span>🔊 Speaking Clear Telugu Audio...</span>
                     </div>
                   )}
                 </div>
@@ -333,8 +366,8 @@ export function VideoGuideModal({
                     key={idx}
                     type="button"
                     onClick={() => setActiveStep(idx)}
-                    className={`h-2.5 rounded-full transition-all duration-500 ${
-                      idx === activeStep ? "w-10 bg-white shadow-lg" : "w-2.5 bg-white/40 hover:bg-white/60"
+                    className={`h-3 rounded-full transition-all duration-500 ${
+                      idx === activeStep ? "w-12 bg-white shadow-xl" : "w-3 bg-white/40 hover:bg-white/60"
                     }`}
                   />
                 ))}
@@ -344,16 +377,16 @@ export function VideoGuideModal({
                 <button
                   type="button"
                   onClick={() => setIsPaused((v) => !v)}
-                  className="flex items-center gap-1.5 rounded-full bg-white/20 hover:bg-white/30 px-3.5 py-1.5 text-xs font-bold text-white transition"
+                  className="flex items-center gap-1.5 rounded-full bg-white/20 hover:bg-white/30 px-4 py-2 text-xs font-bold text-white transition"
                 >
-                  {isPaused ? <Play className="size-3.5" /> : <Pause className="size-3.5" />}
+                  {isPaused ? <Play className="size-4" /> : <Pause className="size-4" />}
                   <span>{isPaused ? "Play Auto-cycle" : "Pause"}</span>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setActiveStep((prev) => (prev - 1 + guideSteps.length) % guideSteps.length)}
-                  className="grid size-9 place-items-center rounded-full bg-white/20 hover:bg-white/30 text-white transition"
+                  className="grid size-10 place-items-center rounded-full bg-white/20 hover:bg-white/30 text-white transition"
                   aria-label="Previous step"
                 >
                   <ChevronLeft className="size-5" />
@@ -361,7 +394,7 @@ export function VideoGuideModal({
                 <button
                   type="button"
                   onClick={() => setActiveStep((prev) => (prev + 1) % guideSteps.length)}
-                  className="grid size-9 place-items-center rounded-full bg-white/20 hover:bg-white/30 text-white transition"
+                  className="grid size-10 place-items-center rounded-full bg-white/20 hover:bg-white/30 text-white transition"
                   aria-label="Next step"
                 >
                   <ChevronRight className="size-5" />
@@ -374,13 +407,13 @@ export function VideoGuideModal({
           <div className="px-6 py-4 bg-card flex flex-col sm:flex-row items-center justify-between gap-3 border-t border-border shrink-0">
             <div className="flex items-center gap-2 text-xs font-bold text-muted-foreground">
               <Sparkles className="size-4 text-emerald-600 shrink-0" />
-              <span>మన ఊరు డిజిటల్ నెట్‌వర్క్ · 100% ఉచిత సేవలు</span>
+              <span>మన ఊరు డిజిటల్ నెట్‌వర్క్ · 100% ఉచిత సేవలు (Free Village OS)</span>
             </div>
 
             <button
               type="button"
               onClick={onClose}
-              className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 px-7 py-3 text-xs font-black text-white shadow-lg hover:brightness-110 transition"
+              className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-8 py-3 text-xs font-black text-white shadow-xl hover:brightness-110 transition"
             >
               Start Using ManaOoru Now (ప్రారంభించండి) →
             </button>
