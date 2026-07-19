@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, X, ChevronRight, ChevronLeft, Volume2, VolumeX, MapPin, Megaphone, AlertTriangle, Landmark, PhoneCall, Sparkles, Maximize2, Minimize2, Radio, CheckCircle2, Award } from "lucide-react";
+import { Play, Pause, X, ChevronRight, ChevronLeft, Volume2, VolumeX, MapPin, Megaphone, AlertTriangle, Landmark, PhoneCall, Sparkles, Maximize2, Minimize2, Radio, CheckCircle2, Award, ArrowRight } from "lucide-react";
 
 export function VideoGuideModal({
   isOpen,
@@ -13,7 +13,7 @@ export function VideoGuideModal({
   const [muted, setMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-  const [isFullscreen, setIsFullscreen] = useState(true); // Default to Fullscreen for immersion
+  const [isFullscreen, setIsFullscreen] = useState(true);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Soft Web Audio API Sound Chime when step changes
@@ -38,16 +38,17 @@ export function VideoGuideModal({
     }
   };
 
+  // 5 Feature-Specific Video Guide Steps (Each step is 100% focused on ONE feature!)
   const guideSteps = [
     {
       step: "01",
       title: "Why Should You Use ManaOoru?",
-      titleTe: "1. మన ఊరు ఎందుకు ఉపయోగించాలి?",
-      desc: "Free digital home for your village. Get notices, report problems, check schemes, and connect without middlemen.",
+      titleTe: "1. మన ఊరు పరిచయం & మీ గ్రామాన్ని ఎంచుకోవడం",
+      desc: "Complete digital home for your village. Access local workers, land, notices, and emergency contacts in 1 place.",
       descTe: "మన గ్రామంలోని నోటీసులు, రోడ్ల సమస్యలు, ప్రభుత్వ పథకాలు మరియు పనివారి వివరాలు దళారులు లేకుండా ఉచితంగా తెలుసుకోవడానికి మన ఊరు ఉపయోగపడుతుంది.",
-      teluguSpeech: "మన ఊరు యాప్ ఎందుకు ఉపయోగించాలి? మన గ్రామంలోని నోటీసులు, రోడ్ల సమస్యలు, ప్రభుత్వ పథకాలు మరియు పనివారి వివరాలు దళారులు లేకుండా ఉచితంగా తెలుసుకోవడానికి మన ఊరు ఉపయోగపడుతుంది.",
+      teluguSpeech: "నమస్కారం! మన ఊరు యాప్‌కి స్వాగతం. మొదట మీ జిల్లా, మండలం మరియు గ్రామాన్ని ఎంచుకోండి. దీనితో మీ గ్రామంలో ఉన్న పనివారు, పంట పొలాలు, పంచాయతీ నోటీసులు మరియు అత్యవసర సేవలు అన్నీ ఉచితంగా మీ ఫోన్‌లోనే చూడవచ్చు.",
       icon: Sparkles,
-      badge: "Why ManaOoru · ఎందుకు ఉపయోగించాలి?",
+      badge: "Feature 1 · మన ఊరు పరిచయం",
       bgGradient: "from-emerald-800 via-teal-900 to-emerald-950",
       animElements: (
         <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-3">
@@ -55,18 +56,15 @@ export function VideoGuideModal({
             <span>🏡 100% Free Village Platform</span>
             <span className="rounded-full bg-emerald-500/30 px-2.5 py-0.5 text-emerald-200">Zero Middlemen</span>
           </div>
+          <div className="rounded-xl bg-emerald-500/20 border border-emerald-400/40 p-3 text-sm font-black text-white">
+            📍 Selected Village: Kothur, Rangareddy District
+          </div>
           <div className="grid grid-cols-2 gap-2 text-xs font-bold">
             <div className="rounded-xl bg-white/10 p-2.5 flex items-center gap-2">
               <Megaphone className="size-4 text-emerald-400" /> 📢 Panchayat Notices
             </div>
             <div className="rounded-xl bg-white/10 p-2.5 flex items-center gap-2">
               <AlertTriangle className="size-4 text-rose-400" /> 🚨 Report Problems
-            </div>
-            <div className="rounded-xl bg-white/10 p-2.5 flex items-center gap-2">
-              <Landmark className="size-4 text-amber-400" /> 🏛️ Govt Schemes
-            </div>
-            <div className="rounded-xl bg-white/10 p-2.5 flex items-center gap-2">
-              <PhoneCall className="size-4 text-cyan-400" /> 📞 Direct Calls
             </div>
           </div>
         </div>
@@ -76,23 +74,23 @@ export function VideoGuideModal({
       step: "02",
       title: "Check & Post Village Notices",
       titleTe: "2. గ్రామ నోటీసులు చూడడం & పోస్ట్ చేయడం",
-      desc: "Stay updated on water cuts, power outages, health camps, and Panchayat announcements. Anyone can post local updates.",
+      desc: "Panchayat announcements, power cuts, water supply notices, and medical health camps.",
       descTe: "గ్రామ నోటీసులు విభాగానికి వెళ్లి పంచాయతీ ప్రచారాలు, కరెంట్ కోతలు, మరియు ఆరోగ్య శిబిరాల నోటీసులు చూడవచ్చు. మీరు కూడా గ్రామ సమాచారాన్ని పోస్ట్ చేయవచ్చు.",
-      teluguSpeech: "గ్రామ నోటీసులు విభాగానికి వెళ్లి పంచాయతీ ప్రచారాలు, కరెంట్ కోతలు, మరియు ఆరోగ్య శిబిరాల నోటీసులు చూడవచ్చు. మీరు కూడా గ్రామ సమాచారాన్ని సులభంగా పోస్ట్ చేయవచ్చు.",
+      teluguSpeech: "రెండవది, గ్రామ నోటీసులు. పంచాయతీ కార్యాలయ ప్రచారాలు, కరెంట్ కోతల సమాచారం, నీటి సరఫరా మరియు ఉచిత వైద్య శిబిరాల నోటీసులు ఇక్కడ చూడవచ్చు. అలాగే మీ గ్రామానికి చెందిన ఏ సమాచారాన్నైనా మీరు ఉచితంగా పోస్ట్ చేయవచ్చు.",
       icon: Megaphone,
-      badge: "Notices · గ్రామ నోటీసులు",
+      badge: "Feature 2 · గ్రామ నోటీసులు",
       bgGradient: "from-teal-800 via-emerald-900 to-teal-950",
       animElements: (
         <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-2.5">
           <div className="flex items-center justify-between text-xs font-bold text-teal-300">
             <span>📌 Pinned Official Panchayat Notice</span>
-            <span className="text-emerald-400">Panchayat Office</span>
+            <span className="text-emerald-400">Gram Panchayat</span>
           </div>
           <div className="rounded-xl bg-emerald-500/20 border border-emerald-400/30 p-3 text-xs font-bold text-white">
             📢 "Free Medical Health Camp this Sunday at Panchayat Office (9 AM - 1 PM)"
           </div>
           <div className="flex justify-end">
-            <span className="rounded-xl bg-white/20 px-3 py-1 text-xs font-bold text-white">+ Post Village Notice</span>
+            <span className="rounded-xl bg-white/20 px-3.5 py-1.5 text-xs font-black text-white">+ Post Village Notice</span>
           </div>
         </div>
       ),
@@ -100,18 +98,18 @@ export function VideoGuideModal({
     {
       step: "03",
       title: "Report Civic Problems with Photo Proof",
-      titleTe: "3. ఫొటో ప్రూఫ్‌తో సమస్యలపై ఫిర్యాదు",
-      desc: "Road damage, broken streetlights, or drainage overflow? Take a photo, upload proof, and get Sarpanch action.",
+      titleTe: "3. రోడ్లు & కరెంట్ సమస్యలపై ఫొటో ప్రూఫ్‌తో ఫిర్యాదు",
+      desc: "Report damaged CC roads, water leakage, or broken streetlights directly to Sarpanch with photo proof.",
       descTe: "మీ గ్రామంలో పాడైపోయిన రోడ్లు, డ్రైనేజీ లేదా వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి ఫిర్యాదు చేయండి. పంచాయతీ అధికారులు చర్యలు తీసుకుంటారు.",
-      teluguSpeech: "మీ గ్రామంలో పాడైపోయిన రోడ్లు, డ్రైనేజీ లేదా వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి ఫిర్యాదు చేయండి. గ్రామ పంచాయతీ అధికారులు వెంటనే చర్యలు తీసుకుంటారు.",
+      teluguSpeech: "మూడవది, గ్రామ సమస్యలపై ఫిర్యాదు. మీ ఊరిలో పాడైపోయిన సీసీ రోడ్లు, నీటి లీకేజీలు, లేదా విరిగిపోయిన వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి జతచేయండి. మీ ఫిర్యాదు నేరుగా గ్రామ పంచాయతీ అధికారుల దృష్టికి వెళ్తుంది.",
       icon: AlertTriangle,
-      badge: "Report Issue · సమస్యలపై ఫిర్యాదు",
+      badge: "Feature 3 · సమస్యలపై ఫిర్యాదు",
       bgGradient: "from-rose-800 via-red-900 to-rose-950",
       animElements: (
         <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-2.5">
           <div className="flex items-center justify-between text-xs font-bold text-rose-300">
             <span>📸 Photo Proof Attached (Road Damage)</span>
-            <span className="rounded-full bg-rose-500/30 px-2 py-0.5 text-rose-200">Action Pending</span>
+            <span className="rounded-full bg-rose-500/30 px-2.5 py-0.5 text-rose-200">Pending Action</span>
           </div>
           <div className="rounded-xl bg-white/10 p-2.5 text-xs font-bold text-white">
             🚨 "CC Road cracked & drainage water near Bus Stop"
@@ -122,19 +120,19 @@ export function VideoGuideModal({
     },
     {
       step: "04",
-      title: "Check Government Schemes & Services",
-      titleTe: "4. ప్రభుత్వ పథకాలు & సేవలు తనిఖీ",
-      desc: "Check Rythu Bharosa, PM-Kisan, PM-Fasal, pensions, and Aadhaar update services directly with official links.",
+      title: "Government Schemes & Citizen Services",
+      titleTe: "4. ప్రభుత్వ పథకాలు & సేవలు పొందే విధానం",
+      desc: "Access PM-KISAN, Rythu Bharosa, crop insurance, pensions, and Aadhaar update services with direct official links.",
       descTe: "రైతు భరోసా, పీఎం కిసాన్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలను పథకాల విభాగంలో ఉచితంగా తనిఖీ చేసి దరఖాస్తు చేసుకోవచ్చు.",
-      teluguSpeech: "రైతు భరోసా, పీఎం కిసాన్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలను పథకాల విభాగంలో ఉచితంగా తనిఖీ చేసి దరఖాస్తు చేసుకోవచ్చు.",
+      teluguSpeech: "నాల్గవది, ప్రభుత్వ పథకాలు. రైతు భరోసా, పీఎం కిసాన్, క్రాప్ ఇన్సూరెన్స్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలకు సంబంధించిన వివరాలు మరియు అధికారిక వెబ్‌సైట్ లింక్‌లు పథకాల విభాగంలో ఉచితంగా పొందవచ్చు.",
       icon: Landmark,
-      badge: "Government Schemes · పథకాలు",
+      badge: "Feature 4 · ప్రభుత్వ పథకాలు",
       bgGradient: "from-amber-800 via-orange-900 to-amber-950",
       animElements: (
         <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-2.5">
           <div className="flex items-center justify-between text-xs font-bold text-amber-300">
             <span>🏛️ Official Government Schemes Desk</span>
-            <span className="text-emerald-400 font-extrabold">Verified Links</span>
+            <span className="text-emerald-400 font-extrabold">100% Free Links</span>
           </div>
           <div className="grid grid-cols-2 gap-2 text-xs font-bold text-white">
             <div className="rounded-xl bg-white/10 p-2">🌾 PM-KISAN ₹6,000/yr</div>
@@ -147,33 +145,44 @@ export function VideoGuideModal({
     },
     {
       step: "05",
-      title: "Direct Connect & How to Post",
-      titleTe: "5. నేరుగా మాట్లాడడం & పోస్ట్ చేయడం",
-      desc: "Call workers, land owners, or shopkeepers directly. Post your requirements in 1 minute.",
+      title: "Hire Workers, Farmland & Direct Phone Calls",
+      titleTe: "5. పనివారు, పొలాలు కౌలు & నేరుగా మాట్లాడడం",
+      desc: "Hire tractor drivers, daily wage farm helpers, or lease farmland without middleman commission fees.",
       descTe: "కూలీలు, పొలాలు కౌలు లేదా మార్కెట్ ఉత్పత్తుల కోసం ఎలాంటి కమీషన్లు లేకుండా మీ గ్రామస్తులతో నేరుగా ఫోన్ చేసి మాట్లాడండి.",
-      teluguSpeech: "కూలీలు, పొలాలు కౌలు లేదా మార్కెట్ ఉత్పత్తుల కోసం ఎలాంటి కమీషన్లు లేకుండా మీ గ్రామస్తులతో నేరుగా ఫోన్ చేసి మాట్లాడండి.",
+      teluguSpeech: "ఐదవది, నేరుగా మాట్లాడడం. వ్యవసాయ కూలీలు, ట్రాక్టర్ డ్రైవర్లు, లేదా పొలాలు కౌలుకు ఇవ్వడానికి ఎలాంటి దళారులు లేదా కమీషన్లు లేకుండా నేరుగా ఫోన్ చేసి మాట్లాడవచ్చు.",
       icon: PhoneCall,
-      badge: "Direct Call · నేరుగా మాట్లాడండి",
+      badge: "Feature 5 · నేరుగా మాట్లాడండి",
       bgGradient: "from-indigo-800 via-purple-900 to-indigo-950",
       animElements: (
         <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white text-center space-y-3">
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-300 border border-emerald-400/30">
-            <PhoneCall className="size-4 animate-bounce" /> Direct Phone Connection Enabled
+            <PhoneCall className="size-4 animate-bounce" /> Direct Call Connected
           </div>
-          <p className="text-xs font-bold text-white">📞 Connect Directly with Village Neighbours & Officers</p>
+          <p className="text-xs font-bold text-white">📞 Call Tractor Drivers & Land Owners Directly</p>
         </div>
       ),
     },
   ];
 
-  // Speech Synthesis Helper with Clean Pronunciation
+  // Speech Synthesis Helper: Ensures current feature is 100% SPOKEN before moving to next
   const speakStepTelugu = (stepIdx: number) => {
-    if (muted || !("speechSynthesis" in window)) return;
+    if (muted || !("speechSynthesis" in window)) {
+      // Fallback timer if muted or speech unsupported
+      if (!isPaused) {
+        timerRef.current = setTimeout(() => {
+          setActiveStep((prev) => (prev + 1) % guideSteps.length);
+        }, 9000);
+      }
+      return;
+    }
+
     try {
       window.speechSynthesis.cancel();
+      if (timerRef.current) clearTimeout(timerRef.current);
+
       const textToSpeak = guideSteps[stepIdx].teluguSpeech;
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
-      
+
       const voices = window.speechSynthesis.getVoices();
       const teluguVoice = voices.find(
         (v) => v.lang.includes("te") || v.name.toLowerCase().includes("telugu")
@@ -185,12 +194,29 @@ export function VideoGuideModal({
       else if (indianVoice) utterance.voice = indianVoice;
 
       utterance.lang = "te-IN";
-      utterance.rate = 0.82; // Slower, clear, natural pace for villagers
+      utterance.rate = 0.82; // Slower, clear, natural pace for rural comprehension
       utterance.pitch = 1.0;
 
       utterance.onstart = () => setIsSpeaking(true);
-      utterance.onend = () => setIsSpeaking(false);
-      utterance.onerror = () => setIsSpeaking(false);
+      
+      // CRITICAL: Advance to next step ONLY AFTER current speech has 100% FINISHED!
+      utterance.onend = () => {
+        setIsSpeaking(false);
+        if (!isPaused) {
+          timerRef.current = setTimeout(() => {
+            setActiveStep((prev) => (prev + 1) % guideSteps.length);
+          }, 1800); // 1.8s pause after speech ends before next feature
+        }
+      };
+
+      utterance.onerror = () => {
+        setIsSpeaking(false);
+        if (!isPaused) {
+          timerRef.current = setTimeout(() => {
+            setActiveStep((prev) => (prev + 1) % guideSteps.length);
+          }, 7000);
+        }
+      };
 
       window.speechSynthesis.speak(utterance);
     } catch (e) {
@@ -202,18 +228,13 @@ export function VideoGuideModal({
   useEffect(() => {
     if (!isOpen) {
       if ("speechSynthesis" in window) window.speechSynthesis.cancel();
+      if (timerRef.current) clearTimeout(timerRef.current);
       setIsSpeaking(false);
       return;
     }
 
     playChimeSound();
     speakStepTelugu(activeStep);
-
-    if (!isPaused) {
-      timerRef.current = setTimeout(() => {
-        setActiveStep((prev) => (prev + 1) % guideSteps.length);
-      }, 7500); // 7.5s per step
-    }
 
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
@@ -254,16 +275,16 @@ export function VideoGuideModal({
               </div>
               <div>
                 <h3 className="font-display text-base sm:text-lg font-extrabold text-clay flex items-center gap-2">
-                  ManaOoru Video Guide · ఎలా ఉపయోగించాలి?
+                  ManaOoru Feature Guide · ప్రతీ ఫీచర్ వివరణ
                   {isSpeaking && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-black text-emerald-400 border border-emerald-500/30">
                       <Radio className="size-3.5 animate-pulse text-emerald-400" />
-                      🔊 Clear Telugu Voice Audio
+                      🔊 Explaining Feature Now...
                     </span>
                   )}
                 </h3>
                 <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                  మన ఊరు డిజిటల్ సేవలు (Notices, Problems, Schemes & How to Use)
+                  ఒక్కొక్క ఫీచర్ పూర్తిగా వివరించిన తర్వాత తరువాతి దానికి వెళ్తుంది (Complete Feature Walkthrough)
                 </p>
               </div>
             </div>
@@ -341,12 +362,12 @@ export function VideoGuideModal({
 
                   {/* Audio Visualizer Waves */}
                   {!muted && isSpeaking && (
-                    <div className="flex items-center gap-2 pt-2 text-emerald-300 font-bold text-xs bg-black/30 rounded-xl px-3 py-2 border border-emerald-400/30 w-fit">
+                    <div className="flex items-center gap-2 pt-2 text-emerald-300 font-bold text-xs bg-black/30 rounded-xl px-3.5 py-2 border border-emerald-400/30 w-fit">
                       <span className="relative flex size-3">
                         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
                         <span className="relative inline-flex size-3 rounded-full bg-emerald-400" />
                       </span>
-                      <span>🔊 Speaking Clear Telugu Audio...</span>
+                      <span>🔊 Explaining this feature completely in Telugu...</span>
                     </div>
                   )}
                 </div>
@@ -387,7 +408,7 @@ export function VideoGuideModal({
                   type="button"
                   onClick={() => setActiveStep((prev) => (prev - 1 + guideSteps.length) % guideSteps.length)}
                   className="grid size-10 place-items-center rounded-full bg-white/20 hover:bg-white/30 text-white transition"
-                  aria-label="Previous step"
+                  aria-label="Previous feature"
                 >
                   <ChevronLeft className="size-5" />
                 </button>
@@ -395,7 +416,7 @@ export function VideoGuideModal({
                   type="button"
                   onClick={() => setActiveStep((prev) => (prev + 1) % guideSteps.length)}
                   className="grid size-10 place-items-center rounded-full bg-white/20 hover:bg-white/30 text-white transition"
-                  aria-label="Next step"
+                  aria-label="Next feature"
                 >
                   <ChevronRight className="size-5" />
                 </button>
