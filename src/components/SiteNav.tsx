@@ -156,14 +156,14 @@ export function SiteNav() {
           </span>
         </Link>
         <div
-          className={`hidden min-w-0 flex-1 items-center justify-center gap-0.5 text-xs font-bold xl:flex xl:gap-1.5 2xl:text-sm ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
+          className={`hidden 2xl:flex items-center justify-center gap-2 text-xs font-bold px-4 shrink-0 ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
         >
           {headerLinks.map((l) => (
             <Link
               key={l.to}
               to={l.to}
               activeOptions={{ exact: l.to === "/" }}
-              className={`whitespace-nowrap rounded-xl px-2 py-1 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
+              className={`whitespace-nowrap rounded-xl px-2.5 py-1.5 transition-all ${isHeroTop ? "hover:bg-white/15 hover:text-white" : "hover:bg-primary/10 hover:text-primary"}`}
               activeProps={{
                 className: isHeroTop
                   ? "text-white font-black bg-white/20 shadow-sm"
@@ -187,7 +187,7 @@ export function SiteNav() {
                 className={`flex h-10 items-center gap-2 rounded-full border px-3 text-xs font-semibold shadow-sm transition ${
                   isHeroTop
                     ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
-                    : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"
+                    : "border-border bg-white dark:bg-card text-foreground hover:border-primary hover:text-primary"
                 }`}
               >
                 {authProfile?.photo_url ? (
@@ -201,7 +201,7 @@ export function SiteNav() {
                     <UserRound className="size-3" />
                   </div>
                 )}
-                <span className="max-w-[90px] truncate">
+                <span className="max-w-[90px] truncate font-bold">
                   {authProfile?.full_name ||
                     authProfile?.username ||
                     (role ? getRoleDisplayName(role) : "") ||
@@ -259,16 +259,17 @@ export function SiteNav() {
           ) : (
             <Link
               to="/auth"
-              className="relative inline-flex h-10 items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-emerald-500 via-primary to-teal-500 px-5 text-sm font-bold text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] ring-2 ring-white/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:ring-white/60"
+              className="relative inline-flex h-10 items-center gap-2 overflow-hidden rounded-full bg-gradient-to-r from-emerald-500 via-primary to-teal-500 px-5 text-sm font-bold text-white shadow-[0_0_20px_rgba(34,197,94,0.5)] ring-2 ring-white/30 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_0_30px_rgba(34,197,94,0.7)] hover:ring-white/60 shrink-0"
             >
               <div className="pointer-events-none absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/25 to-transparent" />
               <UserRound className="relative z-10 size-4" />
               <span className="relative z-10">{t.signIn}</span>
             </Link>
           )}
+
           <Link
             to="/weather"
-            className={`flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-bold shadow-sm transition ${
+            className={`hidden md:inline-flex h-10 items-center gap-1.5 rounded-full border px-3 text-xs font-bold shadow-sm transition ${
               isHeroTop
                 ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
                 : "border-border bg-card text-foreground hover:border-primary hover:text-primary"
@@ -277,31 +278,17 @@ export function SiteNav() {
           >
             <CloudSun className="size-4 text-amber-400" />
             <span>{weather.temp != null ? `${weather.temp}°C` : "31°C"}</span>
-            <span className="hidden sm:inline text-[11px] opacity-80 max-w-[80px] truncate">
+            <span className="hidden lg:inline text-[11px] opacity-80 max-w-[80px] truncate">
               {profile.village || "Hyderabad"}
             </span>
           </Link>
 
-          {/* Dark Mode Sun/Moon Toggle Button */}
-          <button
-            type="button"
-            onClick={() => setDarkMode(!darkMode)}
-            className={`flex size-10 items-center justify-center rounded-full border shadow-sm transition ${
-              isHeroTop
-                ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
-                : "border-border bg-card text-foreground hover:border-primary hover:text-primary"
-            }`}
-            aria-label="Toggle Dark Mode"
-            title={darkMode ? "Switch to Light Mode" : "Switch to Dark Mode"}
-          >
-            {darkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-indigo-400" />}
-          </button>
-
           <InstallAppButton variant="pill" className="hidden sm:inline-flex" />
+
           <div className="nav-menu-container relative">
             <button
               onClick={() => setLanguageOpen((value) => !value)}
-              className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-full border px-2.5 sm:px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+              className={`inline-flex h-10 items-center justify-center gap-1.5 rounded-full border px-2.5 sm:px-3 text-xs font-semibold shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-card text-foreground hover:border-primary hover:text-primary"}`}
               aria-label="Language selector"
               aria-expanded={languageOpen}
             >
@@ -334,11 +321,11 @@ export function SiteNav() {
             <Search className="size-4" />
           </button>
           {user && (
-            <div className="nav-menu-container relative hidden 2xl:block">
+            <div className="nav-menu-container relative block">
               <button
                 type="button"
                 onClick={openNotifications}
-                className={`relative grid size-10 place-items-center rounded-full border shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-white text-muted-foreground hover:border-primary hover:text-primary"}`}
+                className={`relative grid size-10 place-items-center rounded-full border shadow-sm transition ${isHeroTop ? "border-white/25 bg-white/10 text-white hover:bg-white/20" : "border-border bg-card text-foreground hover:border-primary hover:text-primary"}`}
                 aria-label="Notifications"
                 aria-expanded={notificationsOpen}
               >
@@ -455,7 +442,7 @@ export function SiteNav() {
             </div>
           )}
           <button
-            className={`grid size-10 place-items-center rounded-full border shadow-sm xl:hidden ${isHeroTop ? "border-white/25 bg-white/10 text-white" : "border-border bg-white text-foreground"}`}
+            className={`grid size-10 place-items-center rounded-full border shadow-sm 2xl:hidden ${isHeroTop ? "border-white/25 bg-white/10 text-white" : "border-border bg-card text-foreground"}`}
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
           >
@@ -470,7 +457,7 @@ export function SiteNav() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.24, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border/60 bg-[#f7fbf2] dark:bg-zinc-950 text-foreground shadow-2xl xl:hidden max-h-[85vh] overflow-y-auto"
+            className="overflow-hidden border-t border-border/60 bg-[#f7fbf2] dark:bg-zinc-950 text-foreground shadow-2xl 2xl:hidden max-h-[85vh] overflow-y-auto"
           >
             <motion.div
               initial="closed"
