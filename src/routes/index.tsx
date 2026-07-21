@@ -595,26 +595,18 @@ function HeroVillageOSCard({
         </div>
 
         {/* Embedded Animated Village Feed Strip (Sleek and clear preview inside the hero right card!) */}
-        <div className="mt-4 relative rounded-2xl overflow-hidden border border-white/15 bg-black h-36 sm:h-40 group">
+        <div className="mt-4 relative rounded-2xl overflow-hidden border border-white/15 bg-black h-36 sm:h-40 group shadow-inner">
+          {/* Real Sunrise Village Photo with continuous Ken-Burns style slow zoom and pan */}
           <img
             src="/village-life-bg.jpg"
             alt="Live Village Feed"
-            className="absolute inset-0 h-full w-full object-cover brightness-105 contrast-108 scale-105 transition duration-700 group-hover:scale-100 animate-pulse-subtle"
+            className="absolute inset-0 h-full w-full object-cover brightness-105 contrast-108 animate-[pulse_6s_ease-in-out_infinite] scale-110 transition-transform duration-[8000ms] group-hover:scale-100"
           />
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover mix-blend-overlay opacity-60 pointer-events-none"
-          >
-            <source src="/village-video.webm" type="video/webm" />
-            <source src="/village-video.mp4" type="video/mp4" />
-          </video>
 
-          {/* Animated Shimmer Overlays inside feed */}
-          <div className="absolute bottom-[10%] right-[10%] w-1/2 h-4 bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent skew-x-12 blur-[2px] animate-shimmer pointer-events-none" />
-          <div className="absolute bottom-[30%] left-[10%] w-2/3 h-5 bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent blur-[2px] animate-shimmer pointer-events-none" />
+          {/* Animated Shimmer Overlays across the real photo stream */}
+          <div className="absolute bottom-[10%] right-[10%] w-1/2 h-5 bg-gradient-to-r from-transparent via-cyan-400/45 to-transparent skew-x-12 blur-[2px] animate-shimmer pointer-events-none" />
+          <div className="absolute bottom-[30%] left-[10%] w-2/3 h-6 bg-gradient-to-r from-transparent via-emerald-400/35 to-transparent blur-[2px] animate-shimmer pointer-events-none" />
+          <div className="absolute top-[15%] left-[20%] size-24 rounded-full bg-amber-400/20 blur-xl animate-pulse duration-[4000ms] pointer-events-none" />
 
           {/* Top/Bottom tags */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-4">
@@ -1645,18 +1637,6 @@ function Index() {
               alt="Rural India Village Life Sunrise"
               className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-1000 group-hover:scale-100 animate-pulse-subtle brightness-[1.05] contrast-[1.08]"
             />
-
-            {/* Optional Local/Reliable Video Blended Layer */}
-            <video
-              autoPlay
-              loop
-              muted
-              playsInline
-              className="absolute inset-0 h-full w-full object-cover mix-blend-overlay opacity-60 pointer-events-none"
-            >
-              <source src="/village-video.webm" type="video/webm" />
-              <source src="/village-video.mp4" type="video/mp4" />
-            </video>
 
             {/* Layer 1: Animated Sunrise Rays & Golden Morning Air */}
             <div className="absolute top-[12%] left-[18%] size-56 rounded-full bg-gradient-to-tr from-amber-400 via-yellow-300 to-orange-500 opacity-40 blur-2xl animate-pulse duration-[3500ms] pointer-events-none" />
