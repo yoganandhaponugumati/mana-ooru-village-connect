@@ -146,13 +146,14 @@ export function SiteNav() {
   };
 
   return (
-    <nav
-      className={`fixed inset-x-0 top-0 z-[9999] border-b transition-all duration-300 ${
-        isHeroTop
-          ? "border-white/15 bg-black/45 text-white backdrop-blur-md shadow-lg"
-          : "border-[#dfeae2]/80 bg-[#f7fbf2]/95 text-foreground shadow-sm backdrop-blur-2xl dark:bg-zinc-950/95 dark:border-zinc-800/80"
-      }`}
-    >
+    <>
+      <nav
+        className={`fixed inset-x-0 top-0 z-[9999] border-b transition-all duration-300 ${
+          isHeroTop
+            ? "border-white/15 bg-black/45 text-white backdrop-blur-md shadow-lg"
+            : "border-[#dfeae2]/80 bg-[#f7fbf2]/95 text-foreground shadow-sm backdrop-blur-2xl dark:bg-zinc-950/95 dark:border-zinc-800/80"
+        }`}
+      >
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-3 sm:px-5 lg:px-6">
 
         {/* Logo */}
