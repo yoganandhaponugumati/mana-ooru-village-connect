@@ -112,15 +112,16 @@ export function ConceptShowcase() {
         </p>
       </div>
 
-      {/* Grid of 3D Cards */}
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Horizontal Swipeable Track on Mobile / Grid on Desktop */}
+      <div className="flex gap-4 overflow-x-auto pb-4 pt-2 -mx-4 px-4 sm:mx-0 sm:px-0 sm:grid sm:grid-cols-2 lg:grid-cols-4 snap-x snap-mandatory scrollbar-none">
         {concepts.map((concept, idx) => (
-          <ConceptCard
-            key={concept.id}
-            concept={concept}
-            index={idx}
-            onClick={() => navigate({ to: routesMap[concept.id] })}
-          />
+          <div key={concept.id} className="w-[280px] sm:w-auto shrink-0 snap-center h-full">
+            <ConceptCard
+              concept={concept}
+              index={idx}
+              onClick={() => navigate({ to: routesMap[concept.id] })}
+            />
+          </div>
         ))}
       </div>
 

@@ -12,6 +12,7 @@ import {
   Pin,
   Plus,
   School,
+  Shield,
   ShieldCheck,
   Share2,
   MapPin,

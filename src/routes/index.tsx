@@ -48,8 +48,6 @@ import { ConceptShowcase } from "@/components/ConceptShowcase";
 import { VideoGuideModal } from "@/components/VideoGuideModal";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
-import voice1 from "@/assets/voice-1.jpg";
-import voice2 from "@/assets/voice-2.jpg";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -217,21 +215,54 @@ const steps = [
   },
 ];
 
-const voices = [
+const proofTickers = [
   {
-    img: voice1,
-    name: "Lakshmi Devi",
-    role: "Dairy farmer · Kothur",
-    quote:
-      "I leased two acres in one week. Earlier this would have taken a whole season of asking around.",
-    rating: 5,
+    type: "Problem Solved",
+    icon: CheckCircle2,
+    badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+    title: "Drinking Water Pipeline Fixed",
+    desc: "Panchayat repaired the main valve leak in Ward 4 within 3 hours after photo verification.",
+    time: "2h ago",
   },
   {
-    img: voice2,
-    name: "Suresh Reddy",
-    role: "Farmer · Pedda Kallepalli",
-    quote: "I sold 400 kg of paddy directly to my neighbour. No middleman, fair price.",
-    rating: 5,
+    type: "Official Notice",
+    icon: Megaphone,
+    badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30",
+    title: "Kharif Crop Insurance Portal",
+    desc: "Last date for subsidized crop insurance enrollment under Rythu Bharosa is June 30.",
+    time: "4h ago",
+  },
+  {
+    type: "Problem Solved",
+    icon: CheckCircle2,
+    badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+    title: "18 Solar Streetlights Installed",
+    desc: "New LED streetlights operational along Main Bazar & High School feeder roads.",
+    time: "Yesterday",
+  },
+  {
+    type: "Official Notice",
+    icon: Megaphone,
+    badgeColor: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30",
+    title: "Gram Sabha General Meeting",
+    desc: "Open village hall meeting to approve monsoon drainage budget this Friday at 10 AM.",
+    time: "1d ago",
+  },
+  {
+    type: "Problem Solved",
+    icon: CheckCircle2,
+    badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
+    title: "Primary Canal De-siltation",
+    desc: "Irrigation department completed clearing 2.4 km of feeder canal before rain forecast.",
+    time: "2d ago",
+  },
+  {
+    type: "Official Notice",
+    icon: Megaphone,
+    badgeColor: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30",
+    title: "Free Veterinary Health Camp",
+    desc: "Livestock vaccination & free mineral mixture distribution at Mandal veterinary clinic.",
+    time: "3d ago",
   },
 ];
 
@@ -638,10 +669,12 @@ function Index() {
           src={heroVillage}
           alt="Beautiful Indian village with green fields at sunrise"
           loading="eager"
+          fetchPriority="high"
+          decoding="async"
           className="absolute inset-0 z-0 h-full w-full object-cover opacity-60"
         />
         <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_72%_28%,rgba(24,169,153,0.36),transparent_30%),radial-gradient(circle_at_18%_16%,rgba(242,184,75,0.34),transparent_25%),linear-gradient(90deg,rgba(4,18,10,0.92)_0%,rgba(8,31,18,0.72)_45%,rgba(8,41,33,0.28)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 z-10 h-52 bg-gradient-to-t from-[#eef8ed] via-[#eef8ed]/78 to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 z-10 h-52 bg-gradient-to-t from-[#eef8ed] via-[#eef8ed]/78 dark:from-[#0e1712] dark:via-[#0e1712]/78 to-transparent" />
         <div className="pointer-events-none absolute left-0 top-28 z-10 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div className="hero-life-layer pointer-events-none absolute inset-0 z-10" />
 
@@ -1362,47 +1395,43 @@ function Index() {
             </div>
           </div>
 
-          <div>
+          <div className="min-w-0 overflow-hidden">
             <span className="text-xs font-bold uppercase tracking-widest text-secondary">
-              Voices from the village
+              Live Village Updates & Notices
             </span>
-            <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
-              Proof from neighbours who use ManaOoru.
+            <h2 className="mt-2 font-display text-3xl font-semibold text-clay dark:text-foreground sm:text-4xl">
+              Proof of solved problems & official notices.
             </h2>
-            <div className="mt-8 grid gap-4">
-              {voices.map((v, i) => (
-                <figure
-                  key={v.name}
-                  className="hover-lift animate-fade-up relative overflow-hidden rounded-[24px] border border-border/70 bg-card p-6 shadow-sm"
-                  style={{ animationDelay: `${i * 100}ms` }}
-                >
-                  <Quote className="absolute right-5 top-5 size-12 rotate-180 text-primary/10" />
-                  <div className="relative flex gap-5">
-                    <img
-                      src={v.img}
-                      alt={v.name}
-                      loading="lazy"
-                      className="size-16 shrink-0 rounded-2xl object-cover ring-4 ring-accent/20"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1">
-                        {Array.from({ length: v.rating }).map((_, k) => (
-                          <Star key={k} className="size-4 fill-accent text-accent" />
-                        ))}
+            <div className="marquee-container mt-8 py-2 -mx-4 px-4 sm:-mx-6 sm:px-6">
+              <div className="marquee-track flex gap-4">
+                {[...proofTickers, ...proofTickers].map((item, idx) => {
+                  const Icon = item.icon;
+                  return (
+                    <div
+                      key={idx}
+                      className="w-[290px] sm:w-[320px] shrink-0 rounded-[22px] border border-border/80 bg-card/95 dark:bg-card/90 p-5 shadow-sm transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-md"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span
+                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider border ${item.badgeColor}`}
+                        >
+                          <Icon className="size-3.5" />
+                          {item.type}
+                        </span>
+                        <span className="text-[11px] font-semibold text-muted-foreground">
+                          {item.time}
+                        </span>
                       </div>
-                      <blockquote className="mt-3 text-lg font-semibold leading-8 text-clay">
-                        "{v.quote}"
-                      </blockquote>
-                      <figcaption className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1">
-                        <p className="font-display text-xl font-semibold text-foreground">
-                          {v.name}
-                        </p>
-                        <p className="text-sm text-muted-foreground">{v.role}</p>
-                      </figcaption>
+                      <h3 className="mt-3.5 font-display text-base font-bold text-foreground">
+                        {item.title}
+                      </h3>
+                      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground line-clamp-3">
+                        {item.desc}
+                      </p>
                     </div>
-                  </div>
-                </figure>
-              ))}
+                  );
+                })}
+              </div>
             </div>
 
             <div className="mt-6 overflow-hidden rounded-[24px] border border-border/60 bg-gradient-to-br from-card to-muted/60 p-6 shadow-sm">
@@ -1583,25 +1612,45 @@ function Index() {
       </section>
 
       <section className="mx-auto mt-24 max-w-7xl px-4 pb-16 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl border border-border/60 bg-card p-10 shadow-[var(--shadow-soft)] sm:p-14">
-          <div className="absolute -right-16 -top-16 size-64 rounded-full bg-accent/20 blur-3xl animate-float-slow" />
-          <div className="absolute -bottom-20 -left-10 size-72 rounded-full bg-primary/15 blur-3xl animate-float-slow [animation-delay:-3s]" />
-          <div className="relative max-w-2xl">
-            <h2 className="font-display text-3xl font-semibold text-clay sm:text-5xl">
+        <div className="relative overflow-hidden rounded-[32px] border border-primary/30 shadow-[var(--shadow-lift)] min-h-[440px] flex flex-col justify-center p-10 sm:p-16">
+          {/* Background Video with colorful fallback & dark overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-green-900 to-teal-950" />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover brightness-95 contrast-105 scale-105 transition-transform duration-1000"
+          >
+            <source
+              src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-rice-field-and-village-42475-large.mp4"
+              type="video/mp4"
+            />
+          </video>
+          {/* Glass & Gradient Overlays for maximum color & high-contrast readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/40 backdrop-blur-[2px]" />
+          <div className="absolute -right-20 -top-20 size-80 rounded-full bg-accent/30 blur-3xl animate-float-slow pointer-events-none" />
+          <div className="absolute -bottom-20 -left-10 size-80 rounded-full bg-primary/30 blur-3xl animate-float-slow pointer-events-none [animation-delay:-3s]" />
+
+          <div className="relative z-10 max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-accent backdrop-blur-md">
+              <Sparkles className="size-3.5" /> Empowering Rural India
+            </span>
+            <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-white sm:text-5xl drop-shadow-sm">
               Bring your village online.
             </h2>
-            <p className="mt-4 text-pretty text-muted-foreground sm:text-lg">
+            <p className="mt-4 text-pretty text-white/90 sm:text-lg leading-relaxed font-medium">
               Whether you grow rice, fix motors, drive tractors, or run a small shop — there's a
               place for you on ManaOoru. Free for every villager, forever.
             </p>
-            <div className="mt-7 flex flex-wrap gap-3">
-              <Button asChild>
-                <Link to="/post-worker" className="px-6 py-3 text-sm font-semibold">
-                  Create your profile
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-7 py-6 text-base font-bold shadow-lg shadow-accent/20">
+                <Link to="/post-worker">
+                  Create your profile <ArrowRight className="ml-2 size-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline">
-                <Link to="/marketplace" className="px-6 py-3 text-sm font-semibold">
+              <Button asChild variant="outline" size="lg" className="border-white/30 bg-white/15 text-white hover:bg-white/25 hover:text-white px-7 py-6 text-base font-semibold backdrop-blur-md">
+                <Link to="/marketplace">
                   Browse the village
                 </Link>
               </Button>

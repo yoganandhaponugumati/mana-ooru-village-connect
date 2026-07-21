@@ -9,22 +9,22 @@
   "orientation": "portrait-primary",
   "icons": [
     {
+      "src": "/site-icon.svg",
+      "sizes": "192x192 512x512 any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
       "src": "/logo.png",
       "sizes": "192x192 512x512 any",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "/site-icon.png",
       "sizes": "any",
       "type": "image/png",
       "purpose": "any"
-    },
-    {
-      "src": "/site-icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
     }
   ],
   "categories": ["social", "productivity", "shopping", "lifestyle"],

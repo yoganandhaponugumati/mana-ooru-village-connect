@@ -1,4 +1,5 @@
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell,
@@ -418,158 +419,162 @@ export function SiteNav() {
           </div>
         </div>
 
-        {/* ── Mobile / Tablet Drawer ─────────────────────────────── */}
-        <AnimatePresence>
-          {open && (
-            <>
-              {/* Backdrop */}
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="fixed inset-0 z-[9990] bg-black/40 lg:hidden"
-                onClick={() => setOpen(false)}
-              />
-              {/* Drawer panel */}
-              <motion.div
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "100%" }}
-                transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-                className="fixed right-0 top-0 z-[9998] flex h-full w-[min(300px,85vw)] flex-col bg-white dark:bg-zinc-950 shadow-2xl lg:hidden overflow-y-auto"
-              >
-                {/* Drawer header */}
-                <div className="flex items-center justify-between border-b border-border dark:border-zinc-800 px-4 py-3">
-                  <div className="flex items-center gap-2">
-                    <div className="grid size-7 place-items-center rounded-[10px] bg-[var(--gradient-village)] text-white">
-                      <Leaf className="size-4" />
-                    </div>
-                    <span className="font-display font-bold text-clay dark:text-zinc-100">ManaOoru</span>
-                  </div>
-                  <button
+        {/* ── Mobile / Tablet Drawer (Portaled to document.body) ── */}
+        {typeof document !== "undefined" &&
+          createPortal(
+            <AnimatePresence>
+              {open && (
+                <div className="fixed inset-0 z-[100000] lg:hidden">
+                  {/* Backdrop */}
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.2 }}
+                    className="absolute inset-0 bg-black/60 backdrop-blur-sm"
                     onClick={() => setOpen(false)}
-                    className="grid size-8 place-items-center rounded-full border border-border text-muted-foreground hover:text-foreground"
+                  />
+                  {/* Drawer panel */}
+                  <motion.div
+                    initial={{ x: "100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "100%" }}
+                    transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
+                    className="absolute right-0 top-0 flex h-full w-[min(320px,86vw)] flex-col bg-white dark:bg-zinc-950 shadow-2xl overflow-y-auto border-l border-border/60"
                   >
-                    <X className="size-4" />
-                  </button>
-                </div>
-
-                {/* Nav links */}
-                <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-                  {navLinks.map((l) => (
-                    <Link
-                      key={l.to}
-                      to={l.to}
-                      onClick={() => setOpen(false)}
-                      activeOptions={{ exact: l.to === "/" }}
-                      className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground transition hover:bg-primary/10 hover:text-primary dark:text-zinc-200"
-                      activeProps={{ className: "bg-primary text-primary-foreground font-black" }}
-                    >
-                      <l.icon className="size-4 shrink-0" />
-                      {t[l.key] ?? l.label}
-                    </Link>
-                  ))}
-                </div>
-
-                {/* Dark mode + Language */}
-                <div className="border-t border-border dark:border-zinc-800 px-3 py-3 space-y-2">
-                  {/* Dark mode */}
-                  <div className="flex items-center justify-between rounded-xl border border-border dark:border-zinc-800 bg-muted/40 px-3 py-2.5">
-                    <div className="flex items-center gap-2">
-                      {darkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-indigo-400" />}
-                      <span className="text-xs font-bold text-foreground dark:text-zinc-200">
-                        {darkMode ? "Light Mode" : "Dark Mode"}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => setDarkMode(!darkMode)}
-                      className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${darkMode ? "bg-primary" : "bg-muted"}`}
-                    >
-                      <span className={`pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm ring-0 transition ${darkMode ? "translate-x-4" : "translate-x-0"}`} />
-                    </button>
-                  </div>
-
-                  {/* Language */}
-                  <div className="rounded-xl border border-border dark:border-zinc-800 bg-muted/40 p-2.5">
-                    <p className="mb-2 flex items-center gap-1.5 text-xs font-bold text-primary">
-                      <Globe2 className="size-3.5" /> Language / భాష
-                    </p>
-                    <div className="grid grid-cols-3 gap-1.5">
-                      {languageOptions.map((item) => (
-                        <button
-                          key={item.code}
-                          type="button"
-                          onClick={() => { setLanguage(item.code); setOpen(false); }}
-                          className={`rounded-lg border py-1.5 text-xs font-bold transition ${
-                            item.code === language
-                              ? "border-primary bg-primary text-primary-foreground"
-                              : "border-border dark:border-zinc-700 text-foreground dark:text-zinc-200 hover:border-primary"
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  <InstallAppButton variant="drawer" />
-                </div>
-
-                {/* User section */}
-                <div className="border-t border-border dark:border-zinc-800 px-3 py-3">
-                  {user ? (
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2 rounded-xl bg-muted/60 px-3 py-2">
-                        <div className="grid size-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                          <UserRound className="size-4" />
+                    {/* Drawer header */}
+                    <div className="flex items-center justify-between border-b border-border dark:border-zinc-800 px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <div className="grid size-7 place-items-center rounded-[10px] bg-[var(--gradient-village)] text-white">
+                          <Leaf className="size-4" />
                         </div>
-                        <div className="min-w-0">
-                          <p className="truncate text-xs font-bold text-foreground dark:text-zinc-100">
-                            {authProfile?.full_name || user.email?.split("@")[0]}
-                          </p>
-                          <p className="truncate text-[10px] text-muted-foreground">{profile.village || "No village"}</p>
-                        </div>
-                      </div>
-                      {(role === "village_admin" || role === "super_admin") && (
-                        <Link to="/official" onClick={() => setOpen(false)}
-                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white">
-                          <ShieldCheck className="size-4" /> Admin Portal
-                        </Link>
-                      )}
-                      <div className="grid grid-cols-2 gap-2">
-                        <Link to="/dashboard" onClick={() => setOpen(false)}
-                          className="flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 py-2 text-xs font-bold text-clay dark:text-zinc-200">
-                          <LayoutDashboard className="size-3.5 text-blue-600" /> Dashboard
-                        </Link>
-                        <Link to="/profile" onClick={() => setOpen(false)}
-                          className="flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 py-2 text-xs font-bold text-clay dark:text-zinc-200">
-                          <UserRound className="size-3.5 text-amber-600" /> Profile
-                        </Link>
+                        <span className="font-display font-bold text-clay dark:text-zinc-100">ManaOoru</span>
                       </div>
                       <button
-                        type="button"
-                        onClick={() => { signOut(); setOpen(false); }}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/40 px-4 py-2.5 text-xs font-bold text-red-700 dark:text-red-300"
+                        onClick={() => setOpen(false)}
+                        className="grid size-8 place-items-center rounded-full border border-border text-muted-foreground hover:text-foreground"
                       >
-                        <LogOut className="size-3.5" /> Sign Out
+                        <X className="size-4" />
                       </button>
                     </div>
-                  ) : (
-                    <Link
-                      to="/auth"
-                      onClick={() => setOpen(false)}
-                      className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-primary px-4 py-3 text-sm font-bold text-white"
-                    >
-                      <UserRound className="size-4" /> {t.signIn || "Sign In / Register"}
-                    </Link>
-                  )}
+
+                    {/* Nav links */}
+                    <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+                      {navLinks.map((l) => (
+                        <Link
+                          key={l.to}
+                          to={l.to}
+                          onClick={() => setOpen(false)}
+                          activeOptions={{ exact: l.to === "/" }}
+                          className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground transition hover:bg-primary/10 hover:text-primary dark:text-zinc-200"
+                          activeProps={{ className: "bg-primary text-primary-foreground font-black" }}
+                        >
+                          <l.icon className="size-4 shrink-0" />
+                          {t[l.key] ?? l.label}
+                        </Link>
+                      ))}
+                    </div>
+
+                    {/* Dark mode + Language */}
+                    <div className="border-t border-border dark:border-zinc-800 px-3 py-3 space-y-2">
+                      {/* Dark mode */}
+                      <div className="flex items-center justify-between rounded-xl border border-border dark:border-zinc-800 bg-muted/40 px-3 py-2.5">
+                        <div className="flex items-center gap-2">
+                          {darkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-indigo-400" />}
+                          <span className="text-xs font-bold text-foreground dark:text-zinc-200">
+                            {darkMode ? "Light Mode" : "Dark Mode"}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => setDarkMode(!darkMode)}
+                          className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${darkMode ? "bg-primary" : "bg-muted"}`}
+                        >
+                          <span className={`pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm ring-0 transition ${darkMode ? "translate-x-4" : "translate-x-0"}`} />
+                        </button>
+                      </div>
+
+                      {/* Language */}
+                      <div className="rounded-xl border border-border dark:border-zinc-800 bg-muted/40 p-2.5">
+                        <p className="mb-2 flex items-center gap-1.5 text-xs font-bold text-primary">
+                          <Globe2 className="size-3.5" /> Language / భాష
+                        </p>
+                        <div className="grid grid-cols-3 gap-1.5">
+                          {languageOptions.map((item) => (
+                            <button
+                              key={item.code}
+                              type="button"
+                              onClick={() => { setLanguage(item.code); setOpen(false); }}
+                              className={`rounded-lg border py-1.5 text-xs font-bold transition ${
+                                item.code === language
+                                  ? "border-primary bg-primary text-primary-foreground"
+                                  : "border-border dark:border-zinc-700 text-foreground dark:text-zinc-200 hover:border-primary"
+                              }`}
+                            >
+                              {item.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <InstallAppButton variant="drawer" />
+                    </div>
+
+                    {/* User section */}
+                    <div className="border-t border-border dark:border-zinc-800 px-3 py-3">
+                      {user ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 rounded-xl bg-muted/60 px-3 py-2">
+                            <div className="grid size-7 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                              <UserRound className="size-4" />
+                            </div>
+                            <div className="min-w-0">
+                              <p className="truncate text-xs font-bold text-foreground dark:text-zinc-100">
+                                {authProfile?.full_name || user.email?.split("@")[0]}
+                              </p>
+                              <p className="truncate text-[10px] text-muted-foreground">{profile.village || "No village"}</p>
+                            </div>
+                          </div>
+                          {(role === "village_admin" || role === "super_admin") && (
+                            <Link to="/official" onClick={() => setOpen(false)}
+                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white">
+                              <ShieldCheck className="size-4" /> Admin Portal
+                            </Link>
+                          )}
+                          <div className="grid grid-cols-2 gap-2">
+                            <Link to="/dashboard" onClick={() => setOpen(false)}
+                              className="flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 py-2 text-xs font-bold text-clay dark:text-zinc-200">
+                              <LayoutDashboard className="size-3.5 text-blue-600" /> Dashboard
+                            </Link>
+                            <Link to="/profile" onClick={() => setOpen(false)}
+                              className="flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 py-2 text-xs font-bold text-clay dark:text-zinc-200">
+                              <UserRound className="size-3.5 text-amber-600" /> Profile
+                            </Link>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => { signOut(); setOpen(false); }}
+                            className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/40 px-4 py-2.5 text-xs font-bold text-red-700 dark:text-red-300"
+                          >
+                            <LogOut className="size-3.5" /> Sign Out
+                          </button>
+                        </div>
+                      ) : (
+                        <Link
+                          to="/auth"
+                          onClick={() => setOpen(false)}
+                          className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-primary px-4 py-3 text-sm font-bold text-white"
+                        >
+                          <UserRound className="size-4" /> {t.signIn || "Sign In / Register"}
+                        </Link>
+                      )}
+                    </div>
+                  </motion.div>
                 </div>
-              </motion.div>
-            </>
+              )}
+            </AnimatePresence>,
+            document.body
           )}
-        </AnimatePresence>
       </nav>
 
       {/* ── Mobile Bottom Dock ─────────────────────────────────────── */}
