@@ -336,6 +336,24 @@
 .animate-soft-pop {
   animation: soft-pop 0.36s cubic-bezier(0.32, 0.72, 0, 1) both;
 }
+.animate-shimmer {
+  animation: shimmer 3s linear infinite;
+  background-size: 200% 100%;
+}
+.animate-pulse-subtle {
+  animation: pulse-subtle 8s ease-in-out infinite;
+}
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; transform: scale(1.05); }
+  50% { opacity: 0.92; transform: scale(1.02); }
+}
+.animate-bounce-slow {
+  animation: bounce-slow 3s ease-in-out infinite;
+}
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
 
 .hover-lift {
   transition:
