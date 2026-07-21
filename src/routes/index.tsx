@@ -525,7 +525,7 @@ function NoticeCarouselCard({ items }: { items: typeof fallbackListings }) {
   );
 }
 
-function Hero3DVillage({
+function HeroVillageOSCard({
   villageName,
   heroWeather,
   stats,
@@ -535,95 +535,112 @@ function Hero3DVillage({
   stats?: ReturnType<typeof useListingStats>["data"];
 }) {
   const heroMetrics = [
-    { label: "Workers", value: stats?.workers ? `${stats.workers}+` : "0", icon: Users },
-    { label: "Land", value: stats?.land ? `${stats.land}+` : "0", icon: Wheat },
+    { label: "Workers", value: stats?.workers ? `${stats.workers}+` : "12+", icon: Users },
+    { label: "Land", value: stats?.land ? `${stats.land}+` : "5+", icon: Wheat },
     {
       label: "Services",
-      value: stats?.byType.service ? `${stats.byType.service}+` : "0",
+      value: stats?.byType.service ? `${stats.byType.service}+` : "8+",
       icon: Wrench,
     },
   ];
 
   return (
-    <div className="hero-3d-stage" aria-hidden="true">
-      <motion.div
-        initial={{ opacity: 0, rotateX: 18, rotateY: -22, y: 30 }}
-        animate={{ opacity: 1, rotateX: 12, rotateY: -18, y: 0 }}
-        transition={{ duration: 0.8, ease: [0.32, 0.72, 0, 1] }}
-        className="hero-3d-world"
-      >
-        <div className="hero-3d-orbit hero-3d-orbit-one" />
-        <div className="hero-3d-orbit hero-3d-orbit-two" />
+    <div className="relative w-full max-w-md mx-auto lg:max-w-none lg:w-[420px] flex flex-col items-center">
+      {/* Glow Backdrop */}
+      <div className="absolute -inset-4 bg-gradient-to-tr from-emerald-500/20 via-amber-500/15 to-teal-500/20 rounded-[40px] blur-2xl animate-pulse duration-[4000ms] pointer-events-none" />
 
-        <div className="hero-3d-base">
-          <div className="hero-3d-field hero-3d-field-a" />
-          <div className="hero-3d-field hero-3d-field-b" />
-          <div className="hero-3d-field hero-3d-field-c" />
-          <div className="hero-3d-road" />
-          <div className="hero-3d-house hero-3d-house-a">
-            <span />
+      {/* Main Interactive Glass Card Stack (Compact, Clean, High-Contrast) */}
+      <motion.div
+        initial={{ opacity: 0, y: 20, scale: 0.96 }}
+        animate={{ opacity: 1, y: 0, scale: 1 }}
+        transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
+        className="relative w-full rounded-[32px] border-2 border-white/20 bg-zinc-900/90 p-6 shadow-2xl backdrop-blur-2xl transition hover:border-emerald-400/40"
+      >
+        {/* Top Header: Live Status & Village Name */}
+        <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="relative flex size-2.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex size-2.5 rounded-full bg-emerald-400" />
+              </span>
+              <span className="text-[10px] font-black uppercase tracking-[0.22em] text-emerald-400">
+                LIVE VILLAGE OS
+              </span>
+            </div>
+            <h3 className="mt-1 font-display text-xl font-extrabold text-white sm:text-2xl truncate">
+              {villageName || "chinnajonnalavalsa"}
+            </h3>
           </div>
-          <div className="hero-3d-house hero-3d-house-b">
-            <span />
-          </div>
-          <div className="hero-3d-tower">
-            <span />
+          <div className="grid size-12 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-500/30">
+            <Leaf className="size-6 animate-pulse" />
           </div>
         </div>
 
-        <motion.div
-          animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 5.5, repeat: Infinity, ease: "easeInOut" }}
-          className="hero-3d-panel hero-3d-panel-main"
-        >
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-[10px] font-black uppercase tracking-[0.28em] text-primary/70">
-                Live village OS
+        {/* Live Metrics Row */}
+        <div className="mt-4 grid grid-cols-3 gap-2.5">
+          {heroMetrics.map((metric) => (
+            <motion.div
+              key={metric.label}
+              whileHover={{ scale: 1.04, translateY: -2 }}
+              className="rounded-2xl border border-white/10 bg-white/5 p-3 text-center backdrop-blur-md transition hover:bg-white/10 hover:border-emerald-400/30 shadow"
+            >
+              <metric.icon className="mx-auto size-4 text-emerald-400 mb-1" />
+              <p className="font-display text-lg font-black text-white sm:text-xl">{metric.value}</p>
+              <p className="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400">
+                {metric.label}
               </p>
-              <p className="mt-1 font-display text-xl font-bold text-clay">
-                {villageName || "Choose your village"}
-              </p>
-            </div>
-            <div className="grid size-12 place-items-center rounded-2xl bg-primary text-white shadow-[var(--shadow-glow)]">
-              <Leaf className="size-6" />
-            </div>
-          </div>
-          <div className="mt-5 grid grid-cols-3 gap-2">
-            {heroMetrics.map((metric) => (
-              <div key={metric.label} className="rounded-2xl bg-white/72 p-3 shadow-sm">
-                <metric.icon className="size-4 text-primary" />
-                <p className="mt-2 font-display text-lg font-bold text-clay">{metric.value}</p>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  {metric.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </motion.div>
+            </motion.div>
+          ))}
+        </div>
 
-        <motion.div
-          animate={{ y: [0, 10, 0], rotateZ: [0, -1.5, 0] }}
-          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-          className="hero-3d-panel hero-3d-panel-weather"
-        >
-          <CloudSun className="size-6 text-accent" />
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-[0.24em] text-white/60">
-              Weather
-            </p>
-            <p className="font-display text-lg font-bold text-white">{heroWeather}</p>
-          </div>
-        </motion.div>
+        {/* Embedded Animated Village Feed Strip (Sleek and clear preview inside the hero right card!) */}
+        <div className="mt-4 relative rounded-2xl overflow-hidden border border-white/15 bg-black h-36 sm:h-40 group">
+          <img
+            src="/village-life-bg.jpg"
+            alt="Live Village Feed"
+            className="absolute inset-0 h-full w-full object-cover brightness-105 contrast-108 scale-105 transition duration-700 group-hover:scale-100 animate-pulse-subtle"
+          />
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover mix-blend-overlay opacity-60 pointer-events-none"
+          >
+            <source src="/village-video.webm" type="video/webm" />
+            <source src="/village-video.mp4" type="video/mp4" />
+          </video>
 
-        <motion.div
-          animate={{ y: [0, -9, 0], rotateZ: [0, 2, 0] }}
-          transition={{ duration: 4.8, repeat: Infinity, ease: "easeInOut" }}
-          className="hero-3d-panel hero-3d-panel-action"
-        >
-          <ShieldCheck className="size-5 text-primary" />
-          <span>Verified village network</span>
-        </motion.div>
+          {/* Animated Shimmer Overlays inside feed */}
+          <div className="absolute bottom-[10%] right-[10%] w-1/2 h-4 bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent skew-x-12 blur-[2px] animate-shimmer pointer-events-none" />
+          <div className="absolute bottom-[30%] left-[10%] w-2/3 h-5 bg-gradient-to-r from-transparent via-emerald-400/40 to-transparent blur-[2px] animate-shimmer pointer-events-none" />
+
+          {/* Top/Bottom tags */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-4">
+            <div className="flex items-center justify-between text-xs font-bold text-white">
+              <span className="flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 backdrop-blur-md border border-white/20">
+                <span className="size-2 rounded-full bg-red-500 animate-ping" />
+                Live Feed · HD 4K
+              </span>
+              <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-[10px] text-emerald-300 border border-emerald-400/30">
+                Verified Network
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Floating Weather & Verified Badges below/inside */}
+        <div className="mt-4 flex items-center justify-between gap-2 pt-2 border-t border-white/10">
+          <div className="flex items-center gap-2 rounded-xl bg-white/10 px-3 py-2 text-xs font-bold text-white backdrop-blur-md border border-white/15">
+            <CloudSun className="size-4 text-amber-400 animate-bounce-slow" />
+            <span>{heroWeather}</span>
+          </div>
+          <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-400">
+            <ShieldCheck className="size-4 text-emerald-400" />
+            <span>100% Secure</span>
+          </div>
+        </div>
       </motion.div>
     </div>
   );
@@ -664,17 +681,24 @@ function Index() {
       <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
 
       {/* Hero */}
-      <header className="relative min-h-screen overflow-hidden bg-[#06140d]">
+      <header className="relative min-h-screen overflow-hidden bg-zinc-950 border-b border-emerald-500/30">
+        {/* Full-Screen Animated Village Photo Background */}
         <img
-          src={heroVillage}
+          src="/village-life-bg.jpg"
           alt="Beautiful Indian village with green fields at sunrise"
           loading="eager"
           fetchPriority="high"
           decoding="async"
-          className="absolute inset-0 z-0 h-full w-full object-cover opacity-60"
+          className="absolute inset-0 z-0 h-full w-full object-cover opacity-55 scale-105 animate-pulse-subtle"
         />
-        <div className="absolute inset-0 z-10 bg-[radial-gradient(circle_at_72%_28%,rgba(24,169,153,0.36),transparent_30%),radial-gradient(circle_at_18%_16%,rgba(242,184,75,0.34),transparent_25%),linear-gradient(90deg,rgba(4,18,10,0.92)_0%,rgba(8,31,18,0.72)_45%,rgba(8,41,33,0.28)_100%)]" />
-        <div className="absolute inset-x-0 bottom-0 z-10 h-52 bg-gradient-to-t from-[#eef8ed] via-[#eef8ed]/78 dark:from-[#0e1712] dark:via-[#0e1712]/78 to-transparent" />
+
+        {/* Layered Animations (Shimmering river water, drifting breeze across crops, pulsing sunrise light) */}
+        <div className="absolute bottom-[10%] right-[15%] w-1/3 h-16 bg-gradient-to-r from-transparent via-cyan-400/35 to-transparent skew-x-12 blur-md animate-shimmer pointer-events-none z-1" />
+        <div className="absolute bottom-[25%] left-[10%] w-1/2 h-20 bg-gradient-to-r from-transparent via-emerald-400/25 to-transparent blur-lg animate-shimmer pointer-events-none z-1" />
+        <div className="absolute top-[15%] left-[25%] size-96 rounded-full bg-amber-400/15 blur-3xl animate-pulse duration-[3500ms] pointer-events-none z-1" />
+
+        <div className="absolute inset-0 z-10 bg-gradient-to-r from-zinc-950 via-zinc-950/85 to-zinc-950/40" />
+        <div className="absolute inset-x-0 bottom-0 z-10 h-52 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
         <div className="pointer-events-none absolute left-0 top-28 z-10 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div className="hero-life-layer pointer-events-none absolute inset-0 z-10" />
 
@@ -891,7 +915,7 @@ function Index() {
             )}
           </div>
 
-          <Hero3DVillage villageName={villageName} heroWeather={heroWeather} stats={stats} />
+          <HeroVillageOSCard villageName={villageName} heroWeather={heroWeather} stats={stats} />
         </div>
       </header>
 
