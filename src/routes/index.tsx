@@ -1612,89 +1612,78 @@ function Index() {
       </section>
 
       <section className="mx-auto mt-24 max-w-7xl px-4 pb-16 sm:px-6">
-        <div className="relative overflow-hidden rounded-[36px] border border-primary/40 bg-zinc-950 shadow-[0_24px_64px_-12px_rgba(16,185,129,0.25)] min-h-[460px] p-8 sm:p-14 lg:p-16 flex items-center">
-          {/* Background Video — clearly visible on right half, smooth fade to dark on left */}
-          <div className="absolute right-0 top-0 bottom-0 w-full lg:w-2/3 h-full overflow-hidden pointer-events-none">
+        <div className="relative overflow-hidden rounded-[36px] border border-amber-500/40 bg-zinc-950 shadow-[0_24px_64px_-12px_rgba(245,158,11,0.35)] min-h-[520px] flex items-center p-8 sm:p-14 lg:p-16 group">
+          {/* Full Card Animated Photo Background & Video Layers */}
+          <div className="absolute inset-0 h-full w-full overflow-hidden">
+            {/* Primary Base Photo: Rural Sunrise Village with Farmer, Cows & Fields */}
+            <img
+              src="/village-life-bg.jpg"
+              alt="Rural India Village Life Sunrise"
+              className="absolute inset-0 h-full w-full object-cover scale-105 transition-transform duration-1000 group-hover:scale-100 animate-pulse-subtle brightness-[1.05] contrast-[1.08]"
+            />
+
+            {/* Optional Local/Reliable Video Blended Layer */}
             <video
               autoPlay
               loop
               muted
               playsInline
-              className="h-full w-full object-cover brightness-105 contrast-105 scale-105 transition-transform duration-1000"
+              className="absolute inset-0 h-full w-full object-cover mix-blend-overlay opacity-60 pointer-events-none"
             >
-              <source
-                src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-rice-field-and-village-42475-large.mp4"
-                type="video/mp4"
-              />
-              <source
-                src="https://cdn.pixabay.com/video/2021/08/04/83864-584742724_large.mp4"
-                type="video/mp4"
-              />
+              <source src="/village-video.webm" type="video/webm" />
+              <source src="/village-video.mp4" type="video/mp4" />
             </video>
-            {/* Left fade gradient so text is crystal clear on left while video shines on right */}
-            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent lg:bg-gradient-to-r lg:from-zinc-950 lg:via-zinc-950/80 lg:to-transparent" />
-          </div>
 
-          {/* Decorative floating lights */}
-          <div className="absolute -right-20 -top-20 size-80 rounded-full bg-emerald-500/20 blur-3xl animate-float-slow pointer-events-none" />
-          <div className="absolute -bottom-20 -left-10 size-80 rounded-full bg-amber-500/15 blur-3xl animate-float-slow pointer-events-none [animation-delay:-3s]" />
+            {/* Layer 1: Animated Sunrise Rays & Golden Morning Air */}
+            <div className="absolute top-[12%] left-[18%] size-56 rounded-full bg-gradient-to-tr from-amber-400 via-yellow-300 to-orange-500 opacity-40 blur-2xl animate-pulse duration-[3500ms] pointer-events-none" />
+            <div className="absolute top-[10%] left-[16%] size-64 rounded-full bg-amber-300/25 blur-3xl animate-ping duration-[6000ms] pointer-events-none" />
 
-          <div className="relative z-10 grid lg:grid-cols-12 gap-8 items-center w-full">
-            {/* Left Column: CTA Text & Buttons */}
-            <div className="lg:col-span-7 max-w-2xl">
-              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-4 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-400 shadow-sm">
-                <Sparkles className="size-3.5 animate-pulse" /> Empowering Rural India
-              </span>
-              <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl drop-shadow-md leading-tight">
-                Bring your village online.
-              </h2>
-              <p className="mt-4 text-pretty text-zinc-300 sm:text-lg leading-relaxed font-medium">
-                Whether you grow rice, fix motors, drive tractors, or run a small shop — there&apos;s a
-                place for you on ManaOoru. Free for every villager, forever.
-              </p>
-              <div className="mt-8 flex flex-wrap gap-4">
-                <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/20 rounded-2xl transition-all scale-100 hover:scale-[1.02]">
-                  <Link to="/post-worker">
-                    Create your profile <ArrowRight className="ml-2 size-5" />
-                  </Link>
-                </Button>
-                <Button asChild variant="outline" size="lg" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white px-8 py-6 text-base font-bold backdrop-blur-md rounded-2xl transition-all">
-                  <Link to="/marketplace">
-                    Browse the village
-                  </Link>
-                </Button>
-              </div>
+            {/* Layer 2: Animated Moving River Water Shimmer & Flow Waves on Right Stream */}
+            <div className="absolute bottom-0 right-[15%] w-[40%] h-[45%] overflow-hidden pointer-events-none opacity-70">
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300/30 to-blue-400/20 blur-[2px] animate-shimmer transform -skew-x-12 translate-y-1" />
+              <div className="absolute bottom-2 left-4 right-4 h-1.5 rounded-full bg-white/40 blur-[1px] animate-pulse duration-[2000ms]" />
+              <div className="absolute bottom-6 left-12 right-8 h-2 rounded-full bg-amber-200/40 blur-[1px] animate-pulse duration-[2800ms]" />
             </div>
 
-            {/* Right Column: Animated Video Preview Frame so video is guaranteed visible inside card */}
-            <div className="lg:col-span-5 hidden sm:flex justify-end">
-              <div className="relative w-full max-w-md rounded-3xl overflow-hidden border-2 border-white/20 bg-black shadow-2xl group transform lg:rotate-1 hover:rotate-0 transition-all duration-500">
-                <video
-                  autoPlay
-                  loop
-                  muted
-                  playsInline
-                  className="w-full h-64 sm:h-72 object-cover"
-                >
-                  <source
-                    src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-rice-field-and-village-42475-large.mp4"
-                    type="video/mp4"
-                  />
-                  <source
-                    src="https://cdn.pixabay.com/video/2021/08/04/83864-584742724_large.mp4"
-                    type="video/mp4"
-                  />
-                </video>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none flex flex-col justify-end p-5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <span className="size-2.5 rounded-full bg-red-500 animate-ping" />
-                      <span className="text-xs font-bold uppercase tracking-widest text-white/90">Live Village Feed</span>
-                    </div>
-                    <span className="rounded-lg bg-white/20 px-2 py-0.5 text-[10px] font-extrabold text-white backdrop-blur-md">HD 4K</span>
-                  </div>
-                </div>
-              </div>
+            {/* Layer 3: Animated Moving Rice Fields & Wind (Air ripples gently across the crops) */}
+            <div className="absolute bottom-[5%] right-[5%] w-[65%] h-[55%] pointer-events-none overflow-hidden opacity-60">
+              <div className="absolute inset-0 bg-gradient-to-tr from-emerald-400/20 via-transparent to-yellow-300/15 animate-pulse duration-[4000ms]" />
+              <div className="absolute top-1/3 left-0 w-full h-8 bg-gradient-to-r from-transparent via-emerald-300/25 to-transparent blur-md animate-shimmer" />
+            </div>
+
+            {/* Layer 4: Animated Farmer & Oxen/Cows Path Dust & Gentle Bobbing Light */}
+            <div className="absolute bottom-[10%] left-[5%] w-[35%] h-[40%] pointer-events-none">
+              <div className="absolute bottom-4 left-10 size-20 rounded-full bg-amber-600/20 blur-xl animate-bounce duration-[3000ms]" />
+              <div className="absolute bottom-8 left-16 size-4 rounded-full bg-amber-300/60 blur-[2px] animate-ping duration-[2500ms]" />
+            </div>
+
+            {/* Smooth High-Contrast Gradient Overlays so left text is crystal clear while right scene glows */}
+            <div className="absolute inset-0 bg-gradient-to-r from-zinc-950/95 via-zinc-950/80 to-transparent sm:via-zinc-950/70" />
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/85 via-transparent to-transparent sm:hidden" />
+          </div>
+
+          <div className="relative z-10 max-w-2xl">
+            <span className="inline-flex items-center gap-2 rounded-full border border-amber-400/40 bg-amber-500/20 px-4 py-1.5 text-xs font-black uppercase tracking-wider text-amber-300 shadow-md backdrop-blur-md">
+              <Sparkles className="size-3.5 animate-pulse text-yellow-300" /> Empowering Rural India
+            </span>
+            <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl drop-shadow-lg leading-tight">
+              Bring your village online.
+            </h2>
+            <p className="mt-4 text-pretty text-zinc-200 sm:text-lg leading-relaxed font-semibold drop-shadow">
+              Whether you grow rice, fix motors, drive tractors, or run a small shop — there&apos;s a
+              place for you on ManaOoru. Free for every villager, forever.
+            </p>
+            <div className="mt-8 flex flex-wrap gap-4">
+              <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/30 rounded-2xl transition-all scale-100 hover:scale-[1.02]">
+                <Link to="/post-worker">
+                  Create your profile <ArrowRight className="ml-2 size-5" />
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="border-white/30 bg-white/15 text-white hover:bg-white/25 hover:text-white px-8 py-6 text-base font-bold backdrop-blur-md rounded-2xl transition-all shadow-lg">
+                <Link to="/marketplace">
+                  Browse the village
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
