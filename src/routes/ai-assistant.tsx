@@ -291,7 +291,7 @@ function AiAssistantPage() {
                 className={`flex ${item.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[82%] rounded-[20px] px-4 py-3 text-sm leading-6 shadow-sm ${item.role === "user" ? "bg-primary text-primary-foreground" : "bg-white text-foreground"}`}
+                  className={`max-w-[90%] sm:max-w-[82%] rounded-[20px] px-4 py-3 text-sm leading-6 shadow-sm ${item.role === "user" ? "bg-primary text-primary-foreground" : "bg-white text-foreground"}`}
                 >
                   {item.text}
                 </div>

@@ -8,6 +8,7 @@ import {
   sendLoginNotification,
   sendTestPushNotification,
 } from "@/lib/api/notification.functions";
+import { requestFcmToken, registerFcmForegroundListener } from "@/lib/firebase-messaging";
 
 const ASKED_KEY = "manaooru.push.permission.asked.v1";
 
@@ -214,6 +215,9 @@ export function useBrowserPushNotifications() {
 
   useEffect(() => {
     if (!user) return;
+
+    // Trigger FCM Token registration for logged in user
+    void requestFcmToken(user.id);
 
     const onServiceWorkerMessage = (event: MessageEvent) => {
       console.log("[Push SW -> Page]", event.data);

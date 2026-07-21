@@ -3463,3 +3463,41 @@ footer {
     animation: none !important;
   }
 }
+
+/* Mobile-first Responsive Adjustments & Overflow Safeguards */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+}
+
+.responsive-table-container {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 767px) {
+  .feature-hero-showcase {
+    min-height: 280px;
+    perspective: 800px;
+  }
+  .feature-hero-plane {
+    width: 100%;
+    top: 5%;
+    transform: rotateX(45deg) rotateZ(-15deg) scale(0.85);
+  }
+  .feature-hero-panel-main {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+  .feature-hero-panel-side {
+    display: none;
+  }
+  .feature-hero-live-card {
+    scale: 0.85;
+    right: 0.5rem;
+    top: 0.5rem;
+  }
+}
+

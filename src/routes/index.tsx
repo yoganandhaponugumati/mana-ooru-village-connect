@@ -775,7 +775,7 @@ function Index() {
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.08, ease: [0.32, 0.72, 0, 1] }}
-              className="max-w-4xl text-balance font-display text-5xl font-black leading-[0.95] text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.48)] sm:text-7xl lg:text-8xl"
+              className="max-w-4xl text-balance font-display text-3xl sm:text-7xl lg:text-8xl font-black leading-[0.95] text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.48)]"
             >
               ManaOoru
               <span className="block bg-gradient-to-r from-accent via-white to-secondary bg-clip-text text-transparent">
