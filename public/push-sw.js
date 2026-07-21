@@ -43,13 +43,20 @@ self.addEventListener("push", (event) => {
     payload = {};
   }
 
-  const title = payload.title || "ManaOoru";
+  const title = payload.title || "ManaOoru • Village Alert";
   const options = {
-    body: payload.body || "You have a new notification.",
+    body: payload.body || "You have a new update in your village. Tap to open.",
     icon: payload.icon || "/site-icon.svg",
     badge: payload.badge || "/notification-badge.svg",
-    tag: payload.tag || payload.notificationId,
-    renotify: false,
+    tag: payload.tag || payload.notificationId || `manaooru-push-${Date.now()}`,
+    renotify: true,
+    vibrate: [200, 100, 200],
+    actions: [
+      {
+        action: "open",
+        title: "👀 Tap to Open in ManaOoru",
+      },
+    ],
     data: {
       url: payload.url || "/",
       notificationId: payload.notificationId,

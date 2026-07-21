@@ -1,5 +1,5 @@
 import { useNavigate } from "@tanstack/react-router";
-import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Bookmark,
   Camera,
@@ -106,26 +106,77 @@ export function ListingForm({
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  const choosePhoto = (file?: File) => {
+  // Compress any image (including high-res mobile camera shots) to ≤800KB
+  // using browser Canvas API — no external library needed.
+  const compressImage = (file: File): Promise<File> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      const blobUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(blobUrl);
+        const MAX_PX = 1280; // max width or height
+        const scale = Math.min(1, MAX_PX / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { resolve(file); return; }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        // Try quality 0.82 first; drop to 0.65 if still big
+        canvas.toBlob(
+          (blob1) => {
+            if (!blob1) { resolve(file); return; }
+            if (blob1.size <= 800 * 1024) {
+              resolve(new File([blob1], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+              return;
+            }
+            canvas.toBlob(
+              (blob2) => {
+                resolve(new File([blob2 ?? blob1], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+              },
+              "image/jpeg",
+              0.65,
+            );
+          },
+          "image/jpeg",
+          0.82,
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(blobUrl); reject(new Error("Could not read image")); };
+      img.src = blobUrl;
+    });
+
+  const choosePhoto = async (file?: File) => {
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      toast.error("Please choose an image file");
+      toast.error("Please choose an image file (JPG, PNG, WebP)");
       return;
     }
-    if (file.size > 3 * 1024 * 1024) {
-      toast.error("Photo must be under 3 MB");
-      return;
+    // Show a "compressing" toast for large photos
+    let toastId: string | number | undefined;
+    if (file.size > 1.5 * 1024 * 1024) {
+      toastId = toast.loading("Compressing photo…");
     }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setPhotoPreview(String(reader.result || ""));
-      setPhotoName(file.name);
-      setPhotoFile(file);
-      setErrors((prev) => ({ ...prev, imageUrl: "" }));
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressed = await compressImage(file);
+      const reader = new FileReader();
+      reader.onload = () => {
+        setPhotoPreview(String(reader.result || ""));
+        setPhotoName(`${compressed.name} (${(compressed.size / 1024).toFixed(0)} KB)`);
+        setPhotoFile(compressed);
+        setErrors((prev) => ({ ...prev, imageUrl: "" }));
+        if (toastId !== undefined) toast.dismiss(toastId);
+        if (file.size > 1.5 * 1024 * 1024) {
+          toast.success(`Photo compressed: ${(file.size / (1024 * 1024)).toFixed(1)} MB → ${(compressed.size / 1024).toFixed(0)} KB ✓`);
+        }
+      };
+      reader.readAsDataURL(compressed);
+    } catch {
+      if (toastId !== undefined) toast.dismiss(toastId);
+      toast.error("Could not read the photo. Please try a different one.");
+    }
   };
+
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -173,10 +224,15 @@ export function ListingForm({
       let storagePath: string | undefined;
 
       if (photoFile) {
-        const uploaded = await uploadUserFile(bucket, user.id, photoFile);
-        imageUrl = uploaded.url;
-        storagePath = uploaded.path;
-        uploadedStoragePath = uploaded.path;
+        try {
+          const uploaded = await uploadUserFile(bucket, user.id, photoFile);
+          imageUrl = uploaded.url;
+          storagePath = uploaded.path;
+          uploadedStoragePath = uploaded.path;
+        } catch (uploadError) {
+          console.warn("[posting] Supabase storage upload failed, falling back to compressed base64:", uploadError);
+          imageUrl = photoPreview || "";
+        }
       }
 
       let villageId = authProfile?.village_id || undefined;
@@ -235,28 +291,18 @@ export function ListingForm({
   };
 
   return (
-    <motion.form
+    <form
       onSubmit={onSubmit}
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.32, ease: "easeOut" }}
       className="space-y-5"
     >
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">
-            New listing
-          </p>
-          <h2 className="mt-1 font-display text-2xl font-semibold text-clay sm:text-3xl">
-            {title}
-          </h2>
-        </div>
-        <StatusBadge tone="secondary">Village verified</StatusBadge>
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">New listing</p>
+        <h2 className="font-display text-2xl font-semibold text-clay">{title}</h2>
       </div>
       {fields.map((field) => {
         const fieldId = `${type}-field-${field.name}`;
         return (
-          <div key={field.name} className="space-y-2">
+          <div key={field.name} className="space-y-1.5">
             <label htmlFor={fieldId} className="text-sm font-semibold text-foreground">
               {field.label} <span className="text-primary">*</span>
             </label>
@@ -271,13 +317,11 @@ export function ListingForm({
                   if (error) setErrors((prev) => ({ ...prev, [field.name]: error }));
                 }}
                 aria-invalid={Boolean(errors[field.name])}
-                className={`premium-input w-full rounded-2xl px-4 py-3.5 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
+                className={`premium-input w-full rounded-xl px-4 py-3 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
               >
-                <option value="">Select…</option>
+                <option value="">Choose one…</option>
                 {field.options.map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
+                  <option key={option} value={option}>{option}</option>
                 ))}
               </select>
             ) : field.textarea ? (
@@ -293,7 +337,7 @@ export function ListingForm({
                   if (error) setErrors((prev) => ({ ...prev, [field.name]: error }));
                 }}
                 aria-invalid={Boolean(errors[field.name])}
-                className={`premium-input min-h-32 w-full rounded-2xl px-4 py-3.5 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
+                className={`premium-input min-h-28 w-full rounded-xl px-4 py-3 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
               />
             ) : (
               <input
@@ -309,97 +353,79 @@ export function ListingForm({
                   if (error) setErrors((prev) => ({ ...prev, [field.name]: error }));
                 }}
                 aria-invalid={Boolean(errors[field.name])}
-                className={`premium-input w-full rounded-2xl px-4 py-3.5 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
+                className={`premium-input w-full rounded-xl px-4 py-3 text-sm text-foreground ${errors[field.name] ? "border-destructive" : "focus:border-primary"}`}
               />
             )}
-            {errors[field.name] && <p className="text-sm text-destructive">{errors[field.name]}</p>}
+            {errors[field.name] && <p className="text-xs text-destructive">{errors[field.name]}</p>}
           </div>
         );
       })}
-      {/* Photo Incentive Banner */}
-      <div className="rounded-2xl border border-emerald-500/30 bg-emerald-500/10 p-3.5 flex items-center gap-3">
-        <div className="grid size-9 place-items-center rounded-xl bg-emerald-600 text-white shrink-0">
-          <Camera className="size-5" />
-        </div>
-        <div>
-          <h4 className="text-xs font-bold text-emerald-800 dark:text-emerald-300">
-            📸 Pro Tip: Listings with photos get 5x more responses!
-          </h4>
-          <p className="text-[11px] font-semibold text-emerald-700 dark:text-emerald-400">
-            ఫోటో ఉన్న ప్రకటనలకు 5 రెట్లు ఎక్కువ గ్రామస్తుల స్పందన లభిస్తుంది!
-          </p>
-        </div>
-      </div>
 
-      <div className="space-y-2">
+      {/* Photo section */}
+      <div className="space-y-1.5">
         <label className="text-sm font-semibold text-foreground">
-          {photoLabel} {photoRequired && <span className="text-primary">*</span>}
+          📷 {photoLabel} {photoRequired && <span className="text-primary">*</span>}
+          <span className="ml-2 text-xs font-normal text-muted-foreground">(any size — auto compressed)</span>
         </label>
         {photoPreview ? (
-          <div className="overflow-hidden rounded-[20px] border border-border bg-card shadow-sm">
+          <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
             <img
               src={photoPreview}
               alt={photoName || "Selected photo"}
               className="aspect-video w-full object-cover"
             />
             <div className="flex items-center justify-between gap-3 p-3">
-              <p className="min-w-0 truncate text-xs font-semibold text-muted-foreground">
-                {photoName || "Selected photo"}
+              <p className="min-w-0 truncate text-xs text-muted-foreground">
+                ✓ {photoName || "Photo selected"}
               </p>
               <button
                 type="button"
-                onClick={() => {
-                  setPhotoPreview("");
-                  setPhotoName("");
-                  setPhotoFile(null);
-                }}
+                onClick={() => { setPhotoPreview(""); setPhotoName(""); setPhotoFile(null); }}
                 className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition hover:border-destructive hover:text-destructive"
               >
-                <Trash2 className="size-3.5" /> Remove photo
+                <Trash2 className="size-3.5" /> Remove
               </button>
             </div>
           </div>
         ) : (
-          <motion.label
-            whileHover={{ y: -2 }}
-            className={`flex cursor-pointer flex-col items-center justify-center rounded-[20px] border border-dashed px-4 py-8 text-center transition ${
+          <label
+            className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-4 py-8 text-center transition-colors ${
               errors.imageUrl
                 ? "border-destructive bg-destructive/5"
                 : "border-primary/30 bg-primary/5 hover:border-primary hover:bg-primary/10"
             }`}
           >
-            <div className="grid size-12 place-items-center rounded-2xl bg-white text-primary shadow-sm">
+            <div className="grid size-12 place-items-center rounded-xl bg-white text-primary shadow-sm">
               <Camera className="size-6" />
             </div>
             <span className="mt-3 text-sm font-semibold text-clay">{photoLabel}</span>
-            <span className="mt-1 max-w-sm text-xs leading-5 text-muted-foreground">
-              {photoHint}
-            </span>
+            <span className="mt-1 text-xs text-muted-foreground">{photoHint}</span>
+            <span className="mt-1 text-[10px] text-muted-foreground/70">📱 High-res mobile photos are automatically compressed</span>
             <input
               type="file"
-              accept="image/png,image/jpeg,image/webp"
+              accept="image/*"
               capture="environment"
               className="sr-only"
               onChange={(event) => choosePhoto(event.target.files?.[0])}
             />
-          </motion.label>
+          </label>
         )}
-        {errors.imageUrl && <p className="text-sm text-destructive">{errors.imageUrl}</p>}
+        {errors.imageUrl && <p className="text-xs text-destructive">{errors.imageUrl}</p>}
       </div>
-      <motion.button
-        whileTap={{ scale: 0.98 }}
+
+      <button
         type="submit"
         disabled={submitting}
-        className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold shadow-sm transition-all duration-300 disabled:cursor-progress disabled:opacity-70 ${accentStyles[accent]}`}
+        className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold shadow-sm transition-all disabled:cursor-progress disabled:opacity-70 ${accentStyles[accent]}`}
       >
         {submitting ? (
-          <Loader2 className="size-4 animate-spin" />
+          <><Loader2 className="size-4 animate-spin" /> Posting…</>
         ) : (
-          <CheckCircle2 className="size-4" />
+          <><CheckCircle2 className="size-4" /> Post now</>
         )}
-        {submitting ? "Posting…" : "Post now"}
-      </motion.button>
-    </motion.form>
+      </button>
+    </form>
+
   );
 }
 
@@ -474,48 +500,26 @@ export function ListingCard({
         )
       : -1;
 
-  // Interactive 3D tilt physics using Framer Motion
-  const mouseX = useMotionValue(200);
-  const mouseY = useMotionValue(200);
-  const rotateX = useTransform(mouseY, [0, 400], [10, -10]);
-  const rotateY = useTransform(mouseX, [0, 400], [-10, 10]);
-
-  const handleMouseMove = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const relX = ((event.clientX - rect.left) / width) * 400;
-    const relY = ((event.clientY - rect.top) / height) * 400;
-    mouseX.set(relX);
-    mouseY.set(relY);
-  };
-
-  const handleMouseLeave = () => {
-    mouseX.set(200);
-    mouseY.set(200);
-  };
-
   return (
     <motion.div
-      style={{ rotateX, rotateY, transformStyle: "preserve-3d", perspective: 1000 }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      className="listing-3d-card group relative overflow-hidden rounded-[24px] border border-border bg-card p-5 shadow-[0_8px_30px_rgb(0,0,0,0.04)] hover:shadow-[0_20px_50px_rgba(23,99,58,0.12)] transition-shadow duration-300"
+      whileHover={{ scale: 1.01 }}
+      transition={{ duration: 0.15 }}
+      className="group relative overflow-hidden rounded-[20px] border border-border bg-card p-5 shadow-sm hover:shadow-md transition-shadow duration-200"
     >
       {item.imageUrl && (
         <button
           type="button"
           onClick={() => setDetailsOpen(true)}
-          className="mb-4 block w-full overflow-hidden rounded-[18px] bg-muted text-left transform transition duration-300 group-hover:translate-z-10"
+          className="mb-4 block w-full overflow-hidden rounded-[16px] bg-muted text-left"
         >
           <img
             src={item.imageUrl}
             alt={item.title}
-            className="aspect-video w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+            className="aspect-video w-full object-cover transition duration-300 group-hover:brightness-105"
           />
         </button>
       )}
-      <div className="flex items-start justify-between gap-3 transform transition duration-300 group-hover:translate-z-20">
+      <div className="flex items-start justify-between gap-3">
         <div className="flex flex-1 gap-3">
           <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary to-secondary font-display text-sm font-semibold text-white shadow-sm">
             {item.imageUrl ? <ImagePlus className="size-6" /> : initials || "MO"}

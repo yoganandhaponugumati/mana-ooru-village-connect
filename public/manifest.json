@@ -9,6 +9,18 @@
   "orientation": "portrait-primary",
   "icons": [
     {
+      "src": "/logo.png",
+      "sizes": "192x192 512x512 any",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/site-icon.png",
+      "sizes": "any",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
       "src": "/site-icon.svg",
       "sizes": "any",
       "type": "image/svg+xml",

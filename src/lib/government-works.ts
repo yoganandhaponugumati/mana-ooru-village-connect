@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import { deleteUserFile, uploadUserFile } from "@/lib/supabase/storage";
+import { sendVillagePushNotification } from "@/lib/api/notification.functions";
 
 export type GovernmentWork = {
   id: string;
@@ -147,6 +148,19 @@ export function useGovernmentWorks() {
       await queryClient.invalidateQueries({ queryKey: ["timeline-activities"] });
       console.info("[government-work] create:finish", { workId });
       toast.success("Government work update posted");
+
+      void sendVillagePushNotification({
+        data: {
+          villageId: profile?.village_id || null,
+          title: "ManaOoru • Gram Panchayat Work Progress",
+          body: `Sarpanch updated progress: "${input.title}" (${input.status.replace("_", " ")}). Tap to open & view photos.`,
+          url: "/official",
+          tag: `work:${workId}`,
+          notificationId: workId,
+        },
+      }).catch((err) => {
+        console.error("[government-work] push notification error:", err);
+      });
     },
     [queryClient, user, profile?.village_id],
   );

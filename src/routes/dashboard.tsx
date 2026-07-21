@@ -275,7 +275,7 @@ function DashboardPage() {
                   to={
                     item.type === "announcement"
                       ? "/announcements"
-                      : item.type === "complaint" || item.type === "problem"
+                      : (item.type as string) === "complaint" || (item.type as string) === "problem"
                         ? "/problems"
                         : item.type === "market"
                           ? "/marketplace"

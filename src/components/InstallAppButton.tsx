@@ -59,7 +59,7 @@ export function InstallAppButton({
   variant?: "pill" | "full" | "icon" | "drawer";
   className?: string;
 }) {
-  const { deferredPrompt, isInstalled, triggerInstall } = usePWAInstall();
+  const { isInstalled, triggerInstall } = usePWAInstall();
   const [showGuideModal, setShowGuideModal] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
 

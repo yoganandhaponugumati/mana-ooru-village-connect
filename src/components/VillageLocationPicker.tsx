@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check, Search } from "lucide-react";
+import { ChevronDown, Check } from "lucide-react";
 import {
   getDistricts,
   getMandals,
@@ -128,8 +128,9 @@ export function VillageLocationPicker({
 }: {
   value: VillageProfile;
   onChange: (next: VillageProfile) => void;
-  idPrefix: string;
+  idPrefix?: string;
 }) {
+  void idPrefix;
   const states = getStates();
   const districts = getDistricts(value.state);
   const mandals = getMandals(value.state, value.district);

@@ -205,7 +205,11 @@ export function useBrowserPushNotifications() {
       .then((enabled) => {
         if (enabled && loginNotifiedRef.current !== user.id) {
           loginNotifiedRef.current = user.id;
-          void sendLoginNotification();
+          const sessionKey = `manaooru.login.notified.${user.id}`;
+          if (window.sessionStorage.getItem(sessionKey) !== "yes") {
+            window.sessionStorage.setItem(sessionKey, "yes");
+            void sendLoginNotification();
+          }
         }
       })
       .catch((error) => {
@@ -260,13 +264,21 @@ export function useBrowserPushNotifications() {
 
           if (Notification.permission === "granted" && document.visibilityState !== "visible") {
             navigator.serviceWorker.getRegistration("/push-sw.js").then((registration) => {
-              registration?.showNotification(notification.title ?? "ManaOoru", {
+              registration?.showNotification(notification.title ?? "ManaOoru • Village Alert", {
                 body: notification.body,
                 icon: "/site-icon.svg",
                 badge: "/notification-badge.svg",
-                tag: notification.dedupe_key ?? undefined,
+                tag: notification.dedupe_key ?? `manaooru-push-${Date.now()}`,
+                renotify: true,
+                vibrate: [200, 100, 200],
+                actions: [
+                  {
+                    action: "open",
+                    title: "👀 Tap to Open in ManaOoru",
+                  },
+                ],
                 data: { url: notification.action_url ?? "/" },
-              });
+              } as any);
             });
           }
         },

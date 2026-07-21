@@ -3,7 +3,10 @@ import { useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./auth";
 import { toast } from "sonner";
-import { sendNewPostPushNotifications } from "@/lib/api/notification.functions";
+import {
+  sendDirectUserPushNotification,
+  sendNewPostPushNotifications,
+} from "@/lib/api/notification.functions";
 
 export type ListingType =
   | "worker"
@@ -34,10 +37,12 @@ export type Listing = {
     | "accepted"
     | "in_progress"
     | "resolved"
-    | "rejected";
+    | "rejected"
+    | "escalated";
   createdAt: number;
   owner_id?: string;
   localOnly?: boolean;
+  officialResponse?: string;
 };
 
 type Row = {
@@ -55,6 +60,7 @@ type Row = {
   storage_path?: string | null;
   is_pinned?: boolean | null;
   status?: string | null;
+  official_response?: string | null;
   created_at: string;
 };
 
@@ -73,6 +79,7 @@ function toListing(r: Row): Listing {
     storagePath: r.storage_path ?? undefined,
     isPinned: Boolean(r.is_pinned),
     status: (r.status as Listing["status"]) ?? "active",
+    officialResponse: r.official_response ?? undefined,
     createdAt: new Date(r.created_at).getTime(),
     owner_id: r.owner_id,
   };
@@ -165,7 +172,7 @@ export function useListings(type?: ListingType) {
   );
 
   const update = useCallback(
-    async (id: string, patch: Partial<Pick<Listing, "isPinned" | "status">>) => {
+    async (id: string, patch: Partial<Pick<Listing, "isPinned" | "status" | "officialResponse">>) => {
       if (id.startsWith("local-")) {
         toast.error("This legacy local post is not stored in Supabase and cannot be updated.");
         return;
@@ -174,6 +181,7 @@ export function useListings(type?: ListingType) {
       const dbPatch: Record<string, boolean | string> = {};
       if (typeof patch.isPinned === "boolean") dbPatch.is_pinned = patch.isPinned;
       if (patch.status) dbPatch.status = patch.status;
+      if (patch.officialResponse !== undefined) dbPatch.official_response = patch.officialResponse;
 
       const { error } = await supabase
         .from("listings")
@@ -185,9 +193,41 @@ export function useListings(type?: ListingType) {
       }
       qc.invalidateQueries({ queryKey: ["listings"] });
       qc.invalidateQueries({ queryKey: ["listing-stats"] });
-      toast.success("Updated");
+      toast.success("Civic report updated successfully");
+
+      if (patch.status || patch.officialResponse !== undefined) {
+        const item = (query.data ?? []).find((i) => i.id === id);
+        if (item?.owner_id) {
+          const newStatus = patch.status || item.status;
+          const statusLabel =
+            newStatus === "completed" || newStatus === "resolved"
+              ? "✅ Resolved"
+              : newStatus === "in_progress"
+                ? "🛠️ In Progress"
+                : newStatus === "escalated"
+                  ? "⚠️ Escalated / Pending Funds"
+                  : "⏳ Pending Review";
+          const noteText = patch.officialResponse
+            ? ` Note from Panchayat: "${patch.officialResponse}".`
+            : item.officialResponse
+              ? ` Note: "${item.officialResponse}".`
+              : "";
+          void sendDirectUserPushNotification({
+            data: {
+              targetUserId: item.owner_id,
+              title: "ManaOoru • Complaint Status Updated",
+              body: `Update: Your civic report "${item.title}" is marked: ${statusLabel}.${noteText} Tap to open & verify.`,
+              url: "/problems",
+              tag: `complaint_status:${id}`,
+              notificationId: id,
+            },
+          }).catch((err) => {
+            console.error("[store] push status update error:", err);
+          });
+        }
+      }
     },
-    [qc],
+    [qc, query.data],
   );
 
   const items = [...(query.data ?? [])].sort(

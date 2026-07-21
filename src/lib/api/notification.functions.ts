@@ -179,8 +179,8 @@ export const sendLoginNotification = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message || "Could not load push subscriptions.");
 
     const delivery = await sendWebPush(subscriptions ?? [], {
-      title: "Login successful",
-      body: "You signed in to ManaOoru.",
+      title: "ManaOoru • Security & Login",
+      body: "You successfully signed in to ManaOoru. Tap to view your civic profile.",
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",
       url: "/profile",
@@ -202,12 +202,110 @@ export const sendTestPushNotification = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message || "Could not load push subscriptions.");
 
     const delivery = await sendWebPush(subscriptions ?? [], {
-      title: "ManaOoru test notification",
-      body: "Browser push is connected successfully.",
+      title: "ManaOoru • Push Verification",
+      body: "Excellent! Your device is connected to ManaOoru instant alerts. Tap to open dashboard.",
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",
       url: "/dashboard",
       tag: `test:${context.userId}:${Date.now()}`,
+    });
+
+    return { success: true as const, delivery };
+  });
+
+const villagePushSchema = z.object({
+  villageId: z.string().nullable().optional(),
+  title: z.string().min(1),
+  body: z.string().min(1),
+  url: z.string().optional(),
+  tag: z.string().optional(),
+  notificationId: z.string().optional(),
+});
+
+const directPushSchema = z.object({
+  targetUserId: z.string().uuid(),
+  title: z.string().min(1),
+  body: z.string().min(1),
+  url: z.string().optional(),
+  tag: z.string().optional(),
+  notificationId: z.string().optional(),
+});
+
+export const sendVillagePushNotification = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(villagePushSchema)
+  .handler(async ({ context, data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    let targetUserIds: string[] = [];
+    if (data.villageId) {
+      const { data: villageProfiles, error: profileError } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("village_id", data.villageId);
+
+      if (!profileError && villageProfiles) {
+        targetUserIds = villageProfiles
+          .map((p) => p.id)
+          .filter((id) => id !== context.userId);
+      }
+    }
+
+    if (data.villageId && targetUserIds.length === 0) {
+      console.warn("[Push Server] No target users found in village:", data.villageId);
+      return { success: true as const, delivery: { attempted: 0, sent: 0, failed: 0 } };
+    }
+
+    let subscriptionQuery = supabaseAdmin
+      .from("push_subscriptions")
+      .select("endpoint,p256dh,auth");
+
+    if (data.villageId && targetUserIds.length > 0) {
+      subscriptionQuery = subscriptionQuery.in("user_id", targetUserIds);
+    } else {
+      subscriptionQuery = subscriptionQuery.neq("user_id", context.userId);
+    }
+
+    const { data: subscriptions, error: subscriptionError } = await subscriptionQuery;
+    if (subscriptionError) {
+      throw new Error(subscriptionError.message || "Could not load push subscriptions.");
+    }
+
+    const delivery = await sendWebPush(subscriptions ?? [], {
+      title: data.title,
+      body: data.body,
+      icon: "/site-icon.svg",
+      badge: "/notification-badge.svg",
+      url: data.url || "/",
+      tag: data.tag || `village_push:${Date.now()}`,
+      notificationId: data.notificationId,
+    });
+
+    return { success: true as const, delivery };
+  });
+
+export const sendDirectUserPushNotification = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(directPushSchema)
+  .handler(async ({ data }) => {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { data: subscriptions, error: subscriptionError } = await supabaseAdmin
+      .from("push_subscriptions")
+      .select("endpoint,p256dh,auth")
+      .eq("user_id", data.targetUserId);
+
+    if (subscriptionError) {
+      throw new Error(subscriptionError.message || "Could not load push subscriptions.");
+    }
+
+    const delivery = await sendWebPush(subscriptions ?? [], {
+      title: data.title,
+      body: data.body,
+      icon: "/site-icon.svg",
+      badge: "/notification-badge.svg",
+      url: data.url || "/",
+      tag: data.tag || `direct_push:${data.targetUserId}:${Date.now()}`,
+      notificationId: data.notificationId,
     });
 
     return { success: true as const, delivery };
@@ -220,7 +318,7 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { data: listing, error: listingError } = await supabaseAdmin
       .from("listings")
-      .select("id,title,owner_id,type")
+      .select("id,title,owner_id,type,village_id")
       .eq("id", data.postId)
       .single();
 
@@ -241,13 +339,37 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
 
     const { data: profile } = await supabaseAdmin
       .from("profiles")
-      .select("username,full_name")
+      .select("username,full_name,village_id")
       .eq("id", context.userId)
       .maybeSingle();
 
-    const { data: subscriptions, error: subscriptionError } = await supabaseAdmin
+    const targetVillageId = listing.village_id || profile?.village_id || null;
+    let targetUserIds: string[] = [];
+    if (targetVillageId) {
+      const { data: villageProfiles } = await supabaseAdmin
+        .from("profiles")
+        .select("id")
+        .eq("village_id", targetVillageId);
+      if (villageProfiles) {
+        targetUserIds = villageProfiles
+          .map((p) => p.id)
+          .filter((id) => id !== context.userId);
+      }
+    }
+
+    let subscriptionQuery = supabaseAdmin
       .from("push_subscriptions")
       .select("endpoint,p256dh,auth");
+
+    if (targetVillageId && targetUserIds.length > 0) {
+      subscriptionQuery = subscriptionQuery.in("user_id", targetUserIds);
+    } else if (targetVillageId && targetUserIds.length === 0) {
+      return { success: true as const, delivery: { attempted: 0, sent: 0, failed: 0 } };
+    } else {
+      subscriptionQuery = subscriptionQuery.neq("user_id", context.userId);
+    }
+
+    const { data: subscriptions, error: subscriptionError } = await subscriptionQuery;
 
     if (subscriptionError) {
       throw new Error(subscriptionError.message || "Could not load push subscriptions.");
@@ -256,9 +378,20 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
     const actionUrl = listingUrl(listing.type, listing.id);
     const username = profile?.username || profile?.full_name || "Someone";
 
+    const typeLabels: Record<string, string> = {
+      complaint: "Citizen Complaint Reported",
+      announcement: "Official Sarpanch Notice",
+      worker: "Village Worker Profile",
+      work: "Work & Labor Opportunity",
+      land: "Village Real Estate & Land",
+      market: "Marketplace Item Listed",
+      service: "Local Service Offered",
+    };
+    const titleLabel = typeLabels[listing.type] || "Village Timeline Update";
+
     const delivery = await sendWebPush(subscriptions ?? [], {
-      title: "📢 New Post",
-      body: `${username} has posted: ${listing.title}`,
+      title: `ManaOoru • ${titleLabel}`,
+      body: `${username} posted: "${listing.title}". Tap to open & inspect details.`,
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",
       url: actionUrl,

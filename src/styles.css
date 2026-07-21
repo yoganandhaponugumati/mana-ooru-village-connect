@@ -178,7 +178,21 @@
     font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
+    /* Prevent horizontal overflow on mobile */
+    overflow-x: hidden;
   }
+
+  /* Safe-area padding for iPhone notch / home indicator */
+  .safe-area-pb {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  /* Ensure images are responsive by default */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
 
   h1,
   h2,

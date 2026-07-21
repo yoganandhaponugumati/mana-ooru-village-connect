@@ -510,63 +510,49 @@ export function PageLayout({
     <div className="premium-page-bg village-site-bg min-h-screen text-foreground">
       <FullScreenFeatureBackground title={title} />
       <SiteNav />
-      <motion.header
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.35 }}
-        className="page-village-hero relative overflow-hidden border-b border-white/45 pt-16 shadow-[0_24px_90px_-62px_rgba(20,49,32,0.78)] backdrop-blur-xl"
-      >
+      <header className="page-village-hero relative overflow-hidden border-b border-white/45 pt-14 shadow-[0_24px_90px_-62px_rgba(20,49,32,0.78)] backdrop-blur-xl">
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0.58)_36%,rgba(255,255,255,0.18)_68%,rgba(255,255,255,0.06)),linear-gradient(246deg,rgba(24,169,153,0.18),transparent_46%)]" />
-        <div className="pointer-events-none absolute inset-x-0 top-16 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
-        <div className="relative mx-auto grid min-h-[340px] sm:min-h-[460px] max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 sm:py-14 lg:grid-cols-[0.62fr_1.18fr] lg:py-16">
+        {/* On mobile: simple text header. On lg+: card + 3D scene */}
+        <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:grid lg:min-h-[380px] lg:grid-cols-[0.62fr_1.18fr] lg:items-center lg:gap-6 lg:py-14">
           <motion.div
-            initial={{ opacity: 0, y: 18 }}
+            initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease: [0.32, 0.72, 0, 1] }}
-            className="relative z-10 flex flex-col gap-5 rounded-[26px] border border-white/78 bg-white/82 p-5 shadow-[0_28px_80px_-48px_rgba(20,49,32,0.72)] backdrop-blur-2xl sm:flex-row sm:items-center sm:p-7"
+            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
+            className="relative z-10 flex flex-col gap-4 rounded-2xl border border-white/78 bg-white/85 p-4 shadow-md backdrop-blur-2xl sm:flex-row sm:items-center sm:gap-5 sm:p-6"
           >
-            <div className="flex items-start gap-4">
+            <div className="flex items-start gap-3">
               {icon && (
-                <motion.div
-                  animate={{ y: [0, -6, 0] }}
-                  transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="grid size-14 place-items-center rounded-2xl border border-white/65 bg-white/60 text-primary shadow-[var(--shadow-soft)] backdrop-blur-xl shrink-0"
-                >
+                <div className="grid size-11 shrink-0 place-items-center rounded-xl border border-white/65 bg-white/60 text-primary shadow-sm backdrop-blur-xl">
                   {icon}
-                </motion.div>
+                </div>
               )}
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/78 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-primary shadow-sm backdrop-blur-xl">
-                  <Sparkles className="size-3.5" />
-                  ManaOoru Platform
+                <div className="inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/78 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary shadow-sm backdrop-blur-xl">
+                  <Sparkles className="size-3" />
+                  ManaOoru
                 </div>
-                <h1 className="mt-4 text-balance font-display text-2xl sm:text-5xl font-semibold text-clay">
+                <h1 className="mt-2 text-balance font-display text-2xl font-semibold text-clay sm:text-3xl lg:text-4xl">
                   {title}
                 </h1>
                 {subtitle && (
-                  <p className="mt-3 max-w-2xl text-pretty text-xs sm:text-lg leading-6 sm:leading-7 text-muted-foreground">
+                  <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">
                     {subtitle}
                   </p>
                 )}
               </div>
             </div>
           </motion.div>
-          <FeatureHeroShowcase title={title} />
-          <InternalPage3DScene title={title} icon={icon} />
+          {/* 3D showcase only on large screens */}
+          <div className="hidden lg:block">
+            <FeatureHeroShowcase title={title} />
+            <InternalPage3DScene title={title} icon={icon} />
+          </div>
         </div>
-      </motion.header>
-      <motion.main
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.42, delay: 0.08, ease: "easeOut" }}
-        className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-14"
-      >
-        <motion.nav
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.32, delay: 0.12 }}
-          className="village-quick-nav mb-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 rounded-[24px] p-2 shadow-[var(--shadow-soft)] backdrop-blur-2xl"
+      </header>
+      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 pb-20 lg:pb-10">
+        <nav
+          className="village-quick-nav mb-6 grid grid-cols-2 gap-2 rounded-2xl p-2 shadow-sm backdrop-blur-2xl sm:grid-cols-4 sm:gap-3"
           aria-label="Page quick actions"
         >
           {[
@@ -578,17 +564,17 @@ export function PageLayout({
             <Link
               key={item.label}
               to={item.to}
-              className="group flex items-center gap-3 rounded-[18px] px-4 py-3 text-sm font-bold text-clay transition hover:-translate-y-0.5 hover:bg-white hover:shadow-sm focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20"
+              className="group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-clay transition hover:bg-white hover:shadow-sm"
             >
-              <span className="grid size-10 place-items-center rounded-2xl bg-primary/10 text-primary transition group-hover:scale-105">
+              <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
                 <item.icon className="size-4" />
               </span>
               {item.label}
             </Link>
           ))}
-        </motion.nav>
+        </nav>
         {children}
-      </motion.main>
+      </main>
       <SiteFooter />
     </div>
   );

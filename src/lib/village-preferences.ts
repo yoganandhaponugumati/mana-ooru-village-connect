@@ -165,40 +165,78 @@ function makeDistrictSkeleton(districts: string[]): LocationTree[string] {
 export const locationTree = {
   Telangana: {
     ...makeDistrictSkeleton(telanganaDistricts),
-    Rangareddy: {
-      Kandukur: ["Kothur", "Dasarlapally", "Lemoor", "Nednur", "Timmapur", "Gudur"],
-      Maheshwaram: ["Mansanpally", "Nagaram", "Tukkuguda", "Ameenpur", "Sirigiripuram"],
-      Shabad: ["Shabad", "Hayathabad", "Tadlapally", "Manchirevula", "Machanpally"],
-      Chevella: ["Chevella", "Kandawada", "Malkapur", "Aloor", "Devarampally"],
-      Rajendranagar: ["Budvel", "Premavathipet", "Bandlaguda Jagir", "Hydershakote"],
-      Ibrahimpatnam: ["Ibrahimpatnam", "Pocharam", "Sheriguda", "Eliminedu"],
-      Shamshabad: ["Shamshabad", "Kotwalguda", "Satamrai", "Rashidguda"],
+    Adilabad: {
+      Adilabad: ["Adilabad", "Bheempur", "Mavala", "Sirikonda"],
+      Boath: ["Boath", "Gudihatnoor", "Talamadugu", "Jainath"],
+      Jainath: ["Jainath", "Gondi", "Raipur", "Wankdi"],
+      Mavala: ["Mavala", "Ichoda", "Tamsi", "Gadiguda"],
+      Utnoor: ["Utnoor", "Sirpur T", "Narnoor", "Indervelly"],
+    },
+    "Bhadradri Kothagudem": {
+      Kothagudem: ["Kothagudem", "Tekulapalli", "Palwancha", "Yellandu"],
+      Bhadrachalam: ["Bhadrachalam", "Charla", "Dummugudem", "Pinapaka"],
+      Manuguru: ["Manuguru", "Cherla", "Burgampadu", "Aswapuram"],
+      Yellandu: ["Yellandu", "Mulakalapalli", "Gundala", "Chandrugonda"],
+      Palwancha: ["Palwancha", "Enkoor", "Julurpad", "Sujathanagar"],
+    },
+    Hanumakonda: {
+      Hanamkonda: ["Kazipet", "Subedari", "Waddepally", "Lashkar Singaram", "Hanamkonda"],
+      Hasanparthy: ["Hasanparthy", "Ananthasagar", "Bheemaram", "Pegadapally", "Ghanpur"],
+      Inavolu: ["Inavolu", "Punnelu", "Kondaparthy", "Thorrur", "Maripeda"],
+      Dharmasagar: ["Dharmasagar", "Nallabelli", "Palakurthi", "Atmakur"],
+    },
+    Hyderabad: {
+      "Hyderabad Urban": ["Hyderabad", "Secunderabad", "Begumpet", "Koti", "Abids"],
+      Charminar: ["Charminar", "Falaknuma", "Malakpet", "Bahadurpura"],
+      Khairatabad: ["Khairatabad", "Banjara Hills", "Jubilee Hills", "Ameerpet"],
+      Secunderabad: ["Secunderabad", "Marredpally", "Trimulgherry", "Malkajgiri"],
+    },
+    Jagtial: {
+      Jagtial: ["Jagtial", "Kodimyal", "Sarangapur", "Mallapur"],
+      Dharmapuri: ["Dharmapuri", "Korutla", "Metpally", "Mallial"],
+      Korutla: ["Korutla", "Karimnagar", "Vemulawada", "Pegadapalli"],
+      Raikal: ["Raikal", "Kathalapur", "Buggaram", "Sultanabad"],
+      Velgatoor: ["Velgatoor", "Medipally", "Gollapally", "Vemulawada"],
+    },
+    Jangaon: {
+      Jangaon: ["Jangaon", "Ghanpur", "Devaruppula", "Kodakandla"],
+      Tharigoppula: ["Tharigoppula", "Palakurthi", "Raghunathpally", "Lingalaghanpur"],
+      Bachannapet: ["Bachannapet", "Rayaparthi", "Narmetta", "Chilpur"],
+      Hasanparthy: ["Hasanparthy", "Thorrur", "Maripeda", "Nallabelli"],
+    },
+    "Jayashankar Bhupalpally": {
+      Bhupalpally: ["Bhupalpally", "Warangal", "Mahadevpur", "Govindaraopet"],
+      Mahadevpur: ["Mahadevpur", "Chityal", "Yellareddypet", "Palimela"],
+      Mulugu: ["Mulugu", "Eturunagaram", "Tadvai", "Kannaigudem"],
+      Govindaraopet: ["Govindaraopet", "Tekumatla", "Rampur", "Nagunur"],
+    },
+    "Jogulamba Gadwal": {
+      Gadwal: ["Gadwal", "Maldakal", "Aiza", "Dharur"],
+      Alampur: ["Alampur", "Kalvakurthi", "Kollapur", "Ieeja"],
+      Wanaparthy: ["Wanaparthy", "Pebbair", "Pangal", "Kothakota"],
+      Maldakal: ["Maldakal", "Ghattu", "Veldanda", "Undavalli"],
+    },
+    Kamareddy: {
+      Kamareddy: ["Kamareddy", "Banswada", "Nizamsagar", "Yellareddy"],
+      Banswada: ["Banswada", "Tadwai", "Linga", "Pitlam"],
+      Yellareddy: ["Yellareddy", "Machareddy", "Sadasivanagar", "Rajampet"],
+      Bichkunda: ["Bichkunda", "Ramayampet", "Koheda", "Mudhol"],
+    },
+    Karimnagar: {
+      Karimnagar: ["Karimnagar", "Kothapalli", "Bommakal", "Asifnagar", "Manakondur"],
+      Huzurabad: ["Huzurabad", "Jammikunta", "Shankarapatnam", "Veenavanka", "Gambhiraopet"],
+      Choppadandi: ["Choppadandi", "Gangadhara", "Ramadugu", "Kathalapur"],
+      Peddapalli: ["Peddapalli", "Manthani", "Sultanabad", "Godavarikhani"],
+      Sultanabad: ["Sultanabad", "Ramagundam", "Godavarikhani", "Manthani"],
     },
     Khammam: {
       Bonakal: ["Bonakal", "Govindapuram", "Mustikuntla", "Ravinoothala", "Allapadu"],
       Chintakani: ["Chintakani", "Pandillapalli", "Proddutur", "Nagulavancha", "Vepakuntla"],
       Enkoor: ["Enkoor", "Nacharam", "Thimmaraopeta", "Raimadaram", "Jannaram"],
       Kallur: [
-        "Kallur",
-        "Peruvancha",
-        "Yerraboinapalli",
-        "Lokavaram",
-        "Chennuru",
-        "Kappalabandham",
-        "Mucharam",
-        "Vennavalli",
-        "Narayanapuram",
-        "Peddakorukondi",
-        "Chinnakorukondi",
-        "Bathulapalli",
-        "Kistapuram",
-        "Lakshmipuram",
-        "Madhapuram",
-        "Mittapalli",
-        "Narlapuram",
-        "Payapuram",
-        "Raghunadhapalem",
-        "Thalluru",
+        "Kallur", "Peruvancha", "Yerraboinapalli", "Lokavaram", "Chennuru",
+        "Kappalabandham", "Mucharam", "Vennavalli", "Narayanapuram",
+        "Peddakorukondi", "Chinnakorukondi", "Bathulapalli",
       ],
       Kamepally: ["Kamepally", "Mucherla", "Komminepalli", "Govindrala", "Pinapaka"],
       "Khammam Rural": ["Edulapuram", "Gollagudem", "Gudurupadu", "Mallemadugu", "Tekulapalli"],
@@ -208,15 +246,57 @@ export const locationTree = {
       Madhira: ["Madhira", "Dendukuru", "Illuru", "Rayapatnam", "Maturu"],
       Mudigonda: ["Mudigonda", "Chirumarri", "Kamalapuram", "Vallabhi", "Gandarugudem"],
       Nelakondapalli: ["Nelakondapalli", "Aregudem", "Bodulabanda", "Mujjugudem", "Kondapuram"],
-      Penuballi: ["Penuballi", "Bayyannagudem", "Karaigudem", "Tekulapalli", "Vemsoor"],
-      Raghunadhapalem: ["Raghunadhapalem", "Chimmapudi", "Papakollu", "Vepakuntla", "Ballepalli"],
-      Sathupalli: ["Sathupalli", "Gangaram", "Kistaram", "Rejerla", "Vengalarayao Nagar"],
-      Singareni: ["Singareni", "Gareebpeta", "Karepalli", "Madharam", "Usirikapally"],
-      Thallada: ["Thallada", "Annarugudem", "Gopalapeta", "Mittapalli", "Ramanujavaram"],
-      Thirumalayapalem: ["Thirumalayapalem", "Bachodu", "Hydersaipeta", "Patharlapadu", "Subled"],
-      Vemsoor: ["Vemsoor", "Kunchaparthi", "Marla Padu", "Vennavalli", "Yelchuru"],
-      Wyra: ["Wyra", "Gollanapadu", "Khanapuram", "Somavaram", "Vepalasingaram"],
-      Yerrupalem: ["Yerrupalem", "Banigandlapadu", "Gatla Gowraram", "Meenavolu", "Takkelapadu"],
+      Sathupalli: ["Sathupalli", "Gangaram", "Kistaram", "Rejerla"],
+      Wyra: ["Wyra", "Gollanapadu", "Khanapuram", "Somavaram"],
+    },
+    "Kumuram Bheem Asifabad": {
+      Asifabad: ["Asifabad", "Sirpur U", "Kagaznagar", "Dahegaon"],
+      Kagaznagar: ["Kagaznagar", "Sirpur", "Tiryani", "Wankdi"],
+      Rebbena: ["Rebbena", "Wankdi", "Narsapur", "Jodeghat"],
+      Penchikalpet: ["Penchikalpet", "Luxettipet", "Kasipet", "Waranapally"],
+    },
+    Mahabubabad: {
+      Mahabubabad: ["Mahabubabad", "Gudur", "Dornakal", "Kesamudram"],
+      Thorrur: ["Thorrur", "Maripeda", "Narsimhulapet", "Odela"],
+      Kesamudram: ["Kesamudram", "Kuravi", "Nellikuduru", "Gaganpahad"],
+      Dornakal: ["Dornakal", "Nellipaka", "Singareni", "Khanapur"],
+    },
+    Mahabubnagar: {
+      Mahabubnagar: ["Mahabubnagar", "Jadcherla", "Bhootpur", "Devarkadra", "Kosgi"],
+      Shadnagar: ["Farooqnagar", "Kondurg", "Kothur", "Nandigama", "Shadnagar"],
+      Wanaparthy: ["Wanaparthy", "Pebbair", "Ghanpur", "Kothakota"],
+      Jadcherla: ["Jadcherla", "Shamshabad", "Kothur", "Farooqnagar"],
+      Gadwal: ["Gadwal", "Maldakal", "Aiza", "Dharur"],
+    },
+    Mancherial: {
+      Mancherial: ["Mancherial", "Bellampally", "Luxettipet", "Kotapally"],
+      Bellampally: ["Bellampally", "Mandamarri", "Kasipet", "Bheemini"],
+      Luxettipet: ["Luxettipet", "Chennur", "Naspur", "Vemanpally"],
+      Jaipur: ["Jaipur", "Kotapally", "Hajipur", "Bheemaram"],
+    },
+    Medak: {
+      Medak: ["Medak", "Ramayampet", "Shankarampet", "Alladurg", "Narayankhed"],
+      Narsapur: ["Narsapur", "Shivampet", "Kowdipally", "Toopran"],
+      Siddipet: ["Siddipet", "Gajwel", "Dubbak", "Cherial", "Husnabad"],
+      Sangareddy: ["Sangareddy", "Patancheru", "Zaheerabad", "Narayankhed"],
+    },
+    "Medchal-Malkajgiri": {
+      Medchal: ["Medchal", "Dundigal", "Gundlapochampally", "Shameerpet"],
+      Malkajgiri: ["Malkajgiri", "Secunderabad", "Uppal", "Nacharam"],
+      Ghatkesar: ["Ghatkesar", "Keesara", "Neredmet", "Kushaiguda"],
+      Shamirpet: ["Shamirpet", "Medchal", "Kompally", "Jawaharnagar"],
+    },
+    Mulugu: {
+      Mulugu: ["Mulugu", "Eturunagaram", "Tadvai", "Kannaigudem"],
+      Eturunagaram: ["Eturunagaram", "Govindaraopet", "Mogullapally", "Venkatapuram"],
+      Tadvai: ["Tadvai", "Wazeedu", "Kothaguda", "Elgoi"],
+      Venkatapur: ["Venkatapur", "Rampur", "Nagunur", "Tekumatla"],
+    },
+    Nagarkurnool: {
+      Nagarkurnool: ["Nagarkurnool", "Achampet", "Kollapur", "Kalwakurthi"],
+      Achampet: ["Achampet", "Padara", "Veldanda", "Amrabad"],
+      Kollapur: ["Kollapur", "Badepally", "Ieeja", "Peddakothapally"],
+      Kalwakurthi: ["Kalwakurthi", "Dharur", "Bijinapally", "Vangur"],
     },
     Nalgonda: {
       Miryalaguda: ["Vemulapally", "Alagadapa", "Thungapahad", "Miryalaguda", "Tipparthy"],
@@ -225,47 +305,146 @@ export const locationTree = {
       Suryapet: ["Suryapet", "Imampet", "Pillalamarri", "Kasarabad"],
       Devarakonda: ["Devarakonda", "Gaddipally", "Kondabheemanapally", "Chintapally"],
       Kodad: ["Kodad", "Komarabanda", "Gudibanda", "Thimmapuram"],
+      Huzurnagar: ["Huzurnagar", "Nadigudem", "Nidamanuru", "Mothkur"],
+    },
+    Narayanpet: {
+      Narayanpet: ["Narayanpet", "Kosgi", "Makthal", "Marikal"],
+      Makthal: ["Makthal", "Devarkadra", "Bhootpur", "Sanganur"],
+      Marikal: ["Marikal", "Kosgi", "Utkoor", "Atmakur"],
+      Utkoor: ["Utkoor", "Dhanwada", "Keshampet", "Khanapur"],
+    },
+    Nirmal: {
+      Nirmal: ["Nirmal", "Bhainsa", "Dilawarpur", "Narsapur"],
+      Bhainsa: ["Bhainsa", "Mamda", "Tanur", "Laxmanchanda"],
+      Mudhole: ["Mudhole", "Luxettipet", "Kuntala", "Tamsi"],
+      Khanapur: ["Khanapur", "Sarangapur", "Lokeswaram", "Bazarhathnoor"],
+    },
+    Nizamabad: {
+      Nizamabad: ["Nizamabad", "Armoor", "Bodhan", "Balkonda", "Dichpally"],
+      Bodhan: ["Bodhan", "Yedapally", "Renjal", "Navipet"],
+      Armoor: ["Armoor", "Perkit", "Ankapur", "Mamidipally"],
+      Banswada: ["Banswada", "Bhiknoor", "Kotgir", "Pitlam"],
+      Balkonda: ["Balkonda", "Sarangapur", "Yellareddy", "Nandipet"],
+    },
+    Peddapalli: {
+      Peddapalli: ["Peddapalli", "Manthani", "Sultanabad", "Godavarikhani"],
+      Manthani: ["Manthani", "Dharmaram", "Kamanpur", "Ramagundam"],
+      Ramagundam: ["Ramagundam", "Godavarikhani", "NTPC Colony", "Jayipuram"],
+      Sultanabad: ["Sultanabad", "Chandrugonda", "Kasipet", "Srirampur"],
+    },
+    "Rajanna Sircilla": {
+      Sircilla: ["Sircilla", "Vemulawada", "Yellareddypet", "Choppadandi"],
+      Vemulawada: ["Vemulawada", "Konaraopet", "Dharmapuri", "Mallapur"],
+      Konaraopet: ["Konaraopet", "Boinpally", "Gambhiraopet", "Sirikonda"],
+      Thangallapally: ["Thangallapally", "Chandurthi", "Nangnur", "Arepally"],
+    },
+    Rangareddy: {
+      Kandukur: ["Kothur", "Dasarlapally", "Lemoor", "Nednur", "Timmapur", "Gudur"],
+      Maheshwaram: ["Mansanpally", "Nagaram", "Tukkuguda", "Ameenpur", "Sirigiripuram"],
+      Shabad: ["Shabad", "Hayathabad", "Tadlapally", "Manchirevula", "Machanpally"],
+      Chevella: ["Chevella", "Kandawada", "Malkapur", "Aloor", "Devarampally"],
+      Rajendranagar: ["Budvel", "Premavathipet", "Bandlaguda Jagir", "Hydershakote"],
+      Ibrahimpatnam: ["Ibrahimpatnam", "Pocharam", "Sheriguda", "Eliminedu"],
+      Shamshabad: ["Shamshabad", "Kotwalguda", "Satamrai", "Rashidguda"],
+      Vikarabad: ["Vikarabad", "Pargi", "Dharur", "Kodangal"],
+    },
+    Sangareddy: {
+      Sangareddy: ["Sangareddy", "Patancheru", "Zaheerabad", "Narayankhed", "Ramachandrapuram"],
+      Zaheerabad: ["Zaheerabad", "Nyalkal", "Narayankhed", "Andole"],
+      Patancheru: ["Patancheru", "Bollaram", "Jinnaram", "Isnapur"],
+      Andole: ["Andole", "Kowdipally", "Narsapur", "Shivampet"],
+    },
+    Siddipet: {
+      Siddipet: ["Siddipet", "Gajwel", "Dubbak", "Cherial", "Husnabad"],
+      Gajwel: ["Gajwel", "Mulug", "Rajapet", "Pragnapur"],
+      Dubbak: ["Dubbak", "Thoguta", "Arekatika", "Chinnakodur"],
+      Cherial: ["Cherial", "Raipole", "Narsingi", "Kondapak"],
+    },
+    Suryapet: {
+      Suryapet: ["Suryapet", "Nalgonda", "Mothkur", "Huzurnagar"],
+      Kodad: ["Kodad", "Mellacheruvu", "Thungathurthy", "Damaracherla"],
+      Huzurnagar: ["Huzurnagar", "Nadigudem", "Nidamanuru", "Mothkur"],
+      Neredcherla: ["Neredcherla", "Tirumalgiri", "Ananthagiri", "Garidepally"],
+    },
+    Vikarabad: {
+      Vikarabad: ["Vikarabad", "Pargi", "Tandur", "Doma"],
+      Tandur: ["Tandur", "Kodangal", "Marpally", "Basheerabad"],
+      Pargi: ["Pargi", "Dharur", "Pudur", "Rangapur"],
+      Kodangal: ["Kodangal", "Kosgi", "Dhanwada", "Amdapur"],
+    },
+    Wanaparthy: {
+      Wanaparthy: ["Wanaparthy", "Pebbair", "Ghanpur", "Kothakota", "Pangal"],
+      Pebbair: ["Pebbair", "Devarakonda", "Dharur", "Ghanpur"],
+      Kothakota: ["Kothakota", "Maldakal", "Gundlapally", "Revelly"],
+      Amangal: ["Amangal", "Tirumalapur", "Balmoor", "Veepangandla"],
     },
     Warangal: {
       Geesugonda: ["Gorrekunta", "Elkurthy", "Vanchanagiri", "Geesugonda"],
       Parkal: ["Nadikuda", "Damera", "Atmakur", "Parkal", "Nagaram"],
       Sangem: ["Sangem", "Narlavai", "Theegarajupally", "Gavicherla"],
       Narsampet: ["Narsampet", "Chennaraopet", "Duggondi", "Khanapur"],
+      Warangal: ["Warangal", "Kazipet", "Hanamkonda", "Subedari"],
+      Cherial: ["Cherial", "Raipole", "Narsingi", "Kondapak"],
     },
-    Hanumakonda: {
-      Hanamkonda: ["Kazipet", "Subedari", "Waddepally", "Lashkar Singaram"],
-      Hasanparthy: ["Hasanparthy", "Ananthasagar", "Bheemaram", "Pegadapally"],
-      Inavolu: ["Inavolu", "Punnelu", "Kondaparthy"],
-    },
-    Karimnagar: {
-      Karimnagar: ["Karimnagar", "Kothapalli", "Bommakal", "Asifnagar"],
-      Huzurabad: ["Huzurabad", "Jammikunta", "Shankarapatnam", "Veenavanka"],
-      Choppadandi: ["Choppadandi", "Gangadhara", "Ramadugu"],
-    },
-    Nizamabad: {
-      Nizamabad: ["Nizamabad", "Armoor", "Bodhan", "Balkonda", "Dichpally"],
-      Bodhan: ["Bodhan", "Yedapally", "Renjal", "Navipet"],
-      Armoor: ["Armoor", "Perkit", "Ankapur", "Mamidipally"],
-    },
-    Medak: {
-      Medak: ["Medak", "Ramayampet", "Shankarampet", "Alladurg"],
-      Narsapur: ["Narsapur", "Shivampet", "Kowdipally"],
-      Siddipet: ["Siddipet", "Gajwel", "Dubbak", "Cherial"],
-    },
-    Mahabubnagar: {
-      Mahabubnagar: ["Mahabubnagar", "Jadcherla", "Bhootpur", "Devarkadra"],
-      Shadnagar: ["Farooqnagar", "Kondurg", "Kothur", "Nandigama"],
-      Wanaparthy: ["Wanaparthy", "Pebbair", "Ghanpur", "Kothakota"],
+    "Yadadri Bhuvanagiri": {
+      Bhongir: ["Bhongir", "Yadagirigutta", "Raigir", "Choutuppal"],
+      Yadagirigutta: ["Yadagirigutta", "Alair", "Motakondur", "Pochampally"],
+      Choutuppal: ["Choutuppal", "Pochampally", "Neredcherla", "Damercherla"],
+      Raigir: ["Raigir", "Tungathurthi", "Jangaon", "Nidamanuru"],
     },
   },
   "Andhra Pradesh": {
     ...makeDistrictSkeleton(andhraDistricts),
-    Krishna: {
-      Gudivada: ["Pedayerukapadu", "Bethavolu", "Chowtapalli", "Gudivada", "Mandavalli"],
-      Machilipatnam: ["Manginapudi", "Pedapatnam", "Tallapalem", "Machilipatnam", "Chinnapuram"],
-      Avanigadda: ["Avanigadda", "Modumudi", "Vekanuru", "Nagayalanka", "Koduru"],
-      Vijayawada: ["Vijayawada", "Gannavaram", "Kankipadu", "Penamaluru", "Poranki"],
-      Nuzvid: ["Nuzvid", "Agiripalli", "Chatrai", "Musunuru"],
+    "Alluri Sitharama Raju": {
+      Paderu: ["Paderu", "Araku Valley", "Chintapalle", "G.Madugula"],
+      Rampachodavaram: ["Rampachodavaram", "Devipatnam", "Addateegala", "Kothapeta"],
+      "Araku Valley": ["Araku", "Hukumpeta", "Dumbriguda", "Ananthagiri"],
+      Chintapalle: ["Chintapalle", "Koyyuru", "G.Madugula", "Munchingiputtu"],
+    },
+    Anakapalli: {
+      Anakapalli: ["Anakapalli", "Kasimkota", "Munagapaka", "Chodavaram"],
+      Bheemunipatnam: ["Bheemunipatnam", "Kapuluppada", "Tagarapuvalasa", "Narisipatnam"],
+      Nakkapalli: ["Nakkapalli", "Rambilli", "Yellamanchili", "Narsipatnam"],
+      Chodavaram: ["Chodavaram", "Payakaraopet", "Madugula", "Ravikamatham"],
+    },
+    Anantapur: {
+      Anantapur: ["Anantapur", "Bukkarayasamudram", "Gooty", "Guntakal", "Puttaparthi"],
+      Dharmavaram: ["Dharmavaram", "Penukonda", "Hindupur", "Kadiri"],
+      Tadpatri: ["Tadpatri", "Yellanur", "Peddapappur", "Rayadurgam"],
+      Hindupur: ["Hindupur", "Penukonda", "Lepakshi", "Madakasira"],
+      Guntakal: ["Guntakal", "Gooty", "Tadimarri", "Yadiki"],
+    },
+    Annamayya: {
+      Rajampet: ["Rajampet", "Kodur", "Kalikiri", "Obulavaripalli"],
+      Kadapa: ["Kadapa", "Pulivendla", "Mydukur", "Jammalamadugu"],
+      Rayachoti: ["Rayachoti", "Vontimitta", "Simhadripuram", "Nandalur"],
+      Proddutur: ["Proddutur", "Jammalamadugu", "Kamalapuram", "Pulivendla"],
+    },
+    Bapatla: {
+      Bapatla: ["Bapatla", "Karlapalem", "Pittalavanipalem", "Vetapalem"],
+      Chirala: ["Chirala", "Inkollu", "Santhanuthalapadu", "Repalle"],
+      Repalle: ["Repalle", "Pitchika", "Nagaram", "Nizampatnam"],
+      Addanki: ["Addanki", "Korisapadu", "Inkollu", "Parchuru"],
+    },
+    Chittoor: {
+      Tirupati: ["Tirupati", "Chandragiri", "Renigunta", "Karakambadi", "Srikalahasti"],
+      Chittoor: ["Chittoor", "Gudipala", "Tavanampalle", "Puthalapattu"],
+      Madanapalle: ["Madanapalle", "Pileru", "Punganur", "Vayalpad", "Kuppam"],
+      Kuppam: ["Kuppam", "Gudupalle", "Santhipuram", "Venkatagirikota"],
+      Srikalahasti: ["Srikalahasti", "Nagalapuram", "Sullurpeta", "Tada"],
+    },
+    "East Godavari": {
+      Rajahmundry: ["Rajahmundry", "Kadiyam", "Vemagiri", "Torredu", "Peddapuram"],
+      Kakinada: ["Kakinada", "Samalkota", "Peddapuram", "Pithapuram", "Prathipadu"],
+      Amalapuram: ["Amalapuram", "Ravulapalem", "Kothapeta", "Mummidivaram", "Ambajipeta"],
+      Ramachandrapuram: ["Ramachandrapuram", "Mandapeta", "Razole", "Alamuru"],
+      Rajam: ["Rajam", "Narasannapeta", "Palasa", "Srikakulam"],
+    },
+    Eluru: {
+      Eluru: ["Eluru", "Denduluru", "Pedavegi", "Pedapadu", "Nuzvid"],
+      Bhimavaram: ["Bhimavaram", "Palakollu", "Narsapuram", "Tanuku", "Nidadavole"],
+      Tadepalligudem: ["Tadepalligudem", "Pentapadu", "Nidadavole", "Unguturu"],
+      Jangareddygudem: ["Jangareddygudem", "Chintalapudi", "Gopalapuram", "Kamavarapu Kota"],
     },
     Guntur: {
       Tenali: ["Kollipara", "Pedaravuru", "Angalakuduru", "Tenali", "Burripalem"],
@@ -273,6 +452,75 @@ export const locationTree = {
       Prathipadu: ["Prathipadu", "Ganikapudi", "Kondajagarla", "Pedanandipadu"],
       Bapatla: ["Bapatla", "Karlapalem", "Pittalavanipalem", "Vetapalem"],
       Narasaraopet: ["Narasaraopet", "Rompicherla", "Nekarikallu", "Vinukonda"],
+      Guntur: ["Guntur", "Amaravathi", "Tadepalle", "Pedakakani"],
+    },
+    Kakinada: {
+      Kakinada: ["Kakinada", "Samalkota", "Peddapuram", "Pithapuram"],
+      Pithapuram: ["Pithapuram", "Prathipadu", "Gollaprolu", "Yeleswaram"],
+      Tuni: ["Tuni", "Prathipadu", "Rowthulapudi", "Gokavaram"],
+      Jaggampeta: ["Jaggampeta", "Rayavaram", "Biccavolu", "Sankhavaram"],
+    },
+    Konaseema: {
+      Amalapuram: ["Amalapuram", "Ravulapalem", "Kothapeta", "Mummidivaram"],
+      Razole: ["Razole", "Narsapur", "Palacole", "Bhimavaram"],
+      Narsapur: ["Narsapur", "Palacole", "Tanuku", "Palakollu"],
+      Mandapeta: ["Mandapeta", "Kajuluru", "Draksharamam", "P.Gannavaram"],
+    },
+    Krishna: {
+      Gudivada: ["Pedayerukapadu", "Bethavolu", "Chowtapalli", "Gudivada", "Mandavalli"],
+      Machilipatnam: ["Manginapudi", "Pedapatnam", "Tallapalem", "Machilipatnam", "Chinnapuram"],
+      Avanigadda: ["Avanigadda", "Modumudi", "Vekanuru", "Nagayalanka", "Koduru"],
+      Vijayawada: ["Vijayawada", "Gannavaram", "Kankipadu", "Penamaluru", "Poranki"],
+      Nuzvid: ["Nuzvid", "Agiripalli", "Chatrai", "Musunuru", "Jaggayyapeta"],
+      Jaggayyapeta: ["Jaggayyapeta", "Mylavaram", "Vissannapeta", "Tiruvuru"],
+    },
+    Kurnool: {
+      Kurnool: ["Kurnool", "Kallur", "Orvakal", "Veldurthi", "Kodumur"],
+      Nandyal: ["Nandyal", "Allagadda", "Banaganapalle", "Dhone", "Srisailam"],
+      Adoni: ["Adoni", "Yemmiganur", "Mantralayam", "Alur", "Kosigi"],
+      Atmakur: ["Atmakur", "Panyam", "Gospadu", "Peapully"],
+    },
+    Nandyal: {
+      Nandyal: ["Nandyal", "Allagadda", "Banaganapalle", "Dhone"],
+      Srisailam: ["Srisailam", "Giddalur", "Markapuram", "Kanigiri"],
+      Bethamcherla: ["Bethamcherla", "Nandikotkur", "Kolimigundla", "Gospadu"],
+      Allagadda: ["Allagadda", "Sirvel", "Mahanandi", "Srisailam"],
+    },
+    NTR: {
+      Vijayawada: ["Vijayawada", "Gannavaram", "Kankipadu", "Penamaluru", "Poranki"],
+      Jaggayyapeta: ["Jaggayyapeta", "Mylavaram", "Vissannapeta", "Tiruvuru"],
+      Nandigama: ["Nandigama", "Penuganchiprolu", "Chandarlapadu", "Veerullapadu"],
+      Tiruvuru: ["Tiruvuru", "Vuyyuru", "Gampalagudem", "Kaikalur"],
+    },
+    Palnadu: {
+      Narasaraopet: ["Narasaraopet", "Rompicherla", "Nekarikallu", "Vinukonda"],
+      Macherla: ["Macherla", "Atchampet", "Piduguralla", "Gurazala"],
+      Sattenapalle: ["Sattenapalle", "Vemuru", "Pedakurapadu", "Chilakaluripet"],
+      Gurazala: ["Gurazala", "Dachepalle", "Rentachintala", "Bolllapalle"],
+    },
+    "Parvathipuram Manyam": {
+      Parvathipuram: ["Parvathipuram", "Salur", "Bobbili", "Rajam"],
+      Salur: ["Salur", "Seethampeta", "Kurupam", "Makkuva"],
+      Bobbili: ["Bobbili", "Badangi", "Gajapathinagaram", "Cheepurupalli"],
+      Palakonda: ["Palakonda", "Hiramandalam", "Sompeta", "Mandasa"],
+    },
+    Prakasam: {
+      Ongole: ["Ongole", "Chirala", "Kandukur", "Markapur"],
+      Giddalur: ["Giddalur", "Markapuram", "Cumbum", "Podili"],
+      Markapuram: ["Markapuram", "Yerragondapalem", "Dornala", "Darsi"],
+      Kandukur: ["Kandukur", "Chirala", "Vetapalem", "Pamuru"],
+    },
+    "Sri Potti Sriramulu Nellore": {
+      Nellore: ["Nellore", "Kavali", "Gudur", "Atmakur", "Alluru"],
+      Gudur: ["Gudur", "Naidupeta", "Sullurpeta", "Tada"],
+      Kavali: ["Kavali", "Alluru", "Podalakur", "Kovur"],
+      Atmakur: ["Atmakur", "Marripadu", "Vinjamur", "Saidapur"],
+    },
+    "Sri Sathya Sai": {
+      Puttaparthi: ["Puttaparthi", "Kothacheruvu", "Lepakshi", "Penukonda"],
+      Hindupur: ["Hindupur", "Penukonda", "Lepakshi", "Madakasira"],
+      Kadiri: ["Kadiri", "Gooty", "Nallacheruvu", "Tadipatri"],
+      Madakasira: ["Madakasira", "Rayadurgam", "Rolla", "Nallamada"],
     },
     Srikakulam: {
       Srikakulam: ["Srikakulam", "Arasavalli", "Gara", "Ampolu", "Kallepalli"],
@@ -280,37 +528,40 @@ export const locationTree = {
       Palasa: ["Palasa", "Kasibugga", "Mandi", "Vajrapukotturu"],
       Amadalavalasa: ["Amadalavalasa", "Ponduru", "Burja", "Sarubujjili"],
       Ichchapuram: ["Ichchapuram", "Kaviti", "Sompeta", "Kanchili"],
+      Narasannapeta: ["Narasannapeta", "Palasa", "Srikakulam", "Rajam"],
+    },
+    Tirupati: {
+      Tirupati: ["Tirupati", "Chandragiri", "Renigunta", "Karakambadi"],
+      Srikalahasti: ["Srikalahasti", "Nagalapuram", "Sullurpeta", "Tada"],
+      Naidupeta: ["Naidupeta", "Atmakur", "Venkatagiri", "Gudur"],
+      Puttur: ["Puttur", "Nagari", "Pakala", "Chittoor"],
     },
     Visakhapatnam: {
       Bheemunipatnam: ["Bheemunipatnam", "Kapuluppada", "Tagarapuvalasa", "Narisipatnam"],
-      Padmanabham: ["Padmanabham", "Pandrangapuram", "Revidi"],
+      Padmanabham: ["Padmanabham", "Pandrangapuram", "Revidi", "Anandapuram"],
       Anandapuram: ["Anandapuram", "Gambheeram", "Vellanki", "Gidijala"],
       Anakapalli: ["Anakapalli", "Kasimkota", "Munagapaka", "Chodavaram"],
+      Visakhapatnam: ["Visakhapatnam", "Gajuwaka", "Kommadi", "Bheemunipatnam"],
+      Sabbavaram: ["Sabbavaram", "Narsipatnam", "Payakaraopet", "Chodavaram"],
     },
-    "East Godavari": {
-      Rajahmundry: ["Rajahmundry", "Kadiyam", "Vemagiri", "Torredu"],
-      Kakinada: ["Kakinada", "Samalkota", "Peddapuram", "Pithapuram"],
-      Amalapuram: ["Amalapuram", "Ravulapalem", "Kothapeta", "Mummidivaram"],
+    Vizianagaram: {
+      Vizianagaram: ["Vizianagaram", "Bobbili", "Parvathipuram", "Rajam"],
+      Bobbili: ["Bobbili", "Badangi", "Gajapathinagaram", "Cheepurupalli"],
+      Salur: ["Salur", "Seethampeta", "Kurupam", "Makkuva"],
+      Parvathipuram: ["Parvathipuram", "Bhamini", "Pachipenta", "Garugubilli"],
     },
     "West Godavari": {
       Eluru: ["Eluru", "Denduluru", "Pedavegi", "Pedapadu"],
       Bhimavaram: ["Bhimavaram", "Palakollu", "Narsapuram", "Tanuku"],
-      Tadepalligudem: ["Tadepalligudem", "Pentapadu", "Nidadavole"],
+      Tadepalligudem: ["Tadepalligudem", "Pentapadu", "Nidadavole", "Jangareddygudem"],
+      Jangareddygudem: ["Jangareddygudem", "Chintalapudi", "Gopalapuram", "Kamavarapu Kota"],
+      Narasapur: ["Narasapur", "Palacole", "Narsapuram", "Undi"],
     },
-    Kurnool: {
-      Kurnool: ["Kurnool", "Kallur", "Orvakal", "Veldurthi"],
-      Nandyal: ["Nandyal", "Allagadda", "Banaganapalle", "Dhone"],
-      Adoni: ["Adoni", "Yemmiganur", "Mantralayam", "Alur"],
-    },
-    Anantapur: {
-      Anantapur: ["Anantapur", "Bukkarayasamudram", "Gooty", "Guntakal"],
-      Dharmavaram: ["Dharmavaram", "Penukonda", "Hindupur", "Kadiri"],
-      Tadpatri: ["Tadpatri", "Yellanur", "Peddapappur"],
-    },
-    Chittoor: {
-      Tirupati: ["Tirupati", "Chandragiri", "Renigunta", "Karakambadi"],
-      Chittoor: ["Chittoor", "Gudipala", "Tavanampalle", "Puthalapattu"],
-      Madanapalle: ["Madanapalle", "Pileru", "Punganur", "Vayalpad"],
+    "YSR Kadapa": {
+      Kadapa: ["Kadapa", "Pulivendla", "Mydukur", "Jammalamadugu", "Proddatur"],
+      Proddatur: ["Proddatur", "Mydukur", "Rayachoti", "Kamalapuram"],
+      Rajampet: ["Rajampet", "Kodur", "Kalikiri", "Obulavaripalli"],
+      Pulivendla: ["Pulivendla", "Jammalamadugu", "Vontimitta", "Porumamilla"],
     },
   },
   ...Object.fromEntries(otherStatesAndUTs.map((state) => [state, makeStateSkeleton()])),
@@ -1023,27 +1274,29 @@ export function normalizeProfile(profile: Partial<VillageProfile> | undefined): 
   const stateKey = findCaseInsensitiveKey(typedLocationTree, stateInput);
   const state = stateKey || stateInput;
 
-  const districts = getDistricts(state);
-  const districtInput = profile.district?.trim() || districts[0] || defaultProfile.district;
-  const districtKey = findCaseInsensitiveKey(typedLocationTree[state], districtInput);
+  const districtInput = profile.district?.trim() || "";
+  const districtKey = districtInput
+    ? findCaseInsensitiveKey(typedLocationTree[state], districtInput)
+    : undefined;
   const district = districtKey || districtInput;
 
-  const mandals = getMandals(state, district);
-  const mandalInput = profile.mandal?.trim() || mandals[0] || defaultProfile.mandal;
-  const mandalKey = findCaseInsensitiveKey(typedLocationTree[state]?.[district], mandalInput);
+  const mandalInput = profile.mandal?.trim() || "";
+  const mandalKey = mandalInput
+    ? findCaseInsensitiveKey(typedLocationTree[state]?.[district], mandalInput)
+    : undefined;
   const mandal = mandalKey || mandalInput;
 
   const villages = getVillages(state, district, mandal);
-  const hasVillageInput = typeof profile?.village === "string";
+  const hasVillageInput = typeof profile?.village === "string" && profile.village.trim().length > 0;
   const villageName = profile?.village?.split(",")[0]?.trim();
 
   let village = "";
   if (hasVillageInput && villageName) {
     const villageKey = villages.find((v) => v.toLowerCase() === villageName.toLowerCase());
     village = villageKey || villageName;
-  } else {
-    village = villages[0] || defaultProfile.village;
   }
+  // If no village/mandal/district was specified, leave blank — don't auto-fill.
+  // This prevents phantom location assignment for Google sign-in users.
 
   return { state, district, mandal, village };
 }

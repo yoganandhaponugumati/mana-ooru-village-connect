@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, X, ChevronRight, ChevronLeft, Volume2, VolumeX, MapPin, Megaphone, AlertTriangle, Landmark, PhoneCall, Sparkles, Maximize2, Minimize2, Radio, CheckCircle2, Award, ArrowRight } from "lucide-react";
+import { Play, Pause, X, ChevronRight, ChevronLeft, Volume2, VolumeX, Megaphone, AlertTriangle, Landmark, PhoneCall, Sparkles, Maximize2, Minimize2, Radio } from "lucide-react";
 
 export function VideoGuideModal({
   isOpen,
