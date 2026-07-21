@@ -1612,48 +1612,89 @@ function Index() {
       </section>
 
       <section className="mx-auto mt-24 max-w-7xl px-4 pb-16 sm:px-6">
-        <div className="relative overflow-hidden rounded-[32px] border border-primary/30 shadow-[var(--shadow-lift)] min-h-[440px] flex flex-col justify-center p-10 sm:p-16">
-          {/* Background Video with colorful fallback & dark overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-emerald-950 via-green-900 to-teal-950" />
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 h-full w-full object-cover brightness-95 contrast-105 scale-105 transition-transform duration-1000"
-          >
-            <source
-              src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-rice-field-and-village-42475-large.mp4"
-              type="video/mp4"
-            />
-          </video>
-          {/* Glass & Gradient Overlays for maximum color & high-contrast readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/75 to-black/40 backdrop-blur-[2px]" />
-          <div className="absolute -right-20 -top-20 size-80 rounded-full bg-accent/30 blur-3xl animate-float-slow pointer-events-none" />
-          <div className="absolute -bottom-20 -left-10 size-80 rounded-full bg-primary/30 blur-3xl animate-float-slow pointer-events-none [animation-delay:-3s]" />
+        <div className="relative overflow-hidden rounded-[36px] border border-primary/40 bg-zinc-950 shadow-[0_24px_64px_-12px_rgba(16,185,129,0.25)] min-h-[460px] p-8 sm:p-14 lg:p-16 flex items-center">
+          {/* Background Video — clearly visible on right half, smooth fade to dark on left */}
+          <div className="absolute right-0 top-0 bottom-0 w-full lg:w-2/3 h-full overflow-hidden pointer-events-none">
+            <video
+              autoPlay
+              loop
+              muted
+              playsInline
+              className="h-full w-full object-cover brightness-105 contrast-105 scale-105 transition-transform duration-1000"
+            >
+              <source
+                src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-rice-field-and-village-42475-large.mp4"
+                type="video/mp4"
+              />
+              <source
+                src="https://cdn.pixabay.com/video/2021/08/04/83864-584742724_large.mp4"
+                type="video/mp4"
+              />
+            </video>
+            {/* Left fade gradient so text is crystal clear on left while video shines on right */}
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/60 to-transparent lg:bg-gradient-to-r lg:from-zinc-950 lg:via-zinc-950/80 lg:to-transparent" />
+          </div>
 
-          <div className="relative z-10 max-w-2xl">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-accent backdrop-blur-md">
-              <Sparkles className="size-3.5" /> Empowering Rural India
-            </span>
-            <h2 className="mt-4 font-display text-3xl font-bold tracking-tight text-white sm:text-5xl drop-shadow-sm">
-              Bring your village online.
-            </h2>
-            <p className="mt-4 text-pretty text-white/90 sm:text-lg leading-relaxed font-medium">
-              Whether you grow rice, fix motors, drive tractors, or run a small shop — there's a
-              place for you on ManaOoru. Free for every villager, forever.
-            </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-accent/90 px-7 py-6 text-base font-bold shadow-lg shadow-accent/20">
-                <Link to="/post-worker">
-                  Create your profile <ArrowRight className="ml-2 size-5" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg" className="border-white/30 bg-white/15 text-white hover:bg-white/25 hover:text-white px-7 py-6 text-base font-semibold backdrop-blur-md">
-                <Link to="/marketplace">
-                  Browse the village
-                </Link>
-              </Button>
+          {/* Decorative floating lights */}
+          <div className="absolute -right-20 -top-20 size-80 rounded-full bg-emerald-500/20 blur-3xl animate-float-slow pointer-events-none" />
+          <div className="absolute -bottom-20 -left-10 size-80 rounded-full bg-amber-500/15 blur-3xl animate-float-slow pointer-events-none [animation-delay:-3s]" />
+
+          <div className="relative z-10 grid lg:grid-cols-12 gap-8 items-center w-full">
+            {/* Left Column: CTA Text & Buttons */}
+            <div className="lg:col-span-7 max-w-2xl">
+              <span className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/15 px-4 py-1.5 text-xs font-black uppercase tracking-wider text-emerald-400 shadow-sm">
+                <Sparkles className="size-3.5 animate-pulse" /> Empowering Rural India
+              </span>
+              <h2 className="mt-5 font-display text-3xl font-extrabold tracking-tight text-white sm:text-5xl drop-shadow-md leading-tight">
+                Bring your village online.
+              </h2>
+              <p className="mt-4 text-pretty text-zinc-300 sm:text-lg leading-relaxed font-medium">
+                Whether you grow rice, fix motors, drive tractors, or run a small shop — there&apos;s a
+                place for you on ManaOoru. Free for every villager, forever.
+              </p>
+              <div className="mt-8 flex flex-wrap gap-4">
+                <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/20 rounded-2xl transition-all scale-100 hover:scale-[1.02]">
+                  <Link to="/post-worker">
+                    Create your profile <ArrowRight className="ml-2 size-5" />
+                  </Link>
+                </Button>
+                <Button asChild variant="outline" size="lg" className="border-white/20 bg-white/10 text-white hover:bg-white/20 hover:text-white px-8 py-6 text-base font-bold backdrop-blur-md rounded-2xl transition-all">
+                  <Link to="/marketplace">
+                    Browse the village
+                  </Link>
+                </Button>
+              </div>
+            </div>
+
+            {/* Right Column: Animated Video Preview Frame so video is guaranteed visible inside card */}
+            <div className="lg:col-span-5 hidden sm:flex justify-end">
+              <div className="relative w-full max-w-md rounded-3xl overflow-hidden border-2 border-white/20 bg-black shadow-2xl group transform lg:rotate-1 hover:rotate-0 transition-all duration-500">
+                <video
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full h-64 sm:h-72 object-cover"
+                >
+                  <source
+                    src="https://assets.mixkit.co/videos/preview/mixkit-aerial-view-of-a-rice-field-and-village-42475-large.mp4"
+                    type="video/mp4"
+                  />
+                  <source
+                    src="https://cdn.pixabay.com/video/2021/08/04/83864-584742724_large.mp4"
+                    type="video/mp4"
+                  />
+                </video>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent pointer-events-none flex flex-col justify-end p-5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2.5">
+                      <span className="size-2.5 rounded-full bg-red-500 animate-ping" />
+                      <span className="text-xs font-bold uppercase tracking-widest text-white/90">Live Village Feed</span>
+                    </div>
+                    <span className="rounded-lg bg-white/20 px-2 py-0.5 text-[10px] font-extrabold text-white backdrop-blur-md">HD 4K</span>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
