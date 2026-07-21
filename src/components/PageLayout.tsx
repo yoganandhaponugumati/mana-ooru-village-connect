@@ -499,80 +499,41 @@ export function PageLayout({
   title,
   subtitle,
   icon,
+  heroAction,
   children,
 }: {
   title: string;
   subtitle?: string;
   icon?: ReactNode;
+  heroAction?: ReactNode;
   children: ReactNode;
 }) {
   return (
-    <div className="premium-page-bg village-site-bg min-h-screen text-foreground">
-      <FullScreenFeatureBackground title={title} />
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       <SiteNav />
-      <header className="page-village-hero relative overflow-hidden border-b border-white/45 pt-14 shadow-[0_24px_90px_-62px_rgba(20,49,32,0.78)] backdrop-blur-xl">
-        <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0.58)_36%,rgba(255,255,255,0.18)_68%,rgba(255,255,255,0.06)),linear-gradient(246deg,rgba(24,169,153,0.18),transparent_46%)]" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
-        {/* On mobile: simple text header. On lg+: card + 3D scene */}
-        <div className="relative mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 lg:grid lg:min-h-[380px] lg:grid-cols-[0.62fr_1.18fr] lg:items-center lg:gap-6 lg:py-14">
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease: [0.32, 0.72, 0, 1] }}
-            className="relative z-10 flex flex-col gap-4 rounded-2xl border border-white/78 bg-white/85 p-4 shadow-md backdrop-blur-2xl sm:flex-row sm:items-center sm:gap-5 sm:p-6"
-          >
-            <div className="flex items-start gap-3">
-              {icon && (
-                <div className="grid size-11 shrink-0 place-items-center rounded-xl border border-white/65 bg-white/60 text-primary shadow-sm backdrop-blur-xl">
-                  {icon}
-                </div>
-              )}
-              <div>
-                <div className="inline-flex items-center gap-1.5 rounded-full border border-white/70 bg-white/78 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-primary shadow-sm backdrop-blur-xl">
-                  <Sparkles className="size-3" />
-                  ManaOoru
-                </div>
-                <h1 className="mt-2 text-balance font-display text-2xl font-semibold text-clay sm:text-3xl lg:text-4xl">
-                  {title}
-                </h1>
-                {subtitle && (
-                  <p className="mt-2 max-w-2xl text-pretty text-sm leading-6 text-muted-foreground">
-                    {subtitle}
-                  </p>
-                )}
-              </div>
-            </div>
-          </motion.div>
-          {/* 3D showcase only on large screens */}
-          <div className="hidden lg:block">
-            <FeatureHeroShowcase title={title} />
-            <InternalPage3DScene title={title} icon={icon} />
+      <header className="relative overflow-hidden border-b border-border/60 bg-gradient-to-b from-[#f0f7f3] via-[#f9fcf9] to-background pt-22 pb-12 sm:pt-28 sm:pb-16 dark:from-zinc-900/80 dark:via-zinc-950 dark:to-background">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent opacity-70 dark:opacity-40" />
+        <div className="relative mx-auto max-w-4xl px-4 text-center sm:px-6">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/25 bg-white/90 dark:bg-zinc-900/90 px-3.5 py-1 text-xs font-bold uppercase tracking-widest text-primary shadow-sm">
+            {icon || <Sparkles className="size-3.5" />}
+            <span>{title.split(" ")[0]} Network &amp; Portal</span>
           </div>
+          <h1 className="mt-4 font-display text-3xl font-extrabold tracking-tight text-clay dark:text-zinc-100 sm:text-4xl lg:text-5xl text-balance">
+            {title}
+          </h1>
+          {subtitle && (
+            <p className="mt-4 mx-auto max-w-2xl text-base sm:text-lg leading-relaxed text-muted-foreground text-pretty">
+              {subtitle}
+            </p>
+          )}
+          {heroAction && (
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
+              {heroAction}
+            </div>
+          )}
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-10 pb-20 lg:pb-10">
-        <nav
-          className="village-quick-nav mb-6 grid grid-cols-2 gap-2 rounded-2xl p-2 shadow-sm backdrop-blur-2xl sm:grid-cols-4 sm:gap-3"
-          aria-label="Page quick actions"
-        >
-          {[
-            { label: "Search", to: "/search", icon: Search },
-            { label: "Timeline", to: "/timeline", icon: Activity },
-            { label: "Weather", to: "/weather", icon: CloudSun },
-            { label: "Emergency", to: "/emergency", icon: Siren },
-          ].map((item) => (
-            <Link
-              key={item.label}
-              to={item.to}
-              className="group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-bold text-clay transition hover:bg-white hover:shadow-sm"
-            >
-              <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary">
-                <item.icon className="size-4" />
-              </span>
-              {item.label}
-            </Link>
-          ))}
-        </nav>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 sm:py-12 pb-24 lg:pb-14">
         {children}
       </main>
       <SiteFooter />

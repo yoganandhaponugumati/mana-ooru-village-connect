@@ -163,7 +163,32 @@ function AnnPage() {
     <PageLayout
       title="Village Notice Board & Sarpanch Pragati"
       subtitle="Public Panchayat announcements, urgent civic alerts, and transparent tracking of all Sarpanch development works."
-      icon={<Megaphone className="size-7 text-primary" />}
+      icon={<Megaphone className="size-6 text-primary" />}
+      heroAction={
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          {canManageNotices && (
+            <button
+              type="button"
+              onClick={handlePostNoticeClick}
+              className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-primary/30 transition hover:scale-105"
+            >
+              <Plus className="size-5" />
+              <span>{showNoticeForm ? "Hide Notice Form" : "⚡ Post Official Notice +"}</span>
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={() => {
+              setActiveTab("sarpanch_works");
+              if (canManageNotices) setShowWorkForm(true);
+            }}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-6 py-4 text-sm font-bold text-primary shadow-sm transition hover:bg-primary/20"
+          >
+            <Shield className="size-4" />
+            <span>{canManageNotices ? "⚡ Add Sarpanch Work Progress +" : "View Sarpanch Pragati Tracker"}</span>
+          </button>
+        </div>
+      }
     >
       {/* Dual Tab Switcher */}
       <div className="mb-8 flex flex-wrap items-center gap-3 border-b border-border/80 pb-5">

@@ -100,24 +100,22 @@ function ServicesPage() {
 
   return (
     <PageLayout
-      title="Local Services"
-      subtitle="Tractors, repairs, transport — book trusted local providers."
-      icon={<Wrench className="size-7" />}
-    >
-      <SectionHeader
-        eyebrow={mode === "shops" ? "Village shops" : "Trusted help"}
-        title={mode === "shops" ? "Shops and local businesses" : "Available specialists"}
-        description={
-          mode === "shops"
-            ? "Find kirana, medical, bakery, hardware, seeds, dairy, and daily-use shops."
-            : "Find workers and providers for repairs, transport, farming, events, and urgent needs."
-        }
-        actions={
-          <AppButton variant="primary" icon={<Plus className="size-4" />} onClick={handlePostClick}>
-            {showForm ? "Cancel" : mode === "shops" ? "Add a shop" : "Offer a service"}
+      title="Village Services & Shops Directory"
+      subtitle="Find and book trusted local providers for tractors, repairs, borewells, transport, and explore village shops."
+      icon={<Wrench className="size-6 text-primary" />}
+      heroAction={
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <AppButton
+            variant="primary"
+            icon={<Plus className="size-5" />}
+            onClick={handlePostClick}
+            className="rounded-2xl px-8 py-4 text-base font-extrabold shadow-xl shadow-primary/30 hover:scale-105 transition"
+          >
+            {showForm ? "Hide Form" : mode === "shops" ? "⚡ Register Village Shop +" : "⚡ Offer Your Service +"}
           </AppButton>
-        }
-      />
+        </div>
+      }
+    >
       <div className="mb-6 inline-flex rounded-full border border-border bg-card p-1 shadow-sm">
         {[
           ["services", "Find Services"],

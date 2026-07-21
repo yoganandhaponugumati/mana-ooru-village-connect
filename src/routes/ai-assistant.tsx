@@ -208,15 +208,22 @@ function AiAssistantPage() {
 
   return (
     <PageLayout
-      title="AI Assistant"
-      subtitle="Voice and text support for farming, services, weather, and village questions."
-      icon={<Bot className="size-7" />}
+      title="ManaOoru AI Village Assistant"
+      subtitle="Voice and text support for farming, services, weather, and government schemes in Telugu, English, or Hindi."
+      icon={<Bot className="size-6 text-primary" />}
+      heroAction={
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <button
+            type="button"
+            onClick={listen}
+            className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-primary/30 transition hover:scale-105"
+          >
+            <Mic className="size-5" />
+            <span>{listening ? "🔴 Listening... Speak Now" : "⚡ Speak Your Question (Voice AI)"}</span>
+          </button>
+        </div>
+      }
     >
-      <SectionHeader
-        eyebrow="Smart village help"
-        title="Ask in Telugu, English, or Hindi"
-        description="A polished assistant for farmers, workers, services, schemes, and live weather-aware guidance."
-      />
       <div className="grid gap-6 lg:grid-cols-[0.8fr_1.2fr]">
         <div className="space-y-4">
           <SurfaceCard className="overflow-hidden p-5">

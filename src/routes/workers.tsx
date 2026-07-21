@@ -62,20 +62,20 @@ function WorkersPage() {
   );
   return (
     <PageLayout
-      title="Find Workers"
-      subtitle="Skilled hands from your village."
-      icon={<Users className="size-7" />}
+      title="Find Skilled Village Workers"
+      subtitle="Connect directly with local farm laborers, tractor drivers, mechanics, electricians, and builders in your area."
+      icon={<Users className="size-6 text-primary" />}
+      heroAction={
+        <AppLinkButton
+          to="/post-worker"
+          icon={<Plus className="size-5" />}
+          variant="primary"
+          className="rounded-2xl px-8 py-4 text-base font-extrabold shadow-xl shadow-primary/30 hover:scale-105 transition"
+        >
+          ⚡ Register as Village Worker +
+        </AppLinkButton>
+      }
     >
-      <SectionHeader
-        eyebrow="Village network"
-        title="Browse trusted workers"
-        description="Search by skill, area, or availability and connect with people nearby."
-        actions={
-          <AppLinkButton to="/post-worker" icon={<Plus className="size-4" />} variant="primary">
-            Register as worker
-          </AppLinkButton>
-        }
-      />
       <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {workerCategories.map((category) => (
           <SurfaceCard key={category.label} className="p-4" hover>

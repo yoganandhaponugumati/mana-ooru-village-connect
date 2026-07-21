@@ -119,85 +119,27 @@ function ProblemsPage() {
     <PageLayout
       title="Citizen Problem & Civic Action Desk"
       subtitle="Public photo reporting with community upvoting. Every report is visible to the entire village and Gram Panchayat."
-      icon={<AlertTriangle className="size-7 text-red-600" />}
+      icon={<AlertTriangle className="size-6 text-red-600" />}
+      heroAction={
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">
+          <button
+            type="button"
+            onClick={handlePostClick}
+            className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-primary px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.03] hover:bg-primary/95 active:scale-95 cursor-pointer"
+          >
+            <Plus className="size-5" />
+            <span>{showForm ? "Hide Report Form" : "⚡ Report New Civic Problem +"}</span>
+          </button>
+          <Link
+            to="/emergency"
+            className="inline-flex items-center justify-center gap-2 rounded-2xl border border-red-200 bg-red-50/90 px-6 py-4 text-sm font-bold text-red-700 shadow-sm transition hover:bg-red-100 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300"
+          >
+            <Siren className="size-4 animate-pulse" />
+            <span>Urgent Emergency Numbers</span>
+          </Link>
+        </div>
+      }
     >
-      <SectionHeader
-        eyebrow="Civic Transparency"
-        title="Photo Proof Drives Panchayat Action"
-        description="Report damaged roads, overflowing drainage, streetlight outages, and water pipe breaks. Rally support with community upvotes."
-        actions={
-          <>
-            <Link
-              to="/emergency"
-              className="inline-flex h-11 items-center justify-center gap-2 rounded-full border border-red-200 bg-red-50 px-5 text-sm font-semibold text-red-700 transition hover:-translate-y-0.5 hover:bg-red-100 shadow-sm"
-            >
-              <Siren className="size-4 animate-pulse" /> Urgent Siren Contacts
-            </Link>
-            <AppButton
-              variant="primary"
-              icon={<Plus className="size-4" />}
-              onClick={handlePostClick}
-            >
-              {showForm ? "Hide Form" : "Report New Problem"}
-            </AppButton>
-          </>
-        }
-      />
-
-      {/* Emergency quick cards */}
-      <div className="mb-8 grid gap-3 md:grid-cols-3">
-        {urgentContacts.map((contact) => (
-          <SurfaceCard
-            key={contact.id}
-            hover={false}
-            className="border-red-200 bg-red-50/90 p-4 shadow-sm"
-          >
-            <div className="flex items-center gap-3">
-              <FeatureIcon
-                icon={<contact.icon className="size-5" />}
-                className="bg-red-100 text-red-700 shadow-inner"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="font-display text-base font-bold text-clay">{contact.title}</p>
-                <p className="text-xs text-red-700 font-medium">{contact.role}</p>
-              </div>
-              <a
-                href={`tel:${contact.contact}`}
-                onClick={() => logContact(contact, "call")}
-                className="inline-flex size-11 shrink-0 items-center justify-center rounded-full bg-red-600 text-white shadow transition hover:brightness-110"
-                aria-label={`Call ${contact.title}`}
-              >
-                <Phone className="size-4" />
-              </a>
-            </div>
-          </SurfaceCard>
-        ))}
-      </div>
-
-      {/* Category selection chips */}
-      <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {issueTypes.map((issue) => (
-          <SurfaceCard
-            key={issue.label}
-            className="p-4 border-accent/60 bg-gradient-to-br from-card to-accent/5"
-          >
-            <button
-              type="button"
-              onClick={handleOpenFormClick}
-              className="flex w-full items-center gap-3 text-left"
-            >
-              <FeatureIcon icon={<issue.icon className="size-5 text-primary" />} />
-              <span>
-                <span className="block font-bold text-clay">{issue.label}</span>
-                <span className="text-xs text-muted-foreground">
-                  Tap to attach photo & GPS location
-                </span>
-              </span>
-            </button>
-          </SurfaceCard>
-        ))}
-      </div>
-
       {showForm && (
         <div ref={formRef}>
           <SurfaceCard className="mb-8 p-6 sm:p-8 border-2 border-primary/30 shadow-md bg-card ring-2 ring-primary/20">
@@ -239,7 +181,7 @@ function ProblemsPage() {
                 {
                   name: "contact",
                   label: "Your Contact Number",
-                  placeholder: "10-digit mobile (for Panchayat clarification)",
+                  placeholder: "Mobile number for Panchayat verification",
                   required: true,
                 },
               ]}
@@ -247,6 +189,35 @@ function ProblemsPage() {
           </SurfaceCard>
         </div>
       )}
+
+      {/* Category selection chips */}
+      <div className="mb-8">
+        <h2 className="mb-4 font-display text-lg font-bold text-clay dark:text-zinc-100 flex items-center gap-2">
+          <span>Choose Issue Category to Report</span>
+        </h2>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {issueTypes.map((issue) => (
+            <SurfaceCard
+              key={issue.label}
+              className="p-4 border-border/80 bg-gradient-to-br from-card to-primary/5 transition hover:border-primary/50 hover:shadow-md cursor-pointer"
+            >
+              <button
+                type="button"
+                onClick={handleOpenFormClick}
+                className="flex w-full items-center gap-3 text-left"
+              >
+                <FeatureIcon icon={<issue.icon className="size-5 text-primary" />} />
+                <span>
+                  <span className="block font-bold text-clay dark:text-zinc-100">{issue.label}</span>
+                  <span className="text-xs text-muted-foreground">
+                    Tap to attach photo &amp; GPS location
+                  </span>
+                </span>
+              </button>
+            </SurfaceCard>
+          ))}
+        </div>
+      </div>
 
       {/* Status Filter Tabs */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 border-b border-border/60 pb-4">

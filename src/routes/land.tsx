@@ -45,20 +45,20 @@ function LandPage() {
 
   return (
     <PageLayout
-      title="Lease Farmland"
-      subtitle="List your land or find fields available this season."
-      icon={<Wheat className="size-7" />}
+      title="Lease & Find Village Farmland"
+      subtitle="Explore seasonal agricultural fields, verify water sources and soil types, or list your own land for lease."
+      icon={<Wheat className="size-6 text-primary" />}
+      heroAction={
+        <AppButton
+          variant="primary"
+          icon={<Plus className="size-5" />}
+          onClick={handlePostClick}
+          className="rounded-2xl px-8 py-4 text-base font-extrabold shadow-xl shadow-primary/30 hover:scale-105 transition"
+        >
+          {showForm ? "Hide Land Form" : "⚡ List Farmland for Lease +"}
+        </AppButton>
+      }
     >
-      <SectionHeader
-        eyebrow="Seasonal opportunities"
-        title="Available farmland"
-        description="Post your field or browse plots that match your crop plans."
-        actions={
-          <AppButton variant="primary" icon={<Plus className="size-4" />} onClick={handlePostClick}>
-            {showForm ? "Cancel" : "List your land"}
-          </AppButton>
-        }
-      />
       <div className="mb-8 grid gap-4 md:grid-cols-4">
         {[
           { label: "Canal water", value: "18 plots", icon: Droplets },

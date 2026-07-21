@@ -110,19 +110,18 @@ function MarketPage() {
     <PageLayout
       title="Village Marketplace & Bazaar"
       subtitle="Direct peer-to-peer trade with zero commission. Buy and sell crops, cattle, tractors, seeds, and local goods directly with neighbours."
-      icon={<ShoppingBasket className="size-7 text-emerald-600" />}
+      icon={<ShoppingBasket className="size-6 text-emerald-600" />}
+      heroAction={
+        <AppButton
+          variant="primary"
+          icon={<Plus className="size-5" />}
+          onClick={handlePostClick}
+          className="rounded-2xl px-8 py-4 text-base font-extrabold shadow-xl shadow-primary/30 hover:scale-105 transition"
+        >
+          {showForm ? "Hide Sell Form" : "⚡ Sell Your Item Right Now +"}
+        </AppButton>
+      }
     >
-      <SectionHeader
-        eyebrow="Zero Brokerage Trade"
-        title="100% Direct Village Haat"
-        description="Filter by category below or list your own harvest, livestock, or machinery in 30 seconds."
-        actions={
-          <AppButton variant="primary" icon={<Plus className="size-4" />} onClick={handlePostClick}>
-            {showForm ? "Cancel" : "Sell Item Right Now"}
-          </AppButton>
-        }
-      />
-
       {/* Zero Brokerage Banner */}
       <SurfaceCard
         hover={false}

@@ -144,16 +144,9 @@ export function SiteNav() {
     setLanguageOpen(false);
     setUserMenuOpen(false);
   };
-
   return (
     <>
-      <nav
-        className={`fixed inset-x-0 top-0 z-[9999] border-b transition-all duration-300 ${
-          isHeroTop
-            ? "border-white/15 bg-black/45 text-white backdrop-blur-md shadow-lg"
-            : "border-[#dfeae2]/80 bg-[#f7fbf2]/95 text-foreground shadow-sm backdrop-blur-2xl dark:bg-zinc-950/95 dark:border-zinc-800/80"
-        }`}
-      >
+      <nav className="fixed inset-x-0 top-0 z-[9999] border-b border-[#dfeae2]/80 bg-[#f7fbf2]/95 text-foreground shadow-sm transition-all duration-300 backdrop-blur-2xl dark:bg-zinc-950/95 dark:border-zinc-800/80">
       <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-3 sm:px-5 lg:px-6">
 
         {/* Logo */}
@@ -161,27 +154,21 @@ export function SiteNav() {
           <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
             <img src="/logo.png" alt="ManaOoru Emblem" className="size-full object-cover" />
           </div>
-          <span className={`font-display text-lg font-bold tracking-tight shrink-0 ${isHeroTop ? "text-white" : "text-clay dark:text-zinc-100"}`}>
+          <span className="font-display text-lg font-bold tracking-tight shrink-0 text-clay dark:text-zinc-100">
             ManaOoru
           </span>
         </Link>
 
         {/* Desktop Nav Links — visible from lg (1024px) */}
-        <div className={`hidden lg:flex items-center gap-0.5 text-xs font-bold flex-1 justify-center ${isHeroTop ? "text-white/90" : "text-muted-foreground dark:text-zinc-400"}`}>
+        <div className="hidden lg:flex items-center gap-0.5 text-xs font-bold flex-1 justify-center text-muted-foreground dark:text-zinc-400">
           {navLinks.slice(0, 7).map((l) => (
             <Link
               key={l.to}
               to={l.to}
               activeOptions={{ exact: l.to === "/" }}
-              className={`whitespace-nowrap rounded-lg px-2.5 py-1.5 transition-all ${
-                isHeroTop
-                  ? "hover:bg-white/15 hover:text-white"
-                  : "hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
-              }`}
+              className="whitespace-nowrap rounded-lg px-2.5 py-1.5 transition-all hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
               activeProps={{
-                className: isHeroTop
-                  ? "text-white font-black bg-white/20"
-                  : "text-primary font-black bg-primary/10 dark:text-emerald-400",
+                className: "text-primary font-black bg-primary/10 dark:text-emerald-400",
               }}
             >
               {t[l.key] ?? l.label}
@@ -195,11 +182,7 @@ export function SiteNav() {
             {/* Weather pill — md+ */}
             <Link
               to="/weather"
-              className={`hidden md:inline-flex h-8 items-center gap-1.5 rounded-full border px-2.5 text-xs font-bold shadow-sm transition shrink-0 ${
-                isHeroTop
-                  ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
-                  : "border-border bg-card text-foreground hover:border-primary hover:text-primary dark:bg-zinc-900 dark:border-zinc-700"
-              }`}
+              className="hidden md:inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-2.5 text-xs font-bold text-foreground shadow-sm transition shrink-0 hover:border-primary hover:text-primary dark:bg-zinc-900 dark:border-zinc-700"
               title="Live Village Weather"
             >
               <span>☀️</span>
@@ -212,11 +195,7 @@ export function SiteNav() {
             {/* Search — lg+ */}
             <button
               onClick={focusSearch}
-              className={`hidden lg:grid size-8 place-items-center rounded-full border shadow-sm transition ${
-                isHeroTop
-                  ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
-                  : "border-border bg-card text-muted-foreground hover:border-primary hover:text-primary dark:bg-zinc-900"
-              }`}
+              className="hidden lg:grid size-8 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:border-primary hover:text-primary dark:bg-zinc-900"
               aria-label="Search"
             >
               <Search className="size-4" />
@@ -226,11 +205,7 @@ export function SiteNav() {
             <div className="nav-menu-container relative">
               <button
                 onClick={() => { setLanguageOpen((v) => !v); setUserMenuOpen(false); setNotificationsOpen(false); }}
-                className={`inline-flex h-8 items-center justify-center gap-1 rounded-full border px-2 text-xs font-semibold shadow-sm transition ${
-                  isHeroTop
-                    ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
-                    : "border-border bg-card text-foreground hover:border-primary hover:text-primary dark:bg-zinc-900"
-                }`}
+                className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-border bg-card px-2 text-xs font-semibold text-foreground shadow-sm transition hover:border-primary hover:text-primary dark:bg-zinc-900"
                 aria-label="Language"
               >
                 <Globe2 className="size-3.5 shrink-0" />
@@ -268,11 +243,7 @@ export function SiteNav() {
                 <button
                   type="button"
                   onClick={openNotifications}
-                  className={`relative grid size-8 place-items-center rounded-full border shadow-sm transition ${
-                    isHeroTop
-                      ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
-                      : "border-border bg-card text-foreground hover:border-primary hover:text-primary dark:bg-zinc-900"
-                  }`}
+                  className="relative grid size-8 place-items-center rounded-full border border-border bg-card text-foreground shadow-sm transition hover:border-primary hover:text-primary dark:bg-zinc-900"
                   aria-label="Notifications"
                 >
                   <Bell className="size-4" />
@@ -367,11 +338,7 @@ export function SiteNav() {
                 <button
                   type="button"
                   onClick={() => { setUserMenuOpen((v) => !v); setLanguageOpen(false); setNotificationsOpen(false); }}
-                  className={`flex h-8 items-center gap-1.5 rounded-full border px-2 text-xs font-semibold shadow-sm transition max-w-[120px] sm:max-w-[160px] ${
-                    isHeroTop
-                      ? "border-white/25 bg-white/10 text-white hover:bg-white/20"
-                      : "border-border bg-white dark:bg-zinc-900 text-foreground hover:border-primary"
-                  }`}
+                  className="flex h-8 items-center gap-1.5 rounded-full border border-border bg-white dark:bg-zinc-900 px-2 text-xs font-semibold text-foreground shadow-sm transition max-w-[120px] sm:max-w-[160px] hover:border-primary"
                 >
                   {authProfile?.photo_url ? (
                     <img src={authProfile.photo_url} alt="" className="size-5 rounded-full object-cover shrink-0" />
@@ -398,28 +365,34 @@ export function SiteNav() {
                         <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
                           {authProfile?.full_name || user.email?.split("@")[0]}
                         </p>
-                        <p className="text-[10px] text-zinc-500 truncate">{profile.village || "No village set"}</p>
+                        <p className="text-[11px] text-zinc-500 truncate">{user.email || user.phone}</p>
+                        <span className="mt-1 inline-block rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
+                          {getRoleDisplayName(role)}
+                        </span>
                       </div>
+                      <Link
+                        to="/profile"
+                        onClick={() => setUserMenuOpen(false)}
+                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition"
+                      >
+                        <UserRound className="size-3.5" /> Profile &amp; Role
+                      </Link>
+                      <InstallAppButton variant="menuItem" className="rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition" />
                       {(role === "village_admin" || role === "super_admin") && (
-                        <Link to="/official" onClick={() => setUserMenuOpen(false)}
-                          className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary">
-                          <ShieldCheck className="size-4 text-emerald-600" /> Admin Portal
+                        <Link
+                          to="/dashboard"
+                          onClick={() => setUserMenuOpen(false)}
+                          className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition"
+                        >
+                          <LayoutDashboard className="size-3.5" /> Admin Dashboard
                         </Link>
                       )}
-                      <Link to="/dashboard" onClick={() => setUserMenuOpen(false)}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary">
-                        <LayoutDashboard className="size-4 text-blue-600" /> {t.dashboard || "Dashboard"}
-                      </Link>
-                      <Link to="/profile" onClick={() => setUserMenuOpen(false)}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary">
-                        <UserRound className="size-4 text-amber-600" /> {t.profileDetails || "Profile"}
-                      </Link>
-                      <div className="my-1 border-t border-zinc-100 dark:border-zinc-800" />
                       <button
+                        type="button"
                         onClick={() => { setUserMenuOpen(false); signOut(); }}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40"
+                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition mt-1"
                       >
-                        <LogOut className="size-4" /> {t.signOut || "Sign out"}
+                        <LogOut className="size-3.5" /> Sign out
                       </button>
                     </motion.div>
                   )}
@@ -428,20 +401,15 @@ export function SiteNav() {
             ) : (
               <Link
                 to="/auth"
-                className="inline-flex h-8 items-center gap-1.5 overflow-hidden rounded-full bg-gradient-to-r from-emerald-500 to-primary px-3 text-xs font-bold text-white shadow-md transition hover:brightness-110 shrink-0"
+                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 text-xs font-bold text-primary shadow-sm transition hover:bg-primary hover:text-white dark:bg-primary/20 dark:text-emerald-300"
               >
-                <UserRound className="size-3.5" />
-                <span>{t.signIn ?? "Sign In"}</span>
+                <span>Sign in</span>
               </Link>
             )}
 
             {/* Hamburger — hidden on lg+ */}
             <button
-              className={`grid size-8 place-items-center rounded-full border shadow-sm transition lg:hidden ${
-                isHeroTop
-                  ? "border-white/25 bg-white/10 text-white"
-                  : "border-border bg-card text-foreground dark:bg-zinc-900"
-              }`}
+              className="grid size-8 place-items-center rounded-full border border-border bg-card text-foreground shadow-sm transition lg:hidden dark:bg-zinc-900"
               onClick={() => setOpen((v) => !v)}
               aria-label={open ? "Close menu" : "Open menu"}
             >

@@ -584,23 +584,20 @@ function TimelinePage() {
 
   return (
     <PageLayout
-      title="Village Timeline"
-      subtitle="The official live activity history for your village, generated from notices, works, complaints, services, shops, weather, and marketplace updates."
+      title="Village Activity Timeline"
+      subtitle="The official live stream for your village, generated automatically from notices, Sarpanch works, civic complaints, services, and marketplace updates."
       icon={<ActivityIcon />}
+      heroAction={
+        <AppButton
+          icon={<Bell className="size-5" />}
+          variant="primary"
+          onClick={() => toast.success("You will receive notifications for followed activity")}
+          className="rounded-2xl px-8 py-4 text-base font-extrabold shadow-xl shadow-primary/30 hover:scale-105 transition"
+        >
+          ⚡ Follow Village Updates &amp; Alerts
+        </AppButton>
+      }
     >
-      <SectionHeader
-        eyebrow="Official activity center"
-        title={villageName ? `${villageName} live timeline` : "Choose a village to personalize"}
-        description={`Showing ${isSuperAdmin ? "all villages for super admin review" : formatVillageProfile(profile)}.`}
-        actions={
-          <AppButton
-            icon={<Bell className="size-4" />}
-            onClick={() => toast.success("You will receive notifications for followed activity")}
-          >
-            Follow updates
-          </AppButton>
-        }
-      />
 
       <div className="mb-8 grid gap-4 lg:grid-cols-[1fr_0.72fr]">
         <SurfaceCard className="overflow-hidden p-0">
