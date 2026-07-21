@@ -671,7 +671,7 @@ export function ListingCard({
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.98 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="w-full max-w-2xl overflow-hidden rounded-[24px] bg-white shadow-[var(--shadow-lift)]"
+              className="w-full max-w-2xl max-h-[90vh] overflow-y-auto rounded-[24px] bg-white dark:bg-zinc-900 shadow-[var(--shadow-lift)]"
             >
               <div className="flex items-start justify-between gap-4 border-b border-border p-6">
                 <div>

@@ -519,7 +519,7 @@ export function PageLayout({
         <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(105deg,rgba(255,255,255,0.78)_0%,rgba(255,255,255,0.58)_36%,rgba(255,255,255,0.18)_68%,rgba(255,255,255,0.06)),linear-gradient(246deg,rgba(24,169,153,0.18),transparent_46%)]" />
         <div className="pointer-events-none absolute inset-x-0 top-16 h-px bg-gradient-to-r from-transparent via-white/70 to-transparent" />
         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
-        <div className="relative mx-auto grid min-h-[460px] max-w-7xl items-center gap-6 px-4 py-10 sm:px-6 sm:py-14 lg:grid-cols-[0.62fr_1.18fr] lg:py-16">
+        <div className="relative mx-auto grid min-h-[340px] sm:min-h-[460px] max-w-7xl items-center gap-6 px-4 py-8 sm:px-6 sm:py-14 lg:grid-cols-[0.62fr_1.18fr] lg:py-16">
           <motion.div
             initial={{ opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
@@ -531,7 +531,7 @@ export function PageLayout({
                 <motion.div
                   animate={{ y: [0, -6, 0] }}
                   transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                  className="grid size-14 place-items-center rounded-2xl border border-white/65 bg-white/60 text-primary shadow-[var(--shadow-soft)] backdrop-blur-xl"
+                  className="grid size-14 place-items-center rounded-2xl border border-white/65 bg-white/60 text-primary shadow-[var(--shadow-soft)] backdrop-blur-xl shrink-0"
                 >
                   {icon}
                 </motion.div>
@@ -541,11 +541,11 @@ export function PageLayout({
                   <Sparkles className="size-3.5" />
                   ManaOoru Platform
                 </div>
-                <h1 className="mt-4 text-balance font-display text-3xl font-semibold text-clay sm:text-5xl">
+                <h1 className="mt-4 text-balance font-display text-2xl sm:text-5xl font-semibold text-clay">
                   {title}
                 </h1>
                 {subtitle && (
-                  <p className="mt-3 max-w-2xl text-pretty text-sm leading-7 text-muted-foreground sm:text-lg">
+                  <p className="mt-3 max-w-2xl text-pretty text-xs sm:text-lg leading-6 sm:leading-7 text-muted-foreground">
                     {subtitle}
                   </p>
                 )}
@@ -560,13 +560,13 @@ export function PageLayout({
         initial={{ opacity: 0, y: 14 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.42, delay: 0.08, ease: "easeOut" }}
-        className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14"
+        className="mx-auto max-w-7xl px-4 py-6 sm:px-6 sm:py-14"
       >
         <motion.nav
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.32, delay: 0.12 }}
-          className="village-quick-nav mb-8 grid gap-3 rounded-[24px] p-2 shadow-[var(--shadow-soft)] backdrop-blur-2xl sm:grid-cols-4"
+          className="village-quick-nav mb-8 grid grid-cols-2 sm:grid-cols-4 gap-2.5 rounded-[24px] p-2 shadow-[var(--shadow-soft)] backdrop-blur-2xl"
           aria-label="Page quick actions"
         >
           {[

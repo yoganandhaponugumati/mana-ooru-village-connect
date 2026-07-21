@@ -417,7 +417,7 @@ function AuthPage() {
                         setMode("signin");
                         setSignInRole("citizen");
                       }}
-                      className="w-full py-3 rounded-2xl bg-emerald-600 font-bold text-xs text-white shadow-md shadow-emerald-600/20 hover:brightness-110 transition"
+                      className="w-full min-h-[44px] py-3 rounded-2xl bg-emerald-600 font-bold text-xs text-white shadow-md shadow-emerald-600/20 hover:brightness-110 transition flex items-center justify-center"
                     >
                       Sign In as Citizen
                     </button>
@@ -426,7 +426,7 @@ function AuthPage() {
                         setMode("signup");
                         setSignUpRole("citizen");
                       }}
-                      className="w-full py-3 rounded-2xl border border-emerald-600/40 bg-emerald-50/50 font-bold text-xs text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100/60 transition"
+                      className="w-full min-h-[44px] py-3 rounded-2xl border border-emerald-600/40 bg-emerald-50/50 font-bold text-xs text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100/60 transition flex items-center justify-center"
                     >
                       Create Citizen Account
                     </button>

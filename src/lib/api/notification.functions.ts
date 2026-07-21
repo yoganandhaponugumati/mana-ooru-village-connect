@@ -268,3 +268,22 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
 
     return { success: true as const, delivery };
   });
+
+export const saveFcmToken = createServerFn({ method: "POST" })
+  .validator((data: unknown) => z.object({ fcmToken: z.string().min(1) }).parse(data))
+  .handler(async ({ data, request }) => {
+    const context = await requireSupabaseAuth(request);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+
+    const { error } = await supabaseAdmin
+      .from("profiles")
+      .update({ fcm_token: data.fcmToken, updated_at: new Date().toISOString() })
+      .eq("id", context.userId);
+
+    if (error) {
+      console.warn("[Push Server] Could not update profile fcm_token:", error.message);
+    }
+
+    return { success: true as const };
+  });
+

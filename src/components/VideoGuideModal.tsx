@@ -265,7 +265,7 @@ export function VideoGuideModal({
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, scale: 0.95 }}
-          className={`relative w-full ${isFullscreen ? "h-screen rounded-none" : "max-w-5xl rounded-3xl min-h-[640px]"} overflow-hidden border border-white/20 bg-card text-foreground shadow-2xl flex flex-col justify-between`}
+          className={`relative w-full ${isFullscreen ? "h-screen rounded-none" : "max-w-5xl rounded-2xl sm:rounded-3xl max-h-[90vh] overflow-y-auto sm:min-h-[640px]"} border border-white/20 bg-card text-foreground shadow-2xl flex flex-col justify-between`}
         >
           {/* Header Bar */}
           <div className="flex items-center justify-between border-b border-border px-5 py-3.5 bg-muted/50 shrink-0">

@@ -156,7 +156,7 @@ export function SiteNav() {
           </span>
         </Link>
         <div
-          className={`hidden 2xl:flex items-center justify-center gap-2 text-xs font-bold px-4 shrink-0 ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
+          className={`hidden lg:flex items-center justify-center gap-1.5 text-xs font-bold px-2 shrink-0 ${isHeroTop ? "text-white/90" : "text-muted-foreground"}`}
         >
           {headerLinks.map((l) => (
             <Link
@@ -442,7 +442,7 @@ export function SiteNav() {
             </div>
           )}
           <button
-            className={`grid size-10 place-items-center rounded-full border shadow-sm 2xl:hidden ${isHeroTop ? "border-white/25 bg-white/10 text-white" : "border-border bg-card text-foreground"}`}
+            className={`grid size-10 place-items-center rounded-full border shadow-sm lg:hidden ${isHeroTop ? "border-white/25 bg-white/10 text-white" : "border-border bg-card text-foreground"}`}
             onClick={() => setOpen((v) => !v)}
             aria-label="Menu"
           >
@@ -457,7 +457,7 @@ export function SiteNav() {
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.24, ease: "easeOut" }}
-            className="overflow-hidden border-t border-border/60 bg-[#f7fbf2] dark:bg-zinc-950 text-foreground shadow-2xl 2xl:hidden max-h-[85vh] overflow-y-auto"
+            className="overflow-hidden border-t border-border/60 bg-[#f7fbf2] dark:bg-zinc-950 text-foreground shadow-2xl lg:hidden max-h-[85vh] overflow-y-auto"
           >
             <motion.div
               initial="closed"
@@ -481,7 +481,7 @@ export function SiteNav() {
                     <Link
                       to={l.to}
                       onClick={() => setOpen(false)}
-                      className="flex items-center gap-2 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 px-3 py-2.5 text-xs font-bold text-foreground shadow-sm transition hover:border-primary hover:text-primary active:scale-95"
+                      className="flex min-h-[44px] items-center gap-2 rounded-xl border border-border/60 bg-white dark:bg-zinc-900 px-3 py-2.5 text-xs font-bold text-foreground shadow-sm transition hover:border-primary hover:text-primary active:scale-95"
                       activeProps={{
                         className: "bg-primary text-primary-foreground font-black shadow-md border-primary",
                       }}
