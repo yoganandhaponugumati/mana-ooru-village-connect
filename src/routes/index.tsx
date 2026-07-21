@@ -529,11 +529,14 @@ function HeroVillageOSCard({
   villageName,
   heroWeather,
   stats,
+  pinnedNotice,
 }: {
   villageName: string;
   heroWeather: string;
   stats?: ReturnType<typeof useListingStats>["data"];
+  pinnedNotice?: { title: string; to?: string } | null;
 }) {
+  const navigate = useNavigate();
   const heroMetrics = [
     { label: "Workers", value: stats?.workers ? `${stats.workers}+` : "12+", icon: Users },
     { label: "Land", value: stats?.land ? `${stats.land}+` : "5+", icon: Wheat },
@@ -545,9 +548,32 @@ function HeroVillageOSCard({
   ];
 
   return (
-    <div className="relative w-full max-w-md mx-auto lg:max-w-none lg:w-[420px] flex flex-col items-center">
+    <div className="relative w-full max-w-md mx-auto lg:max-w-none lg:w-[420px] flex flex-col items-stretch gap-2">
       {/* Glow Backdrop */}
       <div className="absolute -inset-4 bg-gradient-to-tr from-emerald-500/20 via-amber-500/15 to-teal-500/20 rounded-[40px] blur-2xl animate-pulse duration-[4000ms] pointer-events-none" />
+
+      {/* Pinned Notice — top-right of VillageOS card */}
+      {pinnedNotice && (
+        <motion.div
+          initial={{ opacity: 0, x: 24 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.04 }}
+          onClick={() => navigate({ to: "/announcements" })}
+          className="relative z-10 self-end inline-flex cursor-pointer items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-950/90 px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] backdrop-blur-md transition hover:border-emerald-300 hover:scale-[1.02] active:scale-95"
+        >
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+            <span className="relative inline-flex size-2 rounded-full bg-emerald-400" />
+          </span>
+          <span className="rounded-full bg-emerald-500/25 px-1.5 py-0.5 text-[9px] font-black uppercase text-emerald-300">
+            📌 Pinned Notice
+          </span>
+          <span className="max-w-[140px] truncate font-semibold text-white/95">
+            {pinnedNotice.title}
+          </span>
+          <ArrowRight className="size-3 shrink-0 text-emerald-300" />
+        </motion.div>
+      )}
 
       {/* Main Interactive Glass Card Stack (Compact, Clean, High-Contrast) */}
       <motion.div
@@ -694,35 +720,9 @@ function Index() {
         <div className="pointer-events-none absolute left-0 top-28 z-10 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div className="hero-life-layer pointer-events-none absolute inset-0 z-10" />
 
-        <div className="relative z-20 mx-auto max-w-7xl px-4 pt-24 sm:px-6">
-          {/* Small Animated Pinned Notice Card on the RIGHT SIDE inside 1st Hero Page */}
-          {announcementItems[0] && (
-            <div className="flex justify-end mb-4">
-              <motion.div
-                initial={{ opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.04 }}
-                onClick={() => navigate({ to: "/announcements" })}
-                className="inline-flex cursor-pointer items-center gap-2.5 rounded-full border border-emerald-400/40 bg-emerald-950/85 px-4 py-2 text-xs font-bold text-white shadow-[0_0_24px_rgba(16,185,129,0.4)] backdrop-blur-md transition hover:border-emerald-300 hover:scale-[1.02] active:scale-95"
-              >
-                <span className="relative flex size-2.5">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex size-2.5 rounded-full bg-emerald-400" />
-                </span>
-                <span className="rounded-full bg-emerald-500/25 px-2 py-0.5 text-[10px] font-black uppercase text-emerald-300">
-                  📌 Pinned Notice
-                </span>
-                <span className="max-w-[180px] truncate font-semibold text-white/95 sm:max-w-[300px]">
-                  {announcementItems[0].title}
-                </span>
-                <ArrowRight className="size-3.5 shrink-0 text-emerald-300" />
-              </motion.div>
-            </div>
-          )}
-        </div>
 
         {/* Start Home Page Main Hero Grid (Title, Search Bar & Right Side HeroVillageOSCard) */}
-        <div className="relative z-20 mx-auto grid min-h-[calc(100vh-8rem)] max-w-7xl items-center gap-10 px-4 pt-4 pb-12 sm:px-6 lg:grid-cols-[0.94fr_1.06fr]">
+        <div className="relative z-20 mx-auto grid min-h-[calc(100vh-8rem)] max-w-7xl items-center gap-10 px-4 pt-28 pb-12 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:items-center">
           <div className="max-w-3xl text-left">
             <motion.h1
               initial={{ opacity: 0, y: 22 }}
@@ -771,8 +771,8 @@ function Index() {
                   Search
                 </button>
               </div>
-              <div className="mt-4 flex flex-wrap items-center gap-2 text-sm text-white">
-                <span className="font-semibold">{t.popular}</span>
+              <div className="mt-4 flex items-center gap-2 text-sm text-white overflow-x-auto pb-0.5 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <span className="font-semibold shrink-0">{t.popular}</span>
                 {["Tractor Driver", "Paddy Land", "Electrician", "Milk", "Harvesting"].map((t) => (
                   <button
                     type="button"
@@ -781,7 +781,7 @@ function Index() {
                       setSearchQuery(t);
                       navigate({ to: "/search", search: { q: t } });
                     }}
-                    className="rounded-full border border-white/22 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/20"
+                    className="rounded-full border border-white/22 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-md transition hover:-translate-y-0.5 hover:bg-white/20 shrink-0"
                   >
                     {t}
                   </button>
@@ -811,7 +811,7 @@ function Index() {
             )}
           </div>
 
-          <HeroVillageOSCard villageName={villageName} heroWeather={heroWeather} stats={stats} />
+          <HeroVillageOSCard villageName={villageName} heroWeather={heroWeather} stats={stats} pinnedNotice={announcementItems[0] ?? null} />
         </div>
 
         {/* FULL-WIDTH HERO SHOWCASE CARD SPANNING 100% CONTAINER WIDTH BELOW THE MAIN HERO FOLD */}
