@@ -63,6 +63,9 @@ export async function requestFcmToken(userId?: string): Promise<string | null> {
     }
 
     const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY as string | undefined;
+
+    console.log("VAPID KEY:", vapidKey);
+    console.log("VAPID KEY LENGTH:", vapidKey?.length);
     const swRegistration = await navigator.serviceWorker.register(
       `/firebase-messaging-sw.js?apiKey=${encodeURIComponent(firebaseConfig.apiKey || "")}&projectId=${encodeURIComponent(firebaseConfig.projectId || "")}&messagingSenderId=${encodeURIComponent(firebaseConfig.messagingSenderId || "")}&appId=${encodeURIComponent(firebaseConfig.appId || "")}`,
       { scope: "/" }
