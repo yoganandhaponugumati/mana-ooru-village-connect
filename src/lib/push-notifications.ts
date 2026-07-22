@@ -60,9 +60,6 @@ export async function subscribeToPush(source = "app") {
     return false;
   }
 
-  const {
-  data: { session },
-} = await supabase.auth.getSession();
 
 console.log("========== SESSION ==========");
 console.log(session);
