@@ -295,6 +295,7 @@ export type Database = {
           display_name: string | null;
           district: string | null;
           email: string | null;
+          fcm_token: string | null;
           full_name: string | null;
           id: string;
           mandal: string | null;
@@ -325,6 +326,7 @@ export type Database = {
           display_name?: string | null;
           district?: string | null;
           email?: string | null;
+          fcm_token?: string | null;
           full_name?: string | null;
           id: string;
           mandal?: string | null;
@@ -355,6 +357,7 @@ export type Database = {
           display_name?: string | null;
           district?: string | null;
           email?: string | null;
+          fcm_token?: string | null;
           full_name?: string | null;
           id?: string;
           mandal?: string | null;

@@ -3,116 +3,33 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import {
-  deletePushSubscription,
-  savePushSubscription,
   sendLoginNotification,
   sendTestPushNotification,
 } from "@/lib/api/notification.functions";
-import { requestFcmToken, registerFcmForegroundListener } from "@/lib/firebase-messaging";
+import { requestFcmToken } from "@/lib/firebase-messaging";
 
 const ASKED_KEY = "manaooru.push.permission.asked.v1";
 
-function urlBase64ToUint8Array(base64String: string) {
-  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
-  const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
-  const rawData = window.atob(base64);
-  return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
-}
-
-function getVapidPublicKey() {
-  return import.meta.env.VITE_VAPID_PUBLIC_KEY as string | undefined;
-}
-
-function toPushSubscriptionPayload(subscription: PushSubscription) {
-  const json = subscription.toJSON();
-  if (!json.endpoint || !json.keys?.p256dh || !json.keys.auth) {
-    throw new Error("Browser returned an incomplete push subscription.");
-  }
-  return {
-    endpoint: json.endpoint,
-    expirationTime: json.expirationTime,
-    keys: {
-      p256dh: json.keys.p256dh,
-      auth: json.keys.auth,
-    },
-  };
-}
-
-function logPushEnvironment() {
-  const hasWindow = typeof window !== "undefined";
-  console.log("[Push] typeof window:", typeof window);
-
-  if (!hasWindow) {
-    console.log("[Push] navigator.serviceWorker:", undefined);
-    console.log('[Push] "serviceWorker" in navigator:', false);
-    console.log("[Push] window.isSecureContext:", undefined);
-    console.log("[Push] window.location.origin:", undefined);
-    return;
-  }
-
-  console.log("[Push] navigator.serviceWorker:", navigator.serviceWorker);
-  console.log('[Push] "serviceWorker" in navigator:', "serviceWorker" in navigator);
-  console.log("[Push] window.isSecureContext:", window.isSecureContext);
-  console.log("[Push] window.location.origin:", window.location.origin);
-}
-
-async function verifyServiceWorkerAsset() {
-  console.log("[Push] Verifying /push-sw.js exists...");
+async function unregisterOldPushServiceWorker() {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
   try {
-    const response = await fetch("/push-sw.js", {
-      method: "GET",
-      cache: "no-store",
-      headers: { Accept: "text/javascript,*/*" },
-    });
-    console.log("[Push] /push-sw.js status:", response.status, response.statusText);
-    console.log("[Push] /push-sw.js content-type:", response.headers.get("content-type"));
-
-    if (!response.ok) {
-      throw new Error(`/push-sw.js returned ${response.status} ${response.statusText}`);
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const reg of registrations) {
+      if (reg.active?.scriptURL.includes("push-sw.js")) {
+        console.log("[Push] Found old push-sw.js. Unregistering...");
+        const success = await reg.unregister();
+        if (success) {
+          console.log("[Push] Successfully unregistered old push-sw.js.");
+        }
+      }
     }
-
-    const body = await response.clone().text();
-    if (!body.includes("self.addEventListener")) {
-      throw new Error("/push-sw.js did not look like the push service worker script.");
-    }
-
-    console.log("[Push] /push-sw.js verified.");
-    return true;
   } catch (error) {
-    console.error("[Push] /push-sw.js verification failed:", error);
-    return false;
-  }
-}
-
-async function getServiceWorkerRegistration() {
-  if (!("serviceWorker" in navigator)) {
-    console.warn("[Push] Service workers are not supported in this browser.");
-    if (!window.isSecureContext) {
-      console.warn("[Push] Service workers require a secure context. Use HTTPS or localhost.");
-    }
-    return null;
-  }
-
-  const assetOk = await verifyServiceWorkerAsset();
-  if (!assetOk) return null;
-
-  try {
-    console.log("[Push] Registering service worker...");
-    const registration = await navigator.serviceWorker.register("/push-sw.js", { scope: "/" });
-    await registration.update();
-    const readyRegistration = await navigator.serviceWorker.ready;
-    console.log("[Push] Service worker registered:", readyRegistration.scope);
-    console.log("[Push] Service worker active:", readyRegistration.active?.scriptURL);
-    return readyRegistration;
-  } catch (error) {
-    console.error("[Push] Service worker registration failed:", error);
-    return null;
+    console.error("[Push] Error unregistering old push-sw.js:", error);
   }
 }
 
 export async function subscribeToPush(source = "app") {
-  console.log(`[Push] Starting subscription flow from ${source}.`);
-  logPushEnvironment();
+  console.log(`[Push] Starting FCM subscription flow from ${source}.`);
 
   if (typeof window === "undefined") {
     console.warn("[Push] Skipping subscription outside the browser.");
@@ -124,53 +41,24 @@ export async function subscribeToPush(source = "app") {
     return false;
   }
 
-  if (!("PushManager" in window)) {
-    console.warn("[Push] PushManager is not supported in this browser.");
+  const { data: { session } } = await supabase.auth.getSession();
+  const userId = session?.user?.id;
+  if (!userId) {
+    console.warn("[Push] No authenticated session found. Skipping subscription.");
     return false;
   }
 
-  const publicKey = getVapidPublicKey();
-  if (!publicKey) {
-    console.warn("Missing VITE_VAPID_PUBLIC_KEY; browser push is disabled.");
-    return false;
-  }
-  console.log("[Push] VAPID public key found.");
+  // Unregister the legacy push-sw.js to prevent scope collision
+  await unregisterOldPushServiceWorker();
 
-  const registration = await getServiceWorkerRegistration();
-  if (!registration) return false;
-
-  console.log("[Push] Current notification permission:", Notification.permission);
-  const permission =
-    Notification.permission === "default"
-      ? await Notification.requestPermission()
-      : Notification.permission;
+  console.log("[Push] Requesting FCM device token...");
+  const token = await requestFcmToken(userId);
   window.localStorage.setItem(ASKED_KEY, "yes");
-  console.log("[Push] Notification permission result:", permission);
 
-  if (permission !== "granted") {
-    console.warn("[Push] Permission was not granted; subscription was not created.");
+  if (!token) {
+    console.warn("[Push] Failed to register FCM token.");
     return false;
   }
-
-  console.log("[Push] Checking for an existing push subscription...");
-  const existing = await registration.pushManager.getSubscription();
-  if (existing) {
-    console.log("[Push] Existing subscription found; reusing it.");
-  } else {
-    console.log("[Push] Creating a new push subscription...");
-  }
-
-  const subscription =
-    existing ??
-    (await registration.pushManager.subscribe({
-      userVisibleOnly: true,
-      applicationServerKey: urlBase64ToUint8Array(publicKey),
-    }));
-  console.log("[Push] Push subscription ready:", subscription.endpoint);
-
-  console.log("[Push] Saving subscription to backend...");
-  await savePushSubscription({ data: toPushSubscriptionPayload(subscription) });
-  console.log("[Push] Subscription saved to backend.");
 
   console.log("[Push] Sending test push notification...");
   const testResult = await sendTestPushNotification();
@@ -179,13 +67,19 @@ export async function subscribeToPush(source = "app") {
 }
 
 export async function unsubscribeFromPush() {
-  if (!("serviceWorker" in navigator)) return;
-  const registration = await navigator.serviceWorker.getRegistration("/push-sw.js");
-  const subscription = await registration?.pushManager.getSubscription();
-  if (!subscription) return;
-  const endpoint = subscription.endpoint;
-  await subscription.unsubscribe();
-  await deletePushSubscription({ data: { endpoint } });
+  const { data: { session } } = await supabase.auth.getSession();
+  const userId = session?.user?.id;
+  if (!userId) return;
+
+  console.log("[Push] Unsubscribing from push alerts. Clearing FCM token...");
+  const { error } = await supabase
+    .from("profiles")
+    .update({ fcm_token: null, updated_at: new Date().toISOString() })
+    .eq("id", userId);
+
+  if (error) {
+    console.error("[Push] Error clearing FCM token:", error.message);
+  }
 }
 
 export function useBrowserPushNotifications() {
@@ -213,15 +107,16 @@ export function useBrowserPushNotifications() {
         }
       })
       .catch((error) => {
-        console.error(error);
+        console.error("[Push] Auto-subscription error on login:", error);
       });
   }, [user]);
 
   useEffect(() => {
     if (!user) return;
 
-    // Trigger FCM Token registration for logged in user
+    // Trigger FCM Token registration/update for logged-in user
     void requestFcmToken(user.id);
+    void unregisterOldPushServiceWorker();
 
     const onServiceWorkerMessage = (event: MessageEvent) => {
       console.log("[Push SW -> Page]", event.data);
@@ -263,7 +158,7 @@ export function useBrowserPushNotifications() {
           });
 
           if (Notification.permission === "granted" && document.visibilityState !== "visible") {
-            navigator.serviceWorker.getRegistration("/push-sw.js").then((registration) => {
+            navigator.serviceWorker.getRegistration("/firebase-messaging-sw.js").then((registration) => {
               registration?.showNotification(notification.title ?? "ManaOoru • Village Alert", {
                 body: notification.body,
                 icon: "/site-icon.svg",

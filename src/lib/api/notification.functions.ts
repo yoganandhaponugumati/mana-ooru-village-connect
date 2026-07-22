@@ -47,123 +47,44 @@ function listingUrl(type: string, id: string) {
   return `${base}?post=${id}`;
 }
 
-function getVapidConfig() {
-  const publicKey = process.env.VAPID_PUBLIC_KEY || process.env.VITE_VAPID_PUBLIC_KEY;
-  const privateKey = process.env.VAPID_PRIVATE_KEY;
-  const subject = process.env.VAPID_SUBJECT || "mailto:admin@manaooru.org";
-
-  if (!publicKey || !privateKey) {
-    throw new Error(
-      "Push notifications are not configured. Add VAPID_PUBLIC_KEY and VAPID_PRIVATE_KEY.",
-    );
-  }
-
-  return { publicKey, privateKey, subject };
-}
-
-async function sendWebPush(
-  subscriptions: Array<{ endpoint: string; p256dh: string; auth: string }>,
+async function sendFcmPush(
+  tokens: string[],
   payload: z.infer<typeof pushPayloadSchema>,
 ) {
-  console.log("[Push Server] Preparing web push payload:", payload);
-  console.log("[Push Server] Subscription count:", subscriptions.length);
+  const { sendFcmNotification } = await import("@/lib/firebase-admin.server");
+  const result = await sendFcmNotification(tokens, payload);
 
-  if (subscriptions.length === 0) {
-    console.warn("[Push Server] No push subscriptions found; nothing was sent.");
-    return { attempted: 0, sent: 0, failed: 0 };
+  if (result.failedTokens && result.failedTokens.length > 0) {
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    console.log("[Push Server] Cleaning up invalid FCM tokens:", result.failedTokens);
+    await supabaseAdmin
+      .from("profiles")
+      .update({ fcm_token: null })
+      .in("fcm_token", result.failedTokens);
   }
 
-  const webPush = await import("web-push");
-  const vapid = getVapidConfig();
-  webPush.default.setVapidDetails(vapid.subject, vapid.publicKey, vapid.privateKey);
-
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-  const results = await Promise.all(
-    subscriptions.map(async (subscription) => {
-      try {
-        console.log("[Push Server] Calling web-push.sendNotification():", {
-          endpoint: subscription.endpoint,
-          payload,
-        });
-        const result = await webPush.default.sendNotification(
-          {
-            endpoint: subscription.endpoint,
-            keys: {
-              p256dh: subscription.p256dh,
-              auth: subscription.auth,
-            },
-          },
-          JSON.stringify(payload),
-        );
-        console.log("[Push Server] web-push.sendNotification() accepted:", {
-          endpoint: subscription.endpoint,
-          statusCode: result.statusCode,
-          body: result.body,
-        });
-        return { endpoint: subscription.endpoint, ok: true, statusCode: result.statusCode };
-      } catch (error) {
-        const statusCode =
-          typeof error === "object" && error && "statusCode" in error
-            ? Number((error as { statusCode?: number }).statusCode)
-            : 0;
-        console.error("[Push Server] web-push.sendNotification() failed:", {
-          endpoint: subscription.endpoint,
-          statusCode,
-          error,
-        });
-        if (statusCode === 404 || statusCode === 410) {
-          await supabaseAdmin
-            .from("push_subscriptions")
-            .delete()
-            .eq("endpoint", subscription.endpoint);
-        }
-        return { endpoint: subscription.endpoint, ok: false, statusCode };
-      }
-    }),
-  );
-
-  const summary = {
-    attempted: results.length,
-    sent: results.filter((result) => result.ok).length,
-    failed: results.filter((result) => !result.ok).length,
+  return {
+    attempted: result.attempted,
+    sent: result.sent,
+    failed: result.failed,
   };
-  console.log("[Push Server] Push delivery summary:", summary);
-  return summary;
 }
 
 export const savePushSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(pushSubscriptionSchema)
-  .handler(async ({ context, data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("push_subscriptions").upsert(
-      {
-        user_id: context.userId,
-        endpoint: data.endpoint,
-        p256dh: data.keys.p256dh,
-        auth: data.keys.auth,
-        user_agent: typeof navigator === "undefined" ? null : navigator.userAgent,
-        updated_at: new Date().toISOString(),
-      },
-      { onConflict: "endpoint" },
-    );
-
-    if (error) throw new Error(error.message || "Could not save push subscription.");
+  .handler(async () => {
+    // Deprecated for 100% FCM migration
+    console.log("[Push Server] savePushSubscription is deprecated and ignored.");
     return { success: true as const };
   });
 
 export const deletePushSubscription = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(z.object({ endpoint: z.string().url() }))
-  .handler(async ({ context, data }) => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin
-      .from("push_subscriptions")
-      .delete()
-      .eq("user_id", context.userId)
-      .eq("endpoint", data.endpoint);
-
-    if (error) throw new Error(error.message || "Could not delete push subscription.");
+  .handler(async () => {
+    // Deprecated for 100% FCM migration
+    console.log("[Push Server] deletePushSubscription is deprecated and ignored.");
     return { success: true as const };
   });
 
@@ -171,14 +92,15 @@ export const sendLoginNotification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: subscriptions, error } = await supabaseAdmin
-      .from("push_subscriptions")
-      .select("endpoint,p256dh,auth")
-      .eq("user_id", context.userId);
+    const { data: profile, error } = await supabaseAdmin
+      .from("profiles")
+      .select("fcm_token")
+      .eq("id", context.userId)
+      .maybeSingle();
 
-    if (error) throw new Error(error.message || "Could not load push subscriptions.");
+    if (error) throw new Error(error.message || "Could not load user profile.");
 
-    const delivery = await sendWebPush(subscriptions ?? [], {
+    const delivery = await sendFcmPush(profile?.fcm_token ? [profile.fcm_token] : [], {
       title: "ManaOoru • Security & Login",
       body: "You successfully signed in to ManaOoru. Tap to view your civic profile.",
       icon: "/site-icon.svg",
@@ -194,14 +116,15 @@ export const sendTestPushNotification = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: subscriptions, error } = await supabaseAdmin
-      .from("push_subscriptions")
-      .select("endpoint,p256dh,auth")
-      .eq("user_id", context.userId);
+    const { data: profile, error } = await supabaseAdmin
+      .from("profiles")
+      .select("fcm_token")
+      .eq("id", context.userId)
+      .maybeSingle();
 
-    if (error) throw new Error(error.message || "Could not load push subscriptions.");
+    if (error) throw new Error(error.message || "Could not load user profile.");
 
-    const delivery = await sendWebPush(subscriptions ?? [], {
+    const delivery = await sendFcmPush(profile?.fcm_token ? [profile.fcm_token] : [], {
       title: "ManaOoru • Push Verification",
       body: "Excellent! Your device is connected to ManaOoru instant alerts. Tap to open dashboard.",
       icon: "/site-icon.svg",
@@ -256,22 +179,25 @@ export const sendVillagePushNotification = createServerFn({ method: "POST" })
       return { success: true as const, delivery: { attempted: 0, sent: 0, failed: 0 } };
     }
 
-    let subscriptionQuery = supabaseAdmin
-      .from("push_subscriptions")
-      .select("endpoint,p256dh,auth");
+    let profileQuery = supabaseAdmin
+      .from("profiles")
+      .select("fcm_token")
+      .not("fcm_token", "is", null);
 
     if (data.villageId && targetUserIds.length > 0) {
-      subscriptionQuery = subscriptionQuery.in("user_id", targetUserIds);
+      profileQuery = profileQuery.in("id", targetUserIds);
     } else {
-      subscriptionQuery = subscriptionQuery.neq("user_id", context.userId);
+      profileQuery = profileQuery.neq("id", context.userId);
     }
 
-    const { data: subscriptions, error: subscriptionError } = await subscriptionQuery;
-    if (subscriptionError) {
-      throw new Error(subscriptionError.message || "Could not load push subscriptions.");
+    const { data: profiles, error: profileError } = await profileQuery;
+    if (profileError) {
+      throw new Error(profileError.message || "Could not load FCM profiles.");
     }
 
-    const delivery = await sendWebPush(subscriptions ?? [], {
+    const tokens = (profiles ?? []).map((p) => p.fcm_token).filter(Boolean) as string[];
+
+    const delivery = await sendFcmPush(tokens, {
       title: data.title,
       body: data.body,
       icon: "/site-icon.svg",
@@ -289,16 +215,19 @@ export const sendDirectUserPushNotification = createServerFn({ method: "POST" })
   .inputValidator(directPushSchema)
   .handler(async ({ data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: subscriptions, error: subscriptionError } = await supabaseAdmin
-      .from("push_subscriptions")
-      .select("endpoint,p256dh,auth")
-      .eq("user_id", data.targetUserId);
+    const { data: profile, error: profileError } = await supabaseAdmin
+      .from("profiles")
+      .select("fcm_token")
+      .eq("id", data.targetUserId)
+      .maybeSingle();
 
-    if (subscriptionError) {
-      throw new Error(subscriptionError.message || "Could not load push subscriptions.");
+    if (profileError) {
+      throw new Error(profileError.message || "Could not load target user profile.");
     }
 
-    const delivery = await sendWebPush(subscriptions ?? [], {
+    const tokens = profile?.fcm_token ? [profile.fcm_token] : [];
+
+    const delivery = await sendFcmPush(tokens, {
       title: data.title,
       body: data.body,
       icon: "/site-icon.svg",
@@ -357,23 +286,26 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
       }
     }
 
-    let subscriptionQuery = supabaseAdmin
-      .from("push_subscriptions")
-      .select("endpoint,p256dh,auth");
+    let profileQuery = supabaseAdmin
+      .from("profiles")
+      .select("fcm_token")
+      .not("fcm_token", "is", null);
 
     if (targetVillageId && targetUserIds.length > 0) {
-      subscriptionQuery = subscriptionQuery.in("user_id", targetUserIds);
+      profileQuery = profileQuery.in("id", targetUserIds);
     } else if (targetVillageId && targetUserIds.length === 0) {
       return { success: true as const, delivery: { attempted: 0, sent: 0, failed: 0 } };
     } else {
-      subscriptionQuery = subscriptionQuery.neq("user_id", context.userId);
+      profileQuery = profileQuery.neq("id", context.userId);
     }
 
-    const { data: subscriptions, error: subscriptionError } = await subscriptionQuery;
+    const { data: profiles, error: profileError } = await profileQuery;
 
-    if (subscriptionError) {
-      throw new Error(subscriptionError.message || "Could not load push subscriptions.");
+    if (profileError) {
+      throw new Error(profileError.message || "Could not load FCM profiles.");
     }
+
+    const tokens = (profiles ?? []).map((p) => p.fcm_token).filter(Boolean) as string[];
 
     const actionUrl = listingUrl(listing.type, listing.id);
     const username = profile?.username || profile?.full_name || "Someone";
@@ -389,7 +321,7 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
     };
     const titleLabel = typeLabels[listing.type] || "Village Timeline Update";
 
-    const delivery = await sendWebPush(subscriptions ?? [], {
+    const delivery = await sendFcmPush(tokens, {
       title: `ManaOoru • ${titleLabel}`,
       body: `${username} posted: "${listing.title}". Tap to open & inspect details.`,
       icon: "/site-icon.svg",
