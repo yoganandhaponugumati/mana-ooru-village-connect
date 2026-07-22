@@ -96,26 +96,29 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       },
     });
 
+    console.log("SUPABASE_URL =", process.env.SUPABASE_URL);
+    console.log("AUTH URL =", `${process.env.SUPABASE_URL}/auth/v1`);
+
     const { data, error } = await supabase.auth.getUser(token);
 
-console.log("========== AUTH DEBUG ==========");
-console.log("Token:", token.substring(0, 50) + "...");
-console.log("User:", data?.user);
-console.log("Error:", error);
-console.log("================================");
+    console.log("========== AUTH DEBUG ==========");
+    console.log("Token:", token.substring(0, 50) + "...");
+    console.log("User:", data?.user);
+    console.log("Error:", error);
+    console.log("================================");
 
-if (error || !data?.user) {
-  throw new Error(
-    `Unauthorized: ${error?.message ?? "No user"}`
-  );
-}
+    if (error || !data?.user) {
+        throw new Error(
+          `Unauthorized: ${error?.message ?? "No user"}`
+        );
+    }
 
-return next({
-  context: {
-    supabase,
-    userId: data.user.id,
-    claims: data.user,
-  },
-});
+    return next({
+      context: {
+      supabase,
+      userId: data.user.id,
+      claims: data.user,
+    },
+  });
   },
 );
