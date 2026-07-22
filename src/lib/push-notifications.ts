@@ -60,9 +60,23 @@ export async function subscribeToPush(source = "app") {
     return false;
   }
 
+  const {
+  data: { session },
+} = await supabase.auth.getSession();
+
+console.log("========== SESSION ==========");
+console.log(session);
+console.log("Access Token:", session?.access_token);
+console.log("User ID:", session?.user?.id);
+console.log("=============================");
+
+if (session?.access_token) {
   console.log("[Push] Sending test push notification...");
   const testResult = await sendTestPushNotification();
   console.log("[Push] Test push request complete:", testResult);
+} else {
+  console.warn("[Push] No authenticated session yet. Skipping test notification.");
+}
   return true;
 }
 

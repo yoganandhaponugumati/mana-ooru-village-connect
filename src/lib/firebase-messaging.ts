@@ -82,10 +82,7 @@ export async function requestFcmToken(userId?: string): Promise<string | null> {
     }
 
     const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY as string | undefined;
-
-    console.log("VAPID KEY:", vapidKey);
-    console.log("VAPID KEY LENGTH:", vapidKey?.length);
-
+    
     // 2. Register service worker normally (without query parameters)
     const swRegistration = await navigator.serviceWorker.register(
       "/firebase-messaging-sw.js",
