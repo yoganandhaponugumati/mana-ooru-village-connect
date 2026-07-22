@@ -46,8 +46,27 @@ export async function getFcmMessaging(): Promise<Messaging | null> {
   return messagingPromise;
 }
 
+export async function cleanLegacyServiceWorkers() {
+  if (typeof window === "undefined" || !("serviceWorker" in navigator)) return;
+  try {
+    const registrations = await navigator.serviceWorker.getRegistrations();
+    for (const reg of registrations) {
+      const scriptURL = reg.active?.scriptURL || reg.installing?.scriptURL || reg.waiting?.scriptURL || "";
+      if (scriptURL.includes("push-sw.js") || scriptURL.includes("?apiKey=")) {
+        console.log(`[FCM] Unregistering legacy or mismatched service worker: ${scriptURL}`);
+        await reg.unregister();
+      }
+    }
+  } catch (error) {
+    console.error("[FCM] Error cleaning legacy service workers:", error);
+  }
+}
+
 export async function requestFcmToken(userId?: string): Promise<string | null> {
   try {
+    // 1. Clean legacy service workers first
+    await cleanLegacyServiceWorkers();
+
     const messaging = await getFcmMessaging();
     if (!messaging) return null;
 
@@ -66,21 +85,24 @@ export async function requestFcmToken(userId?: string): Promise<string | null> {
 
     console.log("VAPID KEY:", vapidKey);
     console.log("VAPID KEY LENGTH:", vapidKey?.length);
+
+    // 2. Register service worker normally (without query parameters)
     const swRegistration = await navigator.serviceWorker.register(
-      `/firebase-messaging-sw.js?apiKey=${encodeURIComponent(firebaseConfig.apiKey || "")}&projectId=${encodeURIComponent(firebaseConfig.projectId || "")}&messagingSenderId=${encodeURIComponent(firebaseConfig.messagingSenderId || "")}&appId=${encodeURIComponent(firebaseConfig.appId || "")}`,
+      "/firebase-messaging-sw.js",
       { scope: "/" }
     );
 
+    // 3. Retrieve token using the registration
     const token = await getToken(messaging, {
       vapidKey,
       serviceWorkerRegistration: swRegistration,
     });
 
     if (token) {
-      console.log("[FCM] Obtained device FCM Token:", token);
+      console.log("[FCM] Successfully obtained device FCM Token:", token);
 
       if (userId) {
-        // Save FCM token to user profile
+        // 4. Save FCM token to user profile in database
         const { error } = await supabase
           .from("profiles")
           .update({ fcm_token: token, updated_at: new Date().toISOString() })
@@ -88,13 +110,17 @@ export async function requestFcmToken(userId?: string): Promise<string | null> {
 
         if (error) {
           console.warn("[FCM] Note: profiles table fcm_token column error:", error.message);
+        } else {
+          console.log("[FCM] Successfully updated profiles.fcm_token in database.");
         }
       }
       return token;
+    } else {
+      console.warn("[FCM] getToken() returned a null or empty token.");
     }
 
     return null;
-  } catch (error:any) {
+  } catch (error: any) {
     console.error("========== FCM FULL ERROR ==========");
     console.error(error);
     console.error("Name:", error?.name);
