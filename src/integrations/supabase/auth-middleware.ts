@@ -96,29 +96,26 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
       },
     });
 
-    const { data, error } = await supabase.auth.getClaims(token);
-    console.log("========== AUTH DEBUG ==========");
-    console.log("Token:", token.substring(0, 50) + "...");
-    console.log("Data:", data);
-    console.log("Error:", error);
-    console.log("================================");
+    const { data, error } = await supabase.auth.getUser(token);
 
-    if (error || !data?.claims) {
-      throw new Error(
-        `Unauthorized: ${error?.message ?? "No claims"}`
-      );
-    }
+console.log("========== AUTH DEBUG ==========");
+console.log("Token:", token.substring(0, 50) + "...");
+console.log("User:", data?.user);
+console.log("Error:", error);
+console.log("================================");
 
-    if (!data.claims.sub) {
-      throw new Error("Unauthorized: No user ID found in token");
-    }
+if (error || !data?.user) {
+  throw new Error(
+    `Unauthorized: ${error?.message ?? "No user"}`
+  );
+}
 
-    return next({
-      context: {
-        supabase,
-        userId: data.claims.sub,
-        claims: data.claims,
-      },
-    });
+return next({
+  context: {
+    supabase,
+    userId: data.user.id,
+    claims: data.user,
+  },
+});
   },
 );
