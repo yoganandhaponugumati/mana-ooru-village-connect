@@ -103,7 +103,7 @@ export function SiteNav() {
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (!target.closest(".nav-menu-container")) {
+      if (!target.closest(".nav-menu-container") && !target.closest(".mobile-dock-trigger")) {
         setUserMenuOpen(false);
         setLanguageOpen(false);
         setNotificationsOpen(false);
@@ -581,7 +581,7 @@ export function SiteNav() {
       {/* Safe, separate from footer, fixed at viewport bottom */}
       <div className="fixed bottom-0 inset-x-0 z-[9995] lg:hidden">
         <div className="border-t border-border/80 bg-white/97 dark:bg-zinc-950/97 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
-          <div className="flex items-center justify-around px-2 py-1.5 safe-area-pb">
+          <div className="flex items-center justify-around px-1 py-1.5 safe-area-pb">
             {dockTabs.map((tab) => (
               <Link
                 key={tab.to}
@@ -594,6 +594,33 @@ export function SiteNav() {
                 <span className="truncate">{tab.label}</span>
               </Link>
             ))}
+            {/* Notification Bell — wires to same panel as header bell, zero logic change */}
+            {user ? (
+              <button
+                type="button"
+                onClick={openNotifications}
+                className="mobile-dock-trigger flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 py-1 text-[10px] font-bold text-muted-foreground transition-colors hover:text-primary"
+                aria-label="Open notifications"
+              >
+                <span className="relative inline-flex">
+                  <Bell className="size-5" />
+                  {unreadCount > 0 && (
+                    <span className="absolute -right-1.5 -top-1 grid min-w-[14px] place-items-center rounded-full bg-red-500 px-0.5 text-[8px] font-black leading-[14px] text-white ring-1 ring-white dark:ring-zinc-950">
+                      {unreadCount > 9 ? "9+" : unreadCount}
+                    </span>
+                  )}
+                </span>
+                <span>Alerts</span>
+              </button>
+            ) : (
+              <Link
+                to="/auth"
+                className="mobile-dock-trigger flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 py-1 text-[10px] font-bold text-primary transition-colors"
+              >
+                <Bell className="size-5" />
+                <span>Sign In</span>
+              </Link>
+            )}
             {/* Menu button — opens drawer */}
             <button
               type="button"

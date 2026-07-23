@@ -919,11 +919,15 @@ function Index() {
       <section className="relative z-30 mx-auto mt-6 max-w-7xl px-4 sm:px-6">
         <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-primary">
-              <Megaphone className="size-3.5" /> Village Pulse & Civic Accountability
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-primary">
+              <span className="relative flex size-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-primary" />
+              </span>
+              <Megaphone className="size-3.5" /> Live Village Pulse
             </span>
             <h2 className="mt-1 font-display text-2xl sm:text-3xl font-extrabold text-clay">
-              Official Notices & Citizen Problems
+              🔴 Notices &amp; Problems — First
             </h2>
           </div>
           <div className="flex flex-wrap gap-2 sm:justify-end">
@@ -955,14 +959,21 @@ function Index() {
           />
 
           {/* Citizen Problem Reports Card */}
-          <div className="rounded-[28px] border-2 border-red-200/80 bg-card p-6 shadow-xl flex flex-col justify-between">
+          <div className="rounded-[28px] border-2 border-red-400/80 bg-card shadow-xl flex flex-col justify-between overflow-hidden">
+            {/* Red urgency strip */}
+            <div className="h-1.5 w-full bg-gradient-to-r from-red-500 via-rose-500 to-red-600" />
+            <div className="p-6">
             <div>
               <div className="mb-4 flex items-center justify-between gap-3">
                 <div>
-                  <span className="inline-flex items-center gap-1 text-xs font-black uppercase tracking-[0.18em] text-red-600">
-                    <AlertTriangle className="size-3.5" /> Action Required
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 dark:bg-red-950/50 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                    <span className="relative flex size-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                      <span className="relative inline-flex size-1.5 rounded-full bg-red-500" />
+                    </span>
+                    <AlertTriangle className="size-3" /> URGENT · Action Required
                   </span>
-                  <h3 className="mt-1 font-display text-2xl font-bold text-clay">
+                  <h3 className="mt-2 font-display text-2xl font-bold text-clay">
                     Citizen Problem Reports
                   </h3>
                 </div>
@@ -1018,6 +1029,7 @@ function Index() {
               )}
             </div>
           </div>
+            </div>
         </div>
       </section>
 
@@ -1035,41 +1047,43 @@ function Index() {
             What do you need today?
           </h2>
         </div>
-        <div className="stage-3d mx-auto grid max-w-7xl grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="stage-3d mx-auto grid max-w-7xl grid-cols-2 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {quickActions.map((a, i) =>
             a.to.startsWith("#") ? (
-              <Card3D key={a.label} className="clay-extrude animate-fade-up" intensity={16}>
+              <Card3D key={a.label} className="clay-extrude animate-fade-up" intensity={14}>
                 <a
                   href={a.to}
-                  className="premium-action-card group flex min-h-44 items-center gap-5 rounded-[22px] p-6 text-left"
-                  style={{ animationDelay: `${i * 60}ms` }}
+                  className="premium-action-card group flex items-center gap-3 rounded-[18px] p-4 text-left"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
-                    <a.icon className="size-9" strokeWidth={1.8} />
+                  <div className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}>
+                    <a.icon className="size-5" strokeWidth={1.9} />
                   </div>
-                  <div className="min-w-0" style={{ transform: "translateZ(40px)" }}>
-                    <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
-                    <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-display text-sm font-bold text-foreground leading-tight">{a.label}</p>
+                    <p className="text-[10px] font-semibold text-primary truncate">{a.te}</p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">{a.description}</p>
                   </div>
+                  <ArrowRight className="size-3.5 shrink-0 text-muted-foreground/50 group-hover:text-primary transition" />
                 </a>
               </Card3D>
             ) : (
-              <Card3D key={a.label} className="clay-extrude animate-fade-up" intensity={16}>
+              <Card3D key={a.label} className="clay-extrude animate-fade-up" intensity={14}>
                 <Link
                   to={a.to as Exclude<(typeof quickActions)[number]["to"], "#contacts">}
                   search={"search" in a ? a.search : undefined}
-                  className="premium-action-card group flex min-h-44 items-center gap-5 rounded-[22px] p-6 text-left"
-                  style={{ animationDelay: `${i * 60}ms` }}
+                  className="premium-action-card group flex items-center gap-3 rounded-[18px] p-4 text-left"
+                  style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className="premium-action-icon grid size-16 shrink-0 place-items-center rounded-2xl text-primary transition-transform group-hover:scale-110">
-                    <a.icon className="size-9" strokeWidth={1.8} />
+                  <div className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}>
+                    <a.icon className="size-5" strokeWidth={1.9} />
                   </div>
-                  <div className="min-w-0" style={{ transform: "translateZ(40px)" }}>
-                    <p className="font-display text-xl font-semibold text-foreground">{a.label}</p>
-                    <p className="mt-1 text-xs font-semibold text-primary">{a.te}</p>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{a.description}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="font-display text-sm font-bold text-foreground leading-tight">{a.label}</p>
+                    <p className="text-[10px] font-semibold text-primary truncate">{a.te}</p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">{a.description}</p>
                   </div>
+                  <ArrowRight className="size-3.5 shrink-0 text-muted-foreground/50 group-hover:text-primary transition" />
                 </Link>
               </Card3D>
             ),
@@ -1303,63 +1317,62 @@ function Index() {
             </Link>
           </div>
           {featured.length === 0 ? (
-            <div className="rounded-3xl border-2 border-dashed border-border bg-card/50 p-12 text-center text-muted-foreground">
+            <div className="rounded-2xl border-2 border-dashed border-border bg-card/50 p-8 text-center text-muted-foreground">
               No listings yet.{" "}
-              <Link to="/auth" className="font-semibold text-primary hover:underline">
-                Sign in
-              </Link>{" "}
+              <Link to="/auth" className="font-semibold text-primary hover:underline">Sign in</Link>{" "}
               to be the first to post.
             </div>
           ) : (
-            <div className="grid gap-6 md:grid-cols-3">
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {featured.map((s, i) => (
                 <article
                   key={s.id}
-                  className="hover-lift animate-fade-up group overflow-hidden rounded-3xl border border-border/60 bg-card shadow-sm"
-                  style={{ animationDelay: `${i * 100}ms` }}
+                  className="group flex gap-3 rounded-2xl border border-border/70 bg-card p-3 shadow-sm transition-all duration-200 hover:border-primary/50 hover:shadow-md animate-fade-up"
+                  style={{ animationDelay: `${i * 60}ms` }}
                 >
-                  <div className="relative aspect-[4/3] overflow-hidden bg-muted">
+                  {/* Amazon-style: small square thumbnail LEFT */}
+                  <div className="size-[76px] shrink-0 overflow-hidden rounded-xl bg-muted relative">
                     {s.imageUrl ? (
                       <img
                         src={s.imageUrl}
                         alt={s.title}
                         loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        className="h-full w-full object-cover"
                       />
                     ) : (
-                      <div className="grid h-full w-full place-items-center bg-gradient-to-br from-primary/10 via-white to-accent/20 text-primary">
-                        <div className="text-center">
-                          <ImagePlus className="mx-auto size-10" />
-                          <p className="mt-3 text-xs font-bold uppercase tracking-[0.18em] text-clay">
-                            Photo pending
-                          </p>
-                        </div>
+                      <div className="grid h-full w-full place-items-center bg-gradient-to-br from-primary/10 to-accent/20 text-primary">
+                        <ImagePlus className="size-6" />
                       </div>
                     )}
-                    <div className="absolute inset-x-0 bottom-0 h-20 bg-gradient-to-t from-black/40 to-transparent" />
-                    <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-white/95 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-clay shadow-sm">
-                      <Star className="size-3 fill-accent text-accent" /> {s.type}
-                    </span>
                   </div>
-                  <div className="p-6">
-                    {s.price && (
-                      <span className="inline-block rounded-full bg-secondary/10 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-secondary">
-                        {s.price}
-                      </span>
-                    )}
-                    <h3 className="mt-3 font-display text-xl font-semibold text-clay">{s.title}</h3>
-                    {s.location && (
-                      <p className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <MapPin className="size-3.5" /> {s.location}
-                      </p>
-                    )}
-                    <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-4">
-                      <span className="text-xs text-muted-foreground">{timeAgo(s.createdAt)}</span>
+                  {/* Dense info RIGHT */}
+                  <div className="min-w-0 flex-1 flex flex-col justify-between py-0.5">
+                    <div>
+                      <div className="flex flex-wrap items-center gap-1 mb-1">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-secondary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide text-secondary">
+                          <Star className="size-2.5 fill-accent text-accent" /> {s.type}
+                        </span>
+                        {s.price && (
+                          <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[9px] font-bold text-primary">
+                            {s.price}
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">{s.title}</h3>
+                      {s.location && (
+                        <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
+                          <MapPin className="size-3 shrink-0" />
+                          <span className="truncate">{s.location}</span>
+                        </p>
+                      )}
+                    </div>
+                    <div className="mt-1.5 flex items-center justify-between gap-1">
+                      <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(s.createdAt)}</span>
                       <a
                         href={`tel:${s.contact.replace(/\s|-/g, "")}`}
-                        className="flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition hover:bg-primary hover:text-primary-foreground"
+                        className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold text-primary-foreground transition hover:bg-secondary shrink-0"
                       >
-                        <Phone className="size-3" /> Contact
+                        <Phone className="size-2.5" /> Call
                       </a>
                     </div>
                   </div>
@@ -1696,7 +1709,7 @@ function Index() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/60 bg-muted/40">
+      <footer className="border-t border-border/60 bg-muted/40 pb-16 lg:pb-0">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 py-10 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
             <div className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground font-display italic">
