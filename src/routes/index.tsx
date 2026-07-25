@@ -689,8 +689,8 @@ function Index() {
     .slice(0, 3);
 
   const heroSubtitle = villageName
-    ? `Digitizing ${villageName} with live local weather, transparent citizen problem resolution, agricultural land leases, and direct verified contacts — zero middlemen, powered by AI.`
-    : "Digitize your village. Direct communication with your Sarpanch, agricultural marketplaces, notice boards, and citizen problem tracking — all in one local digital network.";
+    ? `Connect with the Sarpanch, request MeeSeva certificates, check live weather, and find local work in ${villageName} — zero middlemen.`
+    : "Connect with the Sarpanch, request MeeSeva certificates, check live weather, and find local work — zero middlemen.";
 
   const submitSearch = (event?: FormEvent) => {
     event?.preventDefault();
@@ -741,11 +741,11 @@ function Index() {
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.08, ease: [0.32, 0.72, 0, 1] }}
-              className="max-w-4xl text-balance font-display text-4xl sm:text-7xl lg:text-8xl font-black leading-[1.05] sm:leading-[0.95] text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.58)]"
+              className="max-w-4xl text-balance font-display text-2xl sm:text-5xl lg:text-6xl font-black leading-tight text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.58)]"
             >
-              Digitizing Our Village,
-              <span className="block bg-gradient-to-r from-emerald-400 via-teal-200 to-amber-300 bg-clip-text text-transparent mt-1">
-                Empowering Citizens.
+              Smart{" "}
+              <span className="bg-gradient-to-r from-emerald-400 via-teal-200 to-amber-300 bg-clip-text text-transparent">
+                Digital Village
               </span>
             </motion.h1>
 
