@@ -726,34 +726,34 @@ function Index() {
         {/* Start Home Page Main Hero Grid (Title, Search Bar & Right Side HeroVillageOSCard) */}
         <div className="relative z-20 mx-auto grid min-h-[calc(100vh-8rem)] max-w-7xl items-center gap-10 px-4 pt-28 pb-12 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:items-center">
           <div className="max-w-3xl text-left">
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-500/15 border border-emerald-400/35 px-3 py-1 text-xs font-black uppercase tracking-wider text-emerald-400 dark:text-emerald-300 backdrop-blur-md animate-pulse">
+                ✨ Digitized Gram Panchayat
+              </span>
+              {villageName && (
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-400/35 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-amber-300 backdrop-blur-md">
+                  📍 {villageName}
+                </span>
+              )}
+            </div>
+
             <motion.h1
               initial={{ opacity: 0, y: 22 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.55, delay: 0.08, ease: [0.32, 0.72, 0, 1] }}
-              className="max-w-4xl text-balance font-display text-3xl sm:text-7xl lg:text-8xl font-black leading-[0.95] text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.48)]"
+              className="max-w-4xl text-balance font-display text-4xl sm:text-7xl lg:text-8xl font-black leading-[1.05] sm:leading-[0.95] text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.58)]"
             >
-              {villageName ? (
-                <>
-                  {villageName}
-                  <span className="block bg-gradient-to-r from-emerald-400 via-teal-200 to-amber-300 bg-clip-text text-transparent">
-                    100% Digitized Village
-                  </span>
-                </>
-              ) : (
-                <>
-                  ManaOoru
-                  <span className="block bg-gradient-to-r from-accent via-white to-secondary bg-clip-text text-transparent">
-                    Village in your hands
-                  </span>
-                </>
-              )}
+              Digitizing Our Village,
+              <span className="block bg-gradient-to-r from-emerald-400 via-teal-200 to-amber-300 bg-clip-text text-transparent mt-1">
+                Empowering Citizens.
+              </span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.16, ease: "easeOut" }}
-              className="mt-6 max-w-2xl text-pretty text-lg font-medium leading-8 text-white/84 sm:text-xl"
+              className="mt-5 max-w-2xl text-pretty text-sm sm:text-lg font-semibold leading-relaxed text-zinc-200/90"
             >
               {heroSubtitle}
             </motion.p>
