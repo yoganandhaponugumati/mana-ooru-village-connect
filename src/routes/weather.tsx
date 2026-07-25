@@ -71,7 +71,7 @@ function WeatherPage() {
           </div>
         }
       />
-      <SurfaceCard className="mb-6 p-5" hover={false}>
+      <SurfaceCard className="relative z-50 mb-6 p-5 overflow-visible" hover={false}>
         <VillageLocationPicker value={profile} onChange={setProfile} idPrefix="weather" />
         <p className="mt-3 text-xs font-semibold text-muted-foreground">
           Suggestions appear where verified data exists; every Indian state, district, mandal, and

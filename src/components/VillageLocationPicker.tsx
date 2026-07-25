@@ -105,7 +105,7 @@ function SearchableSelectField({
     : allOptions;
 
   return (
-    <div ref={containerRef} className="relative block">
+    <div ref={containerRef} className={`relative block ${open ? "z-[100]" : "z-10"}`}>
       <span className="mb-1 block text-xs font-black uppercase tracking-wider text-primary/80 flex items-center justify-between">
         <span>{label}</span>
         {loading && <span className="text-[10px] lowercase text-muted-foreground italic font-normal">searching...</span>}
@@ -199,7 +199,7 @@ export function VillageLocationPicker({
   const villages = getVillages(value.state, value.district, value.mandal);
 
   return (
-    <div className="grid gap-3 sm:grid-cols-2">
+    <div className="relative z-50 grid gap-3 sm:grid-cols-2">
       <SearchableSelectField
         label="State"
         value={value.state}
