@@ -66,8 +66,8 @@ function WeatherPage() {
         title="Plan farming work with confidence"
         description="A premium weather dashboard for farmers and village operations."
         actions={
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-clay shadow-sm">
-            <MapPin className="size-4 text-primary" /> {profile.village}
+          <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-clay shadow-sm">
+            <MapPin className="size-4 text-primary shrink-0" /> <span className="truncate">{profile.village}</span>
           </div>
         }
       />
@@ -99,7 +99,7 @@ function WeatherPage() {
                 <div className="mt-8 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
                   <div>
                     <p className="font-display text-7xl font-semibold">{tempText}</p>
-                    <p className="mt-2 text-white/80">
+                    <p className="mt-2 break-words text-white/80">
                       {weather.condition} in {profile.village}
                     </p>
                     <p className="mt-2 text-xs font-semibold uppercase tracking-[0.22em] text-white/60">

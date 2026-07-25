@@ -308,9 +308,9 @@ function ProblemsPage() {
                           alt={item.title}
                           className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-105"
                         />
-                        <div className="absolute top-3 right-3 rounded-full bg-black/65 backdrop-blur-md px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5">
-                          <MapPin className="size-3 text-amber-300" />{" "}
-                          {item.location || "Village Street"}
+                        <div className="absolute top-3 right-3 rounded-full bg-black/65 backdrop-blur-md px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 max-w-[70%]">
+                          <MapPin className="size-3 text-amber-300 shrink-0" />{" "}
+                          <span className="truncate">{item.location || "Village Street"}</span>
                         </div>
                       </div>
                     )}
@@ -350,8 +350,8 @@ function ProblemsPage() {
                       </span>
                     </div>
 
-                    <h3 className="mt-3 font-display text-xl font-bold text-clay dark:text-zinc-100">{item.title}</h3>
-                    <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
+                    <h3 className="mt-3 break-words font-display text-xl font-bold text-clay dark:text-zinc-100">{item.title}</h3>
+                    <p className="mt-2 break-words text-sm leading-6 text-muted-foreground">{item.description}</p>
 
                     {isResolved ? (
                       <div className="mt-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 text-sm shadow-md relative overflow-hidden text-left">
@@ -363,7 +363,7 @@ function ProblemsPage() {
                           <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400 animate-pulse" />
                           Official Panchayat Resolution Seal
                         </div>
-                        <p className="mt-2 text-clay dark:text-zinc-200 font-bold leading-6">
+                        <p className="mt-2 break-words text-clay dark:text-zinc-200 font-bold leading-6">
                           {item.officialResponse || "Resolved successfully by Gram Panchayat workers."}
                         </p>
                         <div className="mt-3 flex items-center justify-between border-t border-emerald-200/50 dark:border-emerald-800/40 pt-2 text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
@@ -377,7 +377,7 @@ function ProblemsPage() {
                           <div className="flex items-center gap-1.5 font-bold text-primary text-xs uppercase tracking-wider">
                             <ShieldCheck className="size-4" /> Official Gram Panchayat Response / Note
                           </div>
-                          <p className="mt-1.5 text-clay dark:text-zinc-200 font-medium leading-6">{item.officialResponse}</p>
+                          <p className="mt-1.5 break-words text-clay dark:text-zinc-200 font-medium leading-6">{item.officialResponse}</p>
                         </div>
                       )
                     )}

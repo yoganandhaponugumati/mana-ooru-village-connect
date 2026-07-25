@@ -303,15 +303,15 @@ function MarketPage() {
                   </span>
                 </div>
 
-                <h3 className="mt-3 font-display text-lg font-bold text-clay">{i.title}</h3>
+                <h3 className="mt-3 break-words font-display text-lg font-bold text-clay">{i.title}</h3>
                 {i.description && (
                   <p className="mt-2 text-sm leading-6 text-muted-foreground line-clamp-2">
                     {i.description}
                   </p>
                 )}
                 {i.location && (
-                  <p className="mt-2 text-xs font-semibold text-clay flex items-center gap-1">
-                    <MapPin className="size-3.5 text-emerald-600" /> Pickup: {i.location}
+                  <p className="mt-2 text-xs font-semibold text-clay flex items-center gap-1 max-w-full">
+                    <MapPin className="size-3.5 text-emerald-600 shrink-0" /> <span className="truncate">Pickup: {i.location}</span>
                   </p>
                 )}
               </div>

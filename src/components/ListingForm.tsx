@@ -532,10 +532,10 @@ export function ListingCard({
                 <ShieldCheck className="size-3" /> Verified
               </span>
             </div>
-            <h3 className="mt-3 font-display text-lg font-semibold text-clay">{item.title}</h3>
+            <h3 className="mt-3 break-words font-display text-lg font-semibold text-clay">{item.title}</h3>
             {item.location && (
-              <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground">
-                <MapPin className="size-4 text-primary" /> {item.location}
+              <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground max-w-full">
+                <MapPin className="size-4 text-primary shrink-0" /> <span className="truncate">{item.location}</span>
               </p>
             )}
             <p className="mt-2 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground/80">
@@ -550,7 +550,7 @@ export function ListingCard({
         )}
       </div>
       {item.description && (
-        <p className="mt-4 text-sm leading-7 text-muted-foreground">{item.description}</p>
+        <p className="mt-4 break-words text-sm leading-7 text-muted-foreground">{item.description}</p>
       )}
       {item.type === "complaint" && (
         <div className="mt-4 rounded-2xl border border-red-100 bg-red-50/50 p-3">
@@ -681,7 +681,7 @@ export function ListingCard({
               <div className="flex items-start justify-between gap-4 border-b border-border p-6">
                 <div>
                   <StatusBadge tone="secondary">{typeMeta.eyebrow}</StatusBadge>
-                  <h3 className="mt-3 font-display text-2xl font-semibold text-clay">
+                  <h3 className="mt-3 break-words font-display text-2xl font-semibold text-clay">
                     {item.title}
                   </h3>
                   <p className="mt-1 text-sm text-muted-foreground">
@@ -705,7 +705,7 @@ export function ListingCard({
                       className="mb-4 aspect-video w-full rounded-2xl object-cover"
                     />
                   )}
-                  <p className="text-sm leading-7 text-muted-foreground">
+                  <p className="text-sm break-words leading-7 text-muted-foreground">
                     {item.description || "Verified local listing from your village network."}
                   </p>
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">

@@ -872,7 +872,7 @@ function TimelineCard({
                     </span>
                   )}
                 </div>
-                <h4 className="mt-3 font-display text-xl font-semibold leading-tight text-clay">
+                <h4 className="mt-3 break-words font-display text-xl font-semibold leading-tight text-clay">
                   {item.title}
                 </h4>
               </div>
@@ -882,7 +882,7 @@ function TimelineCard({
             </span>
           </div>
 
-          <p className="mt-4 text-sm leading-7 text-muted-foreground">{item.body}</p>
+          <p className="mt-4 break-words text-sm leading-7 text-muted-foreground">{item.body}</p>
           {item.imageUrl && (
             <img
               src={item.imageUrl}
@@ -893,11 +893,11 @@ function TimelineCard({
           )}
 
           <div className="mt-5 flex flex-wrap items-center gap-2 text-xs font-semibold text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <MapPin className="size-3.5" /> {item.village}
+            <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
+              <MapPin className="size-3.5 shrink-0" /> <span className="truncate">{item.village}</span>
             </span>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <Users className="size-3.5" /> {item.author}
+            <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
+              <Users className="size-3.5 shrink-0" /> <span className="truncate">{item.author}</span>
             </span>
           </div>
 
