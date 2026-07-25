@@ -126,12 +126,10 @@ const otherStatesAndUTs = [
   "Himachal Pradesh",
   "Jammu and Kashmir",
   "Jharkhand",
-  "Karnataka",
   "Kerala",
   "Ladakh",
   "Lakshadweep",
   "Madhya Pradesh",
-  "Maharashtra",
   "Manipur",
   "Meghalaya",
   "Mizoram",
@@ -141,9 +139,7 @@ const otherStatesAndUTs = [
   "Punjab",
   "Rajasthan",
   "Sikkim",
-  "Tamil Nadu",
   "Tripura",
-  "Uttar Pradesh",
   "Uttarakhand",
   "West Bengal",
 ];
@@ -564,6 +560,18 @@ export const locationTree = {
       Pulivendla: ["Pulivendla", "Jammalamadugu", "Vontimitta", "Porumamilla"],
     },
   },
+  Karnataka: makeDistrictSkeleton([
+    "Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"
+  ]),
+  Maharashtra: makeDistrictSkeleton([
+    "Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"
+  ]),
+  "Tamil Nadu": makeDistrictSkeleton([
+    "Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kanchipuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"
+  ]),
+  "Uttar Pradesh": makeDistrictSkeleton([
+    "Agra", "Aligarh", "Allahabad", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Faizabad", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kheri", "Kushinagar", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"
+  ]),
   ...Object.fromEntries(otherStatesAndUTs.map((state) => [state, makeStateSkeleton()])),
 } satisfies LocationTree;
 
@@ -1116,18 +1124,16 @@ async function fetchLiveWeather(
   const coordinateKey =
     `${profile.state}|${profile.district}|${profile.mandal}|${profile.village}`.toLowerCase();
   const knownCoordinates = knownVillageCoordinates[coordinateKey];
+  
+  // Search using simple single terms because Open-Meteo geocoding fails on comma queries
   const searchTerms = [
-    `${profile.village}, ${profile.mandal}, ${profile.district}, ${profile.state}`,
-    `${profile.village}, ${profile.mandal}, ${profile.district}`,
-    `${profile.village}, ${profile.district}, ${profile.state}`,
-    `${profile.mandal}, ${profile.district}`,
-    `${profile.district}, ${profile.state}`,
-  ].filter((term) => term.replace(/,\s*/g, "").trim().length > 0);
+    profile.village,
+    profile.mandal,
+    profile.district,
+  ].filter(Boolean);
+
   let first: GeoResult | undefined = knownCoordinates;
   let confidence: WeatherProfile["confidence"] = knownCoordinates ? "verified" : undefined;
-  const profileParts = [profile.village, profile.mandal, profile.district, profile.state]
-    .filter(Boolean)
-    .map((part) => part.toLowerCase());
 
   for (const term of first ? [] : searchTerms) {
     const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(term)}&count=10&countryCode=IN&language=en&format=json`;
@@ -1136,23 +1142,35 @@ async function fetchLiveWeather(
       return res.json();
     });
     const results = (geo?.results ?? []) as GeoResult[];
-    const exactVillage = profile.village.trim().toLowerCase();
+    
     const ranked = results
       .map((result) => {
-        const values = [result?.name, result?.admin1, result?.admin2, result?.admin3]
-          .filter(Boolean)
-          .map((value) => `${value}`.toLowerCase());
-        const exactScore = values.some((value) => value === exactVillage) ? 8 : 0;
-        const partScore = profileParts.reduce(
-          (score, part) => score + (values.some((value) => value.includes(part)) ? 1 : 0),
-          0,
-        );
-        return { result, score: exactScore + partScore };
+        const nameVal = (result.name || "").toLowerCase().trim();
+        const admin1Val = (result.admin1 || "").toLowerCase().trim(); // State
+        const admin2Val = (result.admin2 || "").toLowerCase().trim(); // District
+        const admin3Val = (result.admin3 || "").toLowerCase().trim(); // Mandal / Tehsil
+        
+        let score = 0;
+        // Check exact match of hierarchies
+        if (profile.village && nameVal === profile.village.toLowerCase().trim()) score += 12;
+        if (profile.mandal && admin3Val === profile.mandal.toLowerCase().trim()) score += 8;
+        if (profile.district && admin2Val === profile.district.toLowerCase().trim()) score += 6;
+        if (profile.state && admin1Val === profile.state.toLowerCase().trim()) score += 4;
+
+        // Partial match fallback
+        if (profile.mandal && admin3Val.includes(profile.mandal.toLowerCase().trim())) score += 2;
+        if (profile.district && admin2Val.includes(profile.district.toLowerCase().trim())) score += 2;
+        if (profile.state && admin1Val.includes(profile.state.toLowerCase().trim())) score += 1;
+
+        return { result, score };
       })
       .sort((a, b) => b.score - a.score);
-    first = ranked[0]?.result;
-    confidence = ranked[0]?.score >= 3 ? "matched" : "fallback";
-    if (first) break;
+
+    if (ranked.length > 0) {
+      first = ranked[0].result;
+      confidence = ranked[0].score >= 8 ? "matched" : "fallback";
+      break;
+    }
   }
 
   if (!first) throw new Error("Location not found");

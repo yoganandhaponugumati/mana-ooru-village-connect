@@ -133,6 +133,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const syncSession = async (s: Session | null) => {
+      // Allow local mock session for MVP testing
+      const mockSaved = typeof window !== "undefined" ? localStorage.getItem("manaooru-mock-session") : null;
+      if (mockSaved) {
+        try {
+          const mockData = JSON.parse(mockSaved);
+          setSession(mockData.session);
+          setProfile(mockData.profile);
+          setLoading(false);
+          return;
+        } catch (e) {
+          console.error("Failed to parse mock session:", e);
+        }
+      }
+
       setSession(s);
       if (s?.user) {
         await loadProfile(s.user.id);
@@ -152,6 +166,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [loadProfile]);
 
   const signOut = async () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("manaooru-mock-session");
+    }
     await signOutFromSupabase();
     queryClient.clear();
     setProfile(null);

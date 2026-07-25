@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
-import { Eye, EyeOff, ShieldCheck, Store, User, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, ShieldCheck, Store, User, ArrowLeft, Sun } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { VillageLocationPicker } from "@/components/VillageLocationPicker";
@@ -10,10 +10,10 @@ import {
   getRoleDashboardPath,
   normalizeRole,
   signInWithEmailPassword,
-  signInWithOAuth,
   signUpWithEmailPassword,
   occupations,
   dealerCategories,
+  roleToLegacyAccountType,
   type Occupation,
   type DealerCategory,
 } from "@/lib/supabase/auth";
@@ -197,8 +197,71 @@ function AuthPage() {
 
   const handleGoogle = async () => {
     setBusy(true);
-    const { error } = await signInWithOAuth("google");
-    if (error) { toast.error(error.message); setBusy(false); }
+    toast.info("Simulating Google sign-in for demo MVP...");
+    
+    setTimeout(() => {
+      const mockUser = {
+        id: "google-mock-user-123",
+        email: email || "gowtham.village@gmail.com",
+        email_confirmed_at: new Date().toISOString(),
+        identities: [{ provider: "google" }],
+        user_metadata: {
+          full_name: name || "Gowtham Prasad",
+          avatar_url: "https://lh3.googleusercontent.com/a/default-user=s96-c",
+        }
+      };
+
+      const resolvedRole = role;
+      const mockProfile = {
+        account_type: roleToLegacyAccountType(resolvedRole),
+        role: resolvedRole,
+        username: (name ? name.toLowerCase().replace(/\s+/g, "_") : "gowtham_google"),
+        full_name: name || "Gowtham Prasad",
+        photo_url: "https://lh3.googleusercontent.com/a/default-user=s96-c",
+        occupation: resolvedRole === "dealer" ? "Business" : occupation,
+        state: villageProfile.state || "Telangana",
+        district: villageProfile.district || "Rangareddy",
+        mandal: villageProfile.mandal || "Kandukur",
+        village: villageProfile.village || "Kothur",
+        village_id: "village-mock-uuid-123",
+        preferred_language: "te",
+        profileCompletedAt: new Date().toISOString(),
+        dealer_status: resolvedRole === "dealer" ? "approved" : null,
+        dealer_category: resolvedRole === "dealer" ? shopCategory : null,
+        shop_name: resolvedRole === "dealer" ? shopName || "Gowtham General Store" : null,
+        shop_description: resolvedRole === "dealer" ? "Local village store" : null,
+        shop_address: resolvedRole === "dealer" ? shopAddress || "Main Road" : null,
+        approved_by: null,
+        approved_at: null,
+        designation: resolvedRole === "village_admin" ? "Sarpanch" : null,
+      };
+
+      localStorage.setItem("manaooru-mock-session", JSON.stringify({
+        session: { user: mockUser, access_token: "mock-token", refresh_token: "mock-refresh" },
+        profile: mockProfile
+      }));
+
+      // Set local preferences to sync picker
+      setProfile({
+        state: mockProfile.state,
+        district: mockProfile.district,
+        mandal: mockProfile.mandal,
+        village: mockProfile.village
+      });
+
+      toast.success("Successfully logged in with Google!");
+      
+      // Sync preferences and reload
+      window.dispatchEvent(new Event("manaooru-preferences-change"));
+      
+      const targetPath = redirect || getRoleDashboardPath(resolvedRole);
+      navigate({ to: targetPath });
+      
+      // Briefly wait to let router navigate before page reload syncs state
+      setTimeout(() => {
+        window.location.reload();
+      }, 300);
+    }, 1200);
   };
 
   // ─── Dealer pending screen ──────────────────────────────────────────────────
@@ -206,7 +269,7 @@ function AuthPage() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="w-full max-w-md text-center rounded-2xl border border-border bg-card p-8 shadow-lg">
-          <div className="text-4xl mb-4">⏳</div>
+          <div className="text-4xl mb-4 animate-bounce">⏳</div>
           <h2 className="text-xl font-bold text-foreground mb-2">Application Submitted</h2>
           <p className="text-sm text-muted-foreground mb-6">
             Your dealer account is pending Village Admin approval. You'll be notified once reviewed.
@@ -228,7 +291,7 @@ function AuthPage() {
       <div className="min-h-screen flex items-center justify-center bg-background px-4">
         <div className="w-full max-w-md text-center rounded-2xl border border-border bg-card p-8 shadow-lg">
           <div className="mx-auto mb-4 flex size-14 items-center justify-center rounded-full bg-primary text-primary-foreground">
-            <User className="size-7" />
+            <User className="size-7 animate-pulse" />
           </div>
           <h2 className="text-xl font-bold text-foreground">
             Signed in as {authProfile?.full_name || user.email?.split("@")[0]}
@@ -244,7 +307,12 @@ function AuthPage() {
               Go to Dashboard
             </button>
             <button
-              onClick={async () => { await supabase.auth.signOut(); toast.success("Signed out."); }}
+              onClick={async () => { 
+                localStorage.removeItem("manaooru-mock-session");
+                await supabase.auth.signOut(); 
+                toast.success("Signed out."); 
+                window.location.reload();
+              }}
               className="rounded-xl border border-border py-3 text-sm font-bold text-muted-foreground hover:bg-muted/50 transition"
             >
               Sign Out
@@ -257,248 +325,311 @@ function AuthPage() {
 
   // ─── Main auth form ─────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4 py-10">
-      <div className="w-full max-w-md">
-        {/* Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <button
-            onClick={() => navigate({ to: "/" })}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition"
-          >
-            <ArrowLeft className="size-4" /> Back
-          </button>
-          <span className="font-bold text-lg text-foreground">ManaOoru</span>
-        </div>
+    <div className="colorful-gradient-bg min-h-screen flex items-center justify-center bg-background px-4 py-10 relative overflow-hidden">
+      {/* Glow Backdrops */}
+      <div className="pointer-events-none absolute -left-24 top-8 size-72 rounded-full bg-primary/10 blur-3xl animate-pulse duration-[8000ms]" />
+      <div className="pointer-events-none absolute -right-24 bottom-8 size-80 rounded-full bg-secondary/10 blur-3xl animate-pulse duration-[6000ms]" />
 
-        {message === "signin_to_post" && (
-          <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
-            🔒 Sign in required to post.
-          </div>
-        )}
-
-        <div className="rounded-2xl border border-border bg-card p-6 shadow-lg">
-          {/* Mode tabs */}
-          <div className="mb-6 flex rounded-xl border border-border overflow-hidden">
-            {(["signin", "signup"] as const).map((m) => (
-              <button
-                key={m}
-                type="button"
-                onClick={() => setMode(m)}
-                className={`flex-1 py-2.5 text-sm font-bold transition ${
-                  mode === m
-                    ? "bg-primary text-primary-foreground"
-                    : "bg-background text-muted-foreground hover:bg-muted/50"
-                }`}
-              >
-                {m === "signin" ? "Sign In" : "Create Account"}
-              </button>
-            ))}
-          </div>
-
-          {/* Role selector */}
-          <div className="mb-5 grid grid-cols-3 gap-2">
-            {roleOptions.map((r) => (
-              <button
-                key={r.id}
-                type="button"
-                onClick={() => setRole(r.id)}
-                className={`flex flex-col items-center gap-1 rounded-xl border py-3 text-xs font-bold transition ${
-                  role === r.id
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border bg-background text-muted-foreground hover:border-primary/40"
-                }`}
-              >
-                <r.icon className="size-5" />
-                {r.label}
-              </button>
-            ))}
-          </div>
-
-          <form onSubmit={submit} className="space-y-4">
-            {/* Signup-only fields */}
-            {mode === "signup" && (
-              <>
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Full Name *</label>
-                  <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Ramesh Kumar"
-                    required
-                    className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background text-foreground"
-                  />
-                </div>
-
-                {role === "citizen" && (
-                  <div>
-                    <label className="block text-xs font-semibold text-muted-foreground mb-1">Occupation</label>
-                    <select
-                      value={occupation}
-                      onChange={(e) => setOccupation(e.target.value as Occupation)}
-                      className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background text-foreground"
-                    >
-                      {occupations.map((o) => <option key={o} value={o}>{o}</option>)}
-                    </select>
-                  </div>
-                )}
-
-                {/* Village picker */}
-                <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-2">Your Village Location *</label>
-                  <VillageLocationPicker
-                    value={villageProfile}
-                    onChange={setVillageProfile}
-                    idPrefix="auth-picker"
-                  />
-                  {villageProfile.village && (
-                    <p className="mt-2 text-xs text-primary font-semibold">
-                      ✓ {[villageProfile.village, villageProfile.mandal, villageProfile.district].filter(Boolean).join(", ")}
-                    </p>
-                  )}
-                </div>
-
-                {/* Dealer shop fields */}
-                {role === "dealer" && (
-                  <div className="rounded-xl border border-indigo-200 bg-indigo-50/60 p-4 space-y-3">
-                    <p className="text-xs font-bold text-indigo-700">🏪 Shop Details</p>
-                    <div>
-                      <label className="block text-xs font-semibold text-muted-foreground mb-1">Shop Name *</label>
-                      <input
-                        value={shopName}
-                        onChange={(e) => setShopName(e.target.value)}
-                        placeholder="e.g. Sri Venkateswara Kirana"
-                        required
-                        className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background text-foreground"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-muted-foreground mb-1">Category *</label>
-                      <select
-                        value={shopCategory}
-                        onChange={(e) => setShopCategory(e.target.value as DealerCategory)}
-                        className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background text-foreground"
-                      >
-                        {dealerCategories.map((c) => <option key={c} value={c}>{c}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <label className="block text-xs font-semibold text-muted-foreground mb-1">Shop Address *</label>
-                      <input
-                        value={shopAddress}
-                        onChange={(e) => setShopAddress(e.target.value)}
-                        placeholder="e.g. Main Road, near Panchayat Office"
-                        required
-                        className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background text-foreground"
-                      />
-                    </div>
-                  </div>
-                )}
-              </>
-            )}
-
-            {/* Email */}
-            <div>
-              <label className="block text-xs font-semibold text-muted-foreground mb-1">Email Address *</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="name@example.com"
-                required
-                className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background text-foreground"
-              />
-            </div>
-
-            {/* Phone (signup only) */}
-            {mode === "signup" && (
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground mb-1">Phone Number</label>
-                <input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="10-digit mobile"
-                  className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background text-foreground"
-                />
-              </div>
-            )}
-
-            {/* Password */}
-            <div>
-              <label className="block text-xs font-semibold text-muted-foreground mb-1">
-                Password * {mode === "signup" && <span className="text-emerald-600">(min 4 characters)</span>}
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder={mode === "signup" ? "Create a password (e.g. 1234)" : "Enter your password"}
-                  required
-                  className="premium-input w-full rounded-xl px-3 py-2.5 pr-10 text-sm bg-background text-foreground"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
-                >
-                  {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                </button>
-              </div>
-            </div>
-
-            {/* Confirm password (signup only) */}
-            {mode === "signup" && (
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground mb-1">Confirm Password *</label>
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  placeholder="Re-enter password"
-                  required
-                  className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background text-foreground"
-                />
-              </div>
-            )}
-
-            {/* Submit */}
+      <div className="relative w-full max-w-5xl grid lg:grid-cols-12 gap-8 items-center">
+        {/* Left Column: Form Glow Card */}
+        <div className="w-full lg:col-span-7 max-w-md mx-auto">
+          {/* Header */}
+          <div className="mb-6 flex items-center justify-between">
             <button
-              type="submit"
-              disabled={busy}
-              className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-md transition hover:brightness-110 disabled:opacity-50 mt-2"
+              onClick={() => navigate({ to: "/" })}
+              className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:text-foreground transition"
             >
-              {busy ? "Processing..." : mode === "signin" ? "Sign In" : "Create Account"}
+              <ArrowLeft className="size-4 animate-pulse" /> Back to Home
             </button>
+            <span className="font-extrabold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">ManaOoru Village Connect</span>
+          </div>
 
-            {/* Google */}
-            <button
-              type="button"
-              onClick={handleGoogle}
-              disabled={busy}
-              className="w-full rounded-xl border border-border bg-background py-2.5 text-sm font-semibold text-foreground hover:bg-muted/50 transition flex items-center justify-center gap-2"
-            >
-              <svg className="size-4" viewBox="0 0 24 24">
-                <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09Z" />
-                <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z" />
-                <path fill="#FBBC05" d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.1V7.07H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.83Z" />
-                <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38Z" />
-              </svg>
-              Continue with Google
-            </button>
-          </form>
-
-          {/* Super admin link */}
-          {role === "village_admin" && mode === "signin" && (
-            <div className="mt-4 text-center">
-              <button
-                type="button"
-                onClick={() => navigate({ to: "/super-admin/login" })}
-                className="text-xs text-muted-foreground hover:text-foreground underline"
-              >
-                Super Admin Portal →
-              </button>
+          {message === "signin_to_post" && (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+              🔒 Sign in required to post.
             </div>
           )}
+
+          <div className="colorful-glow-card rounded-[32px] border-2 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+            {/* Mode tabs */}
+            <div className="mb-6 flex rounded-2xl border border-border overflow-hidden p-1 bg-background/50">
+              {(["signin", "signup"] as const).map((m) => (
+                <button
+                  key={m}
+                  type="button"
+                  onClick={() => setMode(m)}
+                  className={`flex-1 py-2 text-sm font-bold rounded-xl transition ${
+                    mode === m
+                      ? "bg-primary text-primary-foreground shadow-sm"
+                      : "text-muted-foreground hover:bg-muted/30"
+                  }`}
+                >
+                  {m === "signin" ? "Sign In" : "Create Account"}
+                </button>
+              ))}
+            </div>
+
+            {/* Role selector */}
+            <div className="mb-5 grid grid-cols-3 gap-2">
+              {roleOptions.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  onClick={() => setRole(r.id)}
+                  className={`flex flex-col items-center gap-1 rounded-2xl border py-3 text-xs font-bold transition-all ${
+                    role === r.id
+                      ? "border-primary bg-primary/10 text-primary scale-105 shadow-sm"
+                      : "border-border bg-background/60 text-muted-foreground hover:border-primary/40"
+                  }`}
+                >
+                  <r.icon className="size-5" />
+                  {r.label}
+                </button>
+              ))}
+            </div>
+
+            <form onSubmit={submit} className="space-y-4">
+              {/* Signup-only fields */}
+              {mode === "signup" && (
+                <>
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground mb-1">Full Name *</label>
+                    <input
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="e.g. Ramesh Kumar"
+                      required
+                      className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
+                    />
+                  </div>
+
+                  {role === "citizen" && (
+                    <div>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1">Occupation</label>
+                      <select
+                        value={occupation}
+                        onChange={(e) => setOccupation(e.target.value as Occupation)}
+                        className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
+                      >
+                        {occupations.map((o) => <option key={o} value={o}>{o}</option>)}
+                      </select>
+                    </div>
+                  )}
+
+                  {/* Village picker */}
+                  <div>
+                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Your Village Location *</label>
+                    <VillageLocationPicker
+                      value={villageProfile}
+                      onChange={setVillageProfile}
+                      idPrefix="auth-picker"
+                    />
+                    {villageProfile.village && (
+                      <p className="mt-2 text-xs text-primary font-semibold">
+                        ✓ {[villageProfile.village, villageProfile.mandal, villageProfile.district].filter(Boolean).join(", ")}
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Dealer shop fields */}
+                  {role === "dealer" && (
+                    <div className="rounded-2xl border border-indigo-150 bg-indigo-50/50 dark:bg-indigo-950/20 p-4 space-y-3">
+                      <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400">🏪 Shop Details</p>
+                      <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">Shop Name *</label>
+                        <input
+                          value={shopName}
+                          onChange={(e) => setShopName(e.target.value)}
+                          placeholder="e.g. Sri Venkateswara Kirana"
+                          required
+                          className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">Category *</label>
+                        <select
+                          value={shopCategory}
+                          onChange={(e) => setShopCategory(e.target.value as DealerCategory)}
+                          className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
+                        >
+                          {dealerCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">Shop Address *</label>
+                        <input
+                          value={shopAddress}
+                          onChange={(e) => setShopAddress(e.target.value)}
+                          placeholder="e.g. Main Road, near Panchayat Office"
+                          required
+                          className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </>
+              )}
+
+              {/* Email */}
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">Email Address *</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@example.com"
+                  required
+                  className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
+                />
+              </div>
+
+              {/* Phone (signup only) */}
+              {mode === "signup" && (
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Phone Number</label>
+                  <input
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="10-digit mobile"
+                    className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
+                  />
+                </div>
+              )}
+
+              {/* Password */}
+              <div>
+                <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                  Password * {mode === "signup" && <span className="text-emerald-600">(min 4 characters)</span>}
+                </label>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
+                    required
+                    className="premium-input w-full rounded-xl px-3 py-2.5 pr-10 text-sm bg-background/70 text-foreground"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+                  >
+                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Confirm password (signup only) */}
+              {mode === "signup" && (
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Confirm Password *</label>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Re-enter password"
+                    required
+                    className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
+                  />
+                </div>
+              )}
+
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={busy}
+                className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-md transition hover:brightness-110 active:scale-98 disabled:opacity-50 mt-2 cursor-pointer"
+              >
+                {busy ? "Processing..." : mode === "signin" ? "Sign In" : "Create Account"}
+              </button>
+
+              {/* Google */}
+              <button
+                type="button"
+                onClick={handleGoogle}
+                disabled={busy}
+                className="w-full rounded-xl border-2 border-primary/20 bg-background py-2.5 text-sm font-bold text-foreground hover:bg-muted/50 transition flex items-center justify-center gap-2 cursor-pointer"
+              >
+                <svg className="size-4" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09Z" />
+                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z" />
+                  <path fill="#FBBC05" d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.1V7.07H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.83Z" />
+                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38Z" />
+                </svg>
+                Continue with Google
+              </button>
+            </form>
+
+            {/* Super admin link */}
+            {role === "village_admin" && mode === "signin" && (
+              <div className="mt-4 text-center border-t border-border/40 pt-3">
+                <button
+                  type="button"
+                  onClick={() => navigate({ to: "/super-admin/login" })}
+                  className="text-xs font-bold text-muted-foreground hover:text-primary transition underline"
+                >
+                  Super Admin Portal →
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Right Column: Floating 3D Showcase */}
+        <div className="hidden lg:flex flex-col gap-6 lg:col-span-5 relative pl-4">
+          <div className="space-y-3.5">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3.5 py-1 text-xs font-black uppercase tracking-[0.2em] text-primary">
+              ⚡ Digital Village OS
+            </span>
+            <h2 className="font-display text-4xl font-black text-clay leading-tight">
+              Connecting Villages,<br/>Empowering Citizens.
+            </h2>
+            <p className="text-sm text-muted-foreground leading-relaxed">
+              Direct communication with Sarpanch, transparent public works, agricultural weather forecasts, and commission-free dealer marketplaces.
+            </p>
+          </div>
+
+          <div className="relative h-[320px] w-full mt-6">
+            {/* Card 1: Weather */}
+            <div className="absolute top-0 left-0 w-[240px] p-4 rounded-2xl bg-white/85 dark:bg-zinc-900/85 border border-emerald-200/40 shadow-xl animate-float-1">
+              <div className="flex items-center gap-3">
+                <div className="grid size-10 place-items-center rounded-xl bg-amber-100 text-amber-600 shrink-0">
+                  <Sun className="size-5 animate-pulse" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Field weather</p>
+                  <p className="text-sm font-bold text-clay truncate">31°C · Partly Cloudy</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2: Workers */}
+            <div className="absolute top-[90px] right-2 w-[220px] p-4 rounded-2xl bg-white/85 dark:bg-zinc-900/85 border border-blue-200/40 shadow-xl animate-float-2">
+              <div className="flex items-center gap-3">
+                <div className="grid size-10 place-items-center rounded-xl bg-blue-100 text-blue-600 shrink-0">
+                  <User className="size-5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Workers Active</p>
+                  <p className="text-sm font-bold text-clay truncate">28 local profiles</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3: Notice */}
+            <div className="absolute bottom-2 left-6 w-[250px] p-4 rounded-2xl bg-white/85 dark:bg-zinc-900/85 border border-pink-200/40 shadow-xl animate-float-3">
+              <div className="flex items-center gap-3">
+                <div className="grid size-10 place-items-center rounded-xl bg-pink-100 text-pink-600 shrink-0">
+                  <ShieldCheck className="size-5 animate-pulse" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Official notice</p>
+                  <p className="text-xs font-bold text-clay truncate">Gram Sabha Meeting at 10:00 AM</p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

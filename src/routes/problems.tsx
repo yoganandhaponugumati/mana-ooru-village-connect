@@ -25,7 +25,6 @@ import {
   AppButton,
   EmptyState,
   FeatureIcon,
-  SectionHeader,
   SurfaceCard,
 } from "@/components/design-system";
 import { emergencyContacts, fallbackListings } from "@/lib/app-data";
@@ -356,13 +355,33 @@ function ProblemsPage() {
                     <h3 className="mt-3 font-display text-xl font-bold text-clay dark:text-zinc-100">{item.title}</h3>
                     <p className="mt-2 text-sm leading-6 text-muted-foreground">{item.description}</p>
 
-                    {item.officialResponse && (
-                      <div className="mt-3.5 rounded-2xl border border-primary/30 bg-primary/5 dark:bg-primary/10 p-3.5 text-sm shadow-sm">
-                        <div className="flex items-center gap-1.5 font-bold text-primary text-xs uppercase tracking-wider">
-                          <ShieldCheck className="size-4" /> Official Gram Panchayat Response / Note
+                    {isResolved ? (
+                      <div className="mt-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 text-sm shadow-md relative overflow-hidden text-left">
+                        {/* Elegant watermark background badge */}
+                        <div className="absolute right-2 -bottom-2 text-emerald-500/10 pointer-events-none">
+                          <ShieldCheck className="size-20" />
                         </div>
-                        <p className="mt-1.5 text-clay dark:text-zinc-200 font-medium leading-6">{item.officialResponse}</p>
+                        <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-widest">
+                          <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400 animate-pulse" />
+                          Official Panchayat Resolution Seal
+                        </div>
+                        <p className="mt-2 text-clay dark:text-zinc-200 font-bold leading-6">
+                          {item.officialResponse || "Resolved successfully by Gram Panchayat workers."}
+                        </p>
+                        <div className="mt-3 flex items-center justify-between border-t border-emerald-200/50 dark:border-emerald-800/40 pt-2 text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
+                          <span>✓ Verified by Gram Sabha</span>
+                          <span>Status: Completed</span>
+                        </div>
                       </div>
+                    ) : (
+                      item.officialResponse && (
+                        <div className="mt-3.5 rounded-2xl border border-primary/30 bg-primary/5 dark:bg-primary/10 p-3.5 text-sm shadow-sm text-left">
+                          <div className="flex items-center gap-1.5 font-bold text-primary text-xs uppercase tracking-wider">
+                            <ShieldCheck className="size-4" /> Official Gram Panchayat Response / Note
+                          </div>
+                          <p className="mt-1.5 text-clay dark:text-zinc-200 font-medium leading-6">{item.officialResponse}</p>
+                        </div>
+                      )
                     )}
                   </div>
 
@@ -433,15 +452,20 @@ function ProblemsPage() {
                             {status !== "completed" && status !== "resolved" && (
                               <button
                                 type="button"
-                                onClick={() => update(item.id, { status: "completed" })}
-                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100"
+                                onClick={() => {
+                                  setActiveDeskId(item.id);
+                                  setDeskStatus("completed");
+                                  setDeskNote(item.officialResponse || "CC Road patched & cleared by Gram Panchayat workers.");
+                                  toast.info("Panchayat Status: Completed selected. Please review and save the Resolution Note below.");
+                                }}
+                                className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold border border-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 hover:bg-emerald-100 cursor-pointer"
                               >
                                 <CheckCircle2 className="size-3.5" /> Mark Resolved ✅
                               </button>
                             )}
                           </div>
                         )}
-
+ 
                         {(canManage || item.localOnly || (!!user && user.id === item.owner_id)) && (
                           <button
                             type="button"
@@ -453,7 +477,7 @@ function ProblemsPage() {
                         )}
                       </div>
                     </div>
-
+ 
                     {/* Official Panchayat Response & Resolution Desk Panel */}
                     {canManage && activeDeskId === item.id && (
                       <div className="mt-4 rounded-2xl border-2 border-primary/50 bg-primary/5 dark:bg-zinc-900/90 p-4 space-y-3.5 shadow-md">
@@ -469,7 +493,7 @@ function ProblemsPage() {
                             Close ✕
                           </button>
                         </div>
-
+ 
                         <div>
                           <label className="block text-xs font-bold text-clay dark:text-zinc-200 mb-1.5">
                             Select Current Status:
@@ -485,7 +509,7 @@ function ProblemsPage() {
                                 key={s.id}
                                 type="button"
                                 onClick={() => setDeskStatus(s.id)}
-                                className={`rounded-xl px-2.5 py-2 text-xs font-bold border transition text-center ${
+                                className={`rounded-xl px-2.5 py-2 text-xs font-bold border transition text-center cursor-pointer ${
                                   deskStatus === s.id
                                     ? "border-primary bg-primary text-white shadow-sm"
                                     : "border-border bg-white dark:bg-zinc-800 text-foreground hover:border-primary/50"
@@ -496,7 +520,7 @@ function ProblemsPage() {
                             ))}
                           </div>
                         </div>
-
+ 
                         <div>
                           <label className="block text-xs font-bold text-clay dark:text-zinc-200 mb-1">
                             Official Panchayat Explanation / Resolution Note:
@@ -504,6 +528,29 @@ function ProblemsPage() {
                           <p className="text-[11px] text-muted-foreground mb-1.5 leading-4">
                             If Sarpanch cannot solve right now (e.g., waiting for funds or district approval), explain clearly. If verified & resolved, describe what action was taken.
                           </p>
+                          
+                          {/* Template Shortcuts */}
+                          <div className="flex flex-wrap gap-1.5 mb-2.5">
+                            <span className="text-[10px] font-bold text-muted-foreground self-center mr-1">Templates:</span>
+                            {[
+                              "CC Road patched & cleared by Gram Panchayat workers.",
+                              "Drainage cleaned and silt removed by GP sanitation team.",
+                              "Borewell pump replaced, drinking water supply restored.",
+                              "Street lights repaired and LED bulbs installed successfully.",
+                              "Garbage cleared from the site and a new warning sign placed."
+                            ].map((tpl) => (
+                              <button
+                                key={tpl}
+                                type="button"
+                                onClick={() => setDeskNote(tpl)}
+                                className="rounded-lg bg-primary/5 hover:bg-primary/10 border border-primary/20 px-2 py-1 text-[10px] font-semibold text-primary transition truncate max-w-[200px] cursor-pointer"
+                                title={tpl}
+                              >
+                                {tpl}
+                              </button>
+                            ))}
+                          </div>
+
                           <textarea
                             rows={2}
                             value={deskNote}
@@ -512,7 +559,7 @@ function ProblemsPage() {
                             className="w-full rounded-xl border border-border bg-white dark:bg-zinc-800 p-2.5 text-xs font-medium text-foreground placeholder:text-muted-foreground/70 focus:border-primary focus:outline-none shadow-sm"
                           />
                         </div>
-
+ 
                         <div className="flex justify-end gap-2 pt-1">
                           <button
                             type="button"
@@ -530,7 +577,7 @@ function ProblemsPage() {
                               });
                               setActiveDeskId(null);
                             }}
-                            className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:brightness-110 transition active:scale-95 flex items-center gap-1.5"
+                            className="rounded-xl bg-primary px-4 py-1.5 text-xs font-bold text-white shadow-sm hover:brightness-110 transition active:scale-95 flex items-center gap-1.5 cursor-pointer"
                           >
                             <ShieldCheck className="size-4" /> Save Response & Send Citizen Push Alert
                           </button>

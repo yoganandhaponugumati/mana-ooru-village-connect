@@ -436,7 +436,7 @@ export function ListingCard({
   item: Listing;
   onDelete?: (id: string) => Promise<void> | void;
 }) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const { isSaved, toggleSaved } = useSavedItems();
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
@@ -444,7 +444,8 @@ export function ListingCard({
   const [chat, setChat] = useState([
     { role: "seller", text: `Namaste, this is about ${item.title}. How can I help?` },
   ]);
-  const canDelete = !!onDelete && (!!item.localOnly || (!!user && user.id === item.owner_id));
+  const isAdmin = profile?.role === "village_admin" || profile?.role === "super_admin";
+  const canDelete = !!onDelete && (!!item.localOnly || (!!user && (user.id === item.owner_id || isAdmin)));
   const cleanContact = onlyDigits(item.contact);
   const hasMobileContact = MOBILE_RE.test(cleanContact);
   const mapQuery = encodeURIComponent(`${item.location || item.title}, India`);

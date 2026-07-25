@@ -13,16 +13,20 @@ function SearchableSelectField({
   value,
   placeholder,
   options,
+  searchContext,
   onChange,
 }: {
   label: string;
   value: string;
   placeholder: string;
   options: string[];
+  searchContext?: string;
   onChange: (next: string) => void;
 }) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [apiOptions, setApiOptions] = useState<string[]>([]);
+  const [loading, setLoading] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,19 +39,76 @@ function SearchableSelectField({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const query = (open ? search : value || "").trim().toLowerCase();
-  const filtered = options.filter((opt) => opt.toLowerCase().includes(query));
+  // Synchronize local search state when value changes outside while dropdown is closed
+  useEffect(() => {
+    if (!open) {
+      setSearch(value);
+    }
+  }, [value, open]);
+
+  // Dynamic Geocoding Suggestions
+  useEffect(() => {
+    // Only search online if user has typed something new, it doesn't match the selected value,
+    // and we don't have too many predefined local options.
+    if (!search.trim() || search === value || options.length > 10) {
+      setApiOptions([]);
+      return;
+    }
+
+    const delayDebounceFn = setTimeout(async () => {
+      setLoading(true);
+      try {
+        const queryTerm = searchContext ? `${search}, ${searchContext}` : search;
+        const res = await fetch(
+          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(queryTerm)}&count=10&countryCode=IN&language=en&format=json`
+        );
+        const data = await res.json();
+        const results = (data?.results ?? []) as any[];
+
+        const suggestions = results
+          .map((r) => {
+            if (label === "District") return r.admin2 || r.name;
+            if (label === "Mandal / Tehsil") return r.admin3 || r.name;
+            return r.name; // Village
+          })
+          .filter(Boolean);
+
+        setApiOptions(Array.from(new Set(suggestions)));
+      } catch (e) {
+        console.error("Geocoding fetch failed:", e);
+      } finally {
+        setLoading(false);
+      }
+    }, 450);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [search, options.length, label, value, searchContext]);
 
   const selectOption = (opt: string) => {
     onChange(opt);
-    setSearch("");
+    setSearch(opt);
     setOpen(false);
   };
 
+  const handleBlur = () => {
+    // Save typed custom value if they click outside
+    if (search !== value) {
+      onChange(search);
+    }
+  };
+
+  // Predefined + Dynamic options merged
+  const allOptions = Array.from(new Set([...options, ...apiOptions]));
+  const isSearching = search.trim() !== "" && search !== value;
+  const filtered = isSearching
+    ? allOptions.filter((opt) => opt.toLowerCase().includes(search.toLowerCase().trim()))
+    : allOptions;
+
   return (
     <div ref={containerRef} className="relative block">
-      <span className="mb-1 block text-xs font-black uppercase tracking-wider text-primary/80">
-        {label}
+      <span className="mb-1 block text-xs font-black uppercase tracking-wider text-primary/80 flex items-center justify-between">
+        <span>{label}</span>
+        {loading && <span className="text-[10px] lowercase text-muted-foreground italic font-normal">searching...</span>}
       </span>
       <div className="relative">
         <input
@@ -59,9 +120,9 @@ function SearchableSelectField({
           }}
           onChange={(e) => {
             setSearch(e.target.value);
-            onChange(e.target.value);
             setOpen(true);
           }}
+          onBlur={handleBlur}
           placeholder={placeholder}
           className="premium-input w-full rounded-2xl px-4 py-3 pr-10 text-sm font-semibold text-foreground bg-background"
         />
@@ -103,6 +164,7 @@ function SearchableSelectField({
               <p className="text-muted-foreground text-[11px] font-medium">No matching predefined option.</p>
               {search.trim() && (
                 <button
+                  key="custom-btn"
                   type="button"
                   onMouseDown={(e) => {
                     e.preventDefault();
@@ -150,6 +212,7 @@ export function VillageLocationPicker({
         value={value.district}
         placeholder="Select or type District"
         options={districts}
+        searchContext={value.state}
         onChange={(next) => onChange({ ...value, district: next, mandal: "", village: "" })}
       />
       <SearchableSelectField
@@ -157,6 +220,7 @@ export function VillageLocationPicker({
         value={value.mandal}
         placeholder="Select or type Mandal"
         options={mandals}
+        searchContext={[value.district, value.state].filter(Boolean).join(", ")}
         onChange={(next) => onChange({ ...value, mandal: next, village: "" })}
       />
       <SearchableSelectField
@@ -164,6 +228,7 @@ export function VillageLocationPicker({
         value={value.village}
         placeholder="Select or type Village"
         options={villages}
+        searchContext={[value.mandal, value.district, value.state].filter(Boolean).join(", ")}
         onChange={(next) => onChange({ ...value, village: next })}
       />
     </div>

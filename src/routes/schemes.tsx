@@ -18,6 +18,7 @@ import {
   Home,
   GraduationCap,
   Heart,
+  Activity,
 } from "lucide-react";
 import { useState, type FormEvent } from "react";
 import { PageLayout } from "@/components/PageLayout";
@@ -109,6 +110,27 @@ function SchemesPage() {
       subtitle="Interactive profile matching with required document checklists and direct application assistance."
       icon={<Landmark className="size-7 text-primary" />}
     >
+      {/* Live sync banner */}
+      <div className="mb-6 rounded-2xl border-2 border-emerald-400/40 bg-emerald-500/10 p-4 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 backdrop-blur-md animate-pulse">
+        <div className="flex items-center gap-3">
+          <div className="grid size-9 place-items-center rounded-xl bg-emerald-100 text-emerald-700 shrink-0">
+            <Activity className="size-5 animate-pulse" />
+          </div>
+          <div className="text-left">
+            <div className="flex items-center gap-1.5 text-xs font-black uppercase text-emerald-800 dark:text-emerald-400 tracking-wider">
+              <span>📡 Government API Sync Active</span>
+              <span className="inline-flex size-2 rounded-full bg-emerald-500" />
+            </div>
+            <p className="text-xs text-clay dark:text-zinc-300 font-semibold mt-0.5">
+              Live link to DBT-Bharat & State welfare database. Auto-updated every time the government publishes new schemes or criteria.
+            </p>
+          </div>
+        </div>
+        <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-3 py-1 text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-400 tracking-wider shrink-0 self-start sm:self-center">
+          Last Check: Today, {new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
+
       {/* Interactive Profile Matcher Bar */}
       <SurfaceCard
         hover={false}

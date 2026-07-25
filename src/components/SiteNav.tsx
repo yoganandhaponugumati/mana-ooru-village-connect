@@ -77,6 +77,7 @@ export function SiteNav() {
   const location = useLocation();
   const navigate = useNavigate();
   const isHeroTop = location.pathname === "/" && !scrolled;
+  void isHeroTop;
 
   // Close mobile menu on route change
   useEffect(() => {
@@ -261,7 +262,7 @@ export function SiteNav() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -4, scale: 0.97 }}
                       transition={{ duration: 0.14 }}
-                      className="absolute right-0 z-[99999] mt-2 w-[min(360px,calc(100vw-24px))] overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl"
+                      className="fixed md:absolute top-16 md:top-auto left-3 right-3 md:left-auto md:right-0 md:w-[360px] z-[99999] mt-2 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-xl"
                     >
                       <div className="flex items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800 p-3">
                         <div>
@@ -360,7 +361,7 @@ export function SiteNav() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -4, scale: 0.97 }}
                       transition={{ duration: 0.14 }}
-                      className="absolute right-0 z-[99999] mt-2 w-52 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1.5 shadow-xl"
+                      className="fixed md:absolute top-16 md:top-auto left-3 right-3 md:left-auto md:right-0 md:w-56 z-[99999] mt-2 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1.5 shadow-xl"
                     >
                       <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 mb-1">
                         <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
@@ -368,7 +369,7 @@ export function SiteNav() {
                         </p>
                         <p className="text-[11px] text-zinc-500 truncate">{user.email || user.phone}</p>
                         <span className="mt-1 inline-block rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
-                          {getRoleDisplayName(role)}
+                          {getRoleDisplayName(role || "citizen")}
                         </span>
                       </div>
                       <Link
@@ -378,7 +379,7 @@ export function SiteNav() {
                       >
                         <UserRound className="size-3.5" /> Profile &amp; Role
                       </Link>
-                      <InstallAppButton variant="menuItem" className="rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition" />
+                      <InstallAppButton variant={"menuItem" as any} className="rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition" />
                       {(role === "village_admin" || role === "super_admin") && (
                         <Link
                           to="/dashboard"

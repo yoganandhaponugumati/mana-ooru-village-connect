@@ -3755,3 +3755,61 @@ body {
   }
 }
 
+/* Animated Colorful Glow Card & Backgrounds */
+@keyframes border-rainbow {
+  0% { border-color: #10b981; box-shadow: 0 0 25px rgba(16, 185, 129, 0.35), inset 0 0 15px rgba(16, 185, 129, 0.05); }
+  25% { border-color: #3b82f6; box-shadow: 0 0 25px rgba(59, 130, 246, 0.35), inset 0 0 15px rgba(59, 130, 246, 0.05); }
+  50% { border-color: #ec4899; box-shadow: 0 0 25px rgba(236, 72, 153, 0.35), inset 0 0 15px rgba(236, 72, 153, 0.05); }
+  75% { border-color: #f59e0b; box-shadow: 0 0 25px rgba(245, 158, 11, 0.35), inset 0 0 15px rgba(245, 158, 11, 0.05); }
+  100% { border-color: #10b981; box-shadow: 0 0 25px rgba(16, 185, 129, 0.35), inset 0 0 15px rgba(16, 185, 129, 0.05); }
+}
+
+@keyframes gradient-bg-move {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.colorful-glow-card {
+  animation: border-rainbow 8s linear infinite;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  background: 
+    radial-gradient(circle at 10% 20%, rgba(16, 185, 129, 0.04), transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(59, 130, 246, 0.04), transparent 40%),
+    rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(24px) saturate(180%);
+}
+
+.colorful-gradient-bg {
+  background: linear-gradient(-45deg, rgba(16, 185, 129, 0.08), rgba(59, 130, 246, 0.08), rgba(245, 158, 11, 0.08), rgba(236, 72, 153, 0.08));
+  background-size: 400% 400%;
+  animation: gradient-bg-move 16s ease infinite;
+}
+
+@keyframes float-gentle-1 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-12px) rotate(1deg); }
+}
+
+@keyframes float-gentle-2 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-8px) rotate(-1.5deg); }
+}
+
+@keyframes float-gentle-3 {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(0.8deg); }
+}
+
+.animate-float-1 {
+  animation: float-gentle-1 7s ease-in-out infinite;
+}
+
+.animate-float-2 {
+  animation: float-gentle-2 9s ease-in-out infinite;
+}
+
+.animate-float-3 {
+  animation: float-gentle-3 8s ease-in-out infinite;
+}
+

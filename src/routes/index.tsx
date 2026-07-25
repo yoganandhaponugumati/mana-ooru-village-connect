@@ -21,7 +21,6 @@ import {
   MapPin,
   ArrowRight,
   Star,
-  Quote,
   CheckCircle2,
   Zap,
   Building2,
@@ -40,7 +39,6 @@ import {
   Play,
   Sparkles,
 } from "lucide-react";
-import heroVillage from "@/assets/hero-village-premium.jpg";
 import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
@@ -666,21 +664,22 @@ function HeroVillageOSCard({
 
 function Index() {
   const navigate = useNavigate();
-  const { user, profile: authProfile } = useAuth();
-  const { t, profile, weather, hasProfile } = useVillagePreferences();
+  const { profile: authProfile } = useAuth();
+  const { t, profile, weather } = useVillagePreferences();
   const { data: stats } = useListingStats({
     villageId: authProfile?.village_id,
     villageName: profile?.village || authProfile?.village,
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const showSignedInVillage = Boolean(user && hasProfile && profile.village);
+  const villageName = (authProfile?.village || profile?.village || "").trim();
+  const showSignedInVillage = Boolean(villageName);
   const heroWeather = showSignedInVillage
     ? weather.live && weather.temp !== null
       ? `${weather.temp}°C · ${weather.condition}`
       : "Live weather unavailable"
     : "Select village for live weather";
-  const recentItems = stats?.recent ?? fallbackListings;
+  const recentItems = stats?.recent && stats.recent.length > 0 ? stats.recent : fallbackListings;
   const hasRealActivity = Boolean(stats && stats.total > 0);
   const liveActivity = recentItems.slice(0, 4);
   const announcementItems = recentItems.filter((r) => r.type === "announcement").slice(0, 3);
@@ -688,8 +687,11 @@ function Index() {
   const featured = recentItems
     .filter((r) => r.type !== "announcement" && r.type !== "complaint")
     .slice(0, 3);
-  const villageName = showSignedInVillage ? profile.village : "";
-  const heroTitle = villageName ? `Welcome to ManaOoru - ${villageName}` : "Welcome to ManaOoru";
+
+  const heroSubtitle = villageName
+    ? `Digitizing ${villageName} with live local weather, transparent citizen problem resolution, agricultural land leases, and direct verified contacts — zero middlemen, powered by AI.`
+    : "Digitize your village. Direct communication with your Sarpanch, agricultural marketplaces, notice boards, and citizen problem tracking — all in one local digital network.";
+
   const submitSearch = (event?: FormEvent) => {
     event?.preventDefault();
     navigate({ to: "/search", search: { q: searchQuery } });
@@ -730,10 +732,21 @@ function Index() {
               transition={{ duration: 0.55, delay: 0.08, ease: [0.32, 0.72, 0, 1] }}
               className="max-w-4xl text-balance font-display text-3xl sm:text-7xl lg:text-8xl font-black leading-[0.95] text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.48)]"
             >
-              ManaOoru
-              <span className="block bg-gradient-to-r from-accent via-white to-secondary bg-clip-text text-transparent">
-                Village in your hands
-              </span>
+              {villageName ? (
+                <>
+                  {villageName}
+                  <span className="block bg-gradient-to-r from-emerald-400 via-teal-200 to-amber-300 bg-clip-text text-transparent">
+                    100% Digitized Village
+                  </span>
+                </>
+              ) : (
+                <>
+                  ManaOoru
+                  <span className="block bg-gradient-to-r from-accent via-white to-secondary bg-clip-text text-transparent">
+                    Village in your hands
+                  </span>
+                </>
+              )}
             </motion.h1>
 
             <motion.p
@@ -742,7 +755,7 @@ function Index() {
               transition={{ duration: 0.5, delay: 0.16, ease: "easeOut" }}
               className="mt-6 max-w-2xl text-pretty text-lg font-medium leading-8 text-white/84 sm:text-xl"
             >
-              {heroTitle}. {t.subtitle1} {t.subtitle2}
+              {heroSubtitle}
             </motion.p>
 
             <motion.form
@@ -1091,25 +1104,32 @@ function Index() {
         </div>
       </section>
 
-      <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6">
-        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div className="max-w-2xl">
-            <span className="text-xs font-bold uppercase tracking-widest text-secondary">
-              Government help desk
-            </span>
-            <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
-              Aadhaar, schemes, cards, and documents in one place
+      <section className="mx-auto mt-20 max-w-7xl px-4 sm:px-6 relative">
+        {/* Glow backdrop for MeeSeva Desk */}
+        <div className="pointer-events-none absolute -left-12 -top-12 size-72 rounded-full bg-amber-400/10 blur-3xl animate-pulse duration-[6000ms]" />
+
+        <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between border-b border-border/60 pb-6">
+          <div className="max-w-2xl text-left">
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 px-3 py-1 text-xs font-black uppercase tracking-wider text-amber-700 dark:text-amber-400">
+                ⚡ MeeSeva Digital Integration
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 border border-primary/20 px-3 py-1 text-xs font-black uppercase tracking-wider text-primary">
+                మీ సేవ కేంద్రం
+              </span>
+            </div>
+            <h2 className="font-display text-3xl sm:text-4xl font-black text-clay dark:text-zinc-100">
+              Government Help Desk &amp; <span className="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 bg-clip-text text-transparent">MeeSeva Services</span>
             </h2>
-            <p className="mt-2 text-sm leading-7 text-muted-foreground sm:text-base">
-              Useful official services villagers need before applying for support, work, health, and
-              farming schemes.
+            <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
+              Aadhaar, Ration Cards, and official MeeSeva documents in one place. Keep these ready before applying for government support, agriculture, or housing schemes.
             </p>
           </div>
           <Link
             to="/schemes"
-            className="inline-flex items-center gap-2 rounded-full bg-primary px-5 py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5 hover:bg-secondary"
+            className="inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 px-6 py-3.5 text-sm font-bold text-white shadow-md shadow-orange-500/20 hover:brightness-110 hover:-translate-y-0.5 transition shrink-0 self-start md:self-end"
           >
-            View all schemes <ArrowRight className="size-4" />
+            Explore Schemes Matcher <ArrowRight className="size-4" />
           </Link>
         </div>
         <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
