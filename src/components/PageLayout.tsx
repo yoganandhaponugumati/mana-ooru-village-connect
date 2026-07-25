@@ -1,14 +1,11 @@
-import { Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
 import {
-  Activity,
   AlertTriangle,
   Bot,
   CloudSun,
   Leaf,
   MapPin,
   Megaphone,
-  Search,
   ShieldCheck,
   Siren,
   Sparkles,
@@ -331,7 +328,7 @@ function FeatureSceneObjects({ kind }: { kind: SceneKind }) {
   );
 }
 
-function InternalPage3DScene({ title, icon }: { title: string; icon?: ReactNode }) {
+export function InternalPage3DScene({ title, icon }: { title: string; icon?: ReactNode }) {
   const kind = getSceneKind(title);
   const meta = sceneMeta[kind];
   const SceneIcon = meta.icon;
@@ -397,7 +394,7 @@ function InternalPage3DScene({ title, icon }: { title: string; icon?: ReactNode 
   );
 }
 
-function FeatureHeroShowcase({ title }: { title: string }) {
+export function FeatureHeroShowcase({ title }: { title: string }) {
   const kind = getSceneKind(title);
   const meta = sceneMeta[kind];
   const SceneIcon = meta.icon;
@@ -479,7 +476,7 @@ function FeatureHeroShowcase({ title }: { title: string }) {
   );
 }
 
-function FullScreenFeatureBackground({ title }: { title: string }) {
+export function FullScreenFeatureBackground({ title }: { title: string }) {
   const kind = getSceneKind(title);
 
   return (

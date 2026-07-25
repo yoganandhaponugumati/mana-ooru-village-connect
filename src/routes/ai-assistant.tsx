@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
-import { AppButton, FeatureIcon, SectionHeader, SurfaceCard } from "@/components/design-system";
+import { AppButton, FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/ai-assistant")({
@@ -215,7 +215,7 @@ function AiAssistantPage() {
         <div className="flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
-            onClick={listen}
+            onClick={startVoice}
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-primary/30 transition hover:scale-105"
           >
             <Mic className="size-5" />

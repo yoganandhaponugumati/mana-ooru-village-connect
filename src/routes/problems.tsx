@@ -27,8 +27,7 @@ import {
   FeatureIcon,
   SurfaceCard,
 } from "@/components/design-system";
-import { emergencyContacts, fallbackListings } from "@/lib/app-data";
-import { logContact } from "@/lib/local-actions";
+import { fallbackListings } from "@/lib/app-data";
 import { useListings, timeAgo } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -60,7 +59,6 @@ function ProblemsPage() {
   const [activeDeskId, setActiveDeskId] = useState<string | null>(null);
   const [deskStatus, setDeskStatus] = useState<string>("in_progress");
   const [deskNote, setDeskNote] = useState<string>("");
-  const urgentContacts = emergencyContacts.filter((item) => item.urgent).slice(0, 3);
   const canManage = role === "village_admin" || role === "super_admin";
 
   const handlePostClick = () => {

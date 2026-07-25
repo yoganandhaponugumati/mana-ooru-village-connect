@@ -22,7 +22,6 @@ import {
   AppButton,
   EmptyState,
   FeatureIcon,
-  SectionHeader,
   SurfaceCard,
 } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";

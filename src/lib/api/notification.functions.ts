@@ -335,9 +335,9 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
   });
 
 export const saveFcmToken = createServerFn({ method: "POST" })
-  .validator((data: unknown) => z.object({ fcmToken: z.string().min(1) }).parse(data))
-  .handler(async ({ data, request }) => {
-    const context = await requireSupabaseAuth(request);
+  .middleware([requireSupabaseAuth])
+  .inputValidator(z.object({ fcmToken: z.string().min(1) }))
+  .handler(async ({ data, context }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
 
     const { error } = await supabaseAdmin

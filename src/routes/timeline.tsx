@@ -38,14 +38,14 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { PageLayout } from "@/components/PageLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { AppButton, EmptyState, SectionHeader, SurfaceCard } from "@/components/design-system";
+import { AppButton, EmptyState, SurfaceCard } from "@/components/design-system";
 import { supabase } from "@/integrations/supabase/client";
 import { fallbackListings } from "@/lib/app-data";
 import { useAuth } from "@/lib/auth";
 import { useGovernmentWorks } from "@/lib/government-works";
 import { useSavedItems } from "@/lib/local-actions";
 import { type Listing, timeAgo, useListings } from "@/lib/store";
-import { formatVillageProfile, useVillagePreferences } from "@/lib/village-preferences";
+import { useVillagePreferences } from "@/lib/village-preferences";
 
 type TimelineType =
   | "government_work"
