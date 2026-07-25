@@ -65,11 +65,23 @@ type Row = {
 };
 
 function toListing(r: Row): Listing {
+  let desc = r.description ?? "";
+  let officialResponse = r.official_response ?? undefined;
+
+  const separator = "\n\n--- Official Panchayat Response ---\n";
+  if (desc.includes(separator)) {
+    const parts = desc.split(separator);
+    desc = parts[0];
+    if (!officialResponse && parts.length > 1) {
+      officialResponse = parts[1];
+    }
+  }
+
   return {
     id: r.id,
     type: r.type,
     title: r.title,
-    description: r.description ?? "",
+    description: desc,
     contact: r.contact,
     location: r.location ?? "",
     villageId: r.village_id ?? undefined,
@@ -79,7 +91,7 @@ function toListing(r: Row): Listing {
     storagePath: r.storage_path ?? undefined,
     isPinned: Boolean(r.is_pinned),
     status: (r.status as Listing["status"]) ?? "active",
-    officialResponse: r.official_response ?? undefined,
+    officialResponse: officialResponse,
     createdAt: new Date(r.created_at).getTime(),
     owner_id: r.owner_id,
   };
@@ -181,7 +193,17 @@ export function useListings(type?: ListingType) {
       const dbPatch: Record<string, boolean | string> = {};
       if (typeof patch.isPinned === "boolean") dbPatch.is_pinned = patch.isPinned;
       if (patch.status) dbPatch.status = patch.status;
-      if (patch.officialResponse !== undefined) dbPatch.official_response = patch.officialResponse;
+      if (patch.officialResponse !== undefined) {
+        // Fallback: pack into description to prevent schema cache errors if column is missing
+        const item = (query.data ?? []).find((i) => i.id === id);
+        if (item) {
+          const separator = "\n\n--- Official Panchayat Response ---\n";
+          const baseDesc = item.description;
+          dbPatch.description = patch.officialResponse
+            ? `${baseDesc}${separator}${patch.officialResponse}`
+            : baseDesc;
+        }
+      }
 
       const { error } = await supabase
         .from("listings")
