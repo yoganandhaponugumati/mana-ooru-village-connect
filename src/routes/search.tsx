@@ -7,7 +7,9 @@ import { useListings } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/search")({
-  validateSearch: (search: Record<string, unknown>) => ({ q: String(search.q ?? "") }),
+  validateSearch: (search: Record<string, unknown>) => ({
+    q: search.q ? String(search.q) : "",
+  }),
   head: () => ({ meta: [{ title: "Search - ManaOoru" }] }),
   component: SearchPage,
 });
