@@ -197,71 +197,19 @@ function AuthPage() {
 
   const handleGoogle = async () => {
     setBusy(true);
-    toast.info("Simulating Google sign-in for demo MVP...");
-    
-    setTimeout(() => {
-      const mockUser = {
-        id: "google-mock-user-123",
-        email: email || "gowtham.village@gmail.com",
-        email_confirmed_at: new Date().toISOString(),
-        identities: [{ provider: "google" }],
-        user_metadata: {
-          full_name: name || "Gowtham Prasad",
-          avatar_url: "https://lh3.googleusercontent.com/a/default-user=s96-c",
-        }
-      };
-
-      const resolvedRole = role;
-      const mockProfile = {
-        account_type: roleToLegacyAccountType(resolvedRole),
-        role: resolvedRole,
-        username: (name ? name.toLowerCase().replace(/\s+/g, "_") : "gowtham_google"),
-        full_name: name || "Gowtham Prasad",
-        photo_url: "https://lh3.googleusercontent.com/a/default-user=s96-c",
-        occupation: resolvedRole === "dealer" ? "Business" : occupation,
-        state: villageProfile.state || "Telangana",
-        district: villageProfile.district || "Rangareddy",
-        mandal: villageProfile.mandal || "Kandukur",
-        village: villageProfile.village || "Kothur",
-        village_id: "village-mock-uuid-123",
-        preferred_language: "te",
-        profileCompletedAt: new Date().toISOString(),
-        dealer_status: resolvedRole === "dealer" ? "approved" : null,
-        dealer_category: resolvedRole === "dealer" ? shopCategory : null,
-        shop_name: resolvedRole === "dealer" ? shopName || "Gowtham General Store" : null,
-        shop_description: resolvedRole === "dealer" ? "Local village store" : null,
-        shop_address: resolvedRole === "dealer" ? shopAddress || "Main Road" : null,
-        approved_by: null,
-        approved_at: null,
-        designation: resolvedRole === "village_admin" ? "Sarpanch" : null,
-      };
-
-      localStorage.setItem("manaooru-mock-session", JSON.stringify({
-        session: { user: mockUser, access_token: "mock-token", refresh_token: "mock-refresh" },
-        profile: mockProfile
-      }));
-
-      // Set local preferences to sync picker
-      setProfile({
-        state: mockProfile.state,
-        district: mockProfile.district,
-        mandal: mockProfile.mandal,
-        village: mockProfile.village
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/`,
+        },
       });
-
-      toast.success("Successfully logged in with Google!");
-      
-      // Sync preferences and reload
-      window.dispatchEvent(new Event("manaooru-preferences-change"));
-      
-      const targetPath = redirect || getRoleDashboardPath(resolvedRole);
-      navigate({ to: targetPath });
-      
-      // Briefly wait to let router navigate before page reload syncs state
-      setTimeout(() => {
-        window.location.reload();
-      }, 300);
-    }, 1200);
+      if (error) throw error;
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Google Sign-In failed.";
+      toast.error(msg);
+      setBusy(false);
+    }
   };
 
   // ─── Dealer pending screen ──────────────────────────────────────────────────
