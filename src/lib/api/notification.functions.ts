@@ -56,7 +56,6 @@ async function sendFcmPush(
 
   if (result.failedTokens && result.failedTokens.length > 0) {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    console.log("[Push Server] Cleaning up invalid FCM tokens:", result.failedTokens);
     await supabaseAdmin
       .from("profiles")
       .update({ fcm_token: null })
@@ -75,7 +74,6 @@ export const savePushSubscription = createServerFn({ method: "POST" })
   .inputValidator(pushSubscriptionSchema)
   .handler(async () => {
     // Deprecated for 100% FCM migration
-    console.log("[Push Server] savePushSubscription is deprecated and ignored.");
     return { success: true as const };
   });
 
@@ -84,7 +82,6 @@ export const deletePushSubscription = createServerFn({ method: "POST" })
   .inputValidator(z.object({ endpoint: z.string().url() }))
   .handler(async () => {
     // Deprecated for 100% FCM migration
-    console.log("[Push Server] deletePushSubscription is deprecated and ignored.");
     return { success: true as const };
   });
 

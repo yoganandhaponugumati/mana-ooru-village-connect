@@ -18,7 +18,6 @@ if (firebaseConfig.apiKey && firebaseConfig.projectId) {
   const messaging = firebase.messaging();
 
   messaging.onBackgroundMessage((payload) => {
-    console.log('[firebase-messaging-sw.js] Received background message:', payload);
     const title = payload.notification?.title || payload.data?.title || 'ManaOoru Update';
     const options = {
       body: payload.notification?.body || payload.data?.body || 'New village notice or alert available.',

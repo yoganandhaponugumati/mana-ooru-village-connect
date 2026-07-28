@@ -1,4 +1,11 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+  type ReactNode,
+} from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -14,13 +21,18 @@ import {
 } from "@/lib/supabase/auth";
 import { type Language } from "@/lib/village-preferences";
 
-export type { AccountType, AppRole, DealerStatus, LegacyAccountType };
+export type {
+  AccountType,
+  AppRole,
+  DealerStatus,
+  LegacyAccountType,
+};
 
 type AuthProfile = {
   account_type: LegacyAccountType;
   role: AppRole;
   username: string | null;
-  full_name: string | null;
+  full_name: string |null;
   photo_url: string | null;
   occupation: Occupation | null;
   state: string | null;
@@ -30,7 +42,7 @@ type AuthProfile = {
   village_id: string | null;
   preferred_language: Language;
   profileCompletedAt: string | null;
-  // ── Dealer fields ──
+
   dealer_status: DealerStatus | null;
   dealer_category: string | null;
   shop_name: string | null;
@@ -38,7 +50,7 @@ type AuthProfile = {
   shop_address: string | null;
   approved_by: string | null;
   approved_at: string | null;
-  // ── Village Admin fields ──
+
   designation: string | null;
 };
 
@@ -47,17 +59,16 @@ type AuthCtx = {
   session: Session | null;
   profile: AuthProfile | null;
   role: AppRole | null;
-  /** True once a profile row exists AND has a username + completion timestamp. */
+
   needsProfileCompletion: boolean;
-  /** True for password accounts whose email hasn't been confirmed yet. Google/phone accounts don't need this. */
   needsEmailVerification: boolean;
-  /** True if the user is an approved dealer. */
+
   isDealerApproved: boolean;
-  /** True if the user has applied as a dealer and is awaiting approval. */
   isDealerPending: boolean;
-  /** True if the user is a suspended dealer. */
   isDealerSuspended: boolean;
+
   loading: boolean;
+
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
 };
@@ -80,23 +91,23 @@ const Ctx = createContext<AuthCtx>({
 const PROFILE_COLUMNS =
   "account_type,role,username,full_name,photo_url,occupation,state,district,mandal,village,village_id,preferred_language,profile_completed_at,dealer_status,dealer_category,shop_name,shop_description,shop_address,approved_by,approved_at,designation";
 
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({
+  children,
+}: {
+  children: ReactNode;
+}) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<AuthProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
   const queryClient = useQueryClient();
 
   const loadProfile = useCallback(async (userId: string) => {
-    console.log("AUTH USER ID:", userId);
-
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("profiles")
       .select(PROFILE_COLUMNS)
       .eq("id", userId)
       .maybeSingle();
-
-    console.log("PROFILE DATA:", data);
-    console.log("PROFILE ERROR:", error);
 
     const role = normalizeRole(data?.role ?? data?.account_type);
 
@@ -114,17 +125,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             mandal: data.mandal,
             village: data.village,
             village_id: data.village_id,
-            preferred_language: (data.preferred_language as Language) ?? "en",
+            preferred_language:
+              (data.preferred_language as Language) ?? "en",
             profileCompletedAt: data.profile_completed_at,
-            // ── Dealer fields ──
-            dealer_status: (data.dealer_status as DealerStatus | null) ?? null,
+
+            dealer_status:
+              (data.dealer_status as DealerStatus | null) ?? null,
             dealer_category: data.dealer_category ?? null,
             shop_name: data.shop_name ?? null,
             shop_description: data.shop_description ?? null,
             shop_address: data.shop_address ?? null,
             approved_by: data.approved_by ?? null,
             approved_at: data.approved_at ?? null,
-            // ── Village Admin fields ──
+
             designation: data.designation ?? null,
           }
         : null,
@@ -133,26 +146,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const syncSession = async (s: Session | null) => {
-      // Clear any legacy mock session left over from MVP demo
       if (typeof window !== "undefined") {
         localStorage.removeItem("manaooru-mock-session");
       }
 
       setSession(s);
+
       if (s?.user) {
         await loadProfile(s.user.id);
       } else {
         setProfile(null);
       }
+
       setLoading(false);
     };
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      void syncSession(s);
-    });
+    const { data: sub } = supabase.auth.onAuthStateChange(
+      (_event, s) => {
+        void syncSession(s);
+      },
+    );
+
     supabase.auth.getSession().then(({ data }) => {
       void syncSession(data.session);
     });
+
     return () => sub.subscription.unsubscribe();
   }, [loadProfile]);
 
@@ -160,28 +178,45 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (typeof window !== "undefined") {
       localStorage.removeItem("manaooru-mock-session");
     }
+
     await signOutFromSupabase();
+
     queryClient.clear();
     setProfile(null);
   };
 
   const refreshProfile = useCallback(async () => {
-    if (session?.user) await loadProfile(session.user.id);
+    if (session?.user) {
+      await loadProfile(session.user.id);
+    }
   }, [session, loadProfile]);
 
   const user = session?.user ?? null;
-  const needsProfileCompletion = Boolean(user) && Boolean(profile) && !profile?.profileCompletedAt;
-  // Only password-based sign-ins have a meaningful confirmation step here; Google
-  // accounts arrive pre-verified and phone accounts are verified via OTP itself.
-  const hasPasswordIdentity = Boolean(
-    user?.identities?.some((identity) => identity.provider === "email"),
-  );
-  const needsEmailVerification = hasPasswordIdentity && !user?.email_confirmed_at;
 
-  // Dealer status computed properties
-  const isDealerApproved = profile?.role === "dealer" && profile?.dealer_status === "approved";
-  const isDealerPending = profile?.dealer_status === "pending";
-  const isDealerSuspended = profile?.role === "dealer" && profile?.dealer_status === "suspended";
+  const needsProfileCompletion =
+    Boolean(user) &&
+    Boolean(profile) &&
+    !profile?.profileCompletedAt;
+
+  const hasPasswordIdentity = Boolean(
+    user?.identities?.some(
+      (identity) => identity.provider === "email",
+    ),
+  );
+
+  const needsEmailVerification =
+    hasPasswordIdentity && !user?.email_confirmed_at;
+
+  const isDealerApproved =
+    profile?.role === "dealer" &&
+    profile?.dealer_status === "approved";
+
+  const isDealerPending =
+    profile?.dealer_status === "pending";
+
+  const isDealerSuspended =
+    profile?.role === "dealer" &&
+    profile?.dealer_status === "suspended";
 
   return (
     <Ctx.Provider

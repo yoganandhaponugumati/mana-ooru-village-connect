@@ -122,13 +122,7 @@ export function useListings(type?: ListingType) {
         throw new Error("Please sign in before posting. Posts are saved only to Supabase.");
       }
 
-      console.info("[posting] insert:start", {
-        type: item.type,
-        title: item.title,
-        hasImage: Boolean(item.imageUrl),
-        storagePath: item.storagePath,
-        villageId: item.villageId || profile?.village_id,
-      });
+
       const { data, error } = await supabase
         .from("listings")
         .insert({
@@ -156,7 +150,7 @@ export function useListings(type?: ListingType) {
       qc.invalidateQueries({ queryKey: ["listing-stats"] });
       qc.invalidateQueries({ queryKey: ["timeline-activities"] });
       const listing = toListing(data as Row);
-      console.info("[posting] insert:success", { id: listing.id, type: listing.type });
+
       void sendNewPostPushNotifications({ data: { postId: listing.id } }).catch((err) => {
         console.error("Could not send push notifications", err);
       });

@@ -67,11 +67,7 @@ export function useGovernmentWorks() {
         throw new Error("Please sign in before posting. Posts are saved only to Supabase.");
       }
 
-      console.info("[government-work] create:start", {
-        title: input.title,
-        photoCount: input.photos.length,
-        villageId: profile?.village_id,
-      });
+
       const uploadedPaths: string[] = [];
       const { data: work, error: workError } = await supabase
         .from("government_works")
@@ -95,23 +91,17 @@ export function useGovernmentWorks() {
         throw new Error(`Government work could not be saved: ${workError.message}`);
       }
       const workId = (work as unknown as { id: string }).id;
-      console.info("[government-work] create:success", { workId });
+
 
       try {
         if (input.photos.length > 0) {
-          console.info("[government-work] photos:upload:start", {
-            workId,
-            count: input.photos.length,
-          });
+
           const uploaded = await Promise.all(
             input.photos.map((photo) => uploadUserFile("government-works", user.id, photo)),
           );
           uploadedPaths.push(...uploaded.map((photo) => photo.path));
 
-          console.info("[government-work] photos:db-insert:start", {
-            workId,
-            count: uploaded.length,
-          });
+
           const { error: imageError } = await supabase.from("government_work_images").insert(
             uploaded.map((photo) => ({
               government_work_id: workId,
@@ -125,7 +115,7 @@ export function useGovernmentWorks() {
             console.error("[government-work] photos:db-insert:error", imageError);
             throw new Error(`Government work photos could not be saved: ${imageError.message}`);
           }
-          console.info("[government-work] photos:db-insert:success", { workId });
+
         }
       } catch (error) {
         console.error("[government-work] create:rollback:start", { workId, uploadedPaths, error });
@@ -146,7 +136,7 @@ export function useGovernmentWorks() {
 
       await queryClient.invalidateQueries({ queryKey: ["government-works"] });
       await queryClient.invalidateQueries({ queryKey: ["timeline-activities"] });
-      console.info("[government-work] create:finish", { workId });
+
       toast.success("Government work update posted");
 
       void sendVillagePushNotification({

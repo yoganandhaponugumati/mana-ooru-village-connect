@@ -11,7 +11,9 @@ function isNewSupabaseApiKey(value: string): boolean {
 function createSupabaseFetch(supabaseKey: string): typeof fetch {
   return (input, init) => {
     const headers = new Headers(
-      typeof Request !== "undefined" && input instanceof Request ? input.headers : undefined,
+      typeof Request !== "undefined" && input instanceof Request
+        ? input.headers
+        : undefined,
     );
 
     if (init?.headers) {
@@ -27,64 +29,68 @@ function createSupabaseFetch(supabaseKey: string): typeof fetch {
     }
 
     headers.set("apikey", supabaseKey);
-    return fetch(input, { ...init, headers });
+
+    return fetch(input, {
+      ...init,
+      headers,
+    });
   };
 }
 
-export const requireSupabaseAuth = createMiddleware({ type: "function" }).server(
-  async ({ next }) => {
-    const SUPABASE_URL = process.env.SUPABASE_URL;
-    const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
+export const requireSupabaseAuth = createMiddleware({
+  type: "function",
+}).server(async ({ next }) => {
+  const SUPABASE_URL = process.env.SUPABASE_URL;
+  const SUPABASE_PUBLISHABLE_KEY = process.env.SUPABASE_PUBLISHABLE_KEY;
 
-    if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
-      const missing = [
-        ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
-        ...(!SUPABASE_PUBLISHABLE_KEY ? ["SUPABASE_PUBLISHABLE_KEY"] : []),
-      ];
-      const message = `Missing Supabase environment variable(s): ${missing.join(", ")}. Connect Supabase in Lovable Cloud.`;
-      console.error(`[Supabase] ${message}`);
-      throw new Error(message);
-    }
+  if (!SUPABASE_URL || !SUPABASE_PUBLISHABLE_KEY) {
+    const missing = [
+      ...(!SUPABASE_URL ? ["SUPABASE_URL"] : []),
+      ...(!SUPABASE_PUBLISHABLE_KEY
+        ? ["SUPABASE_PUBLISHABLE_KEY"]
+        : []),
+    ];
 
-    const request = getRequest();
+    const message = `Missing Supabase environment variable(s): ${missing.join(
+      ", "
+    )}.`;
 
-    if (!request?.headers) {
-      throw new Error("Unauthorized: No request headers available");
-    }
+    console.error(`[Supabase] ${message}`);
+    throw new Error(message);
+  }
 
-    const authHeader = request.headers.get("authorization");
+  const request = getRequest();
 
-    console.log("========== AUTH DEBUG ==========");
-    console.log("Authorization Header:", authHeader);
+  if (!request?.headers) {
+    throw new Error("Unauthorized: No request headers available");
+  }
 
-    if (authHeader) {
-      const token = authHeader.replace("Bearer ", "");
-      console.log("Token:", token);
-      console.log("Token Parts:", token.split(".").length);
-    }
+  const authHeader = request.headers.get("authorization");
 
-    console.log("===============================");
+  if (!authHeader) {
+    throw new Error("Unauthorized: No authorization header provided");
+  }
 
-    if (!authHeader) {
-      throw new Error("Unauthorized: No authorization header provided");
-    }
+  if (!authHeader.startsWith("Bearer ")) {
+    throw new Error("Unauthorized: Only Bearer tokens are supported");
+  }
 
-    if (!authHeader.startsWith("Bearer ")) {
-      throw new Error("Unauthorized: Only Bearer tokens are supported");
-    }
+  const token = authHeader.replace("Bearer ", "");
 
-    const token = authHeader.replace("Bearer ", "");
-    if (!token) {
-      throw new Error("Unauthorized: No token provided");
-    }
+  if (!token) {
+    throw new Error("Unauthorized: No token provided");
+  }
 
-    if (token.split(".").length !== 3) {
-      throw new Error("Unauthorized: Invalid token");
-    }
+  if (token.split(".").length !== 3) {
+    throw new Error("Unauthorized: Invalid token");
+  }
 
-    const supabase = createClient<Database>(SUPABASE_URL!, SUPABASE_PUBLISHABLE_KEY!, {
+  const supabase = createClient<Database>(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY,
+    {
       global: {
-        fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY!),
+        fetch: createSupabaseFetch(SUPABASE_PUBLISHABLE_KEY),
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -94,31 +100,20 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
         persistSession: false,
         autoRefreshToken: false,
       },
-    });
+    },
+  );
 
-    console.log("SUPABASE_URL =", process.env.SUPABASE_URL);
-    console.log("AUTH URL =", `${process.env.SUPABASE_URL}/auth/v1`);
+  const { data, error } = await supabase.auth.getUser(token);
 
-    const { data, error } = await supabase.auth.getUser(token);
+  if (error || !data?.user) {
+    throw new Error(`Unauthorized: ${error?.message ?? "Invalid user"}`);
+  }
 
-    console.log("========== AUTH DEBUG ==========");
-    console.log("Token:", token.substring(0, 50) + "...");
-    console.log("User:", data?.user);
-    console.log("Error:", error);
-    console.log("================================");
-
-    if (error || !data?.user) {
-        throw new Error(
-          `Unauthorized: ${error?.message ?? "No user"}`
-        );
-    }
-
-    return next({
-      context: {
+  return next({
+    context: {
       supabase,
       userId: data.user.id,
-      claims: data.user,
+      user: data.user,
     },
   });
-  },
-);
+});

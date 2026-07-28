@@ -214,12 +214,7 @@ export function ListingForm({
     const bucket = bucketByType[type];
     let uploadedStoragePath: string | undefined;
     try {
-      console.info("[posting] form:submit:start", {
-        type,
-        title: values.title,
-        hasPhoto: Boolean(photoFile),
-        bucket,
-      });
+
       let imageUrl = "";
       let storagePath: string | undefined;
 
@@ -261,7 +256,7 @@ export function ListingForm({
         villageId,
       });
       uploadedStoragePath = undefined;
-      console.info("[posting] form:submit:success", { type, title: values.title });
+
       toast.success("Posted successfully!", { icon: <CheckCircle2 className="size-4" /> });
       setValues({});
       setPhotoPreview("");
@@ -279,7 +274,7 @@ export function ListingForm({
       }
       toast.error(error instanceof Error ? error.message : "Could not post. Please try again.");
     } finally {
-      console.info("[posting] form:submit:finish", { type });
+
       setSubmitting(false);
     }
   };
