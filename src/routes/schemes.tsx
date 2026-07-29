@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import {
   CheckCircle2,
   Clock3,
@@ -9,7 +9,6 @@ import {
   Plus,
   SearchCheck,
   ShieldCheck,
-  X,
   XCircle,
   Sparkles,
   HelpCircle,
@@ -20,49 +19,20 @@ import {
   Heart,
   Activity,
 } from "lucide-react";
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import {
-  AppButton,
-  EmptyState,
   SectionHeader,
-  SkeletonCard,
   StatusBadge,
   SurfaceCard,
 } from "@/components/design-system";
 import { citizenServices, schemes } from "@/lib/app-data";
-import { useAuth } from "@/lib/auth";
-import { toast } from "sonner";
-import {
-  applicationStatusLabels,
-  schemeCategoryLabels,
-  useApplyToScheme,
-  useCreateScheme,
-  useMyApplications,
-  useVillageSchemes,
-  type ApplicationStatus,
-  type SchemeCategory,
-} from "@/lib/schemes";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/schemes")({
   head: () => ({ meta: [{ title: "Government Schemes Matcher & Assistant — ManaOoru" }] }),
   component: SchemesPage,
 });
-
-const statusTone: Record<ApplicationStatus, "primary" | "accent" | "success" | "danger"> = {
-  submitted: "accent",
-  under_review: "primary",
-  approved: "success",
-  rejected: "danger",
-};
-
-const statusIcon: Record<ApplicationStatus, typeof Clock3> = {
-  submitted: Clock3,
-  under_review: Clock3,
-  approved: CheckCircle2,
-  rejected: XCircle,
-};
 
 const PROFILE_CHIPS = [
   { id: "all", label: "All Schemes", icon: Sparkles, img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=200&q=70&auto=format&fit=crop" },
@@ -101,16 +71,7 @@ function getSchemeImage(category: string, title: string): string {
 
 
 function SchemesPage() {
-  const navigate = useNavigate();
   const { profile } = useVillagePreferences();
-  const { user, role } = useAuth();
-  const canManage = role === "village_admin" || role === "super_admin";
-
-  const { data: villageSchemes, isLoading } = useVillageSchemes();
-  const { data: myApplications } = useMyApplications();
-  const applyMutation = useApplyToScheme();
-  const createMutation = useCreateScheme();
-  const [showForm, setShowForm] = useState(false);
   const [selectedProfile, setSelectedProfile] = useState<string>("all");
 
   const filterScheme = (cat: string, title: string, desc: string) => {
@@ -188,215 +149,76 @@ function SchemesPage() {
                 key={chip.id}
                 type="button"
                 onClick={() => setSelectedProfile(chip.id)}
-                className={`inline-flex shrink-0 flex-col items-center gap-1.5 rounded-2xl px-3 py-2.5 text-xs font-bold transition-all overflow-hidden border-2 ${
+                className={`inline-flex shrink-0 items-center gap-2 rounded-full px-4 py-2.5 text-[11px] font-bold uppercase tracking-wider transition-all border-2 ${
                   active
-                    ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-[1.02]"
-                    : "border-border bg-background text-muted-foreground hover:border-primary hover:text-foreground"
+                    ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25"
+                    : "border-border bg-background text-muted-foreground hover:border-primary/50 hover:text-foreground"
                 }`}
               >
-                <div className="size-12 overflow-hidden rounded-xl relative">
-                  <img
-                    src={chip.img}
-                    alt={chip.label}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                  {active && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-primary/40">
-                      <Icon className="size-5 text-white" />
-                    </div>
-                  )}
-                </div>
-                <span className="text-[10px] font-bold text-center leading-tight max-w-[70px]">{chip.label}</span>
+                <Icon className={`size-4 ${active ? "text-primary-foreground" : "text-primary"}`} />
+                <span>{chip.label}</span>
               </button>
             );
           })}
         </div>
       </SurfaceCard>
 
-      {/* Live, DB-backed schemes posted by this village's admin */}
-      <SectionHeader
-        eyebrow="Apply directly on ManaOoru"
-        title="Schemes Active in Our Gram Panchayat"
-        description="Apply online right here with your village admin and track status step by step."
-        actions={
-          canManage && (
-            <AppButton
-              variant="secondary"
-              icon={showForm ? <X className="size-4" /> : <Plus className="size-4" />}
-              onClick={() => setShowForm((v) => !v)}
-            >
-              {showForm ? "Close Form" : "Post New Panchayat Scheme"}
-            </AppButton>
-          )
-        }
-      />
-
-      {showForm && canManage && (
-        <CreateSchemeForm
-          onCreate={(input) =>
-            createMutation.mutate(input, { onSuccess: () => setShowForm(false) })
-          }
-          busy={createMutation.isPending}
-        />
-      )}
-
-      {isLoading ? (
-        <SkeletonCard count={3} />
-      ) : !villageSchemes || villageSchemes.length === 0 ? (
-        <EmptyState
-          icon={<Landmark className="size-6" />}
-          title="No live village schemes active right now"
-          description={
-            canManage
-              ? "Post your first scheme so citizens can apply and track status right here."
-              : "Your Village Admin hasn't posted custom local schemes yet. Explore the major state & national schemes below!"
-          }
-        />
-      ) : (
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-          {villageSchemes
-            .filter((s) => filterScheme(s.category || "", s.title || "", s.description || ""))
-            .map((scheme) => {
-              const myApplication = myApplications?.[scheme.id];
-              const StatusIcon = myApplication ? statusIcon[myApplication.status] : null;
-              return (
-                <SurfaceCard
-                  key={scheme.id}
-                  className="p-6 flex flex-col justify-between border-primary/20 bg-card/95 shadow-sm"
-                >
-                  <div>
-                    <div className="flex items-center justify-between gap-2">
-                      <StatusBadge tone="accent">
-                        {schemeCategoryLabels[scheme.category as SchemeCategory] || scheme.category}
-                      </StatusBadge>
-                      {scheme.status !== "active" && (
-                        <StatusBadge tone="secondary">{scheme.status}</StatusBadge>
-                      )}
-                    </div>
-                    <h3 className="mt-4 font-display text-2xl font-bold text-clay">
-                      {scheme.title}
-                    </h3>
-                    <p className="mt-3 text-sm leading-7 text-muted-foreground">
-                      {scheme.description}
-                    </p>
-                    {scheme.eligibility && (
-                      <p className="mt-4 text-sm leading-6 text-muted-foreground bg-muted/50 p-3 rounded-xl border border-border/60">
-                        <strong className="text-clay block mb-0.5">Eligibility Criteria:</strong>{" "}
-                        {scheme.eligibility}
-                      </p>
-                    )}
-                    {scheme.benefit_amount ? (
-                      <p className="mt-4 inline-block rounded-xl bg-emerald-500/10 px-3.5 py-1.5 text-sm font-extrabold text-emerald-700">
-                        Benefit: ₹{scheme.benefit_amount.toLocaleString("en-IN")}
-                      </p>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-6 border-t border-border/70 pt-4 space-y-3">
-                    {scheme.deadline && (
-                      <p className="text-xs text-muted-foreground font-semibold">
-                        ⏰ Application Deadline:{" "}
-                        {new Date(scheme.deadline).toLocaleDateString("en-IN")}
-                      </p>
-                    )}
-
-                    {myApplication ? (
-                      <div
-                        className={`flex items-center gap-2 rounded-2xl px-4 py-3 text-sm font-bold ${
-                          statusTone[myApplication.status] === "success"
-                            ? "bg-[#dcfce7] text-[#15803d]"
-                            : statusTone[myApplication.status] === "danger"
-                              ? "bg-[#fee2e2] text-[#b91c1c]"
-                              : "bg-primary/10 text-primary"
-                        }`}
-                      >
-                        {StatusIcon && <StatusIcon className="size-4" />}
-                        Status: {applicationStatusLabels[myApplication.status]}
-                      </div>
-                    ) : (
-                      <AppButton
-                        className="w-full"
-                        disabled={applyMutation.isPending}
-                        loading={applyMutation.isPending}
-                        onClick={() => {
-                          if (!user) {
-                            toast.error("Sign in required to apply.");
-                            navigate({
-                              to: "/auth",
-                              search: {
-                                redirect: window.location.pathname,
-                                message: "signin_to_post",
-                              },
-                            });
-                            return;
-                          }
-                          applyMutation.mutate(scheme.id);
-                        }}
-                      >
-                        {user ? "Apply Online Now" : "Sign in to Apply"}
-                      </AppButton>
-                    )}
-                  </div>
-                </SurfaceCard>
-              );
-            })}
-        </div>
-      )}
-
-      {/* Citizen document services */}
-      <SectionHeader
-        eyebrow="Keep Documents Ready"
-        title="Essential Certificates & Identity Centers"
-        description="Fast access to Aadhaar, Ration Card, Income/Caste certificates, and worker registrations needed for all schemes."
-        compact
-        className="mt-16"
-      />
+      {selectedProfile === "all" && (
+        <>
+          <SectionHeader
+            eyebrow="Keep Documents Ready"
+            title="Essential Certificates & Identity Centers"
+            description="Fast access to Aadhaar, Ration Card, Income/Caste certificates, and worker registrations needed for all schemes."
+            compact
+            className="mt-8"
+          />
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {citizenServices.map((service, index) => {
           const Icon = [Fingerprint, FileText, SearchCheck, ShieldCheck][index % 4];
           return (
-            <SurfaceCard key={service.id} className="p-6 flex flex-col justify-between">
-              <div>
-                <div className="flex items-start justify-between gap-3">
-                  <div className="grid size-12 place-items-center rounded-2xl bg-secondary/12 text-secondary ring-1 ring-secondary/15">
-                    <Icon className="size-5" />
-                  </div>
-                  <StatusBadge tone="secondary">{service.category}</StatusBadge>
+            <a
+              key={service.id}
+              href={service.apply}
+              target="_blank"
+              rel="noreferrer"
+              className="group relative flex items-start gap-4 rounded-[24px] border border-border/60 bg-white/60 p-4 transition-all hover:bg-white hover:shadow-xl hover:shadow-primary/5 dark:bg-zinc-900/50 dark:hover:bg-zinc-900"
+            >
+              <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-inner">
+                <Icon className="size-6 transition-transform group-hover:scale-110" strokeWidth={1.8} />
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-start justify-between gap-2">
+                   <div className="min-w-0">
+                     <p className="font-display text-base font-bold text-clay dark:text-zinc-100 truncate">{service.title}</p>
+                     <p className="text-[10px] font-semibold text-secondary truncate">{service.category}</p>
+                   </div>
+                   <ExternalLink className="size-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
                 </div>
-                <h3 className="mt-4 font-display text-xl font-bold text-clay">{service.title}</h3>
-                <p className="mt-3 text-sm leading-7 text-muted-foreground">
+                <p className="mt-1.5 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2">
                   {service.description}
                 </p>
-                <div className="mt-5 rounded-2xl bg-muted/60 p-4 border border-border/60">
-                  <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
-                    <FileText className="size-3.5" /> Required Documents
-                  </p>
-                  <p className="mt-1.5 text-xs text-muted-foreground font-medium">
+                <div className="mt-2.5 flex items-center gap-1.5 overflow-hidden">
+                  <span className="inline-flex shrink-0 items-center rounded-full bg-secondary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-secondary">
+                    <FileText className="mr-1 size-2.5" /> Keep Ready
+                  </span>
+                  <span className="truncate text-[10px] font-semibold text-muted-foreground">
                     {service.documents.join(", ")}
-                  </p>
+                  </span>
                 </div>
               </div>
-              <a
-                href={service.apply}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full bg-secondary px-5 py-2.5 text-sm font-bold text-secondary-foreground transition hover:-translate-y-0.5 hover:brightness-105"
-              >
-                Open Official Portal <ExternalLink className="size-4" />
-              </a>
-            </SurfaceCard>
-          );
-        })}
-      </div>
+            </a>
+            );
+          })}
+          </div>
+        </>
+      )}
 
-      {/* Static reference list of major national/state schemes */}
       <SectionHeader
         eyebrow="Nationwide & State Benefits"
         title={`Major Government Schemes (${profile.district || "District & State"})`}
         description="Key welfare programs matched to your selected profile with exact document checklists."
         compact
-        className="mt-16"
+        className={selectedProfile === "all" ? "mt-16" : "mt-8"}
       />
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {schemes
@@ -406,39 +228,41 @@ function SchemesPage() {
           .map((scheme) => (
             <SurfaceCard
               key={scheme.id}
-              className="p-0 flex flex-col justify-between border-border/80 shadow-sm hover:shadow-md transition-all overflow-hidden"
+              className="p-4 flex flex-row gap-4 border-border/80 bg-card/95 shadow-sm hover:shadow-md transition-all rounded-[1.25rem] overflow-hidden items-start"
             >
-              {/* Scheme header image */}
-              <div className="h-36 overflow-hidden relative">
+              {/* Scheme header image (Thumbnail) */}
+              <div className="relative w-28 h-32 sm:w-36 sm:h-40 shrink-0 overflow-hidden rounded-[14px] shadow-sm border border-border/80">
                 <img
                   src={getSchemeImage(scheme.category, scheme.title)}
                   alt={scheme.title}
                   loading="lazy"
                   className="h-full w-full object-cover brightness-90"
                 />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
-                <div className="absolute bottom-3 left-3 right-3">
-                  <StatusBadge tone="accent">{scheme.category}</StatusBadge>
+                <div className="absolute bottom-1 left-1 right-1 rounded-md bg-black/70 px-1 py-0.5 text-[9px] font-bold text-white flex items-center justify-center backdrop-blur-md min-w-0 overflow-hidden">
+                  <span className="truncate min-w-0">{scheme.category}</span>
                 </div>
               </div>
-              <div className="p-6 flex flex-col flex-1 justify-between">
-                <div>
-                  <h3 className="mt-2 font-display text-xl font-bold text-clay">{scheme.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-muted-foreground">{scheme.benefit}</p>
 
-                  <div className="mt-4 rounded-2xl bg-muted/70 p-4 border border-border/60">
-                    <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
-                      <FileText className="size-3.5" /> Mandatory Documents
-                    </p>
-                    <p className="mt-1.5 text-xs text-muted-foreground font-medium">
-                      {scheme.documents.join(", ")}
-                    </p>
-                  </div>
+              <div className="flex flex-col flex-1 min-w-0">
+                <h3 className="font-display text-[16px] font-bold text-clay leading-tight mb-1.5">
+                  {scheme.title}
+                </h3>
+                <p className="text-[13px] leading-relaxed text-muted-foreground font-medium">
+                  {scheme.benefit}
+                </p>
 
-                  <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                    <strong className="text-clay">Eligibility:</strong> {scheme.eligibility}
+                <div className="mt-3 rounded-xl bg-muted/70 p-3 border border-border/60">
+                  <p className="flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-primary">
+                    <FileText className="size-3.5" /> Mandatory Documents
+                  </p>
+                  <p className="mt-1.5 text-[11px] text-muted-foreground font-semibold leading-relaxed">
+                    {scheme.documents.join(", ")}
                   </p>
                 </div>
+
+                <p className="mt-3 text-[11px] leading-relaxed text-muted-foreground border-l-2 border-primary/30 pl-2.5">
+                  <strong className="text-clay">Eligibility:</strong> {scheme.eligibility}
+                </p>
 
                 <div className="mt-6 border-t border-border/70 pt-4 space-y-2.5">
                   <a
@@ -462,134 +286,5 @@ function SchemesPage() {
           ))}
       </div>
     </PageLayout>
-  );
-}
-
-function CreateSchemeForm({
-  onCreate,
-  busy,
-}: {
-  onCreate: (input: {
-    title: string;
-    description: string;
-    category: SchemeCategory;
-    eligibility?: string;
-    benefit_amount?: number;
-    deadline?: string;
-  }) => void;
-  busy: boolean;
-}) {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState<SchemeCategory>("general");
-  const [eligibility, setEligibility] = useState("");
-  const [benefitAmount, setBenefitAmount] = useState("");
-  const [deadline, setDeadline] = useState("");
-
-  const submit = (event: FormEvent) => {
-    event.preventDefault();
-    if (!title.trim() || !description.trim()) return;
-    onCreate({
-      title: title.trim(),
-      description: description.trim(),
-      category,
-      eligibility: eligibility.trim() || undefined,
-      benefit_amount: benefitAmount ? Number(benefitAmount) : undefined,
-      deadline: deadline || undefined,
-    });
-    setTitle("");
-    setDescription("");
-    setEligibility("");
-    setBenefitAmount("");
-    setDeadline("");
-  };
-
-  return (
-    <SurfaceCard className="mb-8 p-6 border-2 border-primary/30 bg-card shadow-md">
-      <h3 className="font-display text-xl font-bold text-clay mb-2">
-        Publish New Panchayat Scheme
-      </h3>
-      <p className="text-sm text-muted-foreground mb-6">
-        Create a custom welfare scheme or local subsidy so citizens can apply and track status
-        online.
-      </p>
-      <form onSubmit={submit} className="grid gap-4 sm:grid-cols-2">
-        <input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Scheme Title (e.g. Free Seeds Subsidy for Small Farmers)"
-          required
-          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 sm:col-span-2"
-        />
-        <textarea
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Detailed explanation of how citizens benefit, distribution schedule, and requirements..."
-          required
-          rows={3}
-          className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 sm:col-span-2"
-        />
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
-            Category
-          </label>
-          <select
-            value={category}
-            onChange={(e) => setCategory(e.target.value as SchemeCategory)}
-            className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary font-semibold"
-          >
-            {Object.entries(schemeCategoryLabels).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
-            Benefit Amount (₹)
-          </label>
-          <input
-            value={benefitAmount}
-            onChange={(e) => setBenefitAmount(e.target.value)}
-            placeholder="e.g. 5000 (optional)"
-            type="number"
-            min="0"
-            className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
-            Eligibility Criteria
-          </label>
-          <input
-            value={eligibility}
-            onChange={(e) => setEligibility(e.target.value)}
-            placeholder="e.g. Farmers with less than 3 acres of land"
-            className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-          />
-        </div>
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1">
-            Application Deadline
-          </label>
-          <input
-            value={deadline}
-            onChange={(e) => setDeadline(e.target.value)}
-            type="date"
-            className="w-full rounded-2xl border border-input bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-primary"
-          />
-        </div>
-        <AppButton
-          type="submit"
-          className="sm:col-span-2 mt-2"
-          loading={busy}
-          disabled={busy}
-          icon={<Plus className="size-4" />}
-        >
-          Publish Scheme Online
-        </AppButton>
-      </form>
-    </SurfaceCard>
   );
 }

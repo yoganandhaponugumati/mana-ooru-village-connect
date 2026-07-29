@@ -192,37 +192,31 @@ function AnnPage() {
       }
     >
       {/* Dual Tab Switcher */}
-      <div className="mb-8 flex flex-wrap items-center gap-3 border-b border-border/80 pb-5">
+      <div className="mb-8 grid grid-cols-2 gap-3 border-b border-border/80 pb-5">
         <button
           type="button"
           onClick={() => setActiveTab("notices")}
-          className={`inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-bold transition-all ${
+          className={`flex items-center justify-center gap-2 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold transition-all border-2 ${
             activeTab === "notices"
-              ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
-              : "bg-card text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+              ? "border-primary bg-primary/10 text-primary shadow-sm"
+              : "border-transparent bg-card text-muted-foreground hover:bg-primary/5 hover:text-foreground"
           }`}
         >
-          <Megaphone className="size-4" />
-          <span>Village Notice Board</span>
-          <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-xs font-extrabold">
-            {displayItems.length}
-          </span>
+          <Megaphone className="size-4 shrink-0" />
+          <span className="truncate">Village Notices ({displayItems.length})</span>
         </button>
 
         <button
           type="button"
           onClick={() => setActiveTab("sarpanch_works")}
-          className={`inline-flex items-center gap-2.5 rounded-full px-6 py-3 text-sm font-bold transition-all ${
+          className={`flex items-center justify-center gap-2 rounded-xl p-3 sm:p-4 text-xs sm:text-sm font-bold transition-all border-2 ${
             activeTab === "sarpanch_works"
-              ? "bg-primary text-primary-foreground shadow-md shadow-primary/25"
-              : "bg-card text-muted-foreground hover:bg-primary/10 hover:text-foreground"
+              ? "border-primary bg-primary/10 text-primary shadow-sm"
+              : "border-transparent bg-card text-muted-foreground hover:bg-primary/5 hover:text-foreground"
           }`}
         >
-          <ShieldCheck className="size-4" />
-          <span>Sarpanch Pragati (Works Done)</span>
-          <span className="ml-1 rounded-full bg-white/20 px-2 py-0.5 text-xs font-extrabold">
-            {works.length}
-          </span>
+          <ShieldCheck className="size-4 shrink-0" />
+          <span className="truncate">Sarpanch Pragati ({works.length})</span>
         </button>
       </div>
 
@@ -455,56 +449,62 @@ function AnnPage() {
                         <SurfaceCard
                           key={a.id}
                           hover={false}
-                          className="rounded-[1.5rem] border-l-4 border-primary bg-card/95 p-5 flex flex-col justify-between shadow-sm"
+                          className="rounded-[1.25rem] border-l-4 border-primary bg-card/95 p-4 flex flex-row gap-4 shadow-sm"
                         >
-                          <div>
-                            {a.imageUrl && (
+                          {a.imageUrl && (
+                            <div className="relative size-24 shrink-0 overflow-hidden rounded-[14px] shadow-sm border border-border/80">
                               <img
                                 src={a.imageUrl}
                                 alt={a.title}
-                                className="mb-4 aspect-[16/7] w-full rounded-2xl object-cover"
+                                className="h-full w-full object-cover"
                               />
-                            )}
-                            <div className="flex items-center justify-between gap-2">
-                              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-[11px] font-bold text-primary">
+                            </div>
+                          )}
+                          <div className="flex flex-col flex-1 min-w-0">
+                            <div className="flex flex-wrap items-center justify-between gap-2 mb-1.5">
+                              <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
                                 <ShieldCheck className="size-3" /> {a.category || "Notice"}
                               </span>
-                              <span className="text-xs font-semibold text-muted-foreground">
+                              <span className="text-[10px] font-semibold text-muted-foreground">
                                 {timeAgo(a.createdAt)}
                               </span>
                             </div>
-                            <h4 className="mt-3 font-display text-lg font-bold text-clay">
+                            <h4 className="truncate font-display text-[15px] font-bold text-clay leading-tight">
                               {a.title}
                             </h4>
-                            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                              {a.description}
-                            </p>
-                          </div>
-                          <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-3">
-                            <div className="flex items-center gap-2 text-xs font-semibold text-muted-foreground">
-                              <span className="inline-flex items-center gap-1 rounded-full bg-muted px-2.5 py-1">
-                                <Phone className="size-3" /> {a.contact}
-                              </span>
+                            <div className="mt-1 flex-1">
+                              <p className="text-[13px] leading-5 text-muted-foreground line-clamp-2">
+                                {a.description}
+                              </p>
+                              <button className="text-[10px] font-bold text-primary mt-0.5 hover:underline flex items-center gap-0.5">Read full notice →</button>
                             </div>
-                            <div className="flex items-center gap-3">
-                              <button
-                                type="button"
-                                onClick={() => shareToWhatsApp(a.title, a.description || "")}
-                                className="inline-flex items-center gap-1 text-xs font-bold text-primary hover:underline"
-                              >
-                                <Share2 className="size-3.5" /> Share
-                              </button>
-                              {(canManageNotices ||
-                                a.localOnly ||
-                                (!!user && user.id === a.owner_id)) && (
+                            
+                            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-2.5">
+                              <div className="flex items-center gap-2 text-[10px] font-semibold text-muted-foreground">
+                                <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-1">
+                                  <Phone className="size-2.5" /> {a.contact}
+                                </span>
+                              </div>
+                              <div className="flex items-center gap-3">
                                 <button
                                   type="button"
-                                  onClick={() => remove(a.id)}
-                                  className="text-xs font-semibold text-red-600 transition hover:underline"
+                                  onClick={() => shareToWhatsApp(a.title, a.description || "")}
+                                  className="inline-flex items-center gap-1 text-[10px] font-bold text-primary hover:underline"
                                 >
-                                  Remove
+                                  <Share2 className="size-3" /> Share
                                 </button>
-                              )}
+                                {(canManageNotices ||
+                                  a.localOnly ||
+                                  (!!user && user.id === a.owner_id)) && (
+                                  <button
+                                    type="button"
+                                    onClick={() => remove(a.id)}
+                                    className="text-[10px] font-semibold text-red-600 transition hover:underline"
+                                  >
+                                    Remove
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         </SurfaceCard>

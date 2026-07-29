@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 import {
   Bot,
   Brain,
@@ -42,109 +43,122 @@ function AiAssistantPage() {
       text: "Namaste. Ask me about crops, weather, workers, services, or government schemes in Telugu, English, or Hindi.",
     },
   ]);
+  const [isLoading, setIsLoading] = useState(false);
+
   const weatherSummary =
     weather.live && weather.temp !== null
-      ? `${weather.temp}°C, ${weather.condition}`
-      : "live weather is unavailable right now";
+      ? `${weather.temp}°C, ${weather.weatherCode ? "cloudy/rainy" : "clear"}`
+      : "Weather data unavailable";
+
   const weatherDetails =
     weather.live && weather.temp !== null
       ? `${weather.temp}°C, humidity ${weather.humidity ?? "--"}%, wind ${weather.wind ?? "--"} km/h, rain alert ${weather.rain}`
-      : "live weather is unavailable right now. Check the Weather page after confirming the village spelling.";
-  const weatherTrust =
-    weather.live && weather.temp !== null
-      ? `Source: ${weather.source ?? "Open-Meteo live"}${
-          weather.placeName ? `, matched to ${weather.placeName}` : ""
-        }.`
-      : "I will not guess weather values when live data is unavailable.";
+      : "live weather is unavailable right now.";
 
-  const replies: Record<string, string> = {
-    "Crop Suggestions":
-      language === "te"
-        ? `${profile.village}లో పంట సలహాలకు పంట పేరు, నీటి వనరు, నేల రకం చెప్పండి. ప్రస్తుత స్థితి: ${weatherSummary}.`
-        : language === "hi"
-          ? `${profile.village} में फसल सलाह के लिए फसल, मिट्टी और पानी की जानकारी दें. अभी स्थिति: ${weatherSummary}.`
-          : `For ${profile.village}, share crop, soil type, and water source. Current status: ${weatherSummary}.`,
-    "Disease Detection":
-      language === "te"
-        ? "ఆకు మచ్చలు, పసుపు రంగు, పురుగులు లేదా కాండం నష్టం వివరించండి. అవసరమైతే వ్యవసాయ అధికారిని సంప్రదించమని సూచిస్తాను."
-        : language === "hi"
-          ? "पत्ते के दाग, पीलापन, कीड़े या तने की समस्या बताएं. जरूरत हो तो कृषि अधिकारी से संपर्क की सलाह दूंगा."
-          : "Describe leaf spots, yellowing, insects, or stem damage. I will suggest likely causes and when to contact an agriculture officer.",
-    "Weather Help":
-      language === "te"
-        ? `${profile.village} వాతావరణం: ${weatherDetails}.`
-        : language === "hi"
-          ? `${profile.village} मौसम: ${weatherDetails}.`
-          : `${profile.village} weather: ${weatherDetails}.`,
-    "Government Schemes":
-      language === "te"
-        ? `${profile.district}, ${profile.state}కు సంబంధించిన పథకాల కోసం రైతు రకం, పంట, భూమి వివరాలు చెప్పండి.`
-        : language === "hi"
-          ? `${profile.district}, ${profile.state} की योजनाओं के लिए किसान श्रेणी, फसल और जमीन विवरण बताएं.`
-          : `For schemes in ${profile.district}, ${profile.state}, tell me farmer category, crop, and land details.`,
-    "Nearby Workers":
-      language === "te"
-        ? `${profile.village} దగ్గర వ్యవసాయ పనివారు, ట్రాక్టర్ డ్రైవర్లు, ఎలక్ట్రిషియన్, ప్లంబర్‌లను Workers పేజీలో కనుగొనండి.`
-        : language === "hi"
-          ? `${profile.village} के पास कामगार, ट्रैक्टर ड्राइवर, इलेक्ट्रिशियन और प्लंबर Workers पेज पर मिलेंगे.`
-          : `Find labour, tractor drivers, electricians, and plumbers near ${profile.village} on the Workers page.`,
-    "Nearby Services":
-      language === "te"
-        ? `${profile.village}లో స్థానిక సేవలు: ఎలక్ట్రిషియన్, ప్లంబర్, బోర్‌వెల్, ఇంటర్నెట్, వాహన రిపేర్.`
-        : language === "hi"
-          ? `${profile.village} में सेवाएं: इलेक्ट्रिशियन, प्लंबर, बोरवेल, इंटरनेट, वाहन रिपेयर.`
-          : `Services in ${profile.village}: electrician, plumber, borewell, internet, vehicle repair, and transport.`,
-  };
-
-  const buildResponse = (text: string) => {
-    const normalized = text.toLowerCase();
-    if (
-      normalized.includes("weather") ||
-      normalized.includes("rain") ||
-      normalized.includes("వాతావరణ") ||
-      normalized.includes("बारिश") ||
-      normalized.includes("मौसम")
-    ) {
-      return `${replies["Weather Help"]} ${weatherTrust}`;
-    }
-    if (
-      normalized.includes("crop") ||
-      normalized.includes("paddy") ||
-      normalized.includes("cotton") ||
-      normalized.includes("పంట") ||
-      normalized.includes("फसल")
-    ) {
-      return replies["Crop Suggestions"];
-    }
-    if (
-      normalized.includes("scheme") ||
-      normalized.includes("subsidy") ||
-      normalized.includes("పథ")
-    ) {
-      return replies["Government Schemes"];
-    }
-    if (
-      normalized.includes("worker") ||
-      normalized.includes("labour") ||
-      normalized.includes("పని")
-    ) {
-      return replies["Nearby Workers"];
-    }
-    return (
-      replies[text] ??
-      `I can help with that for ${profile.village || "your village"}. Share the crop, service need, urgency, and location so I can suggest the best next step.`
-    );
-  };
-
-  const send = (text = message) => {
-    if (!text.trim()) return;
-    const response = buildResponse(text.trim());
+  const send = async (text = message) => {
+    if (!text.trim() || isLoading) return;
+    
     setChat((items) => [
       ...items,
       { role: "user", text: text.trim() },
-      { role: "assistant", text: response },
     ]);
     setMessage("");
+    setIsLoading(true);
+
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey) {
+        // Real AI Fallback using a free unauthenticated endpoint
+        try {
+          const systemPrompt = `You are the ManaOoru AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
+Your goal is to assist villagers with agriculture, government schemes, local services, and weather.
+The user is located in ${profile.village || "an unknown village"}${profile.district ? `, ${profile.district}` : ""}${profile.state ? `, ${profile.state}` : ""}.
+Current weather in their village: ${weatherDetails}.
+The user prefers to speak in ${language === 'te' ? 'Telugu' : language === 'hi' ? 'Hindi' : 'English'}.
+
+CRITICAL RULES:
+1. Always reply IN THE EXACT LANGUAGE the user types in, or their preferred language (${language}). If they type in Telugu, YOU MUST reply in Telugu perfectly without grammatical errors. If they type in English, reply in English.
+2. Keep your answers concise, practical, and highly relevant to Indian agriculture or rural life.
+3. Do not use complex markdown that is hard to read on mobile. Use simple bullet points if needed.
+4. Always incorporate the provided village location and live weather into your advice if relevant.`;
+
+          const pollinationsMessages = [
+            { role: "system", content: systemPrompt },
+            ...chat.slice(1).map(c => ({ role: c.role, content: c.text })),
+            { role: "user", content: text.trim() }
+          ];
+
+          const response = await fetch("https://text.pollinations.ai/", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              messages: pollinationsMessages,
+              model: "mistral",
+              seed: Math.floor(Math.random() * 1000)
+            })
+          });
+          
+          if (!response.ok) throw new Error("Fallback AI failed");
+          
+          const responseText = await response.text();
+          
+          setChat((items) => [
+            ...items,
+            { role: "assistant", text: responseText },
+          ]);
+        } catch (e) {
+          console.error("Fallback AI error:", e);
+          setChat((items) => [
+            ...items,
+            { role: "assistant", text: language === "te" ? "క్షమించండి, సర్వర్ బిజీగా ఉంది. దయచేసి మళ్లీ ప్రయత్నించండి." : "I'm sorry, the AI service is currently busy. Please try again in a moment." },
+          ]);
+        }
+        return;
+      }
+      
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      
+      const systemPrompt = `You are the ManaOoru AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
+Your goal is to assist villagers with agriculture, government schemes, local services, and weather.
+The user is located in ${profile.village || "an unknown village"}${profile.district ? `, ${profile.district}` : ""}${profile.state ? `, ${profile.state}` : ""}.
+Current weather in their village: ${weatherDetails}.
+The user prefers to speak in ${language === 'te' ? 'Telugu' : language === 'hi' ? 'Hindi' : 'English'}.
+
+CRITICAL RULES:
+1. Always reply IN THE EXACT LANGUAGE the user types in, or their preferred language (${language}). If they type in Telugu, YOU MUST reply in Telugu perfectly without grammatical errors. If they type in English, reply in English.
+2. Keep your answers concise, practical, and highly relevant to Indian agriculture or rural life.
+3. Do not use complex markdown that is hard to read on mobile. Use simple bullet points if needed.
+4. Always incorporate the provided village location and live weather into your advice if relevant (e.g., advising on crop watering based on rain alert).`;
+
+      const history = chat
+        .slice(1)
+        .map(c => ({
+          role: c.role === "user" ? "user" : "model",
+          parts: [{ text: c.text }]
+        }));
+      
+      const chatSession = model.startChat({
+        history,
+        systemInstruction: systemPrompt
+      });
+
+      const result = await chatSession.sendMessage(text.trim());
+      const response = result.response.text();
+      
+      setChat((items) => [
+        ...items,
+        { role: "assistant", text: response },
+      ]);
+    } catch (error) {
+      console.error(error);
+      setChat((items) => [
+        ...items,
+        { role: "assistant", text: "I'm sorry, I cannot connect to the AI service right now. Please check your internet connection and try again." },
+      ]);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const speakLastAnswer = () => {
@@ -239,7 +253,7 @@ function AiAssistantPage() {
                 Weather aware
               </p>
               <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {weatherDetails}. {weatherTrust}
+                {weatherDetails}
               </p>
             </div>
           </SurfaceCard>
@@ -306,24 +320,35 @@ function AiAssistantPage() {
             ))}
           </div>
           <div className="border-t border-white/70 bg-white/80 p-4 backdrop-blur-xl">
-            <div className="flex gap-2">
-              <button
-                onClick={startVoice}
-                className={`grid size-12 place-items-center rounded-[18px] border text-primary transition hover:-translate-y-0.5 hover:border-primary ${listening ? "border-primary bg-primary text-primary-foreground" : "border-border bg-white"}`}
-                aria-label="Voice input"
-              >
-                <Mic className="size-5" />
-              </button>
+            <div className="flex gap-2 relative">
               <input
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && send()}
                 placeholder="Ask anything about your village..."
-                className="premium-input min-w-0 flex-1 rounded-[18px] px-4 text-sm"
+                className="premium-input min-w-0 flex-1 rounded-[18px] px-4 text-sm h-12"
               />
-              <AppButton onClick={() => send()} icon={<Send className="size-4" />}>
-                Send
-              </AppButton>
+              <div className="absolute inset-y-0 right-1.5 flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={startVoice}
+                    className={`grid size-9 place-items-center rounded-full transition-all ${
+                      listening
+                        ? "bg-red-500/20 text-red-600 dark:bg-red-500/30 dark:text-red-400 animate-pulse"
+                        : "bg-muted text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                    }`}
+                  >
+                    <Mic className="size-4" />
+                  </button>
+                  <button
+                    type="submit"
+                    onClick={() => send()}
+                    disabled={!message.trim() || isLoading}
+                    className="flex h-9 items-center justify-center gap-2 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground transition-all hover:bg-secondary active:scale-95 disabled:opacity-50"
+                  >
+                    {isLoading ? "Thinking..." : "Send"} <Send className="size-3" />
+                  </button>
+              </div>
             </div>
             <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
               <button

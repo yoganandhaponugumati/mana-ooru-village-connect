@@ -13,7 +13,6 @@ import {
   signUpWithEmailPassword,
   occupations,
   dealerCategories,
-  roleToLegacyAccountType,
   type Occupation,
   type DealerCategory,
 } from "@/lib/supabase/auth";

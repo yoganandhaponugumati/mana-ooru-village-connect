@@ -4,12 +4,12 @@ importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-app-compat.js'
 importScripts('https://www.gstatic.com/firebasejs/10.9.0/firebase-messaging-compat.js');
 
 const firebaseConfig = {
-  apiKey: "",
-  authDomain: ".firebaseapp.com",
-  projectId: "",
-  storageBucket: ".appspot.com",
-  messagingSenderId: "",
-  appId: "",
+  apiKey: "AIzaSyAbmE0UB5qWzD8YvAjOoHQEY7jX9BFLwHM",
+  authDomain: "mana-ooru-f6c29.firebaseapp.com",
+  projectId: "mana-ooru-f6c29",
+  storageBucket: "mana-ooru-f6c29.appspot.com",
+  messagingSenderId: "692235642997",
+  appId: "1:692235642997:web:26c28f9aece51d75fc703c",
 };
 
 if (firebaseConfig.apiKey && firebaseConfig.projectId) {

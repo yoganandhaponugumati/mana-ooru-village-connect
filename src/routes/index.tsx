@@ -37,6 +37,9 @@ import {
   Leaf,
   Play,
   Sparkles,
+  UserRound,
+  Bot,
+  FileText,
 } from "lucide-react";
 import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
@@ -391,136 +394,6 @@ function HeroFeatureCarousel() {
   );
 }
 
-function NoticeCarouselCard({ items }: { items: typeof fallbackListings }) {
-  const navigate = useNavigate();
-  const [index, setIndex] = useState(0);
-
-  useEffect(() => {
-    if (items.length <= 1) return;
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % items.length);
-    }, 4000); // 4-second auto cycle
-    return () => clearInterval(interval);
-  }, [items.length]);
-
-  if (items.length === 0) {
-    return (
-      <div className="overflow-hidden rounded-[28px] border-2 border-primary/30 bg-gradient-to-br from-primary via-primary/95 to-emerald-900 p-6 text-white shadow-xl">
-        <h3 className="font-display text-2xl font-bold">No official notices posted yet</h3>
-        <p className="mt-2 text-sm text-white/80">
-          Be the first to post a Panchayat, school, health, power, or water update for your village.
-        </p>
-      </div>
-    );
-  }
-
-  const current = items[index];
-
-  return (
-    <div className="relative overflow-hidden rounded-[28px] border-2 border-primary/30 bg-gradient-to-br from-primary via-primary/95 to-emerald-900 text-primary-foreground shadow-xl transition hover:shadow-2xl">
-      <div className="flex flex-col gap-4 p-6 sm:p-7">
-        <div className="flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-white/20 px-3.5 py-1 text-xs font-bold uppercase tracking-[0.18em] backdrop-blur-md text-white">
-              <Megaphone className="size-3.5" /> Latest Notice
-            </span>
-            {items.length > 1 && (
-              <span className="rounded-full bg-emerald-400/20 px-2.5 py-0.5 text-[10px] font-extrabold text-emerald-200">
-                {index + 1} of {items.length} Notices
-              </span>
-            )}
-          </div>
-          <Link
-            to="/announcements"
-            className="text-xs font-bold text-white/90 underline hover:text-white"
-          >
-            All Notices ({items.length}) →
-          </Link>
-        </div>
-
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={current.id}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -12 }}
-            transition={{ duration: 0.3 }}
-            className="cursor-pointer"
-            onClick={() => navigate({ to: "/announcements" })}
-          >
-            <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_12rem] md:items-end">
-              <div>
-                <span className="rounded-full bg-emerald-400/20 px-3 py-0.5 text-xs font-semibold text-emerald-200">
-                  {current.category || "Panchayat Notice"}
-                </span>
-                <h3 className="mt-2 font-display text-2xl font-bold leading-tight sm:text-3xl text-white">
-                  {current.title}
-                </h3>
-                {current.description && (
-                  <p className="mt-3 max-w-2xl text-sm leading-7 text-white/85 line-clamp-3">
-                    {current.description}
-                  </p>
-                )}
-              </div>
-              <div className="space-y-2">
-                {current.imageUrl ? (
-                  <img
-                    src={current.imageUrl}
-                    alt={current.title}
-                    className="aspect-[4/3] w-full rounded-2xl border border-white/20 object-cover shadow-md"
-                  />
-                ) : (
-                  <div className="grid aspect-[4/3] w-full place-items-center rounded-2xl border border-white/20 bg-white/10 text-white/80">
-                    <Megaphone className="size-8" />
-                  </div>
-                )}
-                <p className="rounded-full bg-white/15 px-3 py-1.5 text-center text-xs font-bold text-white">
-                  {timeAgo(current.createdAt)}
-                </p>
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-
-        {items.length > 1 && (
-          <div className="flex items-center justify-between pt-3 border-t border-white/15">
-            <div className="flex gap-1.5">
-              {items.map((_, i) => (
-                <button
-                  key={i}
-                  type="button"
-                  onClick={() => setIndex(i)}
-                  className={`h-1.5 rounded-full transition-all duration-300 ${
-                    i === index ? "w-6 bg-white" : "w-1.5 bg-white/40"
-                  }`}
-                  aria-label={`Notice ${i + 1}`}
-                />
-              ))}
-            </div>
-            <div className="flex items-center gap-1.5 text-white">
-              <button
-                type="button"
-                onClick={() => setIndex((prev) => (prev - 1 + items.length) % items.length)}
-                className="grid size-7 place-items-center rounded-full bg-white/15 hover:bg-white/30 text-xs font-bold transition"
-                aria-label="Previous notice"
-              >
-                ←
-              </button>
-              <button
-                type="button"
-                onClick={() => setIndex((prev) => (prev + 1) % items.length)}
-                className="grid size-7 place-items-center rounded-full bg-white/15 hover:bg-white/30 text-xs font-bold transition"
-                aria-label="Next notice"
-              >
-                →
-              </button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-}
 
 function HeroVillageOSCard({
   villageName,
@@ -699,8 +572,8 @@ function Index() {
     <div className="village-site-bg min-h-screen text-foreground">
       <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
 
-      {/* Hero */}
-      <header className="relative min-h-screen overflow-hidden bg-zinc-950 border-b border-emerald-500/30">
+      {/* Desktop Hero - Hidden on mobile */}
+      <header className="hidden md:block relative min-h-screen overflow-hidden bg-zinc-950 border-b border-emerald-500/30">
         {/* Full-Screen Animated Village Photo Background */}
         <img
           src="/village-life-bg.jpg"
@@ -929,155 +802,136 @@ function Index() {
 
       {/* ═══════════════════════════════════════════════════════════════════
           📱 MOBILE HOME DASHBOARD — The new app-style section
-          Village greeting + Language button + 4-core grid + Notices + Problems
       ════════════════════════════════════════════════════════════════════ */}
-      <section className="relative z-30 mx-auto mt-2 max-w-7xl px-3 sm:px-6">
+      <section className="relative z-30 mx-auto pt-20 max-w-7xl px-4 sm:px-6 md:hidden">
 
-        {/* Greeting Bar + Language Pill */}
-        <div className="flex items-center justify-between gap-3 mb-5">
-          <div className="flex items-center gap-3">
-            {/* Village icon */}
-            <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
-              <Leaf className="size-5 text-white" />
-            </div>
-            <div className="leading-none">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Namaste 🙏</p>
-              <h2 className="font-display text-lg font-extrabold text-clay dark:text-zinc-100 leading-tight">
-                {villageName || "ManaOoru"}
-              </h2>
-              {heroWeather && (
-                <p className="text-xs text-primary/80 font-semibold flex items-center gap-1 mt-0.5">
-                  <CloudSun className="size-3 text-amber-500" /> {heroWeather}
-                </p>
-              )}
-            </div>
+        {/* Mobile Top Image Banner */}
+        <div className="mb-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
+          <img src="/village-life-bg.jpg" alt="Village" className="absolute inset-0 w-full h-full object-cover" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute bottom-4 left-5 right-5 text-white">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow-sm">Welcome to</span>
+            <h2 className="font-display text-2xl font-bold truncate drop-shadow-md">{villageName || "Smart Village"}</h2>
           </div>
-          {/* Language Quick-Access Pill */}
-          <a
-            href="#"
-            onClick={(e) => { e.preventDefault(); document.querySelector<HTMLButtonElement>('[aria-label="Language"]')?.click(); }}
-            className="inline-flex items-center gap-1.5 rounded-full border-2 border-primary/30 bg-primary/10 px-3 py-2 text-xs font-bold text-primary shadow-sm transition hover:bg-primary hover:text-white"
-          >
-            <span className="text-base leading-none">🌐</span>
-            <span>Language / భాష</span>
-          </a>
         </div>
 
         {/* Search Bar */}
         <form onSubmit={submitSearch} className="mb-6">
-          <div className="flex items-center gap-2 rounded-2xl border border-border bg-white dark:bg-zinc-900 px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-primary/25 transition">
-            <Search className="size-5 text-muted-foreground shrink-0" />
+          <div className="flex h-12 items-center gap-2 rounded-full border border-gray-200 bg-white px-4 shadow-sm focus-within:ring-2 focus-within:ring-primary/25 transition dark:border-zinc-800 dark:bg-zinc-900">
+            <Search className="size-4 text-muted-foreground shrink-0" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t.search || "Search workers, land, schemes…"}
-              className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-muted-foreground"
+              placeholder="Search services, workers, notices..."
+              className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
-            {searchQuery && (
-              <button type="submit" className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-white shrink-0">
-                Go
-              </button>
-            )}
           </div>
         </form>
 
         {/* ════ 4-CORE ACTIVITY GRID ════ */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-display text-base font-extrabold text-clay dark:text-zinc-100">Quick Actions</h3>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">మీ సేవలు</span>
-          </div>
+        <div className="mb-8">
           <div className="grid grid-cols-2 gap-3">
 
             {/* Card 1 — Sarpanch / Contact */}
             <Link
               to="/emergency"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
             >
-              <div className="h-24 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=400&q=75&auto=format&fit=crop"
-                  alt="Sarpanch contact"
-                  className="h-full w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 h-24 bg-gradient-to-b from-transparent to-black/50" />
-              </div>
-              <div className="p-3">
-                <p className="font-display text-sm font-extrabold text-clay dark:text-zinc-100 leading-tight">Sarpanch / Emergency</p>
-                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">సర్పంచ్ సంప్రదింపు</p>
-                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2.5 py-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
-                  <Phone className="size-3" /> Call Now
+              <div className="absolute inset-0 bg-[#eab308]/90 mix-blend-multiply z-10" />
+              <img src="/village-life-bg.jpg" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700" alt="" />
+              <div className="relative z-20 flex items-center gap-2 mb-1.5">
+                <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
+                  <UserRound className="size-4" />
                 </div>
+                <p className="font-display text-[15px] font-bold leading-tight">Sarpanch<br/>Connect</p>
               </div>
+              <p className="relative z-20 text-[10px] font-medium text-white/95">Direct contact, updates</p>
             </Link>
 
             {/* Card 2 — Report Problem */}
             <Link
               to="/problems"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
             >
-              <div className="h-24 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&q=75&auto=format&fit=crop"
-                  alt="Report road problem"
-                  className="h-full w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 h-24 bg-gradient-to-b from-transparent to-black/50" />
-              </div>
-              <div className="p-3">
-                <p className="font-display text-sm font-extrabold text-clay dark:text-zinc-100 leading-tight">Report Problem</p>
-                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">రోడ్డు / నీటి సమస్య</p>
-                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-red-100 dark:bg-red-950/40 px-2.5 py-1 text-[10px] font-bold text-red-700 dark:text-red-300">
-                  <AlertTriangle className="size-3" /> Report
+              <div className="absolute inset-0 bg-[#ef4444]/90 mix-blend-multiply z-10" />
+              <img src="/village-life-bg.jpg" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700" alt="" />
+              <div className="relative z-20 flex items-center gap-2 mb-1.5">
+                <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
+                  <AlertTriangle className="size-4" />
                 </div>
+                <p className="font-display text-[15px] font-bold leading-tight">Report<br/>Problem</p>
               </div>
+              <p className="relative z-20 text-[10px] font-medium text-white/95">Civic issues, requests</p>
             </Link>
 
             {/* Card 3 — Government Schemes */}
             <Link
               to="/schemes"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
             >
-              <div className="h-24 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=75&auto=format&fit=crop"
-                  alt="Government farming schemes"
-                  className="h-full w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 h-24 bg-gradient-to-b from-transparent to-black/50" />
-              </div>
-              <div className="p-3">
-                <p className="font-display text-sm font-extrabold text-clay dark:text-zinc-100 leading-tight">Schemes / Subsidies</p>
-                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">రైతు భరోసా / PM కిసాన్</p>
-                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2.5 py-1 text-[10px] font-bold text-amber-700 dark:text-amber-300">
-                  <Landmark className="size-3" /> Apply Now
+              <div className="absolute inset-0 bg-[#065f46]/90 mix-blend-multiply z-10" />
+              <img src="/village-life-bg.jpg" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700" alt="" />
+              <div className="relative z-20 flex items-center gap-2 mb-1.5">
+                <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
+                  <Landmark className="size-4" />
                 </div>
+                <p className="font-display text-[15px] font-bold leading-tight">Govt<br/>Schemes</p>
               </div>
+              <p className="relative z-20 text-[10px] font-medium text-white/95">Apply, details, benefits</p>
             </Link>
 
             {/* Card 4 — Post Notice */}
             <Link
               to="/announcements"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
+              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
             >
-              <div className="h-24 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=75&auto=format&fit=crop"
-                  alt="Village notice board"
-                  className="h-full w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 h-24 bg-gradient-to-b from-transparent to-black/50" />
-              </div>
-              <div className="p-3">
-                <p className="font-display text-sm font-extrabold text-clay dark:text-zinc-100 leading-tight">Post Notice</p>
-                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">గ్రామ నోటీసు / ప్రకటన</p>
-                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">
-                  <Megaphone className="size-3" /> Post Now
+              <div className="absolute inset-0 bg-[#3b82f6]/90 mix-blend-multiply z-10" />
+              <img src="/village-life-bg.jpg" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700" alt="" />
+              <div className="relative z-20 flex items-center gap-2 mb-1.5">
+                <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
+                  <Megaphone className="size-4" />
                 </div>
+                <p className="font-display text-[15px] font-bold leading-tight">Post<br/>Notice</p>
               </div>
+              <p className="relative z-20 text-[10px] font-medium text-white/95">Share news, events</p>
             </Link>
 
+          </div>
+        </div>
+
+        {/* ════ VILLAGE ASSISTANCE ════ */}
+        <div className="mb-8">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="size-5 text-amber-500" />
+            <h3 className="font-display text-lg font-extrabold text-clay dark:text-zinc-100">Village Assistance</h3>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <Link
+              to="/ai-assistant"
+              className="flex items-center gap-3 rounded-2xl border border-blue-200 bg-blue-50/50 p-4 shadow-sm hover:shadow-md transition-all dark:border-blue-900/50 dark:bg-blue-950/20"
+            >
+              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-900/40 dark:text-blue-400">
+                <Bot className="size-5" />
+              </div>
+              <div>
+                <p className="font-display text-[13px] font-bold text-clay dark:text-zinc-100 leading-tight">ManaOoru AI</p>
+                <p className="text-[10px] font-medium text-muted-foreground mt-0.5">Crop & schemes help</p>
+              </div>
+            </Link>
+            
+            <Link
+              to="/weather"
+              className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm hover:shadow-md transition-all dark:border-amber-900/50 dark:bg-amber-950/20"
+            >
+              <div className="grid size-10 shrink-0 place-items-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-900/40 dark:text-amber-400">
+                <CloudSun className="size-5" />
+              </div>
+              <div>
+                <p className="font-display text-[13px] font-bold text-clay dark:text-zinc-100 leading-tight">Live Weather</p>
+                <p className="text-[10px] font-medium text-muted-foreground mt-0.5">{heroWeather.split("·")[0] || "Check forecast"}</p>
+              </div>
+            </Link>
           </div>
         </div>
 
@@ -1086,22 +940,42 @@ function Index() {
           <div className="flex items-center justify-between mb-3">
             <div className="flex items-center gap-2">
               <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
-                <span className="relative inline-flex size-2 rounded-full bg-primary" />
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-600 opacity-75" />
+                <span className="relative inline-flex size-2 rounded-full bg-emerald-600" />
               </span>
-              <h3 className="font-display text-base font-extrabold text-clay dark:text-zinc-100">Announcements</h3>
+              <h3 className="font-display text-lg font-extrabold text-clay dark:text-zinc-100">Active Announcements</h3>
             </div>
-            <Link to="/announcements" className="text-xs font-bold text-primary hover:underline">
+            <Link to="/announcements" className="text-xs font-bold text-emerald-700 hover:underline">
               View All →
             </Link>
           </div>
-          <NoticeCarouselCard
-            items={
-              announcementItems.length > 0
-                ? announcementItems
-                : fallbackListings.filter((i) => i.type === "announcement")
-            }
-          />
+          
+          {/* Manual Horizontal Scrolling Cards */}
+          <div className="relative flex overflow-x-auto w-[calc(100vw-2rem)] pb-4 hide-scrollbar snap-x snap-mandatory">
+            <div className="flex gap-4">
+            {(announcementItems.length > 0 ? announcementItems : fallbackListings.filter(i => i.type === "announcement")).map((item, idx) => (
+              <div key={`${item.id}-${idx}`} className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border border-border bg-white shadow-sm overflow-hidden flex flex-col relative snap-center snap-always">
+                <div className="h-32 w-full relative overflow-hidden bg-muted">
+                  <img src={item.imageUrl || "/village-life-bg.jpg"} alt={item.title} className="h-full w-full object-cover transition-transform duration-700" />
+                </div>
+                <div className="p-4 flex flex-col flex-1">
+                  <h4 className="font-display text-base font-bold text-clay truncate">{item.title}</h4>
+                  <p className="text-xs text-muted-foreground mt-1 font-medium">
+                    {new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}, {new Date(item.createdAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
+                  </p>
+                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
+                    {item.description || "Official panchayat announcement for the village. Please read for more details."}
+                  </p>
+                  <div className="mt-4 pt-1">
+                    <Link to="/announcements" className="inline-flex items-center justify-center rounded-full bg-[#065f46] px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition">
+                      Read More
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+            </div>
+          </div>
         </div>
 
         {/* ════ CITIZEN PROBLEMS ════ */}
@@ -1156,12 +1030,10 @@ function Index() {
 
       <ConceptShowcase />
 
-
-
-      {/* Quick Actions */}
+      {/* Quick Actions (Desktop only now) */}
       <section
         id="actions"
-        className="relative z-30 mx-auto mt-8 max-w-[calc(100%-2rem)] overflow-hidden rounded-[32px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(232,247,239,0.82)_48%,rgba(255,246,222,0.8))] px-4 py-9 shadow-[0_16px_56px_-24px_rgba(20,49,32,0.3)] backdrop-blur-2xl sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-[40px]"
+        className="relative z-30 mx-auto mt-8 max-w-[calc(100%-2rem)] hidden md:block overflow-hidden rounded-[32px] border border-white/70 bg-[linear-gradient(135deg,rgba(255,255,255,0.9),rgba(232,247,239,0.82)_48%,rgba(255,246,222,0.8))] px-4 py-9 shadow-[0_16px_56px_-24px_rgba(20,49,32,0.3)] backdrop-blur-2xl sm:px-6 lg:max-w-[calc(100%-3rem)] lg:rounded-[40px]"
       >
         <div className="pointer-events-none absolute inset-0 village-pattern opacity-80" />
         <div className="mx-auto mb-7 max-w-7xl text-center">
@@ -1252,21 +1124,28 @@ function Index() {
                   href={service.apply}
                   target="_blank"
                   rel="noreferrer"
-                  className="premium-need-card hover-lift group rounded-[22px] p-5"
+                  className="group relative flex items-start gap-4 rounded-[24px] border border-transparent bg-white/60 p-4 transition-all hover:bg-white hover:shadow-xl hover:shadow-primary/5 dark:bg-zinc-900/50 dark:hover:bg-zinc-900"
                 >
-                  <div className="mb-5 flex items-center justify-between gap-3">
-                    <span className="grid size-12 place-items-center rounded-2xl bg-secondary/12 text-secondary shadow-sm transition group-hover:rotate-[-4deg] group-hover:scale-105">
-                      <Icon className="size-6" strokeWidth={1.8} />
-                    </span>
-                    <ArrowRight className="size-4 text-primary/50 transition group-hover:translate-x-1 group-hover:text-primary" />
+                  <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-inner">
+                    <Icon className="size-6 transition-transform group-hover:scale-110" strokeWidth={1.8} />
                   </div>
-                  <p className="font-display text-xl font-semibold text-clay">{service.title}</p>
-                  <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                    {service.description}
-                  </p>
-                  <p className="mt-4 rounded-2xl bg-muted/60 px-3 py-2 text-xs font-semibold leading-5 text-clay">
-                    Keep ready: {service.documents.slice(0, 3).join(", ")}
-                  </p>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center justify-between gap-2">
+                       <p className="font-display text-base font-bold text-clay dark:text-zinc-100 truncate">{service.title}</p>
+                       <ArrowRight className="size-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                    </div>
+                    <p className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2">
+                      {service.description}
+                    </p>
+                    <div className="mt-2.5 flex items-center gap-1.5 overflow-hidden">
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-secondary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-secondary">
+                        <FileText className="mr-1 size-2.5" /> Keep Ready
+                      </span>
+                      <span className="truncate text-[10px] font-semibold text-muted-foreground">
+                        {service.documents.slice(0, 2).join(", ")}
+                      </span>
+                    </div>
+                  </div>
                 </a>
               );
             })}
@@ -1824,12 +1703,12 @@ function Index() {
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/30 rounded-2xl transition-all scale-100 hover:scale-[1.02]">
-                <Link to="/post-worker">
+                <Link to="/profile">
                   Create your profile <ArrowRight className="ml-2 size-5" />
                 </Link>
               </Button>
               <Button asChild variant="outline" size="lg" className="border-white/30 bg-white/15 text-white hover:bg-white/25 hover:text-white px-8 py-6 text-base font-bold backdrop-blur-md rounded-2xl transition-all shadow-lg">
-                <Link to="/marketplace">
+                <Link to="/search">
                   Browse the village
                 </Link>
               </Button>

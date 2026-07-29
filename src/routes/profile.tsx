@@ -1,5 +1,6 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
+  Activity,
   AlertTriangle,
   Bell,
   Bookmark,
@@ -20,9 +21,9 @@ import {
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { PageLayout } from "@/components/PageLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { AppLinkButton, FeatureIcon, SectionHeader, SurfaceCard } from "@/components/design-system";
+import { AppLinkButton, SurfaceCard } from "@/components/design-system";
+import { SiteNav, SiteFooter } from "@/components/SiteNav";
 import { VillageLocationPicker } from "@/components/VillageLocationPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
@@ -75,8 +76,13 @@ function ProfilePage() {
   const { notificationsEnabled, setNotifications } = useNotificationSettings();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activePanel, setActivePanel] = useState<
-    "saved" | "posts" | "edit" | "language" | "theme" | "notifications" | "account"
-  >("saved");
+    "saved" | "posts" | "edit" | "account" | "activity" | null
+  >(null);
+  
+  const togglePanel = (panel: typeof activePanel) => {
+    setActivePanel((prev) => (prev === panel ? null : panel));
+  };
+
   const myPosts = items.filter((item) => item.owner_id === user?.id);
   const allListings = useMemo(() => {
     const seen = new Set<string>();
@@ -88,7 +94,7 @@ function ProfilePage() {
   }, [items]);
   const savedPosts = allListings.filter((item) => saved.includes(item.id));
 
-  // Edit-profile form state, seeded from the loaded auth profile.
+  // Edit-profile form state
   const [photoPreview, setPhotoPreview] = useState(authProfile?.photo_url || "");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [fullName, setFullName] = useState(authProfile?.full_name || "");
@@ -98,103 +104,82 @@ function ProfilePage() {
   const [villageProfile, setVillageProfile] = useState<VillageProfile>(profile);
   const [savingProfile, setSavingProfile] = useState(false);
   const [resendingVerification, setResendingVerification] = useState(false);
+
   const [deleteStep, setDeleteStep] = useState<"idle" | "confirm">("idle");
   const [deletePassword, setDeletePassword] = useState("");
   const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
-    setFullName(authProfile?.full_name || "");
-    setUsername(authProfile?.username || "");
-    setOccupation(authProfile?.occupation || "Other");
-    setPhotoPreview(authProfile?.photo_url || "");
+    if (authProfile) {
+      setFullName(authProfile.full_name || "");
+      setUsername(authProfile.username || "");
+      setOccupation((authProfile.occupation as Occupation) || "Other");
+      setPhotoPreview(authProfile.photo_url || "");
+    }
   }, [authProfile]);
 
   useEffect(() => {
-    setVillageProfile(profile);
-  }, [profile]);
-
-  useEffect(() => {
-    if (username === authProfile?.username) {
+    if (username === authProfile?.username || username.trim() === "") {
       setUsernameState("idle");
       return;
     }
-    const formatError = getUsernameError(username);
-    if (formatError) {
-      setUsernameState(username.trim() ? "invalid" : "idle");
-      return;
-    }
-    setUsernameState("checking");
-    const timer = setTimeout(async () => {
+    const check = async () => {
+      setUsernameState("checking");
       try {
-        const available = await isUsernameAvailable(username, user?.id);
+        const errorMsg = getUsernameError(username);
+        if (errorMsg) {
+          setUsernameState("invalid");
+          return;
+        }
+        const available = await isUsernameAvailable(username);
         setUsernameState(available ? "available" : "taken");
       } catch {
-        setUsernameState("idle");
+        setUsernameState("invalid");
       }
-    }, 450);
+    };
+    const timer = setTimeout(check, 500);
     return () => clearTimeout(timer);
-  }, [username, user?.id, authProfile?.username]);
+  }, [username, authProfile?.username]);
 
   const chooseProfilePhoto = (file?: File) => {
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please choose an image file");
-      return;
-    }
     if (file.size > 2 * 1024 * 1024) {
-      toast.error("Profile photo must be under 2 MB");
+      toast.error("Please choose an image smaller than 2MB.");
       return;
     }
     setPhotoFile(file);
     const reader = new FileReader();
-    reader.onload = () => setPhotoPreview(String(reader.result || ""));
+    reader.onload = (e) => setPhotoPreview(e.target?.result as string);
     reader.readAsDataURL(file);
   };
 
   const saveProfile = async () => {
     if (!user) return;
-    const usernameError = getUsernameError(username);
-    if (usernameError) {
-      toast.error(usernameError);
+    if (usernameState === "taken" || usernameState === "invalid") {
+      toast.error("Please choose a valid and available username before saving.");
       return;
     }
-    if (usernameState === "taken") {
-      toast.error("That username is already taken.");
-      return;
-    }
-    if (!fullName.trim()) {
-      toast.error("Please enter your name.");
-      return;
-    }
-    if (!villageProfile.village.trim()) {
-      toast.error("Please select or type your village name.");
-      return;
-    }
-
     setSavingProfile(true);
     try {
-      const stillAvailable = await isUsernameAvailable(username, user.id);
-      if (!stillAvailable) {
-        setUsernameState("taken");
-        toast.error("That username was just taken. Please choose another.");
-        return;
-      }
-
-      let photoUrl = authProfile?.photo_url || undefined;
+      let finalPhotoUrl = authProfile?.photo_url || null;
       if (photoFile) {
-        const uploaded = await uploadUserFile("profile-images", user.id, photoFile);
-        photoUrl = uploaded.url;
+        const uploadResult = await uploadUserFile("profile-images", user.id, photoFile);
+        finalPhotoUrl = uploadResult.url;
       }
+      const selectedProfile = {
+        state: villageProfile.state,
+        district: villageProfile.district,
+        mandal: villageProfile.mandal,
+        village: villageProfile.village,
+      };
 
-      const selectedProfile = normalizeProfile(villageProfile);
       const { error } = await supabase
         .from("profiles")
         .update({
-          username: username.trim().toLowerCase(),
-          full_name: fullName.trim(),
-          display_name: fullName.trim(),
+          full_name: fullName.trim() || null,
+          username: username.trim() || null,
           occupation,
-          photo_url: photoUrl,
+          photo_url: finalPhotoUrl,
           state: selectedProfile.state,
           district: selectedProfile.district,
           mandal: selectedProfile.mandal,
@@ -208,6 +193,7 @@ function ProfilePage() {
       setPhotoFile(null);
       await refreshProfile();
       toast.success("Profile updated");
+      setActivePanel(null);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Could not update your profile.";
       toast.error(
@@ -215,19 +201,6 @@ function ProfilePage() {
       );
     } finally {
       setSavingProfile(false);
-    }
-  };
-
-  const changeLanguage = (next: Language) => {
-    setLanguage(next);
-    if (user) {
-      supabase
-        .from("profiles")
-        .update({ preferred_language: next, updated_at: new Date().toISOString() })
-        .eq("id", user.id)
-        .then(({ error }) => {
-          if (error) toast.error("Could not save language preference to your account.");
-        });
     }
   };
 
@@ -264,62 +237,18 @@ function ProfilePage() {
     }
   };
 
-  const settingCards = [
-    {
-      id: "saved" as const,
-      label: "Saved Posts",
-      detail: "Workers, land, products, services",
-      icon: Bookmark,
-    },
-    {
-      id: "posts" as const,
-      label: "My Posts",
-      detail: "Manage all active listings",
-      icon: BriefcaseBusiness,
-    },
-    {
-      id: "edit" as const,
-      label: "Edit Profile",
-      detail: "Name, username, photo, village",
-      icon: Settings,
-    },
-    {
-      id: "language" as const,
-      label: "Language",
-      detail: "Telugu, English, Hindi",
-      icon: Languages,
-    },
-    { id: "theme" as const, label: "Dark Mode", detail: "Comfortable night interface", icon: Moon },
-    {
-      id: "notifications" as const,
-      label: "Notifications",
-      detail: "Calls, notices, weather alerts",
-      icon: Bell,
-    },
-    {
-      id: "account" as const,
-      label: "Account",
-      detail: "Sign out or delete account",
-      icon: ShieldAlert,
-    },
-  ];
-
   return (
-    <PageLayout
-      title="Profile"
-      subtitle="Manage your village identity, saved posts, settings, language, and dark mode."
-      icon={<UserRound className="size-7" />}
-    >
-      <SectionHeader
-        eyebrow="Village identity"
-        title={
-          user
-            ? `Welcome, ${authProfile?.full_name || user.email?.split("@")[0]}`
-            : "Create your ManaOoru profile"
-        }
-        description="Your profile builds trust across workers, land, marketplace, services, and notices."
-        actions={!user && <AppLinkButton to="/auth">Sign in</AppLinkButton>}
-      />
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
+      <SiteNav />
+      <main className="pb-24 pt-20 px-4 max-w-lg mx-auto flex-1 w-full">
+        {!user && (
+        <div className="mb-6 rounded-2xl bg-primary/10 p-5 border border-primary/20 flex flex-col items-center text-center">
+          <ShieldAlert className="size-8 text-primary mb-3" />
+          <h2 className="font-display font-bold text-lg text-clay">Create your profile</h2>
+          <p className="text-sm text-muted-foreground mt-1 mb-4">Your profile builds trust across workers, land, marketplace, and services.</p>
+          <AppLinkButton to="/auth" className="w-full">Sign In / Register</AppLinkButton>
+        </div>
+      )}
       {needsEmailVerification && (
         <div className="mb-6 flex flex-col gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2">
@@ -336,139 +265,111 @@ function ProfilePage() {
           </button>
         </div>
       )}
-      <div className="grid gap-6 lg:grid-cols-[0.85fr_1.15fr]">
-        <SurfaceCard className="p-6">
-          <div className="relative mx-auto grid size-28 place-items-center rounded-full bg-gradient-to-br from-primary to-secondary font-display text-3xl font-semibold text-white shadow-[var(--shadow-lift)]">
-            {photoPreview ? (
-              <img
-                src={photoPreview}
-                alt={user?.email || "Profile photo"}
-                className="h-full w-full rounded-full object-cover"
-              />
-            ) : (
-              (authProfile?.full_name || user?.email)?.[0]?.toUpperCase() || "M"
-            )}
+      <SurfaceCard className="p-6 relative overflow-hidden">
+        <div className="absolute top-0 left-0 right-0 h-16 bg-primary/10"></div>
+        <div className="relative mx-auto mt-4 grid size-24 place-items-center rounded-full border-4 border-card bg-gradient-to-br from-primary to-secondary font-display text-3xl font-semibold text-white shadow-md">
+          {photoPreview ? (
+            <img
+              src={photoPreview}
+              alt={user?.email || "Profile photo"}
+              className="h-full w-full rounded-full object-cover"
+            />
+          ) : (
+            (authProfile?.full_name || user?.email)?.[0]?.toUpperCase() || "M"
+          )}
+          <button
+            type="button"
+            onClick={() => fileInputRef.current?.click()}
+            className="absolute bottom-0 right-0 grid size-8 place-items-center rounded-full border border-white bg-white text-primary shadow-sm hover:bg-muted"
+            aria-label="Update photo"
+          >
+            <Camera className="size-3.5" />
+          </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            className="sr-only"
+            onChange={(event) => chooseProfilePhoto(event.target.files?.[0])}
+          />
+        </div>
+        <div className="mt-4 text-center">
+          <h2 className="font-display text-xl font-bold text-clay">
+            {authProfile?.full_name || user?.email || "Guest villager"}
+          </h2>
+          {authProfile?.username && (
+            <p className="text-xs font-semibold text-primary/80">@{authProfile.username}</p>
+          )}
+          <p className="mt-1 text-xs font-medium text-muted-foreground">{formatVillageProfile(profile)}</p>
+        </div>
+        <div className="mt-5 grid grid-cols-2 gap-3 pt-5 border-t border-border">
+          <div className="text-center" onClick={() => togglePanel('posts')}>
+            <p className="font-display text-lg font-bold text-clay">{myPosts.length}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">My Posts</p>
+          </div>
+          <div className="text-center border-l border-border" onClick={() => togglePanel('saved')}>
+            <p className="font-display text-lg font-bold text-clay">{saved.length}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Saved</p>
+          </div>
+        </div>
+      </SurfaceCard>
+
+      <div className="mt-4 flex flex-col gap-3">
+        {/* Instant Settings */}
+        <SurfaceCard className="divide-y divide-border/60">
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-full bg-secondary/10 text-secondary"><Moon className="size-4" /></div>
+              <p className="text-sm font-semibold text-clay">Dark Mode</p>
+            </div>
             <button
               type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="absolute bottom-0 right-0 grid size-10 place-items-center rounded-full border border-white bg-white text-primary shadow-sm"
-              aria-label="Update photo"
+              onClick={() => setDarkMode(!darkMode)}
+              className={`relative h-6 w-11 rounded-full transition-colors ${darkMode ? 'bg-primary' : 'bg-muted-foreground/30'}`}
             >
-              <Camera className="size-4" />
+              <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${darkMode ? 'left-6' : 'left-1'}`} />
             </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/png,image/jpeg,image/webp"
-              className="sr-only"
-              onChange={(event) => chooseProfilePhoto(event.target.files?.[0])}
-            />
           </div>
-          <div className="mt-6 text-center">
-            <h2 className="font-display text-2xl font-semibold text-clay">
-              {authProfile?.full_name || user?.email || "Guest villager"}
-            </h2>
-            {authProfile?.username && (
-              <p className="text-sm font-medium text-primary">@{authProfile.username}</p>
-            )}
-            <p className="mt-1 text-sm text-muted-foreground">{formatVillageProfile(profile)}</p>
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-full bg-secondary/10 text-secondary"><Bell className="size-4" /></div>
+              <p className="text-sm font-semibold text-clay">Notifications</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setNotifications(!notificationsEnabled)}
+              className={`relative h-6 w-11 rounded-full transition-colors ${notificationsEnabled ? 'bg-primary' : 'bg-muted-foreground/30'}`}
+            >
+              <span className={`absolute top-1 h-4 w-4 rounded-full bg-white transition-all ${notificationsEnabled ? 'left-6' : 'left-1'}`} />
+            </button>
           </div>
-          <div className="mt-6 grid grid-cols-2 gap-3">
-            <div className="rounded-2xl bg-muted/60 p-4 text-center">
-              <p className="font-display text-2xl font-semibold text-clay">{myPosts.length}</p>
-              <p className="text-xs text-muted-foreground">My Posts</p>
+          <div className="flex items-center justify-between p-4">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-full bg-secondary/10 text-secondary"><Languages className="size-4" /></div>
+              <p className="text-sm font-semibold text-clay">Language</p>
             </div>
-            <div className="rounded-2xl bg-muted/60 p-4 text-center">
-              <p className="font-display text-2xl font-semibold text-clay">{saved.length}</p>
-              <p className="text-xs text-muted-foreground">Saved Posts</p>
-            </div>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value as Language)}
+              className="rounded-lg border border-border bg-background px-3 py-1.5 text-xs font-semibold outline-none focus:border-primary"
+            >
+              {languageOptions.map(opt => <option key={opt.code} value={opt.code}>{opt.label}</option>)}
+            </select>
           </div>
         </SurfaceCard>
-        <div className="grid gap-4 sm:grid-cols-2">
-          {settingCards.map((item) => (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => setActivePanel(item.id)}
-              className="text-left"
-            >
-              <SurfaceCard
-                className={`h-full p-5 ${activePanel === item.id ? "border-primary bg-primary/5" : ""}`}
-              >
-                <FeatureIcon icon={<item.icon className="size-5" />} />
-                <p className="mt-4 font-semibold text-clay">{item.label}</p>
-                <p className="text-sm text-muted-foreground">{item.detail}</p>
-              </SurfaceCard>
-            </button>
-          ))}
-        </div>
-      </div>
-      <SurfaceCard className="mt-8 p-6">
-        {activePanel === "saved" && (
-          <>
-            <h3 className="font-display text-2xl font-semibold text-clay">Saved posts</h3>
-            <div className="mt-4 divide-y divide-border">
-              {savedPosts.length === 0 ? (
-                <p className="py-6 text-sm text-muted-foreground">
-                  No saved posts yet. Use the Save button on workers, land, marketplace, services,
-                  and notices.
-                </p>
-              ) : (
-                savedPosts.map((post) => (
-                  <div key={post.id} className="flex items-center justify-between gap-3 py-4">
-                    <div>
-                      <p className="font-semibold text-clay">{post.title}</p>
-                      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                        {post.type} · {post.location || "Village"} · {timeAgo(post.createdAt)}
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => toggleSaved(post)}
-                      className="rounded-full border border-border px-3 py-1 text-xs font-semibold text-muted-foreground transition hover:border-destructive hover:text-destructive"
-                    >
-                      Remove
-                    </button>
-                  </div>
-                ))
-              )}
+
+        {/* Expandable Menus */}
+        <SurfaceCard className="overflow-hidden">
+          <button onClick={() => togglePanel('edit')} className="flex w-full items-center justify-between p-4 text-left hover:bg-muted/30 transition">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-full bg-primary/10 text-primary"><Settings className="size-4" /></div>
+              <p className="text-sm font-semibold text-clay">Edit Profile</p>
             </div>
-          </>
-        )}
-        {activePanel === "posts" && (
-          <>
-            <h3 className="font-display text-2xl font-semibold text-clay">My posts</h3>
-            <div className="mt-4 divide-y divide-border">
-              {myPosts.length === 0 ? (
-                <p className="py-6 text-sm text-muted-foreground">
-                  No posts yet.{" "}
-                  <Link to="/post-work" className="font-semibold text-primary">
-                    Post a requirement
-                  </Link>
-                  .
-                </p>
-              ) : (
-                myPosts.slice(0, 8).map((post) => (
-                  <div key={post.id} className="flex items-center justify-between gap-3 py-4">
-                    <div>
-                      <p className="font-semibold text-clay">{post.title}</p>
-                      <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                        {post.type}
-                      </p>
-                    </div>
-                    <span className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary">
-                      Live
-                    </span>
-                  </div>
-                ))
-              )}
-            </div>
-          </>
-        )}
-        {activePanel === "edit" && (
-          <div>
-            <h3 className="font-display text-2xl font-semibold text-clay">Edit profile</h3>
-            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          </button>
+          {activePanel === "edit" && (
+            <div className="p-4 border-t border-border/60 bg-muted/20">
+
+            <div className="mt-2 grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="edit-fullname" className="text-sm font-semibold text-foreground">
                   Full name
@@ -550,83 +451,96 @@ function ProfilePage() {
               {savingProfile && <Loader2 className="size-4 animate-spin" />}
               {savingProfile ? "Saving…" : "Save changes"}
             </button>
-          </div>
-        )}
-        {activePanel === "language" && (
-          <div>
-            <h3 className="font-display text-2xl font-semibold text-clay">Language</h3>
-            <div className="mt-4 flex flex-wrap gap-3">
-              {languageOptions.map((option) => (
-                <button
-                  key={option.code}
-                  type="button"
-                  onClick={() => changeLanguage(option.code as Language)}
-                  className={`rounded-full border px-5 py-2 text-sm font-semibold transition ${
-                    language === option.code
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : "border-border bg-background text-foreground hover:border-primary"
-                  }`}
-                >
-                  {option.label}
-                </button>
-              ))}
             </div>
-          </div>
-        )}
-        {activePanel === "theme" && (
-          <div>
-            <h3 className="font-display text-2xl font-semibold text-clay">Appearance</h3>
-            <div className="mt-4 grid gap-3 sm:grid-cols-2">
-              <button
-                type="button"
-                onClick={() => setDarkMode(false)}
-                className={`rounded-2xl border p-4 text-left transition ${
-                  !darkMode ? "border-primary bg-primary/10" : "border-border bg-background"
-                }`}
-              >
-                <Sun className="size-5 text-primary" />
-                <p className="mt-3 font-semibold text-clay">Light mode</p>
-              </button>
-              <button
-                type="button"
-                onClick={() => setDarkMode(true)}
-                className={`rounded-2xl border p-4 text-left transition ${
-                  darkMode ? "border-primary bg-primary/10" : "border-border bg-background"
-                }`}
-              >
-                <Moon className="size-5 text-primary" />
-                <p className="mt-3 font-semibold text-clay">Dark mode</p>
-              </button>
+          )}
+          
+          <button onClick={() => togglePanel('saved')} className="flex w-full items-center justify-between p-4 text-left hover:bg-muted/30 transition border-t border-border/60">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-full bg-primary/10 text-primary"><Bookmark className="size-4" /></div>
+              <p className="text-sm font-semibold text-clay">Saved Posts</p>
             </div>
-          </div>
-        )}
-        {activePanel === "notifications" && (
-          <div>
-            <h3 className="font-display text-2xl font-semibold text-clay">Notifications</h3>
-            <div className="mt-4 flex flex-col gap-4 rounded-2xl border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between">
-              <div>
-                <p className="font-semibold text-clay">Village alerts</p>
-                <p className="text-sm text-muted-foreground">
-                  Enable notices, saved-post updates, and weather alert reminders.
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setNotifications(!notificationsEnabled)}
-                className={`rounded-full px-5 py-2 text-sm font-semibold transition ${
-                  notificationsEnabled
-                    ? "bg-primary text-primary-foreground"
-                    : "border border-border bg-card text-foreground"
-                }`}
-              >
-                {notificationsEnabled ? "On" : "Off"}
-              </button>
+          </button>
+          {activePanel === "saved" && (
+            <div className="p-4 border-t border-border/60 bg-muted/20">
+              {savedPosts.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No saved posts yet.</p>
+              ) : (
+                <div className="divide-y divide-border">
+                  {savedPosts.map((post) => (
+                    <div key={post.id} className="flex items-center justify-between gap-3 py-3">
+                      <div>
+                        <p className="text-sm font-semibold text-clay line-clamp-1">{post.title}</p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                          {post.type} · {timeAgo(post.createdAt)}
+                        </p>
+                      </div>
+                      <button onClick={() => toggleSaved(post)} className="text-[10px] font-bold text-destructive">Remove</button>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
-          </div>
-        )}
-        {activePanel === "account" && (
-          <div>
-            <h3 className="font-display text-2xl font-semibold text-clay">Account</h3>
+          )}
+
+          <button onClick={() => togglePanel('posts')} className="flex w-full items-center justify-between p-4 text-left hover:bg-muted/30 transition border-t border-border/60">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-full bg-primary/10 text-primary"><BriefcaseBusiness className="size-4" /></div>
+              <p className="text-sm font-semibold text-clay">My Posts</p>
+            </div>
+          </button>
+          {activePanel === "posts" && (
+            <div className="p-4 border-t border-border/60 bg-muted/20">
+              {myPosts.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No posts yet.</p>
+              ) : (
+                <div className="divide-y divide-border">
+                  {myPosts.map((post) => (
+                    <div key={post.id} className="flex items-center justify-between gap-3 py-3">
+                      <div>
+                        <p className="text-sm font-semibold text-clay line-clamp-1">{post.title}</p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{post.type}</p>
+                      </div>
+                      <span className="rounded bg-primary/10 px-2 py-0.5 text-[10px] font-bold text-primary">Live</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+          
+          <button onClick={() => togglePanel('activity')} className="flex w-full items-center justify-between p-4 text-left hover:bg-muted/30 transition border-t border-border/60">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-full bg-primary/10 text-primary"><Activity className="size-4" /></div>
+              <p className="text-sm font-semibold text-clay">Recent Activity</p>
+            </div>
+          </button>
+          {activePanel === "activity" && (
+            <div className="p-4 border-t border-border/60 bg-muted/20">
+              {contactLog.length === 0 ? (
+                <p className="text-sm text-muted-foreground">No recent activity.</p>
+              ) : (
+                <div className="divide-y divide-border">
+                  {contactLog.slice(0, 5).map((log, index) => (
+                    <div key={`${log.id}-${log.at}-${index}`} className="flex items-center justify-between gap-3 py-3">
+                      <div>
+                        <p className="text-sm font-semibold text-clay line-clamp-1">{log.title}</p>
+                        <p className="text-[10px] uppercase tracking-wider text-muted-foreground">{log.action}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+
+          <button onClick={() => togglePanel('account')} className="flex w-full items-center justify-between p-4 text-left hover:bg-muted/30 transition border-t border-border/60">
+            <div className="flex items-center gap-3">
+              <div className="grid size-8 place-items-center rounded-full bg-destructive/10 text-destructive"><ShieldAlert className="size-4" /></div>
+              <p className="text-sm font-semibold text-destructive">Account Security</p>
+            </div>
+          </button>
+          {activePanel === "account" && (
+            <div className="p-4 border-t border-border/60 bg-muted/20">
             <div className="mt-4 flex flex-col gap-3 rounded-2xl border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="font-semibold text-clay">Signed in as</p>
@@ -703,36 +617,12 @@ function ProfilePage() {
                 </div>
               )}
             </div>
-          </div>
-        )}
-      </SurfaceCard>
-      <SurfaceCard className="mt-8 p-6">
-        <h3 className="font-display text-2xl font-semibold text-clay">Recent contact activity</h3>
-        <div className="mt-4 divide-y divide-border">
-          {contactLog.length === 0 ? (
-            <p className="py-6 text-sm text-muted-foreground">
-              No calls, WhatsApp, chat, or map actions yet.
-            </p>
-          ) : (
-            contactLog.slice(0, 8).map((log, index) => (
-              <div
-                key={`${log.id}-${log.at}-${index}`}
-                className="flex items-center justify-between gap-3 py-4"
-              >
-                <div>
-                  <p className="font-semibold text-clay">{log.title}</p>
-                  <p className="text-xs uppercase tracking-[0.18em] text-muted-foreground">
-                    {log.action}
-                  </p>
-                </div>
-                <span className="text-xs text-muted-foreground">
-                  {new Date(log.at).toLocaleDateString()}
-                </span>
-              </div>
-            ))
+            </div>
           )}
-        </div>
-      </SurfaceCard>
-    </PageLayout>
+        </SurfaceCard>
+      </div>
+      </main>
+      <SiteFooter />
+    </div>
   );
 }

@@ -17,6 +17,7 @@ import {
   MapPin,
   ShieldCheck,
   Award,
+  ArrowRight,
 } from "lucide-react";
 import { useRef, useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
@@ -53,7 +54,7 @@ function ProblemsPage() {
   const { items, remove, update } = useListings("complaint");
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "complaint");
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(true);
   const [statusTab, setStatusTab] = useState<"all" | "pending" | "in_progress" | "completed" | "escalated">("all");
   const [upvotes, setUpvotes] = useState<Record<string, number>>({});
   const [activeDeskId, setActiveDeskId] = useState<string | null>(null);
@@ -124,8 +125,8 @@ function ProblemsPage() {
             onClick={handlePostClick}
             className="inline-flex items-center justify-center gap-2.5 rounded-2xl bg-primary px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-primary/30 transition-all hover:scale-[1.03] hover:bg-primary/95 active:scale-95 cursor-pointer"
           >
-            <Plus className="size-5" />
-            <span>{showForm ? "Hide Report Form" : "⚡ Report New Civic Problem +"}</span>
+            {showForm ? <Trash2 className="size-5" /> : <Plus className="size-5" />}
+            <span>{showForm ? "Cancel New Report" : "⚡ Report New Civic Problem +"}</span>
           </button>
           <Link
             to="/emergency"
@@ -292,7 +293,7 @@ function ProblemsPage() {
                 <SurfaceCard
                   key={item.id}
                   hover={false}
-                  className={`p-6 flex flex-col justify-between transition-all rounded-[1.5rem] shadow-sm border-l-4 ${
+                  className={`p-4 sm:p-5 flex flex-col sm:flex-row gap-4 sm:gap-5 transition-all rounded-[1.25rem] shadow-sm border-l-4 sm:border-l-0 sm:border-t-4 ${
                     isResolved
                       ? "border-emerald-500 bg-emerald-50/30"
                       : isInProgress
@@ -300,90 +301,90 @@ function ProblemsPage() {
                         : "border-amber-500 bg-card/95"
                   }`}
                 >
-                  <div>
-                    {item.imageUrl && (
-                      <div className="mb-4 overflow-hidden rounded-2xl border border-border/80 relative group">
-                        <img
-                          src={item.imageUrl}
-                          alt={item.title}
-                          className="aspect-[16/9] w-full object-cover transition duration-300 group-hover:scale-105"
-                        />
-                        <div className="absolute top-3 right-3 rounded-full bg-black/65 backdrop-blur-md px-3 py-1 text-xs font-bold text-white flex items-center gap-1.5 max-w-[70%]">
-                          <MapPin className="size-3 text-amber-300 shrink-0" />{" "}
-                          <span className="truncate">{item.location || "Village Street"}</span>
-                        </div>
+                  {/* Left Side Thumbnail */}
+                  {item.imageUrl ? (
+                    <div className="relative h-40 w-full sm:size-32 shrink-0 overflow-hidden rounded-[14px] border border-border/80 shadow-sm">
+                      <img
+                        src={item.imageUrl}
+                        alt={item.title}
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute bottom-1 left-1 right-1 rounded-md bg-black/75 px-1.5 py-0.5 text-[10px] sm:text-[8px] font-bold text-white flex items-center justify-center gap-1 backdrop-blur-md min-w-0 overflow-hidden">
+                        <MapPin className="size-2.5 sm:size-2 text-amber-400 shrink-0" />
+                        <span className="truncate min-w-0">{item.location || "Village"}</span>
                       </div>
-                    )}
+                    </div>
+                  ) : (
+                    <div className="relative h-32 w-full sm:size-32 shrink-0 overflow-hidden rounded-[14px] border border-dashed border-border/80 bg-muted/30 flex flex-col items-center justify-center text-muted-foreground">
+                      <ImagePlus className="size-6 mb-1 opacity-20" />
+                      <span className="text-[9px] font-bold uppercase">No Photo</span>
+                    </div>
+                  )}
 
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
-                        <Award className="size-3.5 text-primary" /> {item.category || "Civic Report"}
+                  {/* Right Side Content */}
+                  <div className="flex flex-col flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-1.5 mb-1.5">
+                      <span className="inline-flex items-center gap-1 rounded-md bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary">
+                        <Award className="size-3 text-primary" /> {item.category || "Report"}
                       </span>
                       <span
-                        className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-bold ${
+                        className={`inline-flex items-center gap-1 rounded-md px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider ${
                           isResolved
-                            ? "bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300"
+                            ? "bg-emerald-100 text-emerald-800"
                             : isInProgress
-                              ? "bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300"
+                              ? "bg-blue-100 text-blue-800"
                               : status === "escalated" || status === "rejected"
-                                ? "bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300"
-                                : "bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300"
+                                ? "bg-red-100 text-red-800"
+                                : "bg-amber-100 text-amber-800"
                         }`}
                       >
                         {isResolved ? (
                           <>
-                            <CheckCircle2 className="size-3.5 text-emerald-600" /> Resolved by Panchayat
+                            <CheckCircle2 className="size-3 text-emerald-600" /> Resolved
                           </>
                         ) : isInProgress ? (
                           <>
-                            <Clock className="size-3.5 text-blue-600 animate-pulse" /> Work In Progress
+                            <Clock className="size-3 text-blue-600 animate-pulse" /> In Progress
                           </>
                         ) : status === "escalated" || status === "rejected" ? (
                           <>
-                            <AlertTriangle className="size-3.5 text-red-600" /> Cannot Solve Immediately / Escalated
+                            <AlertTriangle className="size-3 text-red-600" /> Escalated
                           </>
                         ) : (
                           <>
-                            <Clock className="size-3.5 text-amber-600 animate-pulse" /> Pending Review
+                            <Clock className="size-3 text-amber-600 animate-pulse" /> Pending
                           </>
                         )}
                       </span>
                     </div>
 
-                    <h3 className="mt-3 break-words font-display text-xl font-bold text-clay dark:text-zinc-100">{item.title}</h3>
-                    <p className="mt-2 break-words text-sm leading-6 text-muted-foreground">{item.description}</p>
+                    <h3 className="truncate font-display text-base font-bold text-clay leading-tight">{item.title}</h3>
+                    <div className="mt-1 flex-1">
+                      <p className="text-[13px] leading-5 text-muted-foreground line-clamp-2">{item.description}</p>
+                      <button className="text-[10px] font-bold text-primary mt-0.5 hover:underline flex items-center gap-0.5">Read full details <ArrowRight className="size-3" /></button>
+                    </div>
 
                     {isResolved ? (
-                      <div className="mt-4 rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/20 p-4 text-sm shadow-md relative overflow-hidden text-left">
-                        {/* Elegant watermark background badge */}
-                        <div className="absolute right-2 -bottom-2 text-emerald-500/10 pointer-events-none">
-                          <ShieldCheck className="size-20" />
+                      <div className="mt-2.5 rounded-xl border border-emerald-500/30 bg-emerald-50/50 p-2 text-[10px] shadow-sm relative overflow-hidden text-left">
+                        <div className="flex items-center gap-1 text-emerald-800 font-extrabold uppercase tracking-wider">
+                          <CheckCircle2 className="size-3 text-emerald-600" />
+                          Official Resolution
                         </div>
-                        <div className="flex items-center gap-2 text-emerald-800 dark:text-emerald-400 font-extrabold text-xs uppercase tracking-widest">
-                          <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400 animate-pulse" />
-                          Official Panchayat Resolution Seal
-                        </div>
-                        <p className="mt-2 break-words text-clay dark:text-zinc-200 font-bold leading-6">
-                          {item.officialResponse || "Resolved successfully by Gram Panchayat workers."}
+                        <p className="mt-1 truncate text-clay font-bold">
+                          {item.officialResponse || "Resolved successfully."}
                         </p>
-                        <div className="mt-3 flex items-center justify-between border-t border-emerald-200/50 dark:border-emerald-800/40 pt-2 text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400 tracking-wider">
-                          <span>✓ Verified by Gram Sabha</span>
-                          <span>Status: Completed</span>
-                        </div>
                       </div>
                     ) : (
                       item.officialResponse && (
-                        <div className="mt-3.5 rounded-2xl border border-primary/30 bg-primary/5 dark:bg-primary/10 p-3.5 text-sm shadow-sm text-left">
-                          <div className="flex items-center gap-1.5 font-bold text-primary text-xs uppercase tracking-wider">
-                            <ShieldCheck className="size-4" /> Official Gram Panchayat Response / Note
+                        <div className="mt-2.5 rounded-xl border border-primary/20 bg-primary/5 p-2 text-[10px] text-left">
+                          <div className="flex items-center gap-1 font-bold text-primary uppercase tracking-wider">
+                            <ShieldCheck className="size-3" /> Panchayat Note
                           </div>
-                          <p className="mt-1.5 break-words text-clay dark:text-zinc-200 font-medium leading-6">{item.officialResponse}</p>
+                          <p className="mt-1 truncate text-clay font-medium">{item.officialResponse}</p>
                         </div>
                       )
                     )}
-                  </div>
-
-                  <div className="mt-6 border-t border-border/70 pt-4 space-y-4">
+                  <div className="mt-4 border-t border-border/70 pt-3 space-y-3">
                     {/* Community Upvoting Bar */}
                     <div className="flex items-center justify-between rounded-2xl bg-muted/70 p-3">
                       <div className="flex items-center gap-2">
@@ -582,6 +583,7 @@ function ProblemsPage() {
                         </div>
                       </div>
                     )}
+                  </div>
                   </div>
                 </SurfaceCard>
             );

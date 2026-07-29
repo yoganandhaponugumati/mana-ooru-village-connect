@@ -29,20 +29,26 @@ function EmergencyPage() {
         {emergencyContacts.map((item) => (
           <SurfaceCard
             key={item.id}
-            className={`p-5 ${item.urgent ? "border-red-200 bg-red-50/80" : ""}`}
+            className={`p-4 flex flex-row items-center gap-4 border-l-4 rounded-[1.25rem] shadow-sm hover:shadow-md transition ${
+              item.urgent ? "border-red-500 bg-red-50/80 dark:bg-red-950/20" : "border-primary bg-card/95"
+            }`}
           >
             <FeatureIcon
               icon={<item.icon className="size-5" />}
-              className={item.urgent ? "bg-red-100 text-red-700" : ""}
+              className={`shrink-0 ${item.urgent ? "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300" : ""}`}
             />
-            <h3 className="mt-4 font-display text-xl font-semibold text-clay">{item.title}</h3>
-            <p className="mt-2 text-sm text-muted-foreground">{item.role}</p>
+            <div className="flex flex-col flex-1 min-w-0">
+              <h3 className="truncate font-display text-base font-bold text-clay leading-tight">{item.title}</h3>
+              <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{item.role}</p>
+            </div>
             <a
               href={`tel:${item.contact}`}
               onClick={() => logContact(item, "call")}
-              className={`mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3 text-sm font-semibold ${item.urgent ? "bg-red-600 text-white" : "bg-primary text-primary-foreground"}`}
+              className={`shrink-0 inline-flex items-center justify-center rounded-full p-3 shadow-sm transition hover:scale-105 active:scale-95 ${
+                item.urgent ? "bg-red-600 text-white" : "bg-primary text-primary-foreground"
+              }`}
             >
-              <Phone className="size-4" /> Call {item.contact}
+              <Phone className="size-4" />
             </a>
           </SurfaceCard>
         ))}

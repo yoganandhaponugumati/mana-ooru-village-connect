@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   Bell,
   Check,
-  ChevronDown,
   Globe2,
   Leaf,
   LogOut,
@@ -26,8 +25,10 @@ import {
   Wrench,
   Map,
   Bot,
-  Compass,
   Plus,
+  Edit,
+  CloudSun,
+  ArrowLeft,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -55,6 +56,7 @@ const navLinks = [
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
+  const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -79,6 +81,7 @@ export function SiteNav() {
   // Close mobile menu on route change
   useEffect(() => {
     setOpen(false);
+    setPostMenuOpen(false);
   }, [location.pathname]);
 
   // Prevent body scroll when mobile menu is open
@@ -106,6 +109,9 @@ export function SiteNav() {
         setLanguageOpen(false);
         setNotificationsOpen(false);
       }
+      if (!target.closest(".post-menu-container")) {
+        setPostMenuOpen(false);
+      }
     };
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -113,6 +119,7 @@ export function SiteNav() {
         setLanguageOpen(false);
         setNotificationsOpen(false);
         setOpen(false);
+        setPostMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -146,24 +153,42 @@ export function SiteNav() {
   return (
     <>
       <nav className="fixed inset-x-0 top-0 z-[9999] border-b border-[#dfeae2]/80 bg-[#f7fbf2]/95 text-foreground shadow-sm transition-all duration-300 backdrop-blur-2xl dark:bg-zinc-950/95 dark:border-zinc-800/80">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-3 sm:px-5 lg:px-6">
+      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-3 sm:px-5 lg:px-6 relative">
 
-        {/* Logo */}
-        <Link to="/" className="flex shrink-0 items-center gap-2">
-          <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
-            <img src="/logo.png" alt="ManaOoru Emblem" className="size-full object-cover" />
-          </div>
-          <div className="flex flex-col leading-none">
-            <span className="font-display text-base font-bold tracking-tight text-clay dark:text-zinc-100">
-              ManaOoru
-            </span>
-            {profile.village && (
-              <span className="text-[10px] font-semibold text-primary/80 dark:text-emerald-400/80 truncate max-w-[120px]">
-                📍 {profile.village}
+        {/* Left Side: Back Arrow (if not home) + Logo */}
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 relative z-20">
+          {location.pathname !== "/" && (
+            <button
+              type="button"
+              onClick={() => window.history.length > 1 ? window.history.back() : navigate({ to: "/" })}
+              className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition hover:border-primary hover:text-primary dark:bg-zinc-900"
+              aria-label="Go back"
+            >
+              <ArrowLeft className="size-4" />
+            </button>
+          )}
+          <Link to="/" className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5">
+            <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
+              <img src="/logo.png" alt="ManaOoru Emblem" className="size-full object-cover" />
+            </div>
+            <div className="flex flex-col leading-none">
+              <span className="font-display text-base font-bold tracking-tight text-clay dark:text-zinc-100 hidden sm:block">
+                ManaOoru
               </span>
-            )}
-          </div>
-        </Link>
+            </div>
+          </Link>
+        </div>
+
+        {/* Mobile Centered Weather (Matches Mockup exactly) */}
+        <div className="absolute inset-x-0 flex justify-center pointer-events-none md:hidden">
+          <Link to="/weather" className="flex flex-col items-center pointer-events-auto mt-1">
+            <div className="flex items-center gap-1 font-bold text-sm text-foreground">
+              <CloudSun className="size-4 text-amber-500" />
+              <span>{weather.temp != null ? `${weather.temp}°C` : "28°C"}</span>
+            </div>
+            <span className="text-[10px] text-muted-foreground font-semibold">Partly Cloudy</span>
+          </Link>
+        </div>
 
         {/* Desktop Nav Links — visible from lg (1024px) */}
         <div className="hidden lg:flex items-center gap-0.5 text-xs font-bold flex-1 justify-center text-muted-foreground dark:text-zinc-400">
@@ -183,7 +208,7 @@ export function SiteNav() {
         </div>
 
           {/* Right side icons */}
-          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2">
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 relative z-20">
 
             {/* Weather pill — md+ */}
             <Link
@@ -218,6 +243,9 @@ export function SiteNav() {
                 <span className="hidden sm:inline font-bold">
                   {languageOptions.find((i) => i.code === language)?.label}
                 </span>
+                <span className="sm:hidden font-bold uppercase text-[10px]">
+                  {language}
+                </span>
               </button>
               <AnimatePresence>
                 {languageOpen && (
@@ -243,9 +271,9 @@ export function SiteNav() {
               </AnimatePresence>
             </div>
 
-            {/* Notifications — only when signed in */}
+            {/* Notifications — only when signed in, hidden on mobile */}
             {user && (
-              <div className="nav-menu-container relative">
+              <div className="nav-menu-container relative hidden md:block">
                 <button
                   type="button"
                   onClick={openNotifications}
@@ -338,25 +366,28 @@ export function SiteNav() {
               </div>
             )}
 
-            {/* User avatar / Sign in */}
+            {/* User avatar / Sign in (Styled to match mockup on mobile: transparent bg, name below) */}
             {user ? (
               <div className="nav-menu-container relative">
                 <button
                   type="button"
                   onClick={() => { setUserMenuOpen((v) => !v); setLanguageOpen(false); setNotificationsOpen(false); }}
-                  className="flex h-8 items-center gap-1.5 rounded-full border border-border bg-white dark:bg-zinc-900 px-2 text-xs font-semibold text-foreground shadow-sm transition max-w-[120px] sm:max-w-[160px] hover:border-primary"
+                  className="flex flex-col items-center gap-0.5 transition max-w-[80px]"
                 >
-                  {authProfile?.photo_url ? (
-                    <img src={authProfile.photo_url} alt="" className="size-5 rounded-full object-cover shrink-0" />
-                  ) : (
-                    <div className="grid size-5 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
-                      <UserRound className="size-3" />
-                    </div>
-                  )}
-                  <span className="truncate font-bold hidden sm:block">
-                    {authProfile?.full_name?.split(" ")[0] || (role ? getRoleDisplayName(role) : "User")}
+                  <div className="relative">
+                    {authProfile?.photo_url ? (
+                      <img src={authProfile.photo_url} alt="" className="size-8 rounded-full object-cover shrink-0" />
+                    ) : (
+                      <div className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                        <UserRound className="size-4" />
+                      </div>
+                    )}
+                    {/* Mockup shows a red dot notification on profile */}
+                    <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-red-500 border-2 border-white dark:border-zinc-950" />
+                  </div>
+                  <span className="text-[10px] font-bold text-foreground truncate w-full">
+                    {authProfile?.full_name?.split(" ")[0] || "Profile"}
                   </span>
-                  <ChevronDown className="size-3 shrink-0 hidden sm:block" style={{ transform: userMenuOpen ? "rotate(180deg)" : "none" }} />
                 </button>
                 <AnimatePresence>
                   {userMenuOpen && (
@@ -365,7 +396,7 @@ export function SiteNav() {
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -4, scale: 0.97 }}
                       transition={{ duration: 0.14 }}
-                      className="fixed md:absolute top-16 md:top-auto left-3 right-3 md:left-auto md:right-0 md:w-56 z-[99999] mt-2 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1.5 shadow-xl"
+                      className="absolute right-0 top-12 z-[99999] w-48 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1 shadow-xl"
                     >
                       <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 mb-1">
                         <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
@@ -405,17 +436,33 @@ export function SiteNav() {
                 </AnimatePresence>
               </div>
             ) : (
-              <Link
-                to="/auth"
-                className="inline-flex h-8 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 text-xs font-bold text-primary shadow-sm transition hover:bg-primary hover:text-white dark:bg-primary/20 dark:text-emerald-300"
-              >
-                <span>Sign in</span>
-              </Link>
+              <div className="nav-menu-container relative">
+                <Link
+                  to="/auth"
+                  className="hidden md:inline-flex h-8 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 text-xs font-bold text-primary shadow-sm transition hover:bg-primary hover:text-white dark:bg-primary/20 dark:text-emerald-300"
+                >
+                  <span>Sign in</span>
+                </Link>
+                {/* Mobile empty profile avatar (matching mockup) */}
+                <Link
+                  to="/auth"
+                  className="flex md:hidden flex-col items-center gap-0.5 transition max-w-[80px]"
+                >
+                  <div className="relative">
+                    <div className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
+                      <UserRound className="size-4" />
+                    </div>
+                  </div>
+                  <span className="text-[10px] font-bold text-foreground truncate w-full">
+                    Profile
+                  </span>
+                </Link>
+              </div>
             )}
 
-            {/* Hamburger — hidden on lg+ */}
+            {/* Hamburger — hidden on lg+ and hidden on mobile to match exact mockup */}
             <button
-              className="grid size-8 place-items-center rounded-full border border-border bg-card text-foreground shadow-sm transition lg:hidden dark:bg-zinc-900"
+              className="hidden lg:hidden place-items-center rounded-full border border-border bg-card text-foreground shadow-sm transition dark:bg-zinc-900"
               onClick={() => setOpen((v) => !v)}
               aria-label={open ? "Close menu" : "Open menu"}
             >
@@ -582,17 +629,17 @@ export function SiteNav() {
           )}
       </nav>
 
-      {/* ── Mobile Bottom Dock ─────────────────────────────────────── */}
+      {/* ── Mobile Bottom Dock (Matches Mockup) ─────────────────────────────────────── */}
       <div className="fixed bottom-0 inset-x-0 z-[9995] lg:hidden">
-        <div className="border-t border-border/60 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-2xl shadow-[0_-8px_32px_rgba(0,0,0,0.10)]">
+        <div className="border-t border-border/60 bg-white dark:bg-zinc-950 backdrop-blur-2xl shadow-[0_-8px_32px_rgba(0,0,0,0.06)]">
           <div className="flex items-end justify-around px-2 pb-safe safe-area-pb" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}>
 
             {/* Home Tab */}
             <Link
               to="/"
               activeOptions={{ exact: true }}
-              className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-muted-foreground transition-colors"
-              activeProps={{ className: "flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-primary transition-colors" }}
+              className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
+              activeProps={{ className: "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary" }}
             >
               <Home className="size-[22px]" />
               <span>Home</span>
@@ -600,66 +647,72 @@ export function SiteNav() {
 
             {/* Explore Tab */}
             <Link
-              to="/timeline"
-              className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-muted-foreground transition-colors"
-              activeProps={{ className: "flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-primary transition-colors" }}
+              to="/search"
+              className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
+              activeProps={{ className: "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary" }}
             >
-              <Compass className="size-[22px]" />
+              <Search className="size-[22px]" />
               <span>Explore</span>
             </Link>
 
-            {/* Central POST FAB — opens drawer for posting actions */}
-            <div className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 -mt-4">
+            {/* Central POST FAB — explicitly labeled */}
+            <div className="post-menu-container flex flex-col items-center justify-start min-w-[66px] flex-1 px-1 -mt-5 relative">
+              <AnimatePresence>
+                {postMenuOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute bottom-[4.5rem] w-48 flex flex-col gap-1.5 p-2 rounded-2xl bg-white dark:bg-zinc-900 border border-border/60 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]"
+                  >
+                    <Link to="/announcements" onClick={() => setPostMenuOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors text-sm font-bold text-clay dark:text-zinc-100">
+                      <div className="grid size-8 place-items-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
+                        <Megaphone className="size-4" />
+                      </div>
+                      Post Notice
+                    </Link>
+                    <Link to="/problems" onClick={() => setPostMenuOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors text-sm font-bold text-clay dark:text-zinc-100">
+                      <div className="grid size-8 place-items-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
+                        <AlertTriangle className="size-4" />
+                      </div>
+                      Report Problem
+                    </Link>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               <button
                 type="button"
-                onClick={() => setOpen((v) => !v)}
-                aria-label="Post or create something"
-                className="flex size-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl shadow-emerald-500/40 ring-4 ring-white dark:ring-zinc-950 transition-all active:scale-90 hover:shadow-emerald-500/60 hover:from-emerald-400 hover:to-teal-500"
+                onClick={() => setPostMenuOpen((v) => !v)}
+                aria-label="Post or Report"
+                className={`flex size-12 items-center justify-center rounded-full text-white shadow-xl ring-4 ring-white dark:ring-zinc-950 transition-all active:scale-90 ${
+                  postMenuOpen ? "bg-[#0a5738] rotate-45" : "bg-[#0c6b45]"
+                }`}
               >
-                <Plus className="size-7" strokeWidth={2.5} />
+                <Plus className="size-6 transition-transform duration-200" strokeWidth={3} />
               </button>
-              <span className="text-[10px] font-bold text-muted-foreground mt-0.5">Post</span>
+              <span className="mt-1 text-[9px] font-extrabold text-[#0c6b45] dark:text-emerald-400 text-center leading-tight">Post / Report</span>
             </div>
 
-            {/* Notifications Tab */}
-            {user ? (
-              <button
-                type="button"
-                onClick={openNotifications}
-                className="mobile-dock-trigger flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-muted-foreground transition-colors hover:text-primary"
-                aria-label="Open notifications"
-              >
-                <span className="relative inline-flex">
-                  <Bell className="size-[22px]" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -right-1.5 -top-1 grid min-w-[14px] place-items-center rounded-full bg-red-500 px-0.5 text-[8px] font-black leading-[14px] text-white ring-1 ring-white dark:ring-zinc-950">
-                      {unreadCount > 9 ? "9+" : unreadCount}
-                    </span>
-                  )}
-                </span>
-                <span>Alerts</span>
-              </button>
-            ) : (
-              <Link
-                to="/auth"
-                className="mobile-dock-trigger flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-primary transition-colors"
-              >
-                <Bell className="size-[22px]" />
-                <span>Sign In</span>
-              </Link>
-            )}
+            {/* Timeline Tab */}
+            <Link
+              to="/timeline"
+              className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
+              activeProps={{ className: "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary" }}
+            >
+              <Newspaper className="size-[22px]" />
+              <span>Timeline</span>
+            </Link>
+
 
             {/* Profile Tab */}
             <Link
               to="/profile"
-              className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-muted-foreground transition-colors"
-              activeProps={{ className: "flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-primary transition-colors" }}
+              className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
+              activeProps={{ className: "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary" }}
             >
-              {user && authProfile?.photo_url ? (
-                <img src={authProfile.photo_url} alt="" className="size-[22px] rounded-full object-cover border-2 border-primary/30" />
-              ) : (
-                <UserRound className="size-[22px]" />
-              )}
+              <UserRound className="size-[22px]" />
               <span>Profile</span>
             </Link>
 
