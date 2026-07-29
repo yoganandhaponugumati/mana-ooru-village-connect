@@ -1,0 +1,1423 @@
+import { useEffect, useMemo, useState } from "react";
+
+export type Language = "te" | "en" | "hi";
+
+export type VillageProfile = {
+  state: string;
+  district: string;
+  mandal: string;
+  village: string;
+};
+
+type LocationTree = Record<string, Record<string, Record<string, string[]>>>;
+type WeatherProfile = {
+  temp: number | null;
+  humidity: number | null;
+  wind: number | null;
+  rain: string;
+  condition: string;
+  source?: string;
+  updatedAt?: string;
+  loading?: boolean;
+  placeName?: string;
+  coordinates?: { latitude: number; longitude: number };
+  confidence?: "verified" | "matched" | "fallback";
+  live: boolean;
+  error?: string;
+};
+type GeoResult = {
+  latitude: number;
+  longitude: number;
+  name?: string;
+  admin1?: string;
+  admin2?: string;
+  admin3?: string;
+};
+
+export const defaultProfile: VillageProfile = {
+  state: "Telangana",
+  district: "Rangareddy",
+  mandal: "Kandukur",
+  village: "",
+};
+
+const telanganaDistricts = [
+  "Adilabad",
+  "Bhadradri Kothagudem",
+  "Hanumakonda",
+  "Hyderabad",
+  "Jagtial",
+  "Jangaon",
+  "Jayashankar Bhupalpally",
+  "Jogulamba Gadwal",
+  "Kamareddy",
+  "Karimnagar",
+  "Khammam",
+  "Kumuram Bheem Asifabad",
+  "Mahabubabad",
+  "Mahabubnagar",
+  "Mancherial",
+  "Medak",
+  "Medchal-Malkajgiri",
+  "Mulugu",
+  "Nagarkurnool",
+  "Nalgonda",
+  "Narayanpet",
+  "Nirmal",
+  "Nizamabad",
+  "Peddapalli",
+  "Rajanna Sircilla",
+  "Rangareddy",
+  "Sangareddy",
+  "Siddipet",
+  "Suryapet",
+  "Vikarabad",
+  "Wanaparthy",
+  "Warangal",
+  "Yadadri Bhuvanagiri",
+];
+
+const andhraDistricts = [
+  "Alluri Sitharama Raju",
+  "Anakapalli",
+  "Anantapur",
+  "Annamayya",
+  "Bapatla",
+  "Chittoor",
+  "East Godavari",
+  "Eluru",
+  "Guntur",
+  "Kakinada",
+  "Konaseema",
+  "Krishna",
+  "Kurnool",
+  "Nandyal",
+  "NTR",
+  "Palnadu",
+  "Parvathipuram Manyam",
+  "Prakasam",
+  "Sri Potti Sriramulu Nellore",
+  "Sri Sathya Sai",
+  "Srikakulam",
+  "Tirupati",
+  "Visakhapatnam",
+  "Vizianagaram",
+  "West Godavari",
+  "YSR Kadapa",
+];
+
+// All 28 states + 8 union territories of India. Telangana and Andhra Pradesh
+// have hand-curated district/mandal/village data below; every other state is
+// listed here so it's selectable, with district/mandal/village entered as
+// free text (see VillageLocationPicker) since we don't have a verified
+// village-level dataset for the rest of the country.
+const otherStatesAndUTs = [
+  "Andaman and Nicobar Islands",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chandigarh",
+  "Chhattisgarh",
+  "Dadra and Nagar Haveli and Daman and Diu",
+  "Delhi",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jammu and Kashmir",
+  "Jharkhand",
+  "Kerala",
+  "Ladakh",
+  "Lakshadweep",
+  "Madhya Pradesh",
+  "Manipur",
+  "Meghalaya",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Puducherry",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tripura",
+  "Uttarakhand",
+  "West Bengal",
+];
+
+function makeStateSkeleton(): LocationTree[string] {
+  // No fabricated placeholder districts/mandals/villages — this state is
+  // selectable, and district/mandal/village are entered as free text with
+  // no suggestions until real data is curated for it.
+  return {};
+}
+
+function makeDistrictSkeleton(districts: string[]): LocationTree[string] {
+  // Real district names, so they show up as suggestions — but no fabricated
+  // mandal/village placeholders. Mandal and village are free text for any
+  // district we haven't hand-curated real mandal/village data for below.
+  return Object.fromEntries(districts.map((district) => [district, {}]));
+}
+
+export const locationTree = {
+  Telangana: {
+    ...makeDistrictSkeleton(telanganaDistricts),
+    Adilabad: {
+      Adilabad: ["Adilabad", "Bheempur", "Mavala", "Sirikonda"],
+      Boath: ["Boath", "Gudihatnoor", "Talamadugu", "Jainath"],
+      Jainath: ["Jainath", "Gondi", "Raipur", "Wankdi"],
+      Mavala: ["Mavala", "Ichoda", "Tamsi", "Gadiguda"],
+      Utnoor: ["Utnoor", "Sirpur T", "Narnoor", "Indervelly"],
+    },
+    "Bhadradri Kothagudem": {
+      Kothagudem: ["Kothagudem", "Tekulapalli", "Palwancha", "Yellandu"],
+      Bhadrachalam: ["Bhadrachalam", "Charla", "Dummugudem", "Pinapaka"],
+      Manuguru: ["Manuguru", "Cherla", "Burgampadu", "Aswapuram"],
+      Yellandu: ["Yellandu", "Mulakalapalli", "Gundala", "Chandrugonda"],
+      Palwancha: ["Palwancha", "Enkoor", "Julurpad", "Sujathanagar"],
+    },
+    Hanumakonda: {
+      Hanamkonda: ["Kazipet", "Subedari", "Waddepally", "Lashkar Singaram", "Hanamkonda"],
+      Hasanparthy: ["Hasanparthy", "Ananthasagar", "Bheemaram", "Pegadapally", "Ghanpur"],
+      Inavolu: ["Inavolu", "Punnelu", "Kondaparthy", "Thorrur", "Maripeda"],
+      Dharmasagar: ["Dharmasagar", "Nallabelli", "Palakurthi", "Atmakur"],
+    },
+    Hyderabad: {
+      "Hyderabad Urban": ["Hyderabad", "Secunderabad", "Begumpet", "Koti", "Abids"],
+      Charminar: ["Charminar", "Falaknuma", "Malakpet", "Bahadurpura"],
+      Khairatabad: ["Khairatabad", "Banjara Hills", "Jubilee Hills", "Ameerpet"],
+      Secunderabad: ["Secunderabad", "Marredpally", "Trimulgherry", "Malkajgiri"],
+    },
+    Jagtial: {
+      Jagtial: ["Jagtial", "Kodimyal", "Sarangapur", "Mallapur"],
+      Dharmapuri: ["Dharmapuri", "Korutla", "Metpally", "Mallial"],
+      Korutla: ["Korutla", "Karimnagar", "Vemulawada", "Pegadapalli"],
+      Raikal: ["Raikal", "Kathalapur", "Buggaram", "Sultanabad"],
+      Velgatoor: ["Velgatoor", "Medipally", "Gollapally", "Vemulawada"],
+    },
+    Jangaon: {
+      Jangaon: ["Jangaon", "Ghanpur", "Devaruppula", "Kodakandla"],
+      Tharigoppula: ["Tharigoppula", "Palakurthi", "Raghunathpally", "Lingalaghanpur"],
+      Bachannapet: ["Bachannapet", "Rayaparthi", "Narmetta", "Chilpur"],
+      Hasanparthy: ["Hasanparthy", "Thorrur", "Maripeda", "Nallabelli"],
+    },
+    "Jayashankar Bhupalpally": {
+      Bhupalpally: ["Bhupalpally", "Warangal", "Mahadevpur", "Govindaraopet"],
+      Mahadevpur: ["Mahadevpur", "Chityal", "Yellareddypet", "Palimela"],
+      Mulugu: ["Mulugu", "Eturunagaram", "Tadvai", "Kannaigudem"],
+      Govindaraopet: ["Govindaraopet", "Tekumatla", "Rampur", "Nagunur"],
+    },
+    "Jogulamba Gadwal": {
+      Gadwal: ["Gadwal", "Maldakal", "Aiza", "Dharur"],
+      Alampur: ["Alampur", "Kalvakurthi", "Kollapur", "Ieeja"],
+      Wanaparthy: ["Wanaparthy", "Pebbair", "Pangal", "Kothakota"],
+      Maldakal: ["Maldakal", "Ghattu", "Veldanda", "Undavalli"],
+    },
+    Kamareddy: {
+      Kamareddy: ["Kamareddy", "Banswada", "Nizamsagar", "Yellareddy"],
+      Banswada: ["Banswada", "Tadwai", "Linga", "Pitlam"],
+      Yellareddy: ["Yellareddy", "Machareddy", "Sadasivanagar", "Rajampet"],
+      Bichkunda: ["Bichkunda", "Ramayampet", "Koheda", "Mudhol"],
+    },
+    Karimnagar: {
+      Karimnagar: ["Karimnagar", "Kothapalli", "Bommakal", "Asifnagar", "Manakondur"],
+      Huzurabad: ["Huzurabad", "Jammikunta", "Shankarapatnam", "Veenavanka", "Gambhiraopet"],
+      Choppadandi: ["Choppadandi", "Gangadhara", "Ramadugu", "Kathalapur"],
+      Peddapalli: ["Peddapalli", "Manthani", "Sultanabad", "Godavarikhani"],
+      Sultanabad: ["Sultanabad", "Ramagundam", "Godavarikhani", "Manthani"],
+    },
+    Khammam: {
+      Bonakal: ["Bonakal", "Govindapuram", "Mustikuntla", "Ravinoothala", "Allapadu"],
+      Chintakani: ["Chintakani", "Pandillapalli", "Proddutur", "Nagulavancha", "Vepakuntla"],
+      Enkoor: ["Enkoor", "Nacharam", "Thimmaraopeta", "Raimadaram", "Jannaram"],
+      Kallur: [
+        "Kallur", "Peruvancha", "Yerraboinapalli", "Lokavaram", "Chennuru",
+        "Kappalabandham", "Mucharam", "Vennavalli", "Narayanapuram",
+        "Peddakorukondi", "Chinnakorukondi", "Bathulapalli",
+      ],
+      Kamepally: ["Kamepally", "Mucherla", "Komminepalli", "Govindrala", "Pinapaka"],
+      "Khammam Rural": ["Edulapuram", "Gollagudem", "Gudurupadu", "Mallemadugu", "Tekulapalli"],
+      "Khammam Urban": ["Khammam", "Burhanpuram", "Khanapuram Haveli", "Rotary Nagar", "Naya Bazar"],
+      Konijerla: ["Konijerla", "Ammapalem", "Goparam", "Tanukupadu", "Pedda Gopa"],
+      Kusumanchi: ["Kusumanchi", "Jakkepalli", "Nelapatla", "Palair", "Gaikwarpally"],
+      Madhira: ["Madhira", "Dendukuru", "Illuru", "Rayapatnam", "Maturu"],
+      Mudigonda: ["Mudigonda", "Chirumarri", "Kamalapuram", "Vallabhi", "Gandarugudem"],
+      Nelakondapalli: ["Nelakondapalli", "Aregudem", "Bodulabanda", "Mujjugudem", "Kondapuram"],
+      Sathupalli: ["Sathupalli", "Gangaram", "Kistaram", "Rejerla"],
+      Wyra: ["Wyra", "Gollanapadu", "Khanapuram", "Somavaram"],
+    },
+    "Kumuram Bheem Asifabad": {
+      Asifabad: ["Asifabad", "Sirpur U", "Kagaznagar", "Dahegaon"],
+      Kagaznagar: ["Kagaznagar", "Sirpur", "Tiryani", "Wankdi"],
+      Rebbena: ["Rebbena", "Wankdi", "Narsapur", "Jodeghat"],
+      Penchikalpet: ["Penchikalpet", "Luxettipet", "Kasipet", "Waranapally"],
+    },
+    Mahabubabad: {
+      Mahabubabad: ["Mahabubabad", "Gudur", "Dornakal", "Kesamudram"],
+      Thorrur: ["Thorrur", "Maripeda", "Narsimhulapet", "Odela"],
+      Kesamudram: ["Kesamudram", "Kuravi", "Nellikuduru", "Gaganpahad"],
+      Dornakal: ["Dornakal", "Nellipaka", "Singareni", "Khanapur"],
+    },
+    Mahabubnagar: {
+      Mahabubnagar: ["Mahabubnagar", "Jadcherla", "Bhootpur", "Devarkadra", "Kosgi"],
+      Shadnagar: ["Farooqnagar", "Kondurg", "Kothur", "Nandigama", "Shadnagar"],
+      Wanaparthy: ["Wanaparthy", "Pebbair", "Ghanpur", "Kothakota"],
+      Jadcherla: ["Jadcherla", "Shamshabad", "Kothur", "Farooqnagar"],
+      Gadwal: ["Gadwal", "Maldakal", "Aiza", "Dharur"],
+    },
+    Mancherial: {
+      Mancherial: ["Mancherial", "Bellampally", "Luxettipet", "Kotapally"],
+      Bellampally: ["Bellampally", "Mandamarri", "Kasipet", "Bheemini"],
+      Luxettipet: ["Luxettipet", "Chennur", "Naspur", "Vemanpally"],
+      Jaipur: ["Jaipur", "Kotapally", "Hajipur", "Bheemaram"],
+    },
+    Medak: {
+      Medak: ["Medak", "Ramayampet", "Shankarampet", "Alladurg", "Narayankhed"],
+      Narsapur: ["Narsapur", "Shivampet", "Kowdipally", "Toopran"],
+      Siddipet: ["Siddipet", "Gajwel", "Dubbak", "Cherial", "Husnabad"],
+      Sangareddy: ["Sangareddy", "Patancheru", "Zaheerabad", "Narayankhed"],
+    },
+    "Medchal-Malkajgiri": {
+      Medchal: ["Medchal", "Dundigal", "Gundlapochampally", "Shameerpet"],
+      Malkajgiri: ["Malkajgiri", "Secunderabad", "Uppal", "Nacharam"],
+      Ghatkesar: ["Ghatkesar", "Keesara", "Neredmet", "Kushaiguda"],
+      Shamirpet: ["Shamirpet", "Medchal", "Kompally", "Jawaharnagar"],
+    },
+    Mulugu: {
+      Mulugu: ["Mulugu", "Eturunagaram", "Tadvai", "Kannaigudem"],
+      Eturunagaram: ["Eturunagaram", "Govindaraopet", "Mogullapally", "Venkatapuram"],
+      Tadvai: ["Tadvai", "Wazeedu", "Kothaguda", "Elgoi"],
+      Venkatapur: ["Venkatapur", "Rampur", "Nagunur", "Tekumatla"],
+    },
+    Nagarkurnool: {
+      Nagarkurnool: ["Nagarkurnool", "Achampet", "Kollapur", "Kalwakurthi"],
+      Achampet: ["Achampet", "Padara", "Veldanda", "Amrabad"],
+      Kollapur: ["Kollapur", "Badepally", "Ieeja", "Peddakothapally"],
+      Kalwakurthi: ["Kalwakurthi", "Dharur", "Bijinapally", "Vangur"],
+    },
+    Nalgonda: {
+      Miryalaguda: ["Vemulapally", "Alagadapa", "Thungapahad", "Miryalaguda", "Tipparthy"],
+      Nakrekal: ["Chandupatla", "Nomula", "Tatikal", "Nakrekal", "Chityal"],
+      Nalgonda: ["Anneparthy", "Marriguda", "Cherlapally", "Nalgonda", "Kangal"],
+      Suryapet: ["Suryapet", "Imampet", "Pillalamarri", "Kasarabad"],
+      Devarakonda: ["Devarakonda", "Gaddipally", "Kondabheemanapally", "Chintapally"],
+      Kodad: ["Kodad", "Komarabanda", "Gudibanda", "Thimmapuram"],
+      Huzurnagar: ["Huzurnagar", "Nadigudem", "Nidamanuru", "Mothkur"],
+    },
+    Narayanpet: {
+      Narayanpet: ["Narayanpet", "Kosgi", "Makthal", "Marikal"],
+      Makthal: ["Makthal", "Devarkadra", "Bhootpur", "Sanganur"],
+      Marikal: ["Marikal", "Kosgi", "Utkoor", "Atmakur"],
+      Utkoor: ["Utkoor", "Dhanwada", "Keshampet", "Khanapur"],
+    },
+    Nirmal: {
+      Nirmal: ["Nirmal", "Bhainsa", "Dilawarpur", "Narsapur"],
+      Bhainsa: ["Bhainsa", "Mamda", "Tanur", "Laxmanchanda"],
+      Mudhole: ["Mudhole", "Luxettipet", "Kuntala", "Tamsi"],
+      Khanapur: ["Khanapur", "Sarangapur", "Lokeswaram", "Bazarhathnoor"],
+    },
+    Nizamabad: {
+      Nizamabad: ["Nizamabad", "Armoor", "Bodhan", "Balkonda", "Dichpally"],
+      Bodhan: ["Bodhan", "Yedapally", "Renjal", "Navipet"],
+      Armoor: ["Armoor", "Perkit", "Ankapur", "Mamidipally"],
+      Banswada: ["Banswada", "Bhiknoor", "Kotgir", "Pitlam"],
+      Balkonda: ["Balkonda", "Sarangapur", "Yellareddy", "Nandipet"],
+    },
+    Peddapalli: {
+      Peddapalli: ["Peddapalli", "Manthani", "Sultanabad", "Godavarikhani"],
+      Manthani: ["Manthani", "Dharmaram", "Kamanpur", "Ramagundam"],
+      Ramagundam: ["Ramagundam", "Godavarikhani", "NTPC Colony", "Jayipuram"],
+      Sultanabad: ["Sultanabad", "Chandrugonda", "Kasipet", "Srirampur"],
+    },
+    "Rajanna Sircilla": {
+      Sircilla: ["Sircilla", "Vemulawada", "Yellareddypet", "Choppadandi"],
+      Vemulawada: ["Vemulawada", "Konaraopet", "Dharmapuri", "Mallapur"],
+      Konaraopet: ["Konaraopet", "Boinpally", "Gambhiraopet", "Sirikonda"],
+      Thangallapally: ["Thangallapally", "Chandurthi", "Nangnur", "Arepally"],
+    },
+    Rangareddy: {
+      Kandukur: ["Kothur", "Dasarlapally", "Lemoor", "Nednur", "Timmapur", "Gudur"],
+      Maheshwaram: ["Mansanpally", "Nagaram", "Tukkuguda", "Ameenpur", "Sirigiripuram"],
+      Shabad: ["Shabad", "Hayathabad", "Tadlapally", "Manchirevula", "Machanpally"],
+      Chevella: ["Chevella", "Kandawada", "Malkapur", "Aloor", "Devarampally"],
+      Rajendranagar: ["Budvel", "Premavathipet", "Bandlaguda Jagir", "Hydershakote"],
+      Ibrahimpatnam: ["Ibrahimpatnam", "Pocharam", "Sheriguda", "Eliminedu"],
+      Shamshabad: ["Shamshabad", "Kotwalguda", "Satamrai", "Rashidguda"],
+      Vikarabad: ["Vikarabad", "Pargi", "Dharur", "Kodangal"],
+    },
+    Sangareddy: {
+      Sangareddy: ["Sangareddy", "Patancheru", "Zaheerabad", "Narayankhed", "Ramachandrapuram"],
+      Zaheerabad: ["Zaheerabad", "Nyalkal", "Narayankhed", "Andole"],
+      Patancheru: ["Patancheru", "Bollaram", "Jinnaram", "Isnapur"],
+      Andole: ["Andole", "Kowdipally", "Narsapur", "Shivampet"],
+    },
+    Siddipet: {
+      Siddipet: ["Siddipet", "Gajwel", "Dubbak", "Cherial", "Husnabad"],
+      Gajwel: ["Gajwel", "Mulug", "Rajapet", "Pragnapur"],
+      Dubbak: ["Dubbak", "Thoguta", "Arekatika", "Chinnakodur"],
+      Cherial: ["Cherial", "Raipole", "Narsingi", "Kondapak"],
+    },
+    Suryapet: {
+      Suryapet: ["Suryapet", "Nalgonda", "Mothkur", "Huzurnagar"],
+      Kodad: ["Kodad", "Mellacheruvu", "Thungathurthy", "Damaracherla"],
+      Huzurnagar: ["Huzurnagar", "Nadigudem", "Nidamanuru", "Mothkur"],
+      Neredcherla: ["Neredcherla", "Tirumalgiri", "Ananthagiri", "Garidepally"],
+    },
+    Vikarabad: {
+      Vikarabad: ["Vikarabad", "Pargi", "Tandur", "Doma"],
+      Tandur: ["Tandur", "Kodangal", "Marpally", "Basheerabad"],
+      Pargi: ["Pargi", "Dharur", "Pudur", "Rangapur"],
+      Kodangal: ["Kodangal", "Kosgi", "Dhanwada", "Amdapur"],
+    },
+    Wanaparthy: {
+      Wanaparthy: ["Wanaparthy", "Pebbair", "Ghanpur", "Kothakota", "Pangal"],
+      Pebbair: ["Pebbair", "Devarakonda", "Dharur", "Ghanpur"],
+      Kothakota: ["Kothakota", "Maldakal", "Gundlapally", "Revelly"],
+      Amangal: ["Amangal", "Tirumalapur", "Balmoor", "Veepangandla"],
+    },
+    Warangal: {
+      Geesugonda: ["Gorrekunta", "Elkurthy", "Vanchanagiri", "Geesugonda"],
+      Parkal: ["Nadikuda", "Damera", "Atmakur", "Parkal", "Nagaram"],
+      Sangem: ["Sangem", "Narlavai", "Theegarajupally", "Gavicherla"],
+      Narsampet: ["Narsampet", "Chennaraopet", "Duggondi", "Khanapur"],
+      Warangal: ["Warangal", "Kazipet", "Hanamkonda", "Subedari"],
+      Cherial: ["Cherial", "Raipole", "Narsingi", "Kondapak"],
+    },
+    "Yadadri Bhuvanagiri": {
+      Bhongir: ["Bhongir", "Yadagirigutta", "Raigir", "Choutuppal"],
+      Yadagirigutta: ["Yadagirigutta", "Alair", "Motakondur", "Pochampally"],
+      Choutuppal: ["Choutuppal", "Pochampally", "Neredcherla", "Damercherla"],
+      Raigir: ["Raigir", "Tungathurthi", "Jangaon", "Nidamanuru"],
+    },
+  },
+  "Andhra Pradesh": {
+    ...makeDistrictSkeleton(andhraDistricts),
+    "Alluri Sitharama Raju": {
+      Paderu: ["Paderu", "Araku Valley", "Chintapalle", "G.Madugula"],
+      Rampachodavaram: ["Rampachodavaram", "Devipatnam", "Addateegala", "Kothapeta"],
+      "Araku Valley": ["Araku", "Hukumpeta", "Dumbriguda", "Ananthagiri"],
+      Chintapalle: ["Chintapalle", "Koyyuru", "G.Madugula", "Munchingiputtu"],
+    },
+    Anakapalli: {
+      Anakapalli: ["Anakapalli", "Kasimkota", "Munagapaka", "Chodavaram"],
+      Bheemunipatnam: ["Bheemunipatnam", "Kapuluppada", "Tagarapuvalasa", "Narisipatnam"],
+      Nakkapalli: ["Nakkapalli", "Rambilli", "Yellamanchili", "Narsipatnam"],
+      Chodavaram: ["Chodavaram", "Payakaraopet", "Madugula", "Ravikamatham"],
+    },
+    Anantapur: {
+      Anantapur: ["Anantapur", "Bukkarayasamudram", "Gooty", "Guntakal", "Puttaparthi"],
+      Dharmavaram: ["Dharmavaram", "Penukonda", "Hindupur", "Kadiri"],
+      Tadpatri: ["Tadpatri", "Yellanur", "Peddapappur", "Rayadurgam"],
+      Hindupur: ["Hindupur", "Penukonda", "Lepakshi", "Madakasira"],
+      Guntakal: ["Guntakal", "Gooty", "Tadimarri", "Yadiki"],
+    },
+    Annamayya: {
+      Rajampet: ["Rajampet", "Kodur", "Kalikiri", "Obulavaripalli"],
+      Kadapa: ["Kadapa", "Pulivendla", "Mydukur", "Jammalamadugu"],
+      Rayachoti: ["Rayachoti", "Vontimitta", "Simhadripuram", "Nandalur"],
+      Proddutur: ["Proddutur", "Jammalamadugu", "Kamalapuram", "Pulivendla"],
+    },
+    Bapatla: {
+      Bapatla: ["Bapatla", "Karlapalem", "Pittalavanipalem", "Vetapalem"],
+      Chirala: ["Chirala", "Inkollu", "Santhanuthalapadu", "Repalle"],
+      Repalle: ["Repalle", "Pitchika", "Nagaram", "Nizampatnam"],
+      Addanki: ["Addanki", "Korisapadu", "Inkollu", "Parchuru"],
+    },
+    Chittoor: {
+      Tirupati: ["Tirupati", "Chandragiri", "Renigunta", "Karakambadi", "Srikalahasti"],
+      Chittoor: ["Chittoor", "Gudipala", "Tavanampalle", "Puthalapattu"],
+      Madanapalle: ["Madanapalle", "Pileru", "Punganur", "Vayalpad", "Kuppam"],
+      Kuppam: ["Kuppam", "Gudupalle", "Santhipuram", "Venkatagirikota"],
+      Srikalahasti: ["Srikalahasti", "Nagalapuram", "Sullurpeta", "Tada"],
+    },
+    "East Godavari": {
+      Rajahmundry: ["Rajahmundry", "Kadiyam", "Vemagiri", "Torredu", "Peddapuram"],
+      Kakinada: ["Kakinada", "Samalkota", "Peddapuram", "Pithapuram", "Prathipadu"],
+      Amalapuram: ["Amalapuram", "Ravulapalem", "Kothapeta", "Mummidivaram", "Ambajipeta"],
+      Ramachandrapuram: ["Ramachandrapuram", "Mandapeta", "Razole", "Alamuru"],
+      Rajam: ["Rajam", "Narasannapeta", "Palasa", "Srikakulam"],
+    },
+    Eluru: {
+      Eluru: ["Eluru", "Denduluru", "Pedavegi", "Pedapadu", "Nuzvid"],
+      Bhimavaram: ["Bhimavaram", "Palakollu", "Narsapuram", "Tanuku", "Nidadavole"],
+      Tadepalligudem: ["Tadepalligudem", "Pentapadu", "Nidadavole", "Unguturu"],
+      Jangareddygudem: ["Jangareddygudem", "Chintalapudi", "Gopalapuram", "Kamavarapu Kota"],
+    },
+    Guntur: {
+      Tenali: ["Kollipara", "Pedaravuru", "Angalakuduru", "Tenali", "Burripalem"],
+      Mangalagiri: ["Nowluru", "Chinakakani", "Kaza", "Mangalagiri", "Atmakuru"],
+      Prathipadu: ["Prathipadu", "Ganikapudi", "Kondajagarla", "Pedanandipadu"],
+      Bapatla: ["Bapatla", "Karlapalem", "Pittalavanipalem", "Vetapalem"],
+      Narasaraopet: ["Narasaraopet", "Rompicherla", "Nekarikallu", "Vinukonda"],
+      Guntur: ["Guntur", "Amaravathi", "Tadepalle", "Pedakakani"],
+    },
+    Kakinada: {
+      Kakinada: ["Kakinada", "Samalkota", "Peddapuram", "Pithapuram"],
+      Pithapuram: ["Pithapuram", "Prathipadu", "Gollaprolu", "Yeleswaram"],
+      Tuni: ["Tuni", "Prathipadu", "Rowthulapudi", "Gokavaram"],
+      Jaggampeta: ["Jaggampeta", "Rayavaram", "Biccavolu", "Sankhavaram"],
+    },
+    Konaseema: {
+      Amalapuram: ["Amalapuram", "Ravulapalem", "Kothapeta", "Mummidivaram"],
+      Razole: ["Razole", "Narsapur", "Palacole", "Bhimavaram"],
+      Narsapur: ["Narsapur", "Palacole", "Tanuku", "Palakollu"],
+      Mandapeta: ["Mandapeta", "Kajuluru", "Draksharamam", "P.Gannavaram"],
+    },
+    Krishna: {
+      Gudivada: ["Pedayerukapadu", "Bethavolu", "Chowtapalli", "Gudivada", "Mandavalli"],
+      Machilipatnam: ["Manginapudi", "Pedapatnam", "Tallapalem", "Machilipatnam", "Chinnapuram"],
+      Avanigadda: ["Avanigadda", "Modumudi", "Vekanuru", "Nagayalanka", "Koduru"],
+      Vijayawada: ["Vijayawada", "Gannavaram", "Kankipadu", "Penamaluru", "Poranki"],
+      Nuzvid: ["Nuzvid", "Agiripalli", "Chatrai", "Musunuru", "Jaggayyapeta"],
+      Jaggayyapeta: ["Jaggayyapeta", "Mylavaram", "Vissannapeta", "Tiruvuru"],
+    },
+    Kurnool: {
+      Kurnool: ["Kurnool", "Kallur", "Orvakal", "Veldurthi", "Kodumur"],
+      Nandyal: ["Nandyal", "Allagadda", "Banaganapalle", "Dhone", "Srisailam"],
+      Adoni: ["Adoni", "Yemmiganur", "Mantralayam", "Alur", "Kosigi"],
+      Atmakur: ["Atmakur", "Panyam", "Gospadu", "Peapully"],
+    },
+    Nandyal: {
+      Nandyal: ["Nandyal", "Allagadda", "Banaganapalle", "Dhone"],
+      Srisailam: ["Srisailam", "Giddalur", "Markapuram", "Kanigiri"],
+      Bethamcherla: ["Bethamcherla", "Nandikotkur", "Kolimigundla", "Gospadu"],
+      Allagadda: ["Allagadda", "Sirvel", "Mahanandi", "Srisailam"],
+    },
+    NTR: {
+      Vijayawada: ["Vijayawada", "Gannavaram", "Kankipadu", "Penamaluru", "Poranki"],
+      Jaggayyapeta: ["Jaggayyapeta", "Mylavaram", "Vissannapeta", "Tiruvuru"],
+      Nandigama: ["Nandigama", "Penuganchiprolu", "Chandarlapadu", "Veerullapadu"],
+      Tiruvuru: ["Tiruvuru", "Vuyyuru", "Gampalagudem", "Kaikalur"],
+    },
+    Palnadu: {
+      Narasaraopet: ["Narasaraopet", "Rompicherla", "Nekarikallu", "Vinukonda"],
+      Macherla: ["Macherla", "Atchampet", "Piduguralla", "Gurazala"],
+      Sattenapalle: ["Sattenapalle", "Vemuru", "Pedakurapadu", "Chilakaluripet"],
+      Gurazala: ["Gurazala", "Dachepalle", "Rentachintala", "Bolllapalle"],
+    },
+    "Parvathipuram Manyam": {
+      Parvathipuram: ["Parvathipuram", "Salur", "Bobbili", "Rajam"],
+      Salur: ["Salur", "Seethampeta", "Kurupam", "Makkuva"],
+      Bobbili: ["Bobbili", "Badangi", "Gajapathinagaram", "Cheepurupalli"],
+      Palakonda: ["Palakonda", "Hiramandalam", "Sompeta", "Mandasa"],
+    },
+    Prakasam: {
+      Ongole: ["Ongole", "Chirala", "Kandukur", "Markapur"],
+      Giddalur: ["Giddalur", "Markapuram", "Cumbum", "Podili"],
+      Markapuram: ["Markapuram", "Yerragondapalem", "Dornala", "Darsi"],
+      Kandukur: ["Kandukur", "Chirala", "Vetapalem", "Pamuru"],
+    },
+    "Sri Potti Sriramulu Nellore": {
+      Nellore: ["Nellore", "Kavali", "Gudur", "Atmakur", "Alluru"],
+      Gudur: ["Gudur", "Naidupeta", "Sullurpeta", "Tada"],
+      Kavali: ["Kavali", "Alluru", "Podalakur", "Kovur"],
+      Atmakur: ["Atmakur", "Marripadu", "Vinjamur", "Saidapur"],
+    },
+    "Sri Sathya Sai": {
+      Puttaparthi: ["Puttaparthi", "Kothacheruvu", "Lepakshi", "Penukonda"],
+      Hindupur: ["Hindupur", "Penukonda", "Lepakshi", "Madakasira"],
+      Kadiri: ["Kadiri", "Gooty", "Nallacheruvu", "Tadipatri"],
+      Madakasira: ["Madakasira", "Rayadurgam", "Rolla", "Nallamada"],
+    },
+    Srikakulam: {
+      Srikakulam: ["Srikakulam", "Arasavalli", "Gara", "Ampolu", "Kallepalli"],
+      Tekkali: ["Tekkali", "Nandigam", "Kotabommali", "Santhabommali"],
+      Palasa: ["Palasa", "Kasibugga", "Mandi", "Vajrapukotturu"],
+      Amadalavalasa: ["Amadalavalasa", "Ponduru", "Burja", "Sarubujjili"],
+      Ichchapuram: ["Ichchapuram", "Kaviti", "Sompeta", "Kanchili"],
+      Narasannapeta: ["Narasannapeta", "Palasa", "Srikakulam", "Rajam"],
+    },
+    Tirupati: {
+      Tirupati: ["Tirupati", "Chandragiri", "Renigunta", "Karakambadi"],
+      Srikalahasti: ["Srikalahasti", "Nagalapuram", "Sullurpeta", "Tada"],
+      Naidupeta: ["Naidupeta", "Atmakur", "Venkatagiri", "Gudur"],
+      Puttur: ["Puttur", "Nagari", "Pakala", "Chittoor"],
+    },
+    Visakhapatnam: {
+      Bheemunipatnam: ["Bheemunipatnam", "Kapuluppada", "Tagarapuvalasa", "Narisipatnam"],
+      Padmanabham: ["Padmanabham", "Pandrangapuram", "Revidi", "Anandapuram"],
+      Anandapuram: ["Anandapuram", "Gambheeram", "Vellanki", "Gidijala"],
+      Anakapalli: ["Anakapalli", "Kasimkota", "Munagapaka", "Chodavaram"],
+      Visakhapatnam: ["Visakhapatnam", "Gajuwaka", "Kommadi", "Bheemunipatnam"],
+      Sabbavaram: ["Sabbavaram", "Narsipatnam", "Payakaraopet", "Chodavaram"],
+    },
+    Vizianagaram: {
+      Vizianagaram: ["Vizianagaram", "Bobbili", "Parvathipuram", "Rajam"],
+      Bobbili: ["Bobbili", "Badangi", "Gajapathinagaram", "Cheepurupalli"],
+      Salur: ["Salur", "Seethampeta", "Kurupam", "Makkuva"],
+      Parvathipuram: ["Parvathipuram", "Bhamini", "Pachipenta", "Garugubilli"],
+    },
+    "West Godavari": {
+      Eluru: ["Eluru", "Denduluru", "Pedavegi", "Pedapadu"],
+      Bhimavaram: ["Bhimavaram", "Palakollu", "Narsapuram", "Tanuku"],
+      Tadepalligudem: ["Tadepalligudem", "Pentapadu", "Nidadavole", "Jangareddygudem"],
+      Jangareddygudem: ["Jangareddygudem", "Chintalapudi", "Gopalapuram", "Kamavarapu Kota"],
+      Narasapur: ["Narasapur", "Palacole", "Narsapuram", "Undi"],
+    },
+    "YSR Kadapa": {
+      Kadapa: ["Kadapa", "Pulivendla", "Mydukur", "Jammalamadugu", "Proddatur"],
+      Proddatur: ["Proddatur", "Mydukur", "Rayachoti", "Kamalapuram"],
+      Rajampet: ["Rajampet", "Kodur", "Kalikiri", "Obulavaripalli"],
+      Pulivendla: ["Pulivendla", "Jammalamadugu", "Vontimitta", "Porumamilla"],
+    },
+  },
+  Karnataka: makeDistrictSkeleton([
+    "Bagalkot", "Ballari", "Belagavi", "Bengaluru Rural", "Bengaluru Urban", "Bidar", "Chamarajanagar", "Chikkaballapur", "Chikkamagaluru", "Chitradurga", "Dakshina Kannada", "Davanagere", "Dharwad", "Gadag", "Hassan", "Haveri", "Kalaburagi", "Kodagu", "Kolar", "Koppal", "Mandya", "Mysuru", "Raichur", "Ramanagara", "Shivamogga", "Tumakuru", "Udupi", "Uttara Kannada", "Vijayapura", "Yadgir"
+  ]),
+  Maharashtra: makeDistrictSkeleton([
+    "Ahmednagar", "Akola", "Amravati", "Aurangabad", "Beed", "Bhandara", "Buldhana", "Chandrapur", "Dhule", "Gadchiroli", "Gondia", "Hingoli", "Jalgaon", "Jalna", "Kolhapur", "Latur", "Mumbai City", "Mumbai Suburban", "Nagpur", "Nanded", "Nandurbar", "Nashik", "Osmanabad", "Palghar", "Parbhani", "Pune", "Raigad", "Ratnagiri", "Sangli", "Satara", "Sindhudurg", "Solapur", "Thane", "Wardha", "Washim", "Yavatmal"
+  ]),
+  "Tamil Nadu": makeDistrictSkeleton([
+    "Ariyalur", "Chengalpattu", "Chennai", "Coimbatore", "Cuddalore", "Dharmapuri", "Dindigul", "Erode", "Kallakurichi", "Kanchipuram", "Kanyakumari", "Karur", "Krishnagiri", "Madurai", "Mayiladuthurai", "Nagapattinam", "Namakkal", "Nilgiris", "Perambalur", "Pudukkottai", "Ramanathapuram", "Ranipet", "Salem", "Sivaganga", "Tenkasi", "Thanjavur", "Theni", "Thoothukudi", "Tiruchirappalli", "Tirunelveli", "Tirupathur", "Tiruppur", "Tiruvallur", "Tiruvannamalai", "Tiruvarur", "Vellore", "Viluppuram", "Virudhunagar"
+  ]),
+  "Uttar Pradesh": makeDistrictSkeleton([
+    "Agra", "Aligarh", "Allahabad", "Ambedkar Nagar", "Amethi", "Amroha", "Auraiya", "Azamgarh", "Baghpat", "Bahraich", "Ballia", "Balrampur", "Banda", "Barabanki", "Bareilly", "Basti", "Bhadohi", "Bijnor", "Budaun", "Bulandshahr", "Chandauli", "Chitrakoot", "Deoria", "Etah", "Etawah", "Faizabad", "Farrukhabad", "Fatehpur", "Firozabad", "Gautam Buddha Nagar", "Ghaziabad", "Ghazipur", "Gonda", "Gorakhpur", "Hamirpur", "Hapur", "Hardoi", "Hathras", "Jalaun", "Jaunpur", "Jhansi", "Kannauj", "Kanpur Dehat", "Kanpur Nagar", "Kasganj", "Kaushambi", "Kheri", "Kushinagar", "Lalitpur", "Lucknow", "Maharajganj", "Mahoba", "Mainpuri", "Mathura", "Mau", "Meerut", "Mirzapur", "Moradabad", "Muzaffarnagar", "Pilibhit", "Pratapgarh", "Raebareli", "Rampur", "Saharanpur", "Sambhal", "Sant Kabir Nagar", "Shahjahanpur", "Shamli", "Shravasti", "Siddharthnagar", "Sitapur", "Sonbhadra", "Sultanpur", "Unnao", "Varanasi"
+  ]),
+  ...Object.fromEntries(otherStatesAndUTs.map((state) => [state, makeStateSkeleton()])),
+} satisfies LocationTree;
+
+export const languageOptions: { code: Language; label: string }[] = [
+  { code: "te", label: "తెలుగు" },
+  { code: "en", label: "English" },
+  { code: "hi", label: "हिन्दी" },
+];
+
+const dictionary = {
+  en: {
+    home: "Home",
+    timeline: "Timeline",
+    workers: "Workers",
+    land: "Land",
+    marketplace: "Marketplace",
+    services: "Services",
+    problems: "Problems",
+    notices: "Notices",
+    weather: "Weather",
+    ai: "AI Assistant",
+    dashboard: "Dashboard",
+    signIn: "Sign in",
+    signOut: "Sign out",
+    profileDetails: "Profile Details",
+    officialWorkspace: "Official Workspace",
+    notifications: "Notifications",
+    markRead: "Mark all read",
+    clear: "Clear",
+    createAccount: "Create Account",
+    welcomeToManaOoru: "Welcome to ManaOoru",
+    portalSignIn: "Portal Sign In",
+    registerProfile: "Register Profile",
+    chooseDestination: "Choose your destination portal below.",
+    selectIdentity: "Select your village identity type below.",
+    backToWelcome: "Back to welcome screen",
+    emailAddress: "Email Address",
+    password: "Password",
+    confirmPassword: "Confirm Password",
+    fullName: "Full Name",
+    occupation: "Occupation",
+    selectVillage: "Select Village",
+    phoneNumber: "Phone Number",
+    sendOtp: "Send OTP",
+    verificationCode: "Verification Code",
+    verify: "Verify",
+    authenticating: "Authenticating...",
+    registering: "Registering...",
+    signInAs: "Sign in as",
+    registerAs: "Register as",
+    citizen: "Citizen",
+    dealer: "Dealer",
+    villageAdmin: "Village Admin",
+    accessNetwork: "Access network",
+    sellAndTrade: "Sell & trade",
+    manageOps: "Manage ops",
+    localUpdates: "Local updates",
+    registerShop: "Register shop",
+    officialOnly: "Official only",
+    alreadySignedIn: "You are signed in as",
+    goToDashboard: "Go to Portal Dashboard",
+    switchAccount: "Sign out & Switch Account",
+    heroA: "Everything your",
+    heroVillage: "village",
+    heroB: "needs.",
+    heroC: "All in one place.",
+    subtitle1: "Find workers. Lease farmland. Sell products. Hire services.",
+    subtitle2: "Receive village announcements. Powered by AI.",
+    search: "Search everything...",
+    popular: "Popular:",
+    explore: "Explore Village",
+    post: "Post Requirement",
+    findWorkers: "Find Workers",
+    postWork: "Post Work",
+    leaseLand: "Lease Land",
+    localServices: "Local Services",
+    announcements: "Announcements",
+    emergency: "Emergency Contacts",
+    transport: "Transport",
+    schemes: "Schemes",
+  },
+  te: {
+    home: "హోమ్",
+    timeline: "టైమ్‌లైన్",
+    workers: "పనివారు",
+    land: "భూమి",
+    marketplace: "సంత",
+    services: "సేవలు",
+    problems: "సమస్యలు",
+    notices: "నోటీసులు",
+    weather: "వాతావరణం",
+    ai: "AI సహాయకుడు",
+    dashboard: "డాష్‌బోర్డ్",
+    signIn: "సైన్ ఇన్",
+    signOut: "లాగౌట్ చేయండి",
+    profileDetails: "ప్రొఫైల్ వివరాలు",
+    officialWorkspace: "అధికారిక వేదిక",
+    notifications: "నోటిఫికేషన్లు",
+    markRead: "అన్నీ చదివినట్లుగా",
+    clear: "క్లియర్",
+    createAccount: "ఖాతా సృష్టించండి",
+    welcomeToManaOoru: "మనవూరుకి స్వాగతం",
+    portalSignIn: "పోర్టల్ సైన్ ఇన్",
+    registerProfile: "ప్రొఫైల్ నమోదు",
+    chooseDestination: "క్రింద మీ పోర్టల్‌ని ఎంచుకోండి.",
+    selectIdentity: "క్రింద మీ గ్రామ గుర్తింపును ఎంచుకోండి.",
+    backToWelcome: "స్వాగత స్క్రీన్‌కి తిరిగి వెళ్లండి",
+    emailAddress: "ఈమెయిల్ చిరునామా",
+    password: "పాస్‌వర్డ్",
+    confirmPassword: "పాస్‌వర్డ్ నిర్ధారించండి",
+    fullName: "పూర్తి పేరు",
+    occupation: "వృత్తి",
+    selectVillage: "గ్రామాన్ని ఎంచుకోండి",
+    phoneNumber: "ఫోన్ నంబర్",
+    sendOtp: "OTP పంపండి",
+    verificationCode: "నిర్ధారణ కోడ్",
+    verify: "నిర్ధారించండి",
+    authenticating: "లాగిన్ అవుతోంది...",
+    registering: "నమోదు అవుతోంది...",
+    signInAs: "సైన్ ఇన్:",
+    registerAs: "నమోదు:",
+    citizen: "పౌరుడు",
+    dealer: "వ్యాపారి",
+    villageAdmin: "సర్పంచ్ / అడ్మిన్",
+    accessNetwork: "నెట్‌వర్క్ యాక్సెస్",
+    sellAndTrade: "అమ్మకాలు & వ్యాపారం",
+    manageOps: "గ్రామ నిర్వహణ",
+    localUpdates: "స్థానిక సమాచారం",
+    registerShop: "దుకాణం నమోదు",
+    officialOnly: "అధికారులకు మాత్రమే",
+    alreadySignedIn: "మీరు ప్రస్తుతం లాగిన్ అయి ఉన్నారు:",
+    goToDashboard: "డాష్‌బోర్డ్‌కి వెళ్లండి",
+    switchAccount: "లాగౌట్ చేసి వేరే ఖాతాతో లాగిన్ చేయండి",
+    heroA: "మీ",
+    heroVillage: "గ్రామానికి",
+    heroB: "కావాల్సిన ప్రతిదీ.",
+    heroC: "ఒకే చోట.",
+    subtitle1: "పనివారిని కనుగొనండి. భూమిని కౌలుకు తీసుకోండి. ఉత్పత్తులు అమ్మండి. సేవలు పొందండి.",
+    subtitle2: "గ్రామ ప్రకటనలు పొందండి. AI సహాయంతో.",
+    search: "అన్నీ వెతకండి...",
+    popular: "ప్రసిద్ధం:",
+    explore: "గ్రామాన్ని చూడండి",
+    post: "అవసరం పోస్ట్ చేయండి",
+    findWorkers: "పనివారు",
+    postWork: "పని ఇవ్వండి",
+    leaseLand: "భూమి కౌలు",
+    localServices: "స్థానిక సేవలు",
+    announcements: "ప్రకటనలు",
+    emergency: "అత్యవసర నంబర్లు",
+    transport: "రవాణా",
+    schemes: "పథకాలు",
+  },
+  hi: {
+    home: "होम",
+    timeline: "टाइमलाइन",
+    workers: "कामगार",
+    land: "ज़मीन",
+    marketplace: "बाज़ार",
+    services: "सेवाएं",
+    problems: "समस्याएं",
+    notices: "सूचनाएं",
+    weather: "मौसम",
+    ai: "AI सहायक",
+    dashboard: "डैशबोर्ड",
+    signIn: "साइन इन",
+    signOut: "साइन आउट",
+    profileDetails: "प्रोफ़ाइल विवरण",
+    officialWorkspace: "आधिकारिक पोर्टल",
+    notifications: "सूचनाएं",
+    markRead: "सभी पढ़े हुए",
+    clear: "साफ़ करें",
+    createAccount: "खाता बनाएं",
+    welcomeToManaOoru: "मनऊरु में आपका स्वागत है",
+    portalSignIn: "पोर्टल साइन इन",
+    registerProfile: "प्रोफ़ाइल पंजीकरण",
+    chooseDestination: "नीचे अपना पोर्टल चुनें।",
+    selectIdentity: "नीचे अपनी ग्रामीण पहचान चुनें।",
+    backToWelcome: "स्वागत स्क्रीन पर वापस जाएं",
+    emailAddress: "ईमेल पता",
+    password: "पासवर्ड",
+    confirmPassword: "पासवर्ड की पुष्टि करें",
+    fullName: "पूरा नाम",
+    occupation: "व्यवसाय",
+    selectVillage: "गांव चुनें",
+    phoneNumber: "फ़ोन नंबर",
+    sendOtp: "OTP भेजें",
+    verificationCode: "सत्यापन कोड",
+    verify: "सत्यापित करें",
+    authenticating: "प्रमाणित किया जा रहा है...",
+    registering: "पंजीकरण हो रहा है...",
+    signInAs: "साइन इन:",
+    registerAs: "पंजीकरण:",
+    citizen: "नागरिक",
+    dealer: "व्यापारी",
+    villageAdmin: "सरपंच / एडमिन",
+    accessNetwork: "नेटवर्क एक्सेस",
+    sellAndTrade: "बिक्री और व्यापार",
+    manageOps: "ग्राम प्रबंधन",
+    localUpdates: "स्थानीय अपडेट",
+    registerShop: "दुकान पंजीकरण",
+    officialOnly: "केवल अधिकारियों के लिए",
+    alreadySignedIn: "आप साइन इन हैं:",
+    goToDashboard: "डैशबोर्ड पर जाएं",
+    switchAccount: "साइन आउट और खाता बदलें",
+    heroA: "आपके",
+    heroVillage: "गांव",
+    heroB: "की हर जरूरत.",
+    heroC: "एक ही जगह.",
+    subtitle1: "कामगार खोजें. खेत किराए पर लें. उत्पाद बेचें. सेवाएं लें.",
+    subtitle2: "गांव की सूचनाएं पाएं. AI से सहायता.",
+    search: "सब कुछ खोजें...",
+    popular: "लोकप्रिय:",
+    explore: "गांव देखें",
+    post: "जरूरत पोस्ट करें",
+    findWorkers: "कामगार खोजें",
+    postWork: "काम पोस्ट करें",
+    leaseLand: "ज़मीन किराया",
+    localServices: "स्थानीय सेवाएं",
+    announcements: "सूचनाएं",
+    emergency: "आपात संपर्क",
+    transport: "यातायात",
+    schemes: "योजनाएं",
+  },
+} as const;
+
+const weatherProfiles: Record<string, WeatherProfile> = {
+  Kothur: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Dasarlapally: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Lemoor: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Mansanpally: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Chandupatla: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+  Vemulapally: {
+    temp: null,
+    humidity: null,
+    wind: null,
+    rain: "Live weather loading",
+    condition: "Live weather loading",
+    live: false,
+  },
+};
+
+const knownVillageCoordinates: Record<string, GeoResult> = {
+  "telangana|khammam|kallur|yerraboinapalli": {
+    latitude: 17.1360944,
+    longitude: 80.5257056,
+    name: "Yerraboinapalli",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|kallur": {
+    latitude: 17.2023,
+    longitude: 80.5516,
+    name: "Kallur",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|peruvancha": {
+    latitude: 17.2287,
+    longitude: 80.5694,
+    name: "Peruvancha",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|lokavaram": {
+    latitude: 17.1681,
+    longitude: 80.5186,
+    name: "Lokavaram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|chennuru": {
+    latitude: 17.1812,
+    longitude: 80.5843,
+    name: "Chennuru",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|kappalabandham": {
+    latitude: 17.2415,
+    longitude: 80.6012,
+    name: "Kappalabandham",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|mucharam": {
+    latitude: 17.2104,
+    longitude: 80.4908,
+    name: "Mucharam",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|vennavalli": {
+    latitude: 17.1205,
+    longitude: 80.6402,
+    name: "Vennavalli",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|narayanapuram": {
+    latitude: 17.1994,
+    longitude: 80.5303,
+    name: "Narayanapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|peddakorukondi": {
+    latitude: 17.2514,
+    longitude: 80.5482,
+    name: "Peddakorukondi",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|chinnakorukondi": {
+    latitude: 17.2405,
+    longitude: 80.5412,
+    name: "Chinnakorukondi",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|bathulapalli": {
+    latitude: 17.1541,
+    longitude: 80.5312,
+    name: "Bathulapalli",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|kistapuram": {
+    latitude: 17.2145,
+    longitude: 80.5612,
+    name: "Kistapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|lakshmipuram": {
+    latitude: 17.1802,
+    longitude: 80.5103,
+    name: "Lakshmipuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|madhapuram": {
+    latitude: 17.2001,
+    longitude: 80.6121,
+    name: "Madhapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|mittapalli": {
+    latitude: 17.2291,
+    longitude: 80.5312,
+    name: "Mittapalli",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|narlapuram": {
+    latitude: 17.2202,
+    longitude: 80.5882,
+    name: "Narlapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|payapuram": {
+    latitude: 17.2341,
+    longitude: 80.5121,
+    name: "Payapuram",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|raghunadhapalem": {
+    latitude: 17.1895,
+    longitude: 80.4678,
+    name: "Raghunadhapalem",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|khammam|kallur|thalluru": {
+    latitude: 17.2512,
+    longitude: 80.6212,
+    name: "Thalluru",
+    admin3: "Kallur",
+    admin2: "Khammam",
+    admin1: "Telangana",
+  },
+  "telangana|rangareddy|kandukur|kothur": {
+    latitude: 17.1437,
+    longitude: 78.4311,
+    name: "Kothur",
+    admin3: "Kandukur",
+    admin2: "Rangareddy",
+    admin1: "Telangana",
+  },
+  "telangana|rangareddy|kandukur|dasarlapally": {
+    latitude: 17.0863,
+    longitude: 78.4902,
+    name: "Dasarlapally",
+    admin3: "Kandukur",
+    admin2: "Rangareddy",
+    admin1: "Telangana",
+  },
+  "telangana|rangareddy|kandukur|lemoor": {
+    latitude: 17.1517,
+    longitude: 78.6015,
+    name: "Lemoor",
+    admin3: "Kandukur",
+    admin2: "Rangareddy",
+    admin1: "Telangana",
+  },
+};
+
+const prefKey = "manaooru-preferences";
+const prefEvent = "manaooru-preferences-change";
+
+type StoredPreferences = {
+  language: Language;
+  profile: VillageProfile;
+  hasProfile: boolean;
+};
+
+function canUseBrowserStorage() {
+  return typeof window !== "undefined" && typeof window.localStorage !== "undefined";
+}
+
+function readStoredPreferences(): StoredPreferences {
+  if (!canUseBrowserStorage()) {
+    return { language: "te", profile: defaultProfile, hasProfile: false };
+  }
+
+  const saved = window.localStorage.getItem(prefKey);
+  if (!saved) return { language: "te", profile: defaultProfile, hasProfile: false };
+
+  try {
+    const parsed = JSON.parse(saved) as Partial<StoredPreferences>;
+    return {
+      language: parsed.language ?? "te",
+      profile: normalizeProfile(parsed.profile),
+      hasProfile: Boolean(parsed.hasProfile ?? parsed.profile?.village),
+    };
+  } catch {
+    return { language: "te", profile: defaultProfile, hasProfile: false };
+  }
+}
+
+function writeStoredPreferences(next: StoredPreferences) {
+  if (!canUseBrowserStorage()) return;
+
+  const normalized = {
+    language: next.language,
+    profile: normalizeProfile(next.profile),
+    hasProfile: next.hasProfile,
+  };
+  window.localStorage.setItem(prefKey, JSON.stringify(normalized));
+  window.dispatchEvent(new CustomEvent(prefEvent, { detail: normalized }));
+}
+
+export function saveVillageProfilePreference(nextProfile: Partial<VillageProfile>) {
+  const current = readStoredPreferences();
+  writeStoredPreferences({
+    language: current.language,
+    profile: normalizeProfile(nextProfile),
+    hasProfile: true,
+  });
+}
+
+export function saveLanguagePreference(nextLanguage: Language) {
+  const current = readStoredPreferences();
+  writeStoredPreferences({
+    language: nextLanguage,
+    profile: current.profile,
+    hasProfile: current.hasProfile,
+  });
+}
+
+function weatherCodeToCondition(code: number | undefined) {
+  if (code === undefined) return "Current weather";
+  if (code === 0) return "Clear sky";
+  if ([1, 2, 3].includes(code)) return "Partly cloudy";
+  if ([45, 48].includes(code)) return "Fog";
+  if ([51, 53, 55, 56, 57].includes(code)) return "Drizzle";
+  if ([61, 63, 65, 66, 67, 80, 81, 82].includes(code)) return "Rain";
+  if ([95, 96, 99].includes(code)) return "Thunderstorm";
+  return "Cloudy";
+}
+
+function rainLabel(precipitation: number | undefined, rain: number | undefined) {
+  const amount = Math.max(precipitation ?? 0, rain ?? 0);
+  if (amount >= 7.5) return `${amount.toFixed(1)} mm heavy rain now`;
+  if (amount >= 2.5) return `${amount.toFixed(1)} mm moderate rain now`;
+  if (amount > 0) return `${amount.toFixed(1)} mm light rain now`;
+  return "No rain reported now";
+}
+
+async function fetchLiveWeather(
+  profile: VillageProfile,
+  signal: AbortSignal,
+): Promise<WeatherProfile> {
+  const coordinateKey =
+    `${profile.state}|${profile.district}|${profile.mandal}|${profile.village}`.toLowerCase();
+  const knownCoordinates = knownVillageCoordinates[coordinateKey];
+  
+  // Search using simple single terms because Open-Meteo geocoding fails on comma queries
+  const searchTerms = [
+    profile.village,
+    profile.mandal,
+    profile.district,
+  ].filter(Boolean);
+
+  let first: GeoResult | undefined = knownCoordinates;
+  let confidence: WeatherProfile["confidence"] = knownCoordinates ? "verified" : undefined;
+
+  for (const term of first ? [] : searchTerms) {
+    const geoUrl = `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(term)}&count=10&countryCode=IN&language=en&format=json`;
+    const geo = await fetch(geoUrl, { signal }).then((res) => {
+      if (!res.ok) throw new Error("Location lookup failed");
+      return res.json();
+    });
+    const results = (geo?.results ?? []) as GeoResult[];
+    
+    const ranked = results
+      .map((result) => {
+        const nameVal = (result.name || "").toLowerCase().trim();
+        const admin1Val = (result.admin1 || "").toLowerCase().trim(); // State
+        const admin2Val = (result.admin2 || "").toLowerCase().trim(); // District
+        const admin3Val = (result.admin3 || "").toLowerCase().trim(); // Mandal / Tehsil
+        
+        let score = 0;
+        // Check exact match of hierarchies
+        if (profile.village && nameVal === profile.village.toLowerCase().trim()) score += 12;
+        if (profile.mandal && admin3Val === profile.mandal.toLowerCase().trim()) score += 8;
+        if (profile.district && admin2Val === profile.district.toLowerCase().trim()) score += 6;
+        if (profile.state && admin1Val === profile.state.toLowerCase().trim()) score += 4;
+
+        // Partial match fallback
+        if (profile.mandal && admin3Val.includes(profile.mandal.toLowerCase().trim())) score += 2;
+        if (profile.district && admin2Val.includes(profile.district.toLowerCase().trim())) score += 2;
+        if (profile.state && admin1Val.includes(profile.state.toLowerCase().trim())) score += 1;
+
+        return { result, score };
+      })
+      .sort((a, b) => b.score - a.score);
+
+    if (ranked.length > 0) {
+      first = ranked[0].result;
+      confidence = ranked[0].score >= 8 ? "matched" : "fallback";
+      break;
+    }
+  }
+
+  if (!first) throw new Error("Location not found");
+
+  const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${first.latitude}&longitude=${first.longitude}&current=temperature_2m,relative_humidity_2m,precipitation,rain,weather_code,wind_speed_10m&timezone=auto`;
+  const current = await fetch(weatherUrl, { signal })
+    .then((res) => {
+      if (!res.ok) throw new Error("Weather lookup failed");
+      return res.json();
+    })
+    .then((data) => data.current);
+
+  return {
+    temp: Math.round(current.temperature_2m),
+    humidity: Math.round(current.relative_humidity_2m),
+    wind: Math.round(current.wind_speed_10m),
+    rain: rainLabel(current.precipitation, current.rain),
+    condition: weatherCodeToCondition(current.weather_code),
+    source: "Open-Meteo live",
+    updatedAt: current.time,
+    placeName: [first.name, first.admin3, first.admin2, first.admin1].filter(Boolean).join(", "),
+    coordinates: { latitude: first.latitude, longitude: first.longitude },
+    confidence: confidence ?? "matched",
+    live: true,
+  };
+}
+
+const typedLocationTree = locationTree as LocationTree;
+
+function findCaseInsensitiveKey(
+  obj: Record<string, unknown> | undefined,
+  key: string,
+): string | undefined {
+  if (!obj || !key) return undefined;
+  const target = key.trim().toLowerCase();
+  return Object.keys(obj).find((k) => k.toLowerCase() === target);
+}
+
+export function getStates() {
+  return Object.keys(locationTree);
+}
+
+export function getDistricts(state: string) {
+  const stateKey = findCaseInsensitiveKey(typedLocationTree, state);
+  if (!stateKey) {
+    const allDistricts = [
+      ...Object.keys(typedLocationTree["Telangana"] ?? {}),
+      ...Object.keys(typedLocationTree["Andhra Pradesh"] ?? {}),
+    ];
+    return Array.from(new Set(allDistricts));
+  }
+  return Object.keys(typedLocationTree[stateKey] ?? {});
+}
+
+export function getMandals(state: string, district: string) {
+  const stateKey = findCaseInsensitiveKey(typedLocationTree, state);
+  if (!stateKey) {
+    const allMandals: string[] = [];
+    for (const s of ["Telangana", "Andhra Pradesh"]) {
+      for (const d of Object.keys(typedLocationTree[s] ?? {})) {
+        for (const m of Object.keys(typedLocationTree[s][d] ?? {})) {
+          allMandals.push(m);
+        }
+      }
+    }
+    return Array.from(new Set(allMandals));
+  }
+  const districtKey = findCaseInsensitiveKey(typedLocationTree[stateKey], district);
+  if (!districtKey) {
+    const stateMandals: string[] = [];
+    for (const d of Object.keys(typedLocationTree[stateKey] ?? {})) {
+      for (const m of Object.keys(typedLocationTree[stateKey][d] ?? {})) {
+        stateMandals.push(m);
+      }
+    }
+    return Array.from(new Set(stateMandals));
+  }
+  return Object.keys(typedLocationTree[stateKey]?.[districtKey] ?? {});
+}
+
+export function getVillages(state: string, district: string, mandal: string): string[] {
+  const stateKey = findCaseInsensitiveKey(typedLocationTree, state);
+  if (!stateKey) {
+    const allVillages: string[] = [];
+    for (const s of ["Telangana", "Andhra Pradesh"]) {
+      for (const d of Object.keys(typedLocationTree[s] ?? {})) {
+        for (const m of Object.keys(typedLocationTree[s][d] ?? {})) {
+          allVillages.push(...(typedLocationTree[s][d][m] ?? []));
+        }
+      }
+    }
+    return Array.from(new Set(allVillages));
+  }
+  const districtKey = findCaseInsensitiveKey(typedLocationTree[stateKey], district);
+  if (!districtKey) {
+    const stateVillages: string[] = [];
+    for (const d of Object.keys(typedLocationTree[stateKey] ?? {})) {
+      for (const m of Object.keys(typedLocationTree[stateKey][d] ?? {})) {
+        stateVillages.push(...(typedLocationTree[stateKey][d][m] ?? []));
+      }
+    }
+    return Array.from(new Set(stateVillages));
+  }
+  const mandalKey = findCaseInsensitiveKey(typedLocationTree[stateKey]?.[districtKey], mandal);
+  if (!mandalKey) {
+    const districtVillages: string[] = [];
+    for (const m of Object.keys(typedLocationTree[stateKey][districtKey] ?? {})) {
+      districtVillages.push(...(typedLocationTree[stateKey][districtKey][m] ?? []));
+    }
+    return Array.from(new Set(districtVillages));
+  }
+  return typedLocationTree[stateKey]?.[districtKey]?.[mandalKey] ?? [];
+}
+
+export function normalizeProfile(profile: Partial<VillageProfile> | undefined): VillageProfile {
+  if (!profile) return defaultProfile;
+
+  const stateInput = profile.state?.trim() || defaultProfile.state;
+  const stateKey = findCaseInsensitiveKey(typedLocationTree, stateInput);
+  const state = stateKey || stateInput;
+
+  const districtInput = profile.district?.trim() || "";
+  const districtKey = districtInput
+    ? findCaseInsensitiveKey(typedLocationTree[state], districtInput)
+    : undefined;
+  const district = districtKey || districtInput;
+
+  const mandalInput = profile.mandal?.trim() || "";
+  const mandalKey = mandalInput
+    ? findCaseInsensitiveKey(typedLocationTree[state]?.[district], mandalInput)
+    : undefined;
+  const mandal = mandalKey || mandalInput;
+
+  const villages = getVillages(state, district, mandal);
+  const hasVillageInput = typeof profile?.village === "string" && profile.village.trim().length > 0;
+  const villageName = profile?.village?.split(",")[0]?.trim();
+
+  let village = "";
+  if (hasVillageInput && villageName) {
+    const villageKey = villages.find((v) => v.toLowerCase() === villageName.toLowerCase());
+    village = villageKey || villageName;
+  }
+  // If no village/mandal/district was specified, leave blank — don't auto-fill.
+  // This prevents phantom location assignment for Google sign-in users.
+
+  return { state, district, mandal, village };
+}
+
+export function formatVillageProfile(profile: VillageProfile) {
+  return `${profile.village || "Choose village"}, ${profile.mandal}, ${profile.district}, ${profile.state}`;
+}
+
+export function useVillagePreferences() {
+  const [stored, setStored] = useState<StoredPreferences>(() => readStoredPreferences());
+  const { language, profile } = stored;
+
+  useEffect(() => {
+    if (!canUseBrowserStorage()) return;
+
+    const sync = () => setStored(readStoredPreferences());
+    const syncCustom = (event: Event) => {
+      const detail = (event as CustomEvent<StoredPreferences>).detail;
+      setStored(detail ?? readStoredPreferences());
+    };
+
+    sync();
+    window.addEventListener("storage", sync);
+    window.addEventListener(prefEvent, syncCustom);
+    return () => {
+      window.removeEventListener("storage", sync);
+      window.removeEventListener(prefEvent, syncCustom);
+    };
+  }, []);
+
+  const persist = (
+    nextLanguage: Language,
+    nextProfile: VillageProfile,
+    hasProfile = stored.hasProfile,
+  ) => {
+    const next = {
+      language: nextLanguage,
+      profile: normalizeProfile(nextProfile),
+      hasProfile,
+    };
+    setStored(next);
+    writeStoredPreferences(next);
+  };
+
+  const setLanguage = (next: Language) => {
+    persist(next, profile);
+  };
+
+  const setProfile = (next: VillageProfile) => {
+    persist(language, next, Boolean(next.village.trim()));
+  };
+
+  const t = useMemo(() => dictionary[language], [language]);
+  const fallbackWeather = useMemo(
+    () =>
+      weatherProfiles[profile.village] ?? {
+        temp: null,
+        humidity: null,
+        wind: null,
+        rain: "Live weather loading",
+        condition: "Live weather loading",
+        source: "Waiting for live weather",
+        live: false,
+      },
+    [profile.village],
+  );
+  const [weather, setWeather] = useState<WeatherProfile>(fallbackWeather);
+
+  useEffect(() => {
+    if (typeof fetch === "undefined") {
+      setWeather({
+        ...fallbackWeather,
+        source: "Live weather unavailable",
+        rain: "Open this page in the browser for live weather",
+        condition: "Live weather unavailable",
+        live: false,
+      });
+      return;
+    }
+
+    const controller = new AbortController();
+    const activeLocation = profile.village.trim()
+      ? profile
+      : { state: "Telangana", district: "Hyderabad", mandal: "Hyderabad", village: "Hyderabad" };
+
+    setWeather((prev) => ({ ...prev, loading: true }));
+    fetchLiveWeather(activeLocation, controller.signal)
+      .then((live) => setWeather(live))
+      .catch((error) =>
+        setWeather({
+          ...fallbackWeather,
+          temp: 31,
+          condition: "Partly Cloudy",
+          source: "Open-Meteo fallback",
+          rain: "No rain expected",
+          loading: false,
+          live: true,
+          error: error instanceof Error ? error.message : "Weather lookup failed",
+        }),
+      );
+
+    return () => controller.abort();
+  }, [fallbackWeather, profile]);
+
+  return { language, setLanguage, profile, setProfile, hasProfile: stored.hasProfile, t, weather };
+}

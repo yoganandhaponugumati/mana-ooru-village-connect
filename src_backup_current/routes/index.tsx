@@ -31,6 +31,7 @@ import {
   GraduationCap,
   HeartPulse,
   Compass,
+  Plus,
   AlertTriangle,
   ImagePlus,
   Landmark,
@@ -927,174 +928,41 @@ function Index() {
 
       <SiteNav />
 
-      {/* ═══════════════════════════════════════════════════════════════════
-          📱 MOBILE HOME DASHBOARD — The new app-style section
-          Village greeting + Language button + 4-core grid + Notices + Problems
-      ════════════════════════════════════════════════════════════════════ */}
-      <section className="relative z-30 mx-auto mt-2 max-w-7xl px-3 sm:px-6">
-
-        {/* Greeting Bar + Language Pill */}
-        <div className="flex items-center justify-between gap-3 mb-5">
-          <div className="flex items-center gap-3">
-            {/* Village icon */}
-            <div className="grid size-11 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 shadow-lg shadow-emerald-500/25">
-              <Leaf className="size-5 text-white" />
-            </div>
-            <div className="leading-none">
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Namaste 🙏</p>
-              <h2 className="font-display text-lg font-extrabold text-clay dark:text-zinc-100 leading-tight">
-                {villageName || "ManaOoru"}
-              </h2>
-              {heroWeather && (
-                <p className="text-xs text-primary/80 font-semibold flex items-center gap-1 mt-0.5">
-                  <CloudSun className="size-3 text-amber-500" /> {heroWeather}
-                </p>
-              )}
-            </div>
-          </div>
-          {/* Language Quick-Access Pill */}
-          <a
-            href="#"
-            onClick={(e) => { e.preventDefault(); document.querySelector<HTMLButtonElement>('[aria-label="Language"]')?.click(); }}
-            className="inline-flex items-center gap-1.5 rounded-full border-2 border-primary/30 bg-primary/10 px-3 py-2 text-xs font-bold text-primary shadow-sm transition hover:bg-primary hover:text-white"
-          >
-            <span className="text-base leading-none">🌐</span>
-            <span>Language / భాష</span>
-          </a>
-        </div>
-
-        {/* Search Bar */}
-        <form onSubmit={submitSearch} className="mb-6">
-          <div className="flex items-center gap-2 rounded-2xl border border-border bg-white dark:bg-zinc-900 px-4 py-3 shadow-sm focus-within:ring-2 focus-within:ring-primary/25 transition">
-            <Search className="size-5 text-muted-foreground shrink-0" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder={t.search || "Search workers, land, schemes…"}
-              className="min-w-0 flex-1 bg-transparent text-sm font-semibold text-foreground outline-none placeholder:text-muted-foreground"
-            />
-            {searchQuery && (
-              <button type="submit" className="rounded-xl bg-primary px-3 py-1.5 text-xs font-bold text-white shrink-0">
-                Go
-              </button>
-            )}
-          </div>
-        </form>
-
-        {/* ════ 4-CORE ACTIVITY GRID ════ */}
-        <div className="mb-6">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-display text-base font-extrabold text-clay dark:text-zinc-100">Quick Actions</h3>
-            <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">మీ సేవలు</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-
-            {/* Card 1 — Sarpanch / Contact */}
-            <Link
-              to="/emergency"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-            >
-              <div className="h-24 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1600880292089-90a7e086ee0c?w=400&q=75&auto=format&fit=crop"
-                  alt="Sarpanch contact"
-                  className="h-full w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 h-24 bg-gradient-to-b from-transparent to-black/50" />
-              </div>
-              <div className="p-3">
-                <p className="font-display text-sm font-extrabold text-clay dark:text-zinc-100 leading-tight">Sarpanch / Emergency</p>
-                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">సర్పంచ్ సంప్రదింపు</p>
-                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/40 px-2.5 py-1 text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
-                  <Phone className="size-3" /> Call Now
-                </div>
-              </div>
-            </Link>
-
-            {/* Card 2 — Report Problem */}
-            <Link
-              to="/problems"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-            >
-              <div className="h-24 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&q=75&auto=format&fit=crop"
-                  alt="Report road problem"
-                  className="h-full w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 h-24 bg-gradient-to-b from-transparent to-black/50" />
-              </div>
-              <div className="p-3">
-                <p className="font-display text-sm font-extrabold text-clay dark:text-zinc-100 leading-tight">Report Problem</p>
-                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">రోడ్డు / నీటి సమస్య</p>
-                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-red-100 dark:bg-red-950/40 px-2.5 py-1 text-[10px] font-bold text-red-700 dark:text-red-300">
-                  <AlertTriangle className="size-3" /> Report
-                </div>
-              </div>
-            </Link>
-
-            {/* Card 3 — Government Schemes */}
-            <Link
-              to="/schemes"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-            >
-              <div className="h-24 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=75&auto=format&fit=crop"
-                  alt="Government farming schemes"
-                  className="h-full w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 h-24 bg-gradient-to-b from-transparent to-black/50" />
-              </div>
-              <div className="p-3">
-                <p className="font-display text-sm font-extrabold text-clay dark:text-zinc-100 leading-tight">Schemes / Subsidies</p>
-                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">రైతు భరోసా / PM కిసాన్</p>
-                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2.5 py-1 text-[10px] font-bold text-amber-700 dark:text-amber-300">
-                  <Landmark className="size-3" /> Apply Now
-                </div>
-              </div>
-            </Link>
-
-            {/* Card 4 — Post Notice */}
-            <Link
-              to="/announcements"
-              className="group relative overflow-hidden rounded-2xl border border-border bg-white dark:bg-zinc-900 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200"
-            >
-              <div className="h-24 overflow-hidden">
-                <img
-                  src="https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=75&auto=format&fit=crop"
-                  alt="Village notice board"
-                  className="h-full w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-300"
-                />
-                <div className="absolute inset-0 h-24 bg-gradient-to-b from-transparent to-black/50" />
-              </div>
-              <div className="p-3">
-                <p className="font-display text-sm font-extrabold text-clay dark:text-zinc-100 leading-tight">Post Notice</p>
-                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">గ్రామ నోటీసు / ప్రకటన</p>
-                <div className="mt-2 inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-[10px] font-bold text-primary">
-                  <Megaphone className="size-3" /> Post Now
-                </div>
-              </div>
-            </Link>
-
-          </div>
-        </div>
-
-        {/* ════ ANNOUNCEMENTS CAROUSEL ════ */}
-        <div className="mb-5">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
+      {/* Prominent Eye-Catching Showcase: Notices & Citizen Complaints */}
+      <section className="relative z-30 mx-auto mt-6 max-w-7xl px-4 sm:px-6">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <span className="inline-flex items-center gap-2 rounded-full bg-primary/10 px-3 py-1 text-xs font-black uppercase tracking-[0.2em] text-primary">
               <span className="relative flex size-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-primary" />
               </span>
-              <h3 className="font-display text-base font-extrabold text-clay dark:text-zinc-100">Announcements</h3>
-            </div>
-            <Link to="/announcements" className="text-xs font-bold text-primary hover:underline">
-              View All →
+              <Megaphone className="size-3.5" /> Live Village Pulse
+            </span>
+            <h2 className="mt-1 font-display text-2xl sm:text-3xl font-extrabold text-clay">
+              🔴 Notices &amp; Problems — First
+            </h2>
+          </div>
+          <div className="flex flex-wrap gap-2 sm:justify-end">
+            <Link
+              to="/announcements"
+              className="inline-flex items-center gap-2 rounded-2xl bg-primary px-5 py-2.5 text-xs font-black text-primary-foreground shadow-md transition hover:scale-[1.03] active:scale-95"
+            >
+              <Plus className="size-4 animate-bounce" />
+              <span>+ Post Official Notice</span>
+            </Link>
+            <Link
+              to="/problems"
+              className="inline-flex items-center gap-2 rounded-2xl border-2 border-red-300 bg-red-50 dark:bg-red-950/40 px-5 py-2.5 text-xs font-black text-red-700 dark:text-red-300 shadow-md transition hover:scale-[1.03] active:scale-95"
+            >
+              <AlertTriangle className="size-4 animate-pulse text-red-600" />
+              <span>+ Report Problem</span>
             </Link>
           </div>
+        </div>
+
+        <div className="grid gap-5 lg:grid-cols-[1.05fr_0.95fr]">
+          {/* Multi-Notice Auto Carousel Card */}
           <NoticeCarouselCard
             items={
               announcementItems.length > 0
@@ -1102,61 +970,83 @@ function Index() {
                 : fallbackListings.filter((i) => i.type === "announcement")
             }
           />
-        </div>
 
-        {/* ════ CITIZEN PROBLEMS ════ */}
-        <div className="mb-8">
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex items-center gap-2">
-              <span className="relative flex size-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-                <span className="relative inline-flex size-2 rounded-full bg-red-500" />
-              </span>
-              <h3 className="font-display text-base font-extrabold text-clay dark:text-zinc-100">Citizen Problems</h3>
+          {/* Citizen Problem Reports Card */}
+          <div className="rounded-[28px] border-2 border-red-400/80 bg-card shadow-xl flex flex-col justify-between overflow-hidden">
+            {/* Red urgency strip */}
+            <div className="h-1.5 w-full bg-gradient-to-r from-red-500 via-rose-500 to-red-600" />
+            <div className="p-6">
+            <div>
+              <div className="mb-4 flex items-center justify-between gap-3">
+                <div>
+                  <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 dark:bg-red-950/50 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                    <span className="relative flex size-1.5">
+                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                      <span className="relative inline-flex size-1.5 rounded-full bg-red-500" />
+                    </span>
+                    <AlertTriangle className="size-3" /> URGENT · Action Required
+                  </span>
+                  <h3 className="mt-2 font-display text-2xl font-bold text-clay">
+                    Citizen Problem Reports
+                  </h3>
+                </div>
+                <Link
+                  to="/problems"
+                  className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200 transition"
+                >
+                  View All ({problemItems.length}) →
+                </Link>
+              </div>
+
+              {problemItems.length === 0 ? (
+                <div className="rounded-2xl border border-dashed border-red-200 bg-red-50/50 p-6 text-center text-sm text-muted-foreground">
+                  <AlertTriangle className="mx-auto mb-2 size-8 text-red-400" />
+                  No road, drainage, or water problems posted yet.
+                  <p className="mt-2">
+                    <Link to="/problems" className="font-bold text-red-600 hover:underline">
+                      + Report a problem with photo proof
+                    </Link>
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-3">
+                  {problemItems.slice(0, 3).map((item) => (
+                    <Link
+                      key={item.id}
+                      to="/problems"
+                      className="flex gap-3 rounded-2xl border border-border bg-white p-3 shadow-sm transition hover:border-red-300 hover:bg-red-50/40"
+                    >
+                      {item.imageUrl ? (
+                        <img
+                          src={item.imageUrl}
+                          alt={item.title}
+                          className="size-16 rounded-xl object-cover shrink-0"
+                        />
+                      ) : (
+                        <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-red-100 text-red-600 font-bold">
+                          <AlertTriangle className="size-6" />
+                        </span>
+                      )}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate font-bold text-clay text-base">{item.title}</span>
+                        <span className="mt-1 block truncate text-xs text-muted-foreground">
+                          📍 {item.location || item.category || "Village issue"} · {timeAgo(item.createdAt)}
+                        </span>
+                        <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">
+                          {item.status === "completed" ? "✅ Resolved" : item.status === "in_progress" ? "🛠️ In Progress" : "⏳ Pending"}
+                        </span>
+                      </span>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </div>
-            <Link to="/problems" className="text-xs font-bold text-red-600 hover:underline">
-              View All →
-            </Link>
           </div>
-          <div className="space-y-3">
-            {(problemItems.length > 0 ? problemItems : fallbackListings.filter(i => i.type === "complaint").slice(0,3)).map((item) => (
-              <Link
-                key={item.id}
-                to="/problems"
-                className="flex gap-3 rounded-2xl border border-border bg-white dark:bg-zinc-900 p-3 shadow-sm transition hover:border-red-300 hover:bg-red-50/40 dark:hover:bg-red-950/20"
-              >
-                {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.title} className="size-14 rounded-xl object-cover shrink-0" />
-                ) : (
-                  <span className="grid size-14 shrink-0 place-items-center rounded-xl bg-red-100 dark:bg-red-950/50 text-red-600">
-                    <AlertTriangle className="size-6" />
-                  </span>
-                )}
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-bold text-clay dark:text-zinc-100 text-sm">{item.title}</span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground truncate">
-                    📍 {item.location || item.category || "Village issue"} · {timeAgo(item.createdAt)}
-                  </span>
-                  <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">
-                    {item.status === "completed" ? "✅ Resolved" : item.status === "in_progress" ? "🛠️ In Progress" : "⏳ Pending"}
-                  </span>
-                </span>
-              </Link>
-            ))}
-            <Link
-              to="/problems"
-              className="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-red-300 bg-red-50/50 dark:bg-red-950/20 py-3 text-sm font-bold text-red-600 hover:bg-red-100 dark:hover:bg-red-950/40 transition"
-            >
-              <AlertTriangle className="size-4" /> + Report a Problem with Photo Proof
-            </Link>
-          </div>
+            </div>
         </div>
-
       </section>
 
       <ConceptShowcase />
-
-
 
       {/* Quick Actions */}
       <section

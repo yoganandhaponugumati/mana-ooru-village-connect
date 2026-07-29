@@ -26,8 +26,6 @@ import {
   Wrench,
   Map,
   Bot,
-  Compass,
-  Plus,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -50,8 +48,13 @@ const navLinks = [
   { to: "/ai-assistant", key: "ai", icon: Bot, label: "AI Help" },
 ] as const;
 
-// Bottom dock tabs (kept for reference but rendered manually with FAB)
-// const dockTabs = [...] as const;
+// Bottom dock tabs — shown on mobile
+const dockTabs = [
+  { to: "/", key: "home", icon: Home, label: "Home", exact: true },
+  { to: "/problems", key: "problems", icon: AlertTriangle, label: "Problems", exact: false },
+  { to: "/announcements", key: "notices", icon: Megaphone, label: "Notices", exact: false },
+  { to: "/marketplace", key: "marketplace", icon: ShoppingBag, label: "Market", exact: false },
+] as const;
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
@@ -153,16 +156,9 @@ export function SiteNav() {
           <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
             <img src="/logo.png" alt="ManaOoru Emblem" className="size-full object-cover" />
           </div>
-          <div className="flex flex-col leading-none">
-            <span className="font-display text-base font-bold tracking-tight text-clay dark:text-zinc-100">
-              ManaOoru
-            </span>
-            {profile.village && (
-              <span className="text-[10px] font-semibold text-primary/80 dark:text-emerald-400/80 truncate max-w-[120px]">
-                📍 {profile.village}
-              </span>
-            )}
-          </div>
+          <span className="font-display text-lg font-bold tracking-tight shrink-0 text-clay dark:text-zinc-100">
+            ManaOoru
+          </span>
         </Link>
 
         {/* Desktop Nav Links — visible from lg (1024px) */}
@@ -583,54 +579,32 @@ export function SiteNav() {
       </nav>
 
       {/* ── Mobile Bottom Dock ─────────────────────────────────────── */}
+      {/* Safe, separate from footer, fixed at viewport bottom */}
       <div className="fixed bottom-0 inset-x-0 z-[9995] lg:hidden">
-        <div className="border-t border-border/60 bg-white/98 dark:bg-zinc-950/98 backdrop-blur-2xl shadow-[0_-8px_32px_rgba(0,0,0,0.10)]">
-          <div className="flex items-end justify-around px-2 pb-safe safe-area-pb" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}>
-
-            {/* Home Tab */}
-            <Link
-              to="/"
-              activeOptions={{ exact: true }}
-              className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-muted-foreground transition-colors"
-              activeProps={{ className: "flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-primary transition-colors" }}
-            >
-              <Home className="size-[22px]" />
-              <span>Home</span>
-            </Link>
-
-            {/* Explore Tab */}
-            <Link
-              to="/timeline"
-              className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-muted-foreground transition-colors"
-              activeProps={{ className: "flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-primary transition-colors" }}
-            >
-              <Compass className="size-[22px]" />
-              <span>Explore</span>
-            </Link>
-
-            {/* Central POST FAB — opens drawer for posting actions */}
-            <div className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 -mt-4">
-              <button
-                type="button"
-                onClick={() => setOpen((v) => !v)}
-                aria-label="Post or create something"
-                className="flex size-14 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xl shadow-emerald-500/40 ring-4 ring-white dark:ring-zinc-950 transition-all active:scale-90 hover:shadow-emerald-500/60 hover:from-emerald-400 hover:to-teal-500"
+        <div className="border-t border-border/80 bg-white/97 dark:bg-zinc-950/97 backdrop-blur-xl shadow-[0_-4px_24px_rgba(0,0,0,0.08)]">
+          <div className="flex items-center justify-around px-1 py-1.5 safe-area-pb">
+            {dockTabs.map((tab) => (
+              <Link
+                key={tab.to}
+                to={tab.to}
+                activeOptions={{ exact: tab.exact }}
+                className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 py-1 text-[10px] font-bold text-muted-foreground transition-colors"
+                activeProps={{ className: "text-primary" }}
               >
-                <Plus className="size-7" strokeWidth={2.5} />
-              </button>
-              <span className="text-[10px] font-bold text-muted-foreground mt-0.5">Post</span>
-            </div>
-
-            {/* Notifications Tab */}
+                <tab.icon className="size-5" />
+                <span className="truncate">{tab.label}</span>
+              </Link>
+            ))}
+            {/* Notification Bell — wires to same panel as header bell, zero logic change */}
             {user ? (
               <button
                 type="button"
                 onClick={openNotifications}
-                className="mobile-dock-trigger flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-muted-foreground transition-colors hover:text-primary"
+                className="mobile-dock-trigger flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 py-1 text-[10px] font-bold text-muted-foreground transition-colors hover:text-primary"
                 aria-label="Open notifications"
               >
                 <span className="relative inline-flex">
-                  <Bell className="size-[22px]" />
+                  <Bell className="size-5" />
                   {unreadCount > 0 && (
                     <span className="absolute -right-1.5 -top-1 grid min-w-[14px] place-items-center rounded-full bg-red-500 px-0.5 text-[8px] font-black leading-[14px] text-white ring-1 ring-white dark:ring-zinc-950">
                       {unreadCount > 9 ? "9+" : unreadCount}
@@ -642,27 +616,21 @@ export function SiteNav() {
             ) : (
               <Link
                 to="/auth"
-                className="mobile-dock-trigger flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-primary transition-colors"
+                className="mobile-dock-trigger flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 py-1 text-[10px] font-bold text-primary transition-colors"
               >
-                <Bell className="size-[22px]" />
+                <Bell className="size-5" />
                 <span>Sign In</span>
               </Link>
             )}
-
-            {/* Profile Tab */}
-            <Link
-              to="/profile"
-              className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-muted-foreground transition-colors"
-              activeProps={{ className: "flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 pt-2 pb-1 text-[10px] font-bold text-primary transition-colors" }}
+            {/* Menu button — opens drawer */}
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              className="flex flex-col items-center gap-0.5 min-w-0 flex-1 px-1 py-1 text-[10px] font-bold text-muted-foreground transition-colors hover:text-primary"
             >
-              {user && authProfile?.photo_url ? (
-                <img src={authProfile.photo_url} alt="" className="size-[22px] rounded-full object-cover border-2 border-primary/30" />
-              ) : (
-                <UserRound className="size-[22px]" />
-              )}
-              <span>Profile</span>
-            </Link>
-
+              <Menu className="size-5" />
+              <span>Menu</span>
+            </button>
           </div>
         </div>
       </div>

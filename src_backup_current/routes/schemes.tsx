@@ -65,40 +65,13 @@ const statusIcon: Record<ApplicationStatus, typeof Clock3> = {
 };
 
 const PROFILE_CHIPS = [
-  { id: "all", label: "All Schemes", icon: Sparkles, img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=200&q=70&auto=format&fit=crop" },
-  { id: "agriculture", label: "Farmers & Agriculture", icon: Tractor, img: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=200&q=70&auto=format&fit=crop" },
-  { id: "women", label: "Women & SHGs", icon: Heart, img: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=200&q=70&auto=format&fit=crop" },
-  { id: "education", label: "Students & Youth", icon: GraduationCap, img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&q=70&auto=format&fit=crop" },
-  { id: "housing", label: "Housing & Loans", icon: Home, img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=200&q=70&auto=format&fit=crop" },
-  { id: "pension", label: "Seniors & Pensions", icon: Users, img: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=200&q=70&auto=format&fit=crop" },
+  { id: "all", label: "All Schemes", icon: Sparkles },
+  { id: "agriculture", label: "Farmers & Agriculture", icon: Tractor },
+  { id: "women", label: "Women & SHGs", icon: Heart },
+  { id: "education", label: "Students & Youth", icon: GraduationCap },
+  { id: "housing", label: "Housing & Loans", icon: Home },
+  { id: "pension", label: "Seniors & Pensions", icon: Users },
 ] as const;
-
-// Map scheme category to a relevant Unsplash image
-const SCHEME_CATEGORY_IMAGES: Record<string, string> = {
-  agriculture: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=70&auto=format&fit=crop",
-  farmers: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&q=70&auto=format&fit=crop",
-  women: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=400&q=70&auto=format&fit=crop",
-  education: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=70&auto=format&fit=crop",
-  housing: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=70&auto=format&fit=crop",
-  pension: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=70&auto=format&fit=crop",
-  health: "https://images.unsplash.com/photo-1588776814546-1ffbb043e5c8?w=400&q=70&auto=format&fit=crop",
-  general: "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&q=70&auto=format&fit=crop",
-  default: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&q=70&auto=format&fit=crop",
-};
-
-function getSchemeImage(category: string, title: string): string {
-  const cat = (category || "").toLowerCase();
-  const ttl = (title || "").toLowerCase();
-  if (/tractor|farm|agri|crop|kisan|rythu|land|seed|harvest/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.agriculture;
-  if (/women|mahila|shg|lakshmi|mother|kalyana/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.women;
-  if (/house|awas|indiramma|home|shelter/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.housing;
-  if (/student|school|scholar|youth|vidya|skill/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.education;
-  if (/pension|senior|aasara|old age|widow/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.pension;
-  if (/health|medical|hospital/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.health;
-  return SCHEME_CATEGORY_IMAGES[cat] || SCHEME_CATEGORY_IMAGES.default;
-}
-
-
 
 function SchemesPage() {
   const navigate = useNavigate();
@@ -179,7 +152,7 @@ function SchemesPage() {
           </div>
         </div>
 
-        <div className="flex gap-3 pt-2 overflow-x-auto pb-2 -mx-1 px-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+        <div className="flex flex-wrap gap-2.5 pt-2">
           {PROFILE_CHIPS.map((chip) => {
             const Icon = chip.icon;
             const active = selectedProfile === chip.id;
@@ -188,26 +161,14 @@ function SchemesPage() {
                 key={chip.id}
                 type="button"
                 onClick={() => setSelectedProfile(chip.id)}
-                className={`inline-flex shrink-0 flex-col items-center gap-1.5 rounded-2xl px-3 py-2.5 text-xs font-bold transition-all overflow-hidden border-2 ${
+                className={`inline-flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-bold transition-all ${
                   active
-                    ? "border-primary bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-[1.02]"
-                    : "border-border bg-background text-muted-foreground hover:border-primary hover:text-foreground"
+                    ? "bg-primary text-primary-foreground shadow-md shadow-primary/25 scale-[1.02]"
+                    : "bg-background border border-border text-muted-foreground hover:border-primary hover:text-foreground"
                 }`}
               >
-                <div className="size-12 overflow-hidden rounded-xl relative">
-                  <img
-                    src={chip.img}
-                    alt={chip.label}
-                    className="h-full w-full object-cover"
-                    loading="lazy"
-                  />
-                  {active && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-primary/40">
-                      <Icon className="size-5 text-white" />
-                    </div>
-                  )}
-                </div>
-                <span className="text-[10px] font-bold text-center leading-tight max-w-[70px]">{chip.label}</span>
+                <Icon className="size-4" />
+                <span>{chip.label}</span>
               </button>
             );
           })}
@@ -406,57 +367,43 @@ function SchemesPage() {
           .map((scheme) => (
             <SurfaceCard
               key={scheme.id}
-              className="p-0 flex flex-col justify-between border-border/80 shadow-sm hover:shadow-md transition-all overflow-hidden"
+              className="p-6 flex flex-col justify-between border-border/80 shadow-sm hover:shadow-md transition-all"
             >
-              {/* Scheme header image */}
-              <div className="h-36 overflow-hidden relative">
-                <img
-                  src={getSchemeImage(scheme.category, scheme.title)}
-                  alt={scheme.title}
-                  loading="lazy"
-                  className="h-full w-full object-cover brightness-90"
-                />
-                <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black/50" />
-                <div className="absolute bottom-3 left-3 right-3">
-                  <StatusBadge tone="accent">{scheme.category}</StatusBadge>
-                </div>
-              </div>
-              <div className="p-6 flex flex-col flex-1 justify-between">
-                <div>
-                  <h3 className="mt-2 font-display text-xl font-bold text-clay">{scheme.title}</h3>
-                  <p className="mt-2 text-sm leading-7 text-muted-foreground">{scheme.benefit}</p>
+              <div>
+                <StatusBadge tone="accent">{scheme.category}</StatusBadge>
+                <h3 className="mt-4 font-display text-2xl font-bold text-clay">{scheme.title}</h3>
+                <p className="mt-3 text-sm leading-7 text-muted-foreground">{scheme.benefit}</p>
 
-                  <div className="mt-4 rounded-2xl bg-muted/70 p-4 border border-border/60">
-                    <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
-                      <FileText className="size-3.5" /> Mandatory Documents
-                    </p>
-                    <p className="mt-1.5 text-xs text-muted-foreground font-medium">
-                      {scheme.documents.join(", ")}
-                    </p>
-                  </div>
-
-                  <p className="mt-4 text-sm leading-6 text-muted-foreground">
-                    <strong className="text-clay">Eligibility:</strong> {scheme.eligibility}
+                <div className="mt-5 rounded-2xl bg-muted/70 p-4 border border-border/60">
+                  <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-primary">
+                    <FileText className="size-3.5" /> Mandatory Documents
+                  </p>
+                  <p className="mt-1.5 text-xs text-muted-foreground font-medium">
+                    {scheme.documents.join(", ")}
                   </p>
                 </div>
 
-                <div className="mt-6 border-t border-border/70 pt-4 space-y-2.5">
-                  <a
-                    href={scheme.apply}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:brightness-105 shadow-sm"
-                  >
-                    Check Portal &amp; Apply <ExternalLink className="size-4" />
-                  </a>
-                  <button
-                    type="button"
-                    onClick={() => requestPanchayatHelp(scheme.title)}
-                    className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-border bg-background px-4 py-2 text-xs font-bold text-clay hover:bg-muted transition"
-                  >
-                    <HelpCircle className="size-3.5 text-primary" /> Request Panchayat Assistance
-                  </button>
-                </div>
+                <p className="mt-4 text-sm leading-6 text-muted-foreground">
+                  <strong className="text-clay">Eligibility:</strong> {scheme.eligibility}
+                </p>
+              </div>
+
+              <div className="mt-6 border-t border-border/70 pt-4 space-y-2.5">
+                <a
+                  href={scheme.apply}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-primary px-5 py-2.5 text-sm font-bold text-primary-foreground transition hover:-translate-y-0.5 hover:brightness-105 shadow-sm"
+                >
+                  Check Portal & Apply <ExternalLink className="size-4" />
+                </a>
+                <button
+                  type="button"
+                  onClick={() => requestPanchayatHelp(scheme.title)}
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-full border border-border bg-background px-4 py-2 text-xs font-bold text-clay hover:bg-muted transition"
+                >
+                  <HelpCircle className="size-3.5 text-primary" /> Request Panchayat Assistance
+                </button>
               </div>
             </SurfaceCard>
           ))}
