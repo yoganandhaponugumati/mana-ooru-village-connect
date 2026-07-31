@@ -1437,7 +1437,7 @@ function Index() {
                       {s.location && (
                         <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
                           <MapPin className="size-3 shrink-0" />
-                          <span className="truncate">{s.location}</span>
+                          <span className="truncate min-w-0 flex-1">{s.location}</span>
                         </p>
                       )}
                     </div>

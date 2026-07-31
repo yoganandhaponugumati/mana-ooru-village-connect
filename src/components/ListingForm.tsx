@@ -530,7 +530,7 @@ export function ListingCard({
             <h3 className="mt-3 break-words font-display text-lg font-semibold text-clay">{item.title}</h3>
             {item.location && (
               <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground max-w-full">
-                <MapPin className="size-4 text-primary shrink-0" /> <span className="truncate">{item.location}</span>
+                <MapPin className="size-4 text-primary shrink-0" /> <span className="truncate min-w-0 flex-1">{item.location}</span>
               </p>
             )}
             <p className="mt-2 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground/80">

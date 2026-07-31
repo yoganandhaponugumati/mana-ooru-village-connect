@@ -311,7 +311,7 @@ function MarketPage() {
                 )}
                 {i.location && (
                   <p className="mt-2 text-xs font-semibold text-clay flex items-center gap-1 max-w-full">
-                    <MapPin className="size-3.5 text-emerald-600 shrink-0" /> <span className="truncate">Pickup: {i.location}</span>
+                    <MapPin className="size-3.5 text-emerald-600 shrink-0" /> <span className="truncate min-w-0 flex-1">Pickup: {i.location}</span>
                   </p>
                 )}
               </div>

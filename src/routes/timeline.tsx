@@ -894,10 +894,10 @@ function TimelineCard({
 
           <div className="mt-5 flex flex-wrap items-center gap-2 text-xs font-semibold text-muted-foreground">
             <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <MapPin className="size-3.5 shrink-0" /> <span className="truncate">{item.village}</span>
+              <MapPin className="size-3.5 shrink-0" /> <span className="truncate min-w-0 flex-1">{item.village}</span>
             </span>
             <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <Users className="size-3.5 shrink-0" /> <span className="truncate">{item.author}</span>
+              <Users className="size-3.5 shrink-0" /> <span className="truncate min-w-0 flex-1">{item.author}</span>
             </span>
           </div>
 
