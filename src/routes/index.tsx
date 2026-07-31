@@ -1203,11 +1203,11 @@ function Index() {
                     <p className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2">
                       {service.description}
                     </p>
-                    <div className="mt-2.5 flex items-center gap-1.5 overflow-hidden">
+                    <div className="mt-2.5 flex items-center gap-1.5 min-w-0">
                       <span className="inline-flex shrink-0 items-center rounded-full bg-secondary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-secondary">
                         <FileText className="mr-1 size-2.5" /> Keep Ready
                       </span>
-                      <span className="truncate text-[10px] font-semibold text-muted-foreground">
+                      <span className="truncate min-w-0 flex-1 text-[10px] font-semibold text-muted-foreground">
                         {service.documents.slice(0, 2).join(", ")}
                       </span>
                     </div>
