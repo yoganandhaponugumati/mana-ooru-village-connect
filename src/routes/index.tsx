@@ -40,8 +40,10 @@ import {
   UserRound,
   Bot,
   FileText,
+  Mic,
 } from "lucide-react";
 import { SiteNav } from "@/components/SiteNav";
+import { VillageStories } from "@/components/VillageStories";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
 import { ConceptShowcase } from "@/components/ConceptShowcase";
@@ -560,6 +562,7 @@ function Index() {
     villageName: profile?.village || authProfile?.village,
   });
   const [searchQuery, setSearchQuery] = useState("");
+  const [isListening, setIsListening] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
   const villageName = (authProfile?.village || profile?.village || "").trim();
   const showSignedInVillage = Boolean(villageName);
@@ -576,6 +579,29 @@ function Index() {
   const featured = recentItems
     .filter((r) => r.type !== "announcement" && r.type !== "complaint")
     .slice(0, 3);
+
+  // Web Speech API for Telugu Voice Search
+  const startVoiceSearch = () => {
+    if (!("webkitSpeechRecognition" in window) && !("SpeechRecognition" in window)) {
+      alert("Voice search is not supported in this browser.");
+      return;
+    }
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = "te-IN"; // Telugu
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event: any) => {
+      const text = event.results[0][0].transcript;
+      setSearchQuery(text);
+      // Auto-submit search after voice input
+      navigate({ to: "/search", search: { q: text } });
+    };
+    recognition.start();
+  };
 
   const heroSubtitle = villageName
     ? `Connect with the Sarpanch, request MeeSeva certificates, check live weather, and find local work in ${villageName} — zero middlemen.`
@@ -666,6 +692,17 @@ function Index() {
                   placeholder={t.search}
                   className="min-w-0 flex-1 bg-transparent text-base font-semibold text-foreground outline-none placeholder:text-muted-foreground"
                 />
+                <button
+                  type="button"
+                  onClick={startVoiceSearch}
+                  className={`grid size-10 place-items-center rounded-xl transition shadow-sm ${
+                    isListening
+                      ? "bg-red-500 text-white animate-pulse"
+                      : "bg-primary/10 text-primary hover:bg-primary/20"
+                  }`}
+                >
+                  <Mic className="size-5" />
+                </button>
                 <button
                   type="submit"
                   className="rounded-[18px] bg-primary px-6 py-3 text-sm font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-0.5 hover:bg-secondary sm:px-8"
@@ -821,9 +858,10 @@ function Index() {
           📱 MOBILE HOME DASHBOARD — The new app-style section
       ════════════════════════════════════════════════════════════════════ */}
       <section className="relative z-30 mx-auto pt-20 max-w-7xl px-4 sm:px-6 md:hidden">
+        <VillageStories />
 
         {/* Mobile Top Image Banner */}
-        <div className="mb-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
+        <div className="mb-6 mt-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
           <img src="/village-life-bg.jpg" alt="Village" className="absolute inset-0 w-full h-full object-cover" />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <div className="absolute bottom-4 left-5 right-5 text-white">
@@ -843,6 +881,17 @@ function Index() {
               placeholder="Search services, workers, notices..."
               className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
+            <button
+              type="button"
+              onClick={startVoiceSearch}
+              className={`grid size-8 place-items-center rounded-full transition shrink-0 ${
+                isListening
+                  ? "bg-red-500 text-white animate-pulse"
+                  : "bg-primary/10 text-primary hover:bg-primary/20"
+              }`}
+            >
+              <Mic className="size-4" />
+            </button>
           </div>
         </form>
 

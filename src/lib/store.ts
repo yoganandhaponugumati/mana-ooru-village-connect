@@ -147,6 +147,19 @@ export function useListings(type?: ListingType) {
       }
 
 
+      if (typeof navigator !== "undefined" && !navigator.onLine) {
+        const { useUIStore } = await import("./ui-store");
+        useUIStore.getState().addToOfflineQueue(item);
+        toast.info("Offline mode. Post saved locally, will sync when network returns.");
+        
+        // Optimistically return a local version
+        return {
+          id: `local-sync-${Date.now()}`,
+          ...item,
+          createdAt: Date.now(),
+        } as Listing;
+      }
+
       const { data, error } = await supabase
         .from("listings")
         .insert({

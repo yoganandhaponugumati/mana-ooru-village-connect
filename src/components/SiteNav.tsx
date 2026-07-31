@@ -239,6 +239,15 @@ export function SiteNav() {
               <Search className="size-4" />
             </button>
 
+            {/* Dark Mode — Desktop */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="hidden md:grid size-8 place-items-center rounded-full border border-border bg-card text-muted-foreground shadow-sm transition hover:border-primary hover:text-primary dark:bg-zinc-900"
+              aria-label="Toggle Dark Mode"
+            >
+              {darkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4" />}
+            </button>
+
             {/* Language selector */}
             <div className="nav-menu-container relative">
               <button
