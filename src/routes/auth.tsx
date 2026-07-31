@@ -13,7 +13,6 @@ import {
   signUpWithEmailPassword,
   signInWithOtp,
   verifyPhoneOtp,
-  verifyPhoneOtp,
   occupations,
   dealerCategories,
   type Occupation,
