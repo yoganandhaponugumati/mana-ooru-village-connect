@@ -104,7 +104,7 @@ export function useListings(type?: ListingType) {
   const query = useQuery({
     queryKey: ["listings", type ?? "all", profile?.village_id ?? "all"],
     queryFn: async () => {
-      let q = supabase.from("listings").select("*").order("created_at", { ascending: false });
+      let q = supabase.from("listings").select("*").order("created_at", { ascending: false }).limit(100);
       if (type) q = q.eq("type", type);
       if (profile?.village_id) q = q.eq("village_id", profile.village_id);
       const { data, error } = await q;

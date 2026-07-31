@@ -322,9 +322,21 @@ export function getPasswordStrength(password: string): "weak" | "fair" | "strong
   return "strong";
 }
 
-// ── Phone OTP ───────────────────────────────────────────────────────────────
+export async function signInWithOtp(phone: string) {
+  return supabase.auth.signInWithOtp({ phone });
+}
+
 export async function verifyPhoneOtp(phone: string, token: string) {
   return supabase.auth.verifyOtp({ phone, token, type: "sms" });
+}
+
+export async function signInWithMagicLink(email: string) {
+  return supabase.auth.signInWithOtp({
+    email,
+    options: {
+      emailRedirectTo: getAuthRedirectUrl(),
+    },
+  });
 }
 
 // ── Username ────────────────────────────────────────────────────────────────

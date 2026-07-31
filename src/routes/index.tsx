@@ -951,7 +951,7 @@ function Index() {
           </div>
           
           {/* Manual Horizontal Scrolling Cards */}
-          <div className="relative flex overflow-x-auto w-[calc(100vw-2rem)] pb-4 hide-scrollbar snap-x snap-mandatory">
+          <div className="relative flex overflow-x-auto w-full pb-4 hide-scrollbar snap-x snap-mandatory">
             <div className="flex gap-4">
             {(announcementItems.length > 0 ? announcementItems : fallbackListings.filter(i => i.type === "announcement")).map((item, idx) => (
               <div key={`${item.id}-${idx}`} className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border border-border bg-white shadow-sm overflow-hidden flex flex-col relative snap-center snap-always">

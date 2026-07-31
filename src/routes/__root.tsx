@@ -16,6 +16,7 @@ import { reportLovableError } from "../lib/lovable-error-reporting";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { useBrowserPushNotifications } from "@/lib/push-notifications";
+import { supabase } from "@/integrations/supabase/client";
 
 function NotFoundComponent() {
   return (
@@ -180,6 +181,48 @@ function BrowserPushGate() {
   return null;
 }
 
+function GlobalErrorListener() {
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const logErrorToDB = async (message: string, source?: string, lineno?: number, colno?: number, errorObj?: any) => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        await supabase.from("error_logs").insert({
+          message,
+          source,
+          lineno,
+          colno,
+          error_stack: errorObj?.stack || String(errorObj),
+          user_id: session?.user?.id || null,
+          user_agent: navigator.userAgent,
+          url: window.location.href,
+        });
+      } catch (err) {
+        console.error("Failed to log error to DB:", err);
+      }
+    };
+
+    const handleGlobalError = (event: ErrorEvent) => {
+      logErrorToDB(event.message, event.filename, event.lineno, event.colno, event.error);
+    };
+
+    const handleUnhandledRejection = (event: PromiseRejectionEvent) => {
+      logErrorToDB(String(event.reason), "PromiseRejection", 0, 0, event.reason);
+    };
+
+    window.addEventListener("error", handleGlobalError);
+    window.addEventListener("unhandledrejection", handleUnhandledRejection);
+
+    return () => {
+      window.removeEventListener("error", handleGlobalError);
+      window.removeEventListener("unhandledrejection", handleUnhandledRejection);
+    };
+  }, []);
+  
+  return null;
+}
+
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
 
@@ -187,6 +230,7 @@ function RootComponent() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
+        <GlobalErrorListener />
         <ProfileCompletionGate />
         <BrowserPushGate />
         <Outlet />

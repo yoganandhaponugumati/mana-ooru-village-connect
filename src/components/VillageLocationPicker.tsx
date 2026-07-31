@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from "react";
-import { ChevronDown, Check } from "lucide-react";
+import { ChevronDown, Check, MapPin, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import {
   getDistricts,
   getMandals,
@@ -197,9 +198,72 @@ export function VillageLocationPicker({
   const districts = getDistricts(value.state);
   const mandals = getMandals(value.state, value.district);
   const villages = getVillages(value.state, value.district, value.mandal);
+  const [isLocating, setIsLocating] = useState(false);
+
+  const handleUseLocation = () => {
+    if (!navigator.geolocation) {
+      toast.error("Geolocation is not supported by your browser");
+      return;
+    }
+    setIsLocating(true);
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords;
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`,
+            { headers: { "User-Agent": "ManaOoru-Village-App/1.0" } }
+          );
+          if (!res.ok) throw new Error("Failed to fetch location data");
+          const data = await res.json();
+          const address = data.address || {};
+          
+          const state = address.state || "";
+          const district = address.state_district || address.county || "";
+          const mandal = address.county || address.suburb || "";
+          const village = address.village || address.town || "";
+
+          // We try to match with our predefined dropdowns if possible, or just set it as text
+          onChange({
+            state: state.replace(" State", ""),
+            district: district.replace(" District", ""),
+            mandal: mandal,
+            village: village
+          });
+          toast.success("Location detected!");
+        } catch (error) {
+          console.error(error);
+          toast.error("Could not determine your location. Please enter manually.");
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (error) => {
+        setIsLocating(false);
+        if (error.code === error.PERMISSION_DENIED) {
+          toast.error("Location permission denied. Please allow it in browser settings.");
+        } else {
+          toast.error("Could not fetch location.");
+        }
+      },
+      { timeout: 10000, maximumAge: 60000 }
+    );
+  };
 
   return (
-    <div className="relative z-50 grid gap-3 sm:grid-cols-2">
+    <div className="relative z-50">
+      <div className="mb-4 flex justify-end">
+        <button
+          type="button"
+          onClick={handleUseLocation}
+          disabled={isLocating}
+          className="inline-flex items-center gap-2 rounded-xl bg-primary/10 px-4 py-2 text-xs font-bold text-primary transition hover:bg-primary/20 disabled:opacity-50"
+        >
+          {isLocating ? <Loader2 className="size-4 animate-spin" /> : <MapPin className="size-4" />}
+          {isLocating ? "Detecting location..." : "Use my location"}
+        </button>
+      </div>
+      <div className="grid gap-3 sm:grid-cols-2">
       <SearchableSelectField
         label="State"
         value={value.state}
@@ -231,6 +295,7 @@ export function VillageLocationPicker({
         searchContext={[value.mandal, value.district, value.state].filter(Boolean).join(", ")}
         onChange={(next) => onChange({ ...value, village: next })}
       />
+      </div>
     </div>
   );
 }

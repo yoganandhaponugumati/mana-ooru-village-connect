@@ -32,8 +32,20 @@ function SuperAdminLoginPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password) {
-      toast.error("Please enter email and password.");
+    if (!email) {
+      toast.error("Please enter email.");
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast.error("Please enter a valid email address.");
+      return;
+    }
+    if (!password) {
+      toast.error("Please enter password.");
+      return;
+    }
+    if (password.length < 4) {
+      toast.error("Password must be at least 4 characters.");
       return;
     }
 

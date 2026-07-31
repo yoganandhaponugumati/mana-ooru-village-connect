@@ -11,6 +11,9 @@ import {
   normalizeRole,
   signInWithEmailPassword,
   signUpWithEmailPassword,
+  signInWithOtp,
+  verifyPhoneOtp,
+  verifyPhoneOtp,
   occupations,
   dealerCategories,
   type Occupation,
@@ -58,6 +61,11 @@ function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
+  
+  // Auth methods
+  const [authMethod, setAuthMethod] = useState<"password" | "phone">("password");
+  const [otpToken, setOtpToken] = useState("");
+  const [otpSent, setOtpSent] = useState(false);
   const [occupation, setOccupation] = useState<Occupation>("Other");
 
   const [shopName, setShopName] = useState("");
@@ -122,6 +130,9 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
+      if (!email) { toast.error("Please enter your email address."); setBusy(false); return; }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error("Please enter a valid email address."); setBusy(false); return; }
+
       if (mode === "signup") {
         const passwordError = getPasswordError(password);
         if (passwordError) { toast.error(passwordError); setBusy(false); return; }
@@ -170,18 +181,67 @@ function AuthPage() {
         navigate({ to: redirect || getRoleDashboardPath("citizen") });
       } else {
         // Sign In
-        if (!password) { toast.error("Please enter your password."); setBusy(false); return; }
-        const { data, error } = await signInWithEmailPassword(email, password);
-        if (error) throw error;
+        if (authMethod === "phone") {
+          if (!phone) { toast.error("Please enter your phone number (+91...)."); setBusy(false); return; }
+          if (!otpSent) {
+            const { error } = await signInWithOtp(phone);
+            if (error) throw error;
+            setOtpSent(true);
+            toast.success("OTP sent via SMS!");
+            setBusy(false);
+            return;
+          } else {
+            const { data, error } = await verifyPhoneOtp(phone, otpToken);
+            if (error) throw error;
+            if (!data.session) {
+               toast.error("Invalid OTP");
+               setBusy(false);
+               return;
+            }
+            // Proceed to session load
+          }
+        }
 
-        const signedInProfile = data.user ? await loadSignedInProfile(data.user.id) : null;
+        if (authMethod === "password") {
+          if (!password) { toast.error("Please enter your password."); setBusy(false); return; }
+          const passwordError = getPasswordError(password);
+          if (passwordError) { toast.error(passwordError); setBusy(false); return; }
+
+          const { error } = await signInWithEmailPassword(email, password);
+          if (error) throw error;
+        }
+
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session) {
+           setBusy(false);
+           return; // Waiting for phone OTP
+        }
+
+        const signedInProfile = sessionData.session.user ? await loadSignedInProfile(sessionData.session.user.id) : null;
         const resolvedRole = normalizeRole(signedInProfile?.role ?? signedInProfile?.account_type);
+
+        // Strict role validation
+        if (role === "village_admin" && resolvedRole !== "village_admin" && resolvedRole !== "super_admin") {
+          await supabase.auth.signOut();
+          toast.error("Access denied. You are not an Admin.");
+          setBusy(false);
+          return;
+        }
+
+        if (role === "dealer" && resolvedRole !== "dealer") {
+          if (signedInProfile?.dealer_status !== "pending") {
+            await supabase.auth.signOut();
+            toast.error("Access denied. You do not have an active Dealer account.");
+            setBusy(false);
+            return;
+          }
+        }
 
         toast.success("Welcome back!");
         await refreshProfile();
 
         let targetPath = redirect || getRoleDashboardPath(resolvedRole);
-        if (role === "dealer" && resolvedRole === "citizen" && signedInProfile?.dealer_status === "pending") {
+        if (role === "dealer" && resolvedRole !== "dealer" && signedInProfile?.dealer_status === "pending") {
           targetPath = "/dealer-registration";
         }
         navigate({ to: targetPath });
@@ -197,12 +257,8 @@ function AuthPage() {
   const handleGoogle = async () => {
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: `${window.location.origin}/`,
-        },
-      });
+      const { signInWithOAuth } = await import("@/lib/supabase/auth");
+      const { error } = await signInWithOAuth("google");
       if (error) throw error;
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Google Sign-In failed.";
@@ -304,7 +360,7 @@ function AuthPage() {
                 <button
                   key={m}
                   type="button"
-                  onClick={() => setMode(m)}
+                  onClick={() => { setMode(m); setAuthMethod("password"); setOtpSent(false); }}
                   className={`flex-1 py-2 text-sm font-bold rounded-xl transition ${
                     mode === m
                       ? "bg-primary text-primary-foreground shadow-sm"
@@ -316,23 +372,33 @@ function AuthPage() {
               ))}
             </div>
 
+            {mode === "signin" && (
+              <div className="mb-6 flex flex-wrap gap-2 justify-center">
+                <button type="button" onClick={() => { setAuthMethod("password"); setOtpSent(false); }} className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${authMethod === "password" ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground hover:bg-muted/50"}`}>Email + Password</button>
+                <button type="button" onClick={() => { setAuthMethod("phone"); setOtpSent(false); }} className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${authMethod === "phone" ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground hover:bg-muted/50"}`}>Phone OTP</button>
+              </div>
+            )}
+
             {/* Role selector */}
-            <div className="mb-5 grid grid-cols-3 gap-2">
-              {roleOptions.map((r) => (
-                <button
-                  key={r.id}
-                  type="button"
-                  onClick={() => setRole(r.id)}
-                  className={`flex flex-col items-center gap-1 rounded-2xl border py-3 text-xs font-bold transition-all ${
-                    role === r.id
-                      ? "border-primary bg-primary/10 text-primary scale-105 shadow-sm"
-                      : "border-border bg-background/60 text-muted-foreground hover:border-primary/40"
-                  }`}
-                >
-                  <r.icon className="size-5" />
-                  {r.label}
-                </button>
-              ))}
+            <div className={`mb-5 grid gap-2 ${mode === "signup" ? "grid-cols-2" : "grid-cols-3"}`}>
+              {roleOptions.map((r) => {
+                if (mode === "signup" && r.id === "village_admin") return null;
+                return (
+                  <button
+                    key={r.id}
+                    type="button"
+                    onClick={() => setRole(r.id)}
+                    className={`flex flex-col items-center gap-1 rounded-2xl border py-3 text-xs font-bold transition-all ${
+                      role === r.id
+                        ? "border-primary bg-primary/10 text-primary scale-105 shadow-sm"
+                        : "border-border bg-background/60 text-muted-foreground hover:border-primary/40"
+                    }`}
+                  >
+                    <r.icon className="size-5" />
+                    {r.label}
+                  </button>
+                );
+              })}
             </div>
 
             <form onSubmit={submit} className="space-y-4">
@@ -418,54 +484,72 @@ function AuthPage() {
               )}
 
               {/* Email */}
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground mb-1">Email Address *</label>
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="name@example.com"
-                  required
-                  className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
-                />
-              </div>
-
-              {/* Phone (signup only) */}
-              {mode === "signup" && (
+              {(mode === "signup" || authMethod === "password") && (
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Phone Number</label>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Email Address *</label>
                   <input
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="10-digit mobile"
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="name@example.com"
+                    required
                     className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
                   />
                 </div>
               )}
 
-              {/* Password */}
-              <div>
-                <label className="block text-xs font-semibold text-muted-foreground mb-1">
-                  Password * {mode === "signup" && <span className="text-emerald-600">(min 4 characters)</span>}
-                </label>
-                <div className="relative">
+              {/* Phone */}
+              {(mode === "signup" || authMethod === "phone") && (
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Phone Number {authMethod === "phone" && "*"}</label>
                   <input
-                    type={showPassword ? "text" : "password"}
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
-                    required
-                    className="premium-input w-full rounded-xl px-3 py-2.5 pr-10 text-sm bg-background/70 text-foreground"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    placeholder="+91..."
+                    required={authMethod === "phone"}
+                    className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
                   />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
-                  >
-                    {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
-                  </button>
                 </div>
-              </div>
+              )}
+
+              {authMethod === "phone" && otpSent && (
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Enter OTP *</label>
+                  <input
+                    value={otpToken}
+                    onChange={(e) => setOtpToken(e.target.value)}
+                    placeholder="6-digit code"
+                    required
+                    className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground tracking-widest text-center font-bold"
+                  />
+                </div>
+              )}
+
+              {/* Password */}
+              {(mode === "signup" || authMethod === "password") && (
+                <div>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Password * {mode === "signup" && <span className="text-emerald-600">(min 4 characters)</span>}
+                  </label>
+                  <div className="relative">
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder={mode === "signup" ? "Create a password" : "Enter your password"}
+                      required
+                      className="premium-input w-full rounded-xl px-3 py-2.5 pr-10 text-sm bg-background/70 text-foreground"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((v) => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition"
+                    >
+                      {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                    </button>
+                  </div>
+                </div>
+              )}
 
               {/* Confirm password (signup only) */}
               {mode === "signup" && (
@@ -488,7 +572,7 @@ function AuthPage() {
                 disabled={busy}
                 className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-md transition hover:brightness-110 active:scale-98 disabled:opacity-50 mt-2 cursor-pointer"
               >
-                {busy ? "Processing..." : mode === "signin" ? "Sign In" : "Create Account"}
+                {busy ? "Processing..." : mode === "signup" ? "Create Account" : (authMethod === "phone" && !otpSent ? "Send OTP" : "Sign In")}
               </button>
 
               {/* Google */}

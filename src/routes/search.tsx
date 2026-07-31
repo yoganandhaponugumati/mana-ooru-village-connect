@@ -6,9 +6,11 @@ import { expandSearchQuery, fallbackListings, getSearchableItems } from "@/lib/a
 import { useListings } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
+import { z } from "zod";
+
 export const Route = createFileRoute("/search")({
-  validateSearch: (search: Record<string, unknown>) => ({
-    q: search.q ? String(search.q) : "",
+  validateSearch: z.object({
+    q: z.string().optional(),
   }),
   head: () => ({ meta: [{ title: "Search - ManaOoru" }] }),
   component: SearchPage,
@@ -19,8 +21,9 @@ function SearchPage() {
   const { items } = useListings();
   const { profile } = useVillagePreferences();
   const allItems = getSearchableItems(items.length > 0 ? items : fallbackListings);
-  const normalized = q.trim().toLowerCase();
-  const expandedQuery = expandSearchQuery(q);
+  const query = q || "";
+  const normalized = query.trim().toLowerCase();
+  const expandedQuery = expandSearchQuery(query);
   const queryTerms = expandedQuery.split(/\s+/).filter(Boolean);
   const results = normalized
     ? allItems.filter((item) => {
