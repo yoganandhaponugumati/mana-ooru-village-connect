@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Play, ShieldCheck } from "lucide-react";
+import { X, Play, ShieldCheck, Plus, Upload } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
+import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
+import { useRef } from "react";
 
 const dummyStories = [
   {
@@ -39,6 +42,10 @@ const dummyStories = [
 export function VillageStories() {
   const [activeStory, setActiveStory] = useState<typeof dummyStories[0] | null>(null);
   const triggerHaptic = useUIStore((s) => s.triggerHaptic);
+  const { role, profile } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const isAdmin = role === "admin" || role === "super_admin" || profile?.designation === "Sarpanch";
 
   const handleStoryClick = (story: typeof dummyStories[0]) => {
     triggerHaptic("medium");
@@ -53,7 +60,38 @@ export function VillageStories() {
   return (
     <div className="w-full bg-transparent pb-4 pt-2">
       {/* Scrollable Avatars */}
-      <div className="flex gap-4 overflow-x-auto px-4 sm:px-6 no-scrollbar snap-x">
+      <div className="flex gap-4 overflow-x-auto px-4 sm:px-6 no-scrollbar snap-x items-start">
+        
+        {/* Admin Post Button */}
+        {isAdmin && (
+          <div className="snap-start flex flex-col items-center gap-1 shrink-0">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="relative size-[68px] rounded-full border-2 border-dashed border-primary/50 bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 hover:border-primary transition group"
+            >
+              <Plus className="size-6 group-hover:scale-110 transition-transform" />
+              <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-1 shadow-md">
+                <Upload className="size-3" />
+              </div>
+            </button>
+            <span className="text-[10px] font-bold text-primary mt-1">Post Update</span>
+            <input 
+              type="file" 
+              accept="video/*,image/*" 
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  toast.loading("Encrypting and uploading media...", { id: "story-upload" });
+                  setTimeout(() => {
+                    toast.success("Story posted successfully! Live for 24 hours.", { id: "story-upload" });
+                  }, 2000);
+                }
+              }}
+            />
+          </div>
+        )}
+
         {dummyStories.map((story) => (
           <div
             key={story.id}
