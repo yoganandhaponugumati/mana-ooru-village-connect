@@ -8,6 +8,10 @@ import {
   sendNewPostPushNotifications,
 } from "@/lib/api/notification.functions";
 
+/**
+ * ListingType defines the primary category of a user-generated post or official record.
+ * This drives the UI filtering, icons, and analytics across the application.
+ */
 export type ListingType =
   | "worker"
   | "work"
@@ -17,6 +21,10 @@ export type ListingType =
   | "announcement"
   | "complaint";
 
+/**
+ * The standard Listing object used throughout the frontend.
+ * Maps 1:1 with the Supabase `listings` table, but normalized for TypeScript.
+ */
 export type Listing = {
   id: string;
   type: ListingType;
@@ -64,6 +72,10 @@ type Row = {
   created_at: string;
 };
 
+/**
+ * Transforms a raw Supabase DB row into a clean frontend Listing object.
+ * Also handles extracting the "Official Panchayat Response" from legacy descriptions.
+ */
 function toListing(r: Row): Listing {
   let desc = r.description ?? "";
   let officialResponse = r.official_response ?? undefined;
@@ -97,6 +109,12 @@ function toListing(r: Row): Listing {
   };
 }
 
+/**
+ * Main data hook for fetching, adding, updating, and removing listings.
+ * Uses TanStack React Query for caching, automatic background refetching, and optimistic updates.
+ *
+ * @param type Optional listing type to filter by (e.g., 'worker', 'land'). Defaults to fetching all.
+ */
 export function useListings(type?: ListingType) {
   const qc = useQueryClient();
   const { user, profile } = useAuth();
@@ -115,6 +133,12 @@ export function useListings(type?: ListingType) {
     },
   });
 
+  /**
+   * Adds a new listing to the Supabase database.
+   * Ensures the user is authenticated, otherwise throws an error.
+   * After insertion, invalidates React Query caches to instantly update the UI,
+   * and triggers a backend push notification to relevant villagers.
+   */
   const add = useCallback(
     async (item: Omit<Listing, "id" | "createdAt" | "owner_id" | "localOnly">) => {
       if (!user) {
@@ -159,6 +183,10 @@ export function useListings(type?: ListingType) {
     [user, profile?.village_id, qc],
   );
 
+  /**
+   * Permanently deletes a listing from the database.
+   * Only the owner or an admin can do this (enforced by Supabase RLS).
+   */
   const remove = useCallback(
     async (id: string) => {
       if (id.startsWith("local-")) {
@@ -177,6 +205,11 @@ export function useListings(type?: ListingType) {
     [qc],
   );
 
+  /**
+   * Updates an existing listing. Often used by admins to pin announcements,
+   * change problem statuses (e.g., 'pending' to 'resolved'), or add official responses.
+   * Sends a targeted push notification to the post owner when their issue status changes.
+   */
   const update = useCallback(
     async (id: string, patch: Partial<Pick<Listing, "isPinned" | "status" | "officialResponse">>) => {
       if (id.startsWith("local-")) {
@@ -252,6 +285,11 @@ export function useListings(type?: ListingType) {
   return { items, add, remove, update, total: items.length, loading: query.isLoading };
 }
 
+/**
+   * Fetches real-time statistical counts of the village.
+   * If there isn't enough data in the DB yet, it gracefully falls back to baseline simulation data
+   * to ensure the dashboard always looks populated and inviting.
+   */
 export function useListingStats(filter?: {
   villageId?: string | null;
   villageName?: string | null;

@@ -157,6 +157,13 @@ export function SiteNav() {
 
         {/* Left Side: Back Arrow (if not home) + Logo */}
         <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 relative z-20">
+          <button
+            className="flex lg:hidden place-items-center justify-center size-8 rounded-full border border-border bg-card text-foreground shadow-sm transition dark:bg-zinc-900 mr-1"
+            onClick={() => setOpen((v) => !v)}
+            aria-label={open ? "Close menu" : "Open menu"}
+          >
+            {open ? <X className="size-4" /> : <Menu className="size-4" />}
+          </button>
           {location.pathname !== "/" && (
             <button
               type="button"
@@ -460,14 +467,6 @@ export function SiteNav() {
               </div>
             )}
 
-            {/* Hamburger — hidden on lg+ and hidden on mobile to match exact mockup */}
-            <button
-              className="hidden lg:hidden place-items-center rounded-full border border-border bg-card text-foreground shadow-sm transition dark:bg-zinc-900"
-              onClick={() => setOpen((v) => !v)}
-              aria-label={open ? "Close menu" : "Open menu"}
-            >
-              {open ? <X className="size-4" /> : <Menu className="size-4" />}
-            </button>
           </div>
         </div>
 
@@ -488,11 +487,11 @@ export function SiteNav() {
                   />
                   {/* Drawer panel */}
                   <motion.div
-                    initial={{ x: "100%" }}
+                    initial={{ x: "-100%" }}
                     animate={{ x: 0 }}
-                    exit={{ x: "100%" }}
+                    exit={{ x: "-100%" }}
                     transition={{ duration: 0.25, ease: [0.32, 0.72, 0, 1] }}
-                    className="absolute right-0 top-0 flex h-full w-[min(320px,86vw)] flex-col bg-white dark:bg-zinc-950 shadow-2xl overflow-y-auto border-l border-border/60"
+                    className="absolute left-0 top-0 flex h-full w-[min(320px,86vw)] flex-col bg-white dark:bg-zinc-950 shadow-2xl overflow-y-auto border-r border-border/60"
                   >
                     {/* Drawer header */}
                     <div className="flex items-center justify-between border-b border-border dark:border-zinc-800 px-4 py-3">

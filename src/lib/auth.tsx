@@ -28,6 +28,10 @@ export type {
   LegacyAccountType,
 };
 
+/**
+ * Represents the normalized profile of the currently logged-in user.
+ * This is fetched from the 'profiles' table after a successful session is established.
+ */
 type AuthProfile = {
   account_type: LegacyAccountType;
   role: AppRole;
@@ -73,6 +77,9 @@ type AuthCtx = {
   refreshProfile: () => Promise<void>;
 };
 
+/**
+ * The default context state before initialization is complete.
+ */
 const Ctx = createContext<AuthCtx>({
   user: null,
   session: null,
@@ -91,6 +98,11 @@ const Ctx = createContext<AuthCtx>({
 const PROFILE_COLUMNS =
   "account_type,role,username,full_name,photo_url,occupation,state,district,mandal,village,village_id,preferred_language,profile_completed_at,dealer_status,dealer_category,shop_name,shop_description,shop_address,approved_by,approved_at,designation";
 
+/**
+ * AuthProvider wraps the root of the application to provide global access to the current
+ * user's session, profile, and authentication state (like loading and email verification).
+ * It listens to Supabase's `onAuthStateChange` to automatically keep the UI in sync with the backend.
+ */
 export function AuthProvider({
   children,
 }: {
@@ -144,6 +156,10 @@ export function AuthProvider({
     );
   }, []);
 
+  /**
+   * Effect to synchronize the local state with Supabase's authentication state.
+   * This handles initial page load and any login/logout events dynamically.
+   */
   useEffect(() => {
     const syncSession = async (s: Session | null) => {
       if (typeof window !== "undefined") {
@@ -174,6 +190,10 @@ export function AuthProvider({
     return () => sub.subscription.unsubscribe();
   }, [loadProfile]);
 
+  /**
+   * Signs the user out locally and on the Supabase backend.
+   * Clears the React Query cache to prevent data leaks between accounts.
+   */
   const signOut = async () => {
     if (typeof window !== "undefined") {
       localStorage.removeItem("manaooru-mock-session");
@@ -240,4 +260,7 @@ export function AuthProvider({
   );
 }
 
+/**
+ * Custom hook to consume the authentication context anywhere in the application.
+ */
 export const useAuth = () => useContext(Ctx);

@@ -49,6 +49,10 @@ import { VideoGuideModal } from "@/components/VideoGuideModal";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
 
+/**
+ * Route definition for the Homepage (/).
+ * Configures the meta tags for SEO and social sharing (Open Graph).
+ */
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
@@ -68,6 +72,10 @@ export const Route = createFileRoute("/")({
   component: Index,
 });
 
+/**
+ * Static configuration arrays for Quick Actions, Categories, Needs, and Proof Tickers.
+ * Extracted outside the component to prevent unnecessary re-renders.
+ */
 const quickActions = [
   {
     icon: Users,
@@ -394,7 +402,11 @@ function HeroFeatureCarousel() {
   );
 }
 
-
+/**
+ * HeroVillageOSCard
+ * Renders the live 'Digital Village OS' floating card on the desktop hero section.
+ * Shows real-time village metrics, weather, and the top pinned notice.
+ */
 function HeroVillageOSCard({
   villageName,
   heroWeather,
@@ -534,6 +546,11 @@ function HeroVillageOSCard({
   );
 }
 
+/**
+ * Main Homepage Component.
+ * Orchestrates the Desktop Hero, Mobile Quick Actions, Live Activity Feed, and specific categorical grids.
+ * Fetches real-time stats via `useListingStats` to populate the UI dynamically.
+ */
 function Index() {
   const navigate = useNavigate();
   const { profile: authProfile } = useAuth();

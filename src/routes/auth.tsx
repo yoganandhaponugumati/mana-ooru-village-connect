@@ -46,6 +46,17 @@ const roleOptions: { id: AppRole; label: string; icon: typeof User }[] = [
   { id: "village_admin", label: "Admin", icon: ShieldCheck },
 ];
 
+/**
+ * The main Authentication Page for ManaOoru.
+ * 
+ * Handles three primary workflows:
+ * 1. Citizen / Admin Sign In (Email+Password or Phone OTP)
+ * 2. Citizen Sign Up (Creates a profile and links to a village)
+ * 3. Dealer Sign Up (Requires additional shop details and goes into 'pending' status)
+ * 
+ * Upon successful authentication, it redirects users to their appropriate dashboard 
+ * based on their role (`getRoleDashboardPath`).
+ */
 function AuthPage() {
   const navigate = useNavigate();
   const { redirect, message } = Route.useSearch();
@@ -80,6 +91,11 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
   const [dealerPending, setDealerPending] = useState(false);
 
+  /**
+   * Effect: Auto-redirect signed-in users.
+   * If a user visits `/auth` but is already authenticated and has no pending dealer status,
+   * they are automatically redirected to their dashboard or the requested `redirect` path.
+   */
   useEffect(() => {
     if (!user || busy || dealerPending) return;
     const resolvedRole = normalizeRole(authProfile?.role ?? authProfile?.account_type);
@@ -125,6 +141,10 @@ function AuthPage() {
     await refreshProfile();
   };
 
+  /**
+   * Core form submission handler.
+   * Branches logic between Sign Up, Email Sign In, and Phone OTP Sign In.
+   */
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     setBusy(true);
