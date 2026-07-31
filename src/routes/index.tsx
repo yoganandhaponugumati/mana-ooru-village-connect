@@ -1124,7 +1124,7 @@ function Index() {
                   href={service.apply}
                   target="_blank"
                   rel="noreferrer"
-                  className="group relative flex items-start gap-4 rounded-[24px] border border-transparent bg-white/60 p-4 transition-all hover:bg-white hover:shadow-xl hover:shadow-primary/5 dark:bg-zinc-900/50 dark:hover:bg-zinc-900"
+                  className="group relative flex items-start gap-4 min-w-0 rounded-[24px] border border-transparent bg-white/60 p-4 transition-all hover:bg-white hover:shadow-xl hover:shadow-primary/5 dark:bg-zinc-900/50 dark:hover:bg-zinc-900"
                 >
                   <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-inner">
                     <Icon className="size-6 transition-transform group-hover:scale-110" strokeWidth={1.8} />
@@ -1169,7 +1169,7 @@ function Index() {
                   href={scheme.apply}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center justify-between gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/14"
+                  className="flex items-center justify-between min-w-0 gap-3 rounded-2xl border border-white/10 bg-white/8 px-4 py-3 text-sm font-semibold text-white transition hover:bg-white/14"
                 >
                   <span className="min-w-0">
                     <span className="block truncate">{scheme.title}</span>
@@ -1336,7 +1336,7 @@ function Index() {
               {featured.map((s, i) => (
                 <article
                   key={s.id}
-                  className="group flex gap-3 rounded-2xl border border-border/70 bg-card p-3 shadow-sm transition-all duration-200 hover:border-primary/50 hover:shadow-md animate-fade-up"
+                  className="group flex gap-3 min-w-0 rounded-2xl border border-border/70 bg-card p-3 shadow-sm transition-all duration-200 hover:border-primary/50 hover:shadow-md animate-fade-up"
                   style={{ animationDelay: `${i * 60}ms` }}
                 >
                   {/* Amazon-style: small square thumbnail LEFT */}
