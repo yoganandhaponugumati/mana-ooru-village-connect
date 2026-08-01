@@ -39,7 +39,42 @@ export function VillageStories() {
   const { user, role, profile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isAdmin = role === "village_admin" || role === "super_admin" || profile?.designation === "Sarpanch";
+  const isAdmin = 
+    role === "village_admin" || 
+    role === "super_admin" || 
+    role === "platform_admin" ||
+    profile?.designation === "Sarpanch";
+
+  const compressImage = (file: File): Promise<File> =>
+    new Promise((resolve) => {
+      if (!file.type.startsWith("image/")) {
+        resolve(file);
+        return;
+      }
+      const img = new Image();
+      const blobUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(blobUrl);
+        const MAX_PX = 1280;
+        const scale = Math.min(1, MAX_PX / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { resolve(file); return; }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) { resolve(file); return; }
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+          },
+          "image/jpeg",
+          0.80
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(blobUrl); resolve(file); };
+      img.src = blobUrl;
+    });
 
   useEffect(() => {
     const fetchStories = async () => {
@@ -98,17 +133,25 @@ export function VillageStories() {
     setActiveStory(null);
   };
 
-  const handleDeleteStory = async (storyId: string) => {
+  const handleDeleteStory = async (storyId: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
     if (!window.confirm("Are you sure you want to delete this story?")) return;
-    toast.promise(
-      async () => {
-        const { error } = await (supabase as any).from("village_stories").delete().eq("id", storyId);
-        if (error) throw error;
-        setStories(s => s.filter(x => x.id !== storyId));
-        setActiveStory(null);
-      },
-      { loading: "Deleting...", success: "Story deleted.", error: (e:any) => `Failed: ${e.message}` }
-    );
+    
+    // Immediately remove from UI
+    setStories(s => s.filter(x => x.id !== storyId));
+    if (activeStory?.id === storyId) setActiveStory(null);
+
+    // Also delete from database if it's not a static dummy story
+    if (storyId !== "1" && storyId !== "2") {
+      try {
+        await (supabase as any).from("village_stories").delete().eq("id", storyId);
+        toast.success("Story deleted.");
+      } catch (err) {
+        console.error("Delete story error:", err);
+      }
+    } else {
+      toast.success("Demo story removed.");
+    }
   };
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,10 +173,13 @@ export function VillageStories() {
     
     toast.promise(
       async () => {
-        // 1. Upload to Supabase Storage
-        const uploaded = await uploadUserFile("events", user.id, file);
+        // 1. Fast client-side image compression for ultra-fast uploads
+        const fileToUpload = isVideo ? file : await compressImage(file);
         
-        // 2. Build insert payload — only include village_id if it's a real value
+        // 2. Upload to Supabase Storage
+        const uploaded = await uploadUserFile("events", user.id, fileToUpload);
+        
+        // 3. Build insert payload
         const villageId = profile?.village_id;
         const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
@@ -145,19 +191,18 @@ export function VillageStories() {
           expires_at: expiresAt,
         };
 
-        // Only attach village_id if profile has a real one
         if (villageId) {
           payload.village_id = villageId;
         }
         
-        const { data: insertData, error } = await (supabase as any).from("village_stories").insert(payload).select();
+        const { error } = await (supabase as any).from("village_stories").insert(payload);
         
         if (error) {
           console.error("[VillageStories] insert error:", JSON.stringify(error));
           throw error;
         }
         
-        // 3. Add to UI immediately
+        // 4. Add to UI immediately
         const newStory = {
           id: Date.now().toString(),
           author: profile?.full_name || profile?.designation || role || "Official",
@@ -167,13 +212,14 @@ export function VillageStories() {
           caption: caption || "New village update",
           timeAgo: "Just now",
           isVerified: true,
+          authorId: user.id,
         };
         setStories(prev => [newStory, ...prev]);
       },
       {
-        loading: isVideo ? "Uploading video (this may take a moment)..." : "Uploading image...",
+        loading: isVideo ? "Uploading video..." : "Optimizing & posting update...",
         success: "Story posted successfully! Live for 24 hours.",
-        error: (err: any) => `Error [${err.code}]: ${err.message || err.hint || "Unknown error. Check browser console."}`
+        error: (err: any) => `Error [${err.code || "Upload"}]: ${err.message || "Failed to post story."}`
       }
     );
     
@@ -227,6 +273,15 @@ export function VillageStories() {
                 <div className="absolute bottom-0 right-0 bg-blue-500 text-white rounded-full p-0.5 shadow-md">
                   <ShieldCheck className="size-3" />
                 </div>
+              )}
+              {(isAdmin || user?.id === story.authorId) && (
+                <button
+                  onClick={(e) => handleDeleteStory(story.id, e)}
+                  title="Delete Story"
+                  className="absolute -top-1 -right-1 z-10 bg-red-500 hover:scale-110 text-white rounded-full p-1 shadow-md transition"
+                >
+                  <Trash2 className="size-3" />
+                </button>
               )}
             </div>
             <span className="text-[10px] font-semibold text-foreground/80 truncate max-w-[70px] text-center">
