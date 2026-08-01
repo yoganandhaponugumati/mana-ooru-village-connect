@@ -18,7 +18,7 @@ CREATE TABLE IF NOT EXISTS public.village_stories (
 );
 
 -- Index for querying active stories fast
-CREATE INDEX IF NOT EXISTS idx_village_stories_active ON public.village_stories(village_id, expires_at) WHERE expires_at > NOW();
+CREATE INDEX IF NOT EXISTS idx_village_stories_active ON public.village_stories(village_id, expires_at);
 
 -- Enable RLS
 ALTER TABLE public.village_stories ENABLE ROW LEVEL SECURITY;
