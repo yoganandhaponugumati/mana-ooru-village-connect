@@ -130,7 +130,7 @@ function DashboardPage() {
   useEffect(() => {
     if (!user || pushAttemptedForUserRef.current === user.id) return;
     pushAttemptedForUserRef.current = user.id;
-    void subscribeToPush("dashboard").catch((error) => {
+    void subscribeToPush().catch((error) => {
       console.error("[Push] Dashboard subscription failed:", error);
       pushAttemptedForUserRef.current = null;
     });

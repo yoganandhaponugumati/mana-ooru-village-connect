@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
-import { AppButton, FeatureIcon, SurfaceCard } from "@/components/design-system";
+import { FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/ai-assistant")({
@@ -47,7 +47,7 @@ function AiAssistantPage() {
 
   const weatherSummary =
     weather.live && weather.temp !== null
-      ? `${weather.temp}°C, ${weather.weatherCode ? "cloudy/rainy" : "clear"}`
+      ? `${weather.temp}°C, ${(weather as any).weatherCode ? "cloudy/rainy" : "clear"}`
       : "Weather data unavailable";
 
   const weatherDetails =

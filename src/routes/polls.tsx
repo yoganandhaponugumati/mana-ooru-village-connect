@@ -137,11 +137,11 @@ function PollsPage() {
   const myVotes = new Set(votesQuery.data?.map(v => v.poll_id) || []);
 
   const getVoteCount = (pollId: string, optionId: string) => {
-    return allVotesQuery.data?.filter(v => v.poll_id === pollId && v.option_id === optionId).length || 0;
+    return allVotesQuery.data?.filter((v: any) => v.poll_id === pollId && v.option_id === optionId).length || 0;
   };
 
   const getTotalVotes = (pollId: string) => {
-    return allVotesQuery.data?.filter(v => v.poll_id === pollId).length || 0;
+    return allVotesQuery.data?.filter((v: any) => v.poll_id === pollId).length || 0;
   };
 
   return (
@@ -250,6 +250,11 @@ function PollsPage() {
                   }`}>
                     {poll.status === 'open' ? 'Active Poll' : 'Closed'}
                   </span>
+                  {hasVoted && (
+                    <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-800">
+                      <CheckCircle2 className="size-3" /> Voted
+                    </span>
+                  )}
                   <span className="text-[10px] font-semibold text-muted-foreground">
                     Total votes: {totalVotes}
                   </span>

@@ -17,7 +17,7 @@ export async function logAdminAction(
     throw new Error("Admin user not found for audit log");
   }
 
-  return supabaseAdmin.from("audit_logs").insert({
+  return (supabaseAdmin as any).from("audit_logs").insert({
     village_id: villageId,
     admin_id: adminId,
     action,

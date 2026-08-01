@@ -43,7 +43,7 @@ export function VillageStories() {
   useEffect(() => {
     const fetchStories = async () => {
       try {
-        const { data, error } = await supabase
+        const { data, error } = await (supabase as any)
           .from("village_stories")
           .select(`
             id,
@@ -112,7 +112,7 @@ export function VillageStories() {
         // 2. Save metadata to DB
         const villageId = profile?.village_id || "00000000-0000-0000-0000-000000000000";
         
-        const { error } = await supabase.from("village_stories").insert({
+        const { error } = await (supabase as any).from("village_stories").insert({
           author_id: user.id,
           village_id: villageId,
           media_url: uploaded.url,

@@ -188,7 +188,7 @@ function GlobalErrorListener() {
     const logErrorToDB = async (message: string, source?: string, lineno?: number, colno?: number, errorObj?: any) => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
-        await supabase.from("error_logs").insert({
+        await (supabase as any).from("error_logs").insert({
           message,
           source,
           lineno,

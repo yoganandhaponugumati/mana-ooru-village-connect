@@ -1,15 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
-  CheckCircle2,
-  Clock3,
   ExternalLink,
   FileText,
   Fingerprint,
   Landmark,
-  Plus,
   SearchCheck,
   ShieldCheck,
-  XCircle,
   Sparkles,
   HelpCircle,
   Users,
@@ -23,7 +19,6 @@ import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import {
   SectionHeader,
-  StatusBadge,
   SurfaceCard,
 } from "@/components/design-system";
 import { citizenServices, schemes } from "@/lib/app-data";

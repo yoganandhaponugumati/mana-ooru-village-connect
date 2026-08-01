@@ -36,7 +36,7 @@ export function AdminRoleManager() {
     try {
       const { data: profile, error: findError } = await supabase
         .from("profiles")
-        .select("id,email,display_name")
+        .select("id,email,display_name,role")
         .ilike("email", trimmedEmail)
         .maybeSingle();
 
@@ -58,14 +58,12 @@ export function AdminRoleManager() {
       if (updateError) throw updateError;
 
       // Log the action to audit_logs
-      if (user) {
-        await supabase.from("audit_logs").insert({
+      const { error: logError } = await (supabase as any).from("audit_logs").insert({
           action: "ROLE_CHANGE",
-          actor_id: user.id,
+          actor_id: user?.id,
           target_id: profile.id,
           details: { old_role: profile.role || null, new_role: role, target_email: profile.email },
         });
-      }
 
       toast.success(
         `${profile.display_name || profile.email || "User"} is now ${roleLabels[role]}`,

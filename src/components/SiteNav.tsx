@@ -211,7 +211,7 @@ export function SiteNav() {
                 className: "text-primary font-black bg-primary/10 dark:text-emerald-400",
               }}
             >
-              {t[l.key] ?? l.label}
+              {(t as any)[l.key] ?? l.label}
             </Link>
           ))}
         </div>
@@ -532,7 +532,7 @@ export function SiteNav() {
                           activeProps={{ className: "bg-primary text-primary-foreground font-black" }}
                         >
                           <l.icon className="size-4 shrink-0" />
-                          {t[l.key] ?? l.label}
+                          {(t as any)[l.key] ?? l.label}
                         </Link>
                       ))}
                     </div>

@@ -1,4 +1,4 @@
-import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Activity,
   AlertTriangle,
@@ -14,9 +14,7 @@ import {
   Moon,
   Settings,
   ShieldAlert,
-  Sun,
   Trash2,
-  UserRound,
   XCircle,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
@@ -47,7 +45,6 @@ import { timeAgo, useListings } from "@/lib/store";
 import {
   formatVillageProfile,
   languageOptions,
-  normalizeProfile,
   saveVillageProfilePreference,
   useVillagePreferences,
   type Language,
