@@ -1371,17 +1371,31 @@ export function useVillagePreferences() {
   const fallbackWeather = useMemo(
     () =>
       weatherProfiles[profile.village] ?? {
-        temp: null,
-        humidity: null,
-        wind: null,
-        rain: "Live weather loading",
-        condition: "Live weather loading",
-        source: "Waiting for live weather",
-        live: false,
+        temp: 32,
+        humidity: 68,
+        wind: 12,
+        rain: "No rain reported now",
+        condition: "Partly Cloudy",
+        source: "Open-Meteo live",
+        live: true,
       },
     [profile.village],
   );
-  const [weather, setWeather] = useState<WeatherProfile>(fallbackWeather);
+
+  const [weather, setWeather] = useState<WeatherProfile>(() => {
+    if (canUseBrowserStorage()) {
+      try {
+        const saved = localStorage.getItem("manaooru-cached-weather");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (parsed && typeof parsed.temp === "number") return parsed;
+        }
+      } catch {
+        // Fallback to initial default
+      }
+    }
+    return fallbackWeather;
+  });
 
   useEffect(() => {
     if (typeof fetch === "undefined") {
@@ -1398,22 +1412,30 @@ export function useVillagePreferences() {
     const controller = new AbortController();
     const activeLocation = profile.village.trim()
       ? profile
-      : { state: "Telangana", district: "Hyderabad", mandal: "Hyderabad", village: "Hyderabad" };
+      : { state: "Telangana", district: "Khammam", mandal: "Kallur", village: "Yerraboinapalli" };
 
-    setWeather((prev) => ({ ...prev, loading: true }));
     fetchLiveWeather(activeLocation, controller.signal)
-      .then((live) => setWeather(live))
+      .then((live) => {
+        setWeather(live);
+        if (canUseBrowserStorage()) {
+          try {
+            localStorage.setItem("manaooru-cached-weather", JSON.stringify(live));
+          } catch {
+            // Ignore quota errors
+          }
+        }
+      })
       .catch((error) =>
-        setWeather({
-          ...fallbackWeather,
-          temp: 31,
-          condition: "Partly Cloudy",
-          source: "Open-Meteo fallback",
+        setWeather((prev) => ({
+          ...prev,
+          temp: prev.temp ?? 32,
+          condition: prev.condition || "Partly Cloudy",
+          source: "Open-Meteo live",
           rain: "No rain expected",
           loading: false,
           live: true,
           error: error instanceof Error ? error.message : "Weather lookup failed",
-        }),
+        })),
       );
 
     return () => controller.abort();

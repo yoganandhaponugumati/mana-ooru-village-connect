@@ -207,12 +207,19 @@ export function useListings(type?: ListingType) {
         return;
       }
       const { error } = await supabase.from("listings").delete().eq("id", id);
+      try {
+        await (supabase as any).from("complaints").delete().eq("id", id);
+      } catch (err) {
+        console.warn("[store] delete complaints fallback error:", err);
+      }
+
       if (error) {
         toast.error(error.message);
         return;
       }
       qc.invalidateQueries({ queryKey: ["listings"] });
       qc.invalidateQueries({ queryKey: ["listing-stats"] });
+      qc.invalidateQueries({ queryKey: ["complaints"] });
       toast.success("Removed");
     },
     [qc],
