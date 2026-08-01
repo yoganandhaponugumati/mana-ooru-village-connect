@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { uploadUserFile } from "@/lib/supabase/storage";
 import { timeAgo as getTimeAgo } from "@/lib/store";
 import { checkContentSafety } from "@/lib/moderation";
+import { checkContentSpam } from "@/lib/spam-filter";
+import { checkRateLimit, DEFAULT_STORY_LIMIT } from "@/lib/rate-limiter";
 
 const dummyStories = [
   {
@@ -205,7 +207,19 @@ export function VillageStories() {
     const caption = window.prompt("Enter a description for your update:");
     if (caption === null) return; // Cancelled
     
+    const rateCheck = checkRateLimit(user.id, "upload_story", DEFAULT_STORY_LIMIT);
+    if (!rateCheck.allowed) {
+      toast.error(`Please wait ${rateCheck.waitSeconds}s before uploading another story update.`);
+      return;
+    }
+
     if (caption) {
+      const spamCheck = checkContentSpam(caption);
+      if (!spamCheck.isClean) {
+        toast.error(spamCheck.reason || "Spam or profanity detected.");
+        return;
+      }
+
       const safety = await checkContentSafety(caption);
       if (!safety.isSafe) {
         toast.error(safety.reason || "Inappropriate language detected.");
