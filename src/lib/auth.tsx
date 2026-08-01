@@ -19,7 +19,7 @@ import {
   type LegacyAccountType,
   type Occupation,
 } from "@/lib/supabase/auth";
-import { type Language } from "@/lib/village-preferences";
+import { type Language, saveVillageProfilePreference } from "@/lib/village-preferences";
 
 export type {
   AccountType,
@@ -122,6 +122,15 @@ export function AuthProvider({
       .maybeSingle();
 
     const role = normalizeRole(data?.role ?? data?.account_type);
+
+    if (data && (data.village || data.mandal)) {
+      saveVillageProfilePreference({
+        state: data.state || "Telangana",
+        district: data.district || "Khammam",
+        mandal: data.mandal || "Kallur",
+        village: data.village || "",
+      });
+    }
 
     setProfile(
       data

@@ -557,15 +557,23 @@ function Index() {
   const navigate = useNavigate();
   const { profile: authProfile } = useAuth();
   const { t, profile, weather } = useVillagePreferences();
+  
+  const villageName = (
+    authProfile?.village?.trim() ||
+    profile?.village?.trim() ||
+    authProfile?.mandal?.trim() ||
+    profile?.mandal?.trim() ||
+    "Smart Village"
+  );
+
   const { data: stats } = useListingStats({
     villageId: authProfile?.village_id,
-    villageName: profile?.village || authProfile?.village,
+    villageName,
   });
   const [searchQuery, setSearchQuery] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [showVideoModal, setShowVideoModal] = useState(false);
-  const villageName = (authProfile?.village || profile?.village || "").trim();
-  const showSignedInVillage = Boolean(villageName);
+  const showSignedInVillage = Boolean(villageName && villageName !== "Smart Village");
   const heroWeather = showSignedInVillage
     ? weather.live && weather.temp !== null
       ? `${weather.temp}°C · ${weather.condition}`
