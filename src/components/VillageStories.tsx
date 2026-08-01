@@ -258,6 +258,12 @@ export function VillageStories() {
     }
 
     if (caption) {
+      const safetyCheck = await checkContentSafety(caption);
+      if (!safetyCheck.isSafe) {
+        toast.error(safetyCheck.reason || "Inappropriate content detected.");
+        if (fileInputRef.current) fileInputRef.current.value = "";
+        return;
+      }
       const spamCheck = checkContentSpam(caption);
       if (!spamCheck.isClean) {
         toast.error(spamCheck.reason || "Spam or profanity detected.");
@@ -420,7 +426,7 @@ export function VillageStories() {
               accept="video/*,image/*" 
               className="hidden" 
               ref={fileInputRef}
-              onChange={handleUpload}
+              onChange={handleFileUpload}
             />
           </div>
         )}
