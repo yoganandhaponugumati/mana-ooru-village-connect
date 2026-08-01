@@ -126,7 +126,7 @@ export function VillageStories() {
       const blobUrl = URL.createObjectURL(file);
       img.onload = () => {
         URL.revokeObjectURL(blobUrl);
-        const MAX_PX = 1280;
+        const MAX_PX = 800;
         const scale = Math.min(1, MAX_PX / Math.max(img.width, img.height));
         const canvas = document.createElement("canvas");
         canvas.width = Math.round(img.width * scale);
@@ -140,7 +140,7 @@ export function VillageStories() {
             resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
           },
           "image/jpeg",
-          0.80
+          0.70
         );
       };
       img.onerror = () => { URL.revokeObjectURL(blobUrl); resolve(file); };
@@ -244,12 +244,6 @@ export function VillageStories() {
         toast.error(spamCheck.reason || "Spam or profanity detected.");
         return;
       }
-
-      const safety = await checkContentSafety(caption);
-      if (!safety.isSafe) {
-        toast.error(safety.reason || "Inappropriate language detected.");
-        return;
-      }
     }
     
     const isVideo = file.type.startsWith("video/");
@@ -299,38 +293,40 @@ export function VillageStories() {
         };
         setStories(prev => [newStory, ...prev]);
 
-        // 5. Dispatch instant live notifications to all villagers in this village!
-        try {
-          const authorName = profile?.full_name || profile?.designation || role || "Village Official";
-          let notifQuery = (supabase as any).from("profiles").select("id");
-          if (villageId) {
-            notifQuery = notifQuery.eq("village_id", villageId);
-          }
-          const { data: villagers } = await notifQuery;
-
-          if (villagers && villagers.length > 0) {
-            const notifItems = villagers
-              .filter((v: any) => v.id !== user.id)
-              .map((v: any) => ({
-                recipient_id: v.id,
-                created_by: user.id,
-                village_id: villageId || null,
-                title: `📸 New Update from ${authorName}`,
-                body: caption ? `"${caption}"` : "A new story update was posted in your village. Tap to view!",
-                type: "story",
-                action_url: "/timeline",
-              }));
-
-            if (notifItems.length > 0) {
-              await (supabase as any).from("notifications").insert(notifItems);
+        // 5. Dispatch instant live notifications asynchronously in background without blocking upload resolution!
+        void (async () => {
+          try {
+            const authorName = profile?.full_name || profile?.designation || role || "Village Official";
+            let notifQuery = (supabase as any).from("profiles").select("id");
+            if (villageId) {
+              notifQuery = notifQuery.eq("village_id", villageId);
             }
+            const { data: villagers } = await notifQuery;
+
+            if (villagers && villagers.length > 0) {
+              const notifItems = villagers
+                .filter((v: any) => v.id !== user.id)
+                .map((v: any) => ({
+                  recipient_id: v.id,
+                  created_by: user.id,
+                  village_id: villageId || null,
+                  title: `📸 New Update from ${authorName}`,
+                  body: caption ? `"${caption}"` : "A new story update was posted in your village. Tap to view!",
+                  type: "story",
+                  action_url: "/timeline",
+                }));
+
+              if (notifItems.length > 0) {
+                await (supabase as any).from("notifications").insert(notifItems);
+              }
+            }
+          } catch (notifErr) {
+            console.warn("[VillageStories] Story notification warning:", notifErr);
           }
-        } catch (notifErr) {
-          console.warn("[VillageStories] Story notification warning:", notifErr);
-        }
+        })();
       },
       {
-        loading: isVideo ? "Uploading video..." : "Optimizing & posting update...",
+        loading: isVideo ? "Uploading video..." : "Posting update...",
         success: "Story posted successfully! Live for 24 hours.",
         error: (err: any) => `Error [${err.code || "Upload"}]: ${err.message || "Failed to post story."}`
       }
