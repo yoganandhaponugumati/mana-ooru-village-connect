@@ -1,5 +1,5 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
-import { GraduationCap, BookOpen, Utensils, PhoneCall, ShieldCheck, Award, ExternalLink, School, Users } from "lucide-react";
+import { createFileRoute } from "@tanstack/react-router";
+import { GraduationCap, Utensils, PhoneCall, ShieldCheck, Award, ExternalLink, School, Users } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { SurfaceCard } from "@/components/design-system";
 

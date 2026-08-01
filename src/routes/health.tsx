@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { HeartPulse, Siren, Stethoscope, PhoneCall, ShieldCheck, CalendarDays, Hospital, Pill, Activity } from "lucide-react";
+import { HeartPulse, Siren, Stethoscope, PhoneCall, ShieldCheck, CalendarDays, Pill, Activity } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { SurfaceCard } from "@/components/design-system";
 

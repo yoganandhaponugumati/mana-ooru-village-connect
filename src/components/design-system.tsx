@@ -447,62 +447,6 @@ export function Button3D({
 }
 
 /**
- * Reusable EmptyState Component
- * Displays a clean, illustrated empty-state card with dual Telugu/English guidance and CTA.
- */
-export function EmptyState({
-  icon,
-  title,
-  teluguTitle,
-  description,
-  actionLabel,
-  onAction,
-  actionTo,
-  action,
-}: {
-  icon: React.ReactNode;
-  title: string;
-  teluguTitle?: string;
-  description: string;
-  actionLabel?: string;
-  onAction?: () => void;
-  actionTo?: string;
-  action?: React.ReactNode;
-}) {
-  return (
-    <SurfaceCard className="p-8 sm:p-12 text-center flex flex-col items-center justify-center my-6 border-dashed border-primary/20 bg-card/60 backdrop-blur-md">
-      <div className="size-16 rounded-3xl bg-primary/10 text-primary flex items-center justify-center mb-4 shadow-sm border border-primary/20 animate-pulse">
-        {icon}
-      </div>
-      {teluguTitle && (
-        <span className="text-xs font-bold uppercase tracking-wider text-primary/80 mb-1">
-          {teluguTitle}
-        </span>
-      )}
-      <h3 className="font-display text-xl font-bold text-foreground mb-2">{title}</h3>
-      <p className="text-sm text-muted-foreground max-w-md leading-relaxed mb-6">
-        {description}
-      </p>
-      {action ? (
-        action
-      ) : (
-        actionLabel && (actionTo || onAction) && (
-          actionTo ? (
-            <AppLinkButton to={actionTo} variant="primary" size="md">
-              {actionLabel}
-            </AppLinkButton>
-          ) : (
-            <AppButton onClick={onAction} variant="primary" size="md">
-              {actionLabel}
-            </AppButton>
-          )
-        )
-      )}
-    </SurfaceCard>
-  );
-}
-
-/**
  * Skeleton Header Shimmer Loader
  */
 export function SkeletonHeader() {
@@ -511,28 +455,6 @@ export function SkeletonHeader() {
       <div className="h-4 w-32 bg-slate-300 dark:bg-zinc-700 rounded-full mb-3" />
       <div className="h-8 w-64 bg-slate-300 dark:bg-zinc-700 rounded-2xl mb-2" />
       <div className="h-4 w-48 bg-slate-300 dark:bg-zinc-700 rounded-full" />
-    </div>
-  );
-}
-
-/**
- * Skeleton Card Shimmer Loader
- */
-export function SkeletonCard() {
-  return (
-    <div className="w-full rounded-2xl bg-card border border-border/40 p-5 shadow-sm animate-pulse space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="size-10 rounded-full bg-slate-200 dark:bg-zinc-800 shrink-0" />
-        <div className="space-y-2 flex-1">
-          <div className="h-4 w-3/4 bg-slate-200 dark:bg-zinc-800 rounded-full" />
-          <div className="h-3 w-1/2 bg-slate-200 dark:bg-zinc-800 rounded-full" />
-        </div>
-      </div>
-      <div className="h-16 w-full bg-slate-200 dark:bg-zinc-800 rounded-xl" />
-      <div className="flex justify-between items-center pt-2">
-        <div className="h-8 w-20 bg-slate-200 dark:bg-zinc-800 rounded-full" />
-        <div className="h-8 w-24 bg-slate-200 dark:bg-zinc-800 rounded-full" />
-      </div>
     </div>
   );
 }

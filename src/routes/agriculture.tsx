@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Sprout, Tractor, Search, TrendingUp, PhoneCall, ShieldCheck, Wheat, Store, TestTube, ExternalLink } from "lucide-react";
+import { Sprout, Tractor, Search, TrendingUp, PhoneCall, ShieldCheck, Wheat, TestTube, ExternalLink } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
-import { SurfaceCard, AppButton } from "@/components/design-system";
+import { SurfaceCard } from "@/components/design-system";
 
 export const Route = createFileRoute("/agriculture")({
   head: () => ({ meta: [{ title: "Agriculture & Farming Hub - ManaOoru" }] }),
@@ -76,6 +76,7 @@ function AgriculturePage() {
             </h2>
             <Link
               to="/services"
+              search={{ kind: "services" }}
               className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
             >
               View All Services <ExternalLink className="size-3" />
