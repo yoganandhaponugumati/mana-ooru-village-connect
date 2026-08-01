@@ -1,5 +1,5 @@
 /**
- * Sliding Window Client & Action Rate Limiter for ManaOoru
+ * Sliding Window Client & Action Rate Limiter for DigiMitra
  */
 
 interface RateLimitTracker {

@@ -41,7 +41,7 @@ export type SchemeApplication = {
   created_at: string;
 };
 
-/** All schemes an admin has posted through ManaOoru, newest first. */
+/** All schemes an admin has posted through DigiMitra, newest first. */
 export function useVillageSchemes() {
   return useQuery({
     queryKey: ["village-schemes"],

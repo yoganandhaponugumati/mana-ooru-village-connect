@@ -1,5 +1,5 @@
 /**
- * Moderation, Profanity, and Spam Detection Engine for ManaOoru
+ * Moderation, Profanity, and Spam Detection Engine for DigiMitra
  */
 
 const BANNED_TERMS = [

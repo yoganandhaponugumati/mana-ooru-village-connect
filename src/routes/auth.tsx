@@ -47,7 +47,7 @@ const roleOptions: { id: AppRole; label: string; icon: typeof User }[] = [
 ];
 
 /**
- * The main Authentication Page for ManaOoru.
+ * The main Authentication Page for DigiMitra.
  * 
  * Handles three primary workflows:
  * 1. Citizen / Admin Sign In (Email+Password or Phone OTP)

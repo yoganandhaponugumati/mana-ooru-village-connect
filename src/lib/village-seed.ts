@@ -1,5 +1,5 @@
 /**
- * Client-Side Default Emergency Contacts & Seed Announcements for ManaOoru
+ * Client-Side Default Emergency Contacts & Seed Announcements for DigiMitra
  * Ensures no village ever looks blank or broken.
  */
 
