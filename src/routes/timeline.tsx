@@ -788,7 +788,7 @@ function TimelinePage() {
                     }
                     onReport={() => toast.success("Report received for review")}
                     onDelete={
-                      (isAdmin || item.authorId === authProfile?.id)
+                      isAdmin
                         ? () => handleDelete(item.id, item.source, item.sourceId)
                         : undefined
                     }

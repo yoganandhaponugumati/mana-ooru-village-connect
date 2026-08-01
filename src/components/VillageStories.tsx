@@ -255,6 +255,7 @@ export function VillageStories() {
           </div>
         )}
 
+        {/* Admin Trash Icon overlay on story circle */}
         {stories.map((story) => (
           <div
             key={story.id}
@@ -274,7 +275,7 @@ export function VillageStories() {
                   <ShieldCheck className="size-3" />
                 </div>
               )}
-              {(isAdmin || user?.id === story.authorId) && (
+              {isAdmin && (
                 <button
                   onClick={(e) => handleDeleteStory(story.id, e)}
                   title="Delete Story"
@@ -298,7 +299,7 @@ export function VillageStories() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[9999] flex flex-col bg-black text-white"
+            className="fixed inset-0 z-[999999] flex flex-col bg-black text-white"
           >
             {/* Top Bar: Progress Bar + User Info + Close/Back */}
             <div className="absolute top-0 inset-x-0 z-30 flex flex-col bg-gradient-to-b from-black/90 via-black/40 to-transparent pt-3 pb-8 px-4">
@@ -340,7 +341,7 @@ export function VillageStories() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                  {(isAdmin || user?.id === activeStory?.authorId) && (
+                  {isAdmin && (
                     <button
                       onClick={(e) => handleDeleteStory(activeStory.id, e)}
                       className="grid size-9 place-items-center rounded-full bg-red-500/30 text-red-400 hover:bg-red-500/50 transition"

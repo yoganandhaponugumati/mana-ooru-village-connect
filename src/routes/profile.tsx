@@ -138,16 +138,69 @@ function ProfilePage() {
     return () => clearTimeout(timer);
   }, [username, authProfile?.username]);
 
-  const chooseProfilePhoto = (file?: File) => {
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      toast.error("Please choose an image smaller than 2MB.");
-      return;
-    }
-    setPhotoFile(file);
-    const reader = new FileReader();
-    reader.onload = (e) => setPhotoPreview(e.target?.result as string);
-    reader.readAsDataURL(file);
+  const compressImage = (file: File): Promise<File> =>
+    new Promise((resolve) => {
+      const img = new Image();
+      const blobUrl = URL.createObjectURL(file);
+      img.onload = () => {
+        URL.revokeObjectURL(blobUrl);
+        const MAX_PX = 1000;
+        const scale = Math.min(1, MAX_PX / Math.max(img.width, img.height));
+        const canvas = document.createElement("canvas");
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        if (!ctx) { resolve(file); return; }
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          (blob) => {
+            if (!blob) { resolve(file); return; }
+            resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+          },
+          "image/jpeg",
+          0.82
+        );
+      };
+      img.onerror = () => { URL.revokeObjectURL(blobUrl); resolve(file); };
+      img.src = blobUrl;
+    });
+
+  const chooseProfilePhoto = async (file?: File) => {
+    if (!file || !user) return;
+    
+    toast.promise(
+      async () => {
+        // 1. Auto-compress photo client side
+        const compressed = await compressImage(file);
+        
+        // 2. Show instant preview
+        const reader = new FileReader();
+        reader.onload = (e) => setPhotoPreview(e.target?.result as string);
+        reader.readAsDataURL(compressed);
+
+        // 3. Upload to Supabase Storage
+        const uploadResult = await uploadUserFile("profile-images", user.id, compressed);
+
+        // 4. Instant DB update
+        const { error } = await supabase
+          .from("profiles")
+          .update({
+            photo_url: uploadResult.url,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", user.id);
+
+        if (error) throw error;
+
+        // 5. Refresh Auth state
+        await refreshProfile();
+      },
+      {
+        loading: "Optimizing & updating profile picture...",
+        success: "Profile picture updated successfully! ✓",
+        error: "Failed to update profile picture."
+      }
+    );
   };
 
   const saveProfile = async () => {
@@ -264,12 +317,12 @@ function ProfilePage() {
       )}
       <SurfaceCard className="p-6 relative overflow-hidden">
         <div className="absolute top-0 left-0 right-0 h-16 bg-primary/10"></div>
-        <div className="relative mx-auto mt-4 grid size-24 place-items-center rounded-full border-4 border-card bg-gradient-to-br from-primary to-secondary font-display text-3xl font-semibold text-white shadow-md">
-          {photoPreview ? (
+        <div className="relative mx-auto mt-4 size-24 rounded-full overflow-hidden border-4 border-card bg-gradient-to-br from-primary to-secondary font-display text-3xl font-semibold text-white shadow-md aspect-square flex items-center justify-center">
+          {photoPreview || authProfile?.photo_url ? (
             <img
-              src={photoPreview}
+              src={photoPreview || authProfile?.photo_url}
               alt={user?.email || "Profile photo"}
-              className="h-full w-full rounded-full object-cover"
+              className="size-full rounded-full object-cover aspect-square"
             />
           ) : (
             (authProfile?.full_name || user?.email)?.[0]?.toUpperCase() || "M"
@@ -277,7 +330,7 @@ function ProfilePage() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="absolute bottom-0 right-0 grid size-8 place-items-center rounded-full border border-white bg-white text-primary shadow-sm hover:bg-muted"
+            className="absolute bottom-0 right-0 z-10 grid size-8 place-items-center rounded-full border border-white bg-white text-primary shadow-sm hover:bg-muted"
             aria-label="Update photo"
           >
             <Camera className="size-3.5" />
