@@ -150,9 +150,12 @@ export function VillageStories() {
           payload.village_id = villageId;
         }
         
-        const { error } = await (supabase as any).from("village_stories").insert(payload);
+        const { data: insertData, error } = await (supabase as any).from("village_stories").insert(payload).select();
         
-        if (error) throw error;
+        if (error) {
+          console.error("[VillageStories] insert error:", JSON.stringify(error));
+          throw error;
+        }
         
         // 3. Add to UI immediately
         const newStory = {
@@ -170,7 +173,7 @@ export function VillageStories() {
       {
         loading: isVideo ? "Uploading video (this may take a moment)..." : "Uploading image...",
         success: "Story posted successfully! Live for 24 hours.",
-        error: (err: any) => `Failed to post story: ${err.message || "Please ensure you have permission."}`
+        error: (err: any) => `Error [${err.code}]: ${err.message || err.hint || "Unknown error. Check browser console."}`
       }
     );
     
