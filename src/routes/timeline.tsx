@@ -86,10 +86,13 @@ type TimelineActivity = {
   isEmergency?: boolean;
   verified?: boolean;
   source?: string;
+  sourceId?: string;
+  authorId?: string;
 };
 
 type TimelineRow = {
   id: string;
+  source_id: string | null;
   activity_type: TimelineType;
   title: string;
   body: string | null;
@@ -382,6 +385,8 @@ function toTimelineActivity(row: TimelineRow, fallbackVillage: string): Timeline
     isEmergency: Boolean(row.is_emergency),
     verified: Boolean(row.verified),
     source: row.source_table,
+    sourceId: row.source_id || undefined,
+    authorId: row.author_id || undefined,
   };
 }
 
@@ -409,7 +414,7 @@ function TimelinePage() {
       let request = supabase
         .from("timeline_activities" as never)
         .select(
-          "id,activity_type,title,body,image_url,action_url,author_id,is_pinned,is_emergency,verified,created_at,source_table,villages(name),profiles(username,full_name)",
+          "id,source_id,activity_type,title,body,image_url,action_url,author_id,is_pinned,is_emergency,verified,created_at,source_table,villages(name),profiles(username,full_name)",
         )
         .order("is_emergency", { ascending: false })
         .order("is_pinned", { ascending: false })
@@ -580,6 +585,23 @@ function TimelinePage() {
     if (!value.trim()) return;
     setComments((prev) => ({ ...prev, [id]: [value.trim(), ...(prev[id] || [])] }));
     toast.success("Comment added");
+  };
+
+  const handleDelete = async (id: string, sourceTable?: string, sourceId?: string) => {
+    if (!window.confirm("Are you sure you want to delete this post?")) return;
+    
+    // Fallback: If it's a direct timeline_activities row without a source_table, or we have the source.
+    const tableToDeleteFrom = sourceTable || "timeline_activities";
+    const idToDelete = sourceId || id;
+    
+    toast.promise(
+      async () => {
+        const { error } = await supabase.from(tableToDeleteFrom as any).delete().eq("id", idToDelete);
+        if (error) throw error;
+        await queryClient.invalidateQueries({ queryKey: ["timeline-activities"] });
+      },
+      { loading: "Deleting...", success: "Post deleted successfully.", error: (e: any) => `Delete failed: ${e.message}` }
+    );
   };
 
   return (
@@ -765,6 +787,11 @@ function TimelinePage() {
                         .then(() => toast.success("Timeline link copied"))
                     }
                     onReport={() => toast.success("Report received for review")}
+                    onDelete={
+                      (isAdmin || item.authorId === authProfile?.id)
+                        ? () => handleDelete(item.id, item.source, item.sourceId)
+                        : undefined
+                    }
                     onToggleComments={() =>
                       setCommentOpen(commentOpen === item.id ? null : item.id)
                     }
@@ -818,6 +845,7 @@ function TimelineCard({
   onReport: () => void;
   onToggleComments: () => void;
   onComment: (id: string, value: string) => void;
+  onDelete?: () => void;
 }) {
   const meta = activityMeta[item.type];
   const Icon = meta.icon;
@@ -927,11 +955,25 @@ function TimelineCard({
                 label={saved ? "Saved" : "Save"}
                 onClick={onSave}
               />
-              <TimelineAction
-                icon={<Flag className="size-4" />}
-                label="Report"
+              <button
                 onClick={onReport}
-              />
+                className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-slate-500 hover:bg-slate-100 hover:text-red-600 transition"
+                title="Report"
+              >
+                <Flag className="size-4" />
+                <span className="hidden sm:inline">Report</span>
+              </button>
+              
+              {onDelete && (
+                <button
+                  onClick={onDelete}
+                  className="flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-slate-500 hover:bg-red-50 hover:text-red-600 transition ml-auto"
+                  title="Delete"
+                >
+                  <Trash2 className="size-4" />
+                  <span className="hidden sm:inline">Delete</span>
+                </button>
+              )}
             </div>
             <a
               href={item.href}

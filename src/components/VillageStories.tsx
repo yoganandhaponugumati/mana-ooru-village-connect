@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Play, ShieldCheck, Plus, Upload } from "lucide-react";
+import { X, Play, ShieldCheck, Plus, Upload, Trash2 } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { uploadUserFile } from "@/lib/supabase/storage";
 import { timeAgo as getTimeAgo } from "@/lib/store";
+import { checkContentSafety } from "@/lib/moderation";
 
 const dummyStories = [
   {
@@ -47,6 +48,7 @@ export function VillageStories() {
           .from("village_stories")
           .select(`
             id,
+            author_id,
             media_url,
             media_type,
             caption,
@@ -74,6 +76,7 @@ export function VillageStories() {
               caption: s.caption || "",
               timeAgo: getTimeAgo(new Date(s.created_at).getTime()),
               isVerified: p?.is_verified || false,
+              authorId: s.author_id,
             };
           });
           setStories([...mapped, ...dummyStories]);
@@ -95,12 +98,33 @@ export function VillageStories() {
     setActiveStory(null);
   };
 
+  const handleDeleteStory = async (storyId: string) => {
+    if (!window.confirm("Are you sure you want to delete this story?")) return;
+    toast.promise(
+      async () => {
+        const { error } = await (supabase as any).from("village_stories").delete().eq("id", storyId);
+        if (error) throw error;
+        setStories(s => s.filter(x => x.id !== storyId));
+        setActiveStory(null);
+      },
+      { loading: "Deleting...", success: "Story deleted.", error: (e:any) => `Failed: ${e.message}` }
+    );
+  };
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
     
     const caption = window.prompt("Enter a description for your update:");
     if (caption === null) return; // Cancelled
+    
+    if (caption) {
+      const safety = await checkContentSafety(caption);
+      if (!safety.isSafe) {
+        toast.error(safety.reason || "Inappropriate language detected.");
+        return;
+      }
+    }
     
     const isVideo = file.type.startsWith("video/");
     
@@ -226,12 +250,22 @@ export function VillageStories() {
                   <span className="text-white/60 text-xs">{activeStory.timeAgo}</span>
                 </div>
               </div>
-              <button
-                onClick={closeStory}
-                className="grid size-10 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition backdrop-blur-md"
-              >
-                <X className="size-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                {(isAdmin || user?.id === activeStory?.authorId) && (
+                  <button
+                    onClick={() => handleDeleteStory(activeStory.id)}
+                    className="grid size-10 place-items-center rounded-full bg-red-500/20 text-red-500 hover:bg-red-500/40 transition backdrop-blur-md"
+                  >
+                    <Trash2 className="size-5" />
+                  </button>
+                )}
+                <button
+                  onClick={closeStory}
+                  className="grid size-10 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition backdrop-blur-md"
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
             </div>
 
             {/* Media Content */}
