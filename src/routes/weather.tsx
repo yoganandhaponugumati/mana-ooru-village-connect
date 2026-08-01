@@ -16,7 +16,7 @@ import { Card3D, FeatureIcon, SectionHeader, SurfaceCard } from "@/components/de
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/weather")({
-  head: () => ({ meta: [{ title: "Weather - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Weather - DigiMitra" }] }),
   component: WeatherPage,
 });
 

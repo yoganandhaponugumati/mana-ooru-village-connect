@@ -164,7 +164,7 @@ export async function registerFcmForegroundListener(
     const title =
       payload.notification?.title ||
       payload.data?.title ||
-      "ManaOoru Notification";
+      "DigiMitra Notification";
 
     const body =
       payload.notification?.body ||

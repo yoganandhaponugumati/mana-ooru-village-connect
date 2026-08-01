@@ -7,7 +7,7 @@ import { logContact } from "@/lib/local-actions";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/emergency")({
-  head: () => ({ meta: [{ title: "Emergency Contacts - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Emergency Contacts - DigiMitra" }] }),
   component: EmergencyPage,
 });
 

@@ -42,7 +42,7 @@ export function VideoGuideModal({
   const guideSteps = [
     {
       step: "01",
-      title: "Why Should You Use ManaOoru?",
+      title: "Why Should You Use DigiMitra?",
       titleTe: "1. మన ఊరు పరిచయం & మీ గ్రామాన్ని ఎంచుకోవడం",
       desc: "Complete digital home for your village. Access local workers, land, notices, and emergency contacts in 1 place.",
       descTe: "మన గ్రామంలోని నోటీసులు, రోడ్ల సమస్యలు, ప్రభుత్వ పథకాలు మరియు పనివారి వివరాలు దళారులు లేకుండా ఉచితంగా తెలుసుకోవడానికి మన ఊరు ఉపయోగపడుతుంది.",
@@ -275,7 +275,7 @@ export function VideoGuideModal({
               </div>
               <div>
                 <h3 className="font-display text-base sm:text-lg font-extrabold text-clay flex items-center gap-2">
-                  ManaOoru Feature Guide · ప్రతీ ఫీచర్ వివరణ
+                  DigiMitra Feature Guide · ప్రతీ ఫీచర్ వివరణ
                   {isSpeaking && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-emerald-500/20 px-2.5 py-0.5 text-[11px] font-black text-emerald-400 border border-emerald-500/30">
                       <Radio className="size-3.5 animate-pulse text-emerald-400" />
@@ -436,7 +436,7 @@ export function VideoGuideModal({
               onClick={onClose}
               className="w-full sm:w-auto rounded-2xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-700 px-8 py-3 text-xs font-black text-white shadow-xl hover:brightness-110 transition"
             >
-              Start Using ManaOoru Now (ప్రారంభించండి) →
+              Start Using DigiMitra Now (ప్రారంభించండి) →
             </button>
           </div>
         </motion.div>

@@ -177,11 +177,11 @@ export function SiteNav() {
           )}
           <Link to="/" className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5">
             <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
-              <img src="/logo.png" alt="ManaOoru Emblem" className="size-full object-cover" />
+              <img src="/logo.png" alt="DigiMitra Emblem" className="size-full object-cover" />
             </div>
             <div className="flex flex-col leading-none">
               <span className="font-display text-base font-bold tracking-tight text-clay dark:text-zinc-100 hidden sm:block">
-                ManaOoru
+                DigiMitra
               </span>
             </div>
           </Link>
@@ -509,7 +509,7 @@ export function SiteNav() {
                         <div className="grid size-7 place-items-center rounded-[10px] bg-[var(--gradient-village)] text-white">
                           <Leaf className="size-4" />
                         </div>
-                        <span className="font-display font-bold text-clay dark:text-zinc-100">ManaOoru</span>
+                        <span className="font-display font-bold text-clay dark:text-zinc-100">DigiMitra</span>
                       </div>
                       <button
                         onClick={() => setOpen(false)}
@@ -740,9 +740,9 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <div className="flex items-center gap-2.5">
             <div className="size-8 rounded-full overflow-hidden border border-primary/30 shadow-sm shrink-0 bg-white">
-              <img src="/logo.png" alt="ManaOoru Emblem" className="size-full object-cover" />
+              <img src="/logo.png" alt="DigiMitra Emblem" className="size-full object-cover" />
             </div>
-            <span className="font-display text-base font-bold text-clay dark:text-zinc-100">ManaOoru</span>
+            <span className="font-display text-base font-bold text-clay dark:text-zinc-100">DigiMitra</span>
           </div>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             A trusted digital village platform for workers, land, services, markets, notices, and community support.
@@ -776,14 +776,14 @@ export function SiteFooter() {
         <div>
           <p className="text-sm font-semibold text-clay dark:text-zinc-200">Contact</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>privacy@manaooru.org</li>
-            <li>hello@manaooru.org</li>
+            <li>privacy@digimitra.org</li>
+            <li>hello@digimitra.org</li>
           </ul>
         </div>
       </div>
       <div className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} ManaOoru · Built for our villages.</p>
+          <p>© {new Date().getFullYear()} DigiMitra · Built for our villages.</p>
           <div className="flex flex-wrap gap-3">
             <Link to="/" className="hover:text-primary transition">Home</Link>
             <Link to="/announcements" className="hover:text-primary transition">Notices</Link>

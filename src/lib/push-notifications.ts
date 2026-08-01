@@ -165,7 +165,7 @@ export function useBrowserPushNotifications() {
                 ?.getRegistration()
                 ?.then((registration) => {
                   registration?.showNotification(
-                    notification.title ?? "ManaOoru • Village Alert",
+                    notification.title ?? "DigiMitra • Village Alert",
                     {
                       body: notification.body,
                       icon: "/site-icon.svg",

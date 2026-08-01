@@ -83,19 +83,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "ManaOoru - Premium Digital Village Platform" },
+      { title: "DigiMitra - Premium Digital Village Platform" },
       {
         name: "description",
         content:
           "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and AI support.",
       },
-      { name: "author", content: "ManaOoru" },
-      { property: "og:title", content: "ManaOoru - Premium Digital Village Platform" },
+      { name: "author", content: "DigiMitra" },
+      { property: "og:title", content: "DigiMitra - Premium Digital Village Platform" },
       { property: "og:description", content: "Everything your village needs. All in one place." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@ManaOoru" },
-      { name: "twitter:title", content: "ManaOoru" },
+      { name: "twitter:site", content: "@DigiMitra" },
+      { name: "twitter:title", content: "DigiMitra" },
       { name: "twitter:description", content: "Everything your village needs. All in one place." },
       {
         property: "og:image",

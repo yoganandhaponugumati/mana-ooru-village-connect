@@ -4,7 +4,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { SurfaceCard } from "@/components/design-system";
 
 export const Route = createFileRoute("/government")({
-  head: () => ({ meta: [{ title: "Gram Panchayat & Govt Services - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Gram Panchayat & Govt Services - DigiMitra" }] }),
   component: GovernmentPage,
 });
 

@@ -52,7 +52,7 @@ import {
 } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/profile")({
-  head: () => ({ meta: [{ title: "Profile - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Profile - DigiMitra" }] }),
   component: () => (
     <ProtectedRoute dealerMustBeApproved={false}>
       <ProfilePage />

@@ -67,7 +67,7 @@ export function getVillageWelcomeAnnouncement(villageName: string) {
   const name = villageName && villageName !== "Smart Village" ? villageName : "your village";
   return {
     id: `welcome-${villageName}`,
-    title: `🎉 Welcome to ManaOoru ${name}!`,
+    title: `🎉 Welcome to DigiMitra ${name}!`,
     body: `Namaste villagers of ${name}! Welcome to your digital village hub. Use this platform to hire local workers, check crop prices, report civic problems, connect with Sarpanch, and read Gram Panchayat notices.`,
     author: "Gram Panchayat Desk",
     authorRole: "Panchayat Admin",

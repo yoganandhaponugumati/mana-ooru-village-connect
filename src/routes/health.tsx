@@ -4,7 +4,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { SurfaceCard } from "@/components/design-system";
 
 export const Route = createFileRoute("/health")({
-  head: () => ({ meta: [{ title: "Health & Medical Hub - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Health & Medical Hub - DigiMitra" }] }),
   component: HealthPage,
 });
 

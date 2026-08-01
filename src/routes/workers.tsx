@@ -29,7 +29,7 @@ import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 
 export const Route = createFileRoute("/workers")({
-  head: () => ({ meta: [{ title: "Find Workers — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Find Workers — DigiMitra" }] }),
   component: WorkersPage,
 });
 

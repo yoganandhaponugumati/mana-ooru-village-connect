@@ -25,7 +25,7 @@ import { citizenServices, schemes } from "@/lib/app-data";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/schemes")({
-  head: () => ({ meta: [{ title: "Government Schemes Matcher & Assistant — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Government Schemes Matcher & Assistant — DigiMitra" }] }),
   component: SchemesPage,
 });
 

@@ -8,7 +8,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/super-admin/login")({
-  head: () => ({ meta: [{ title: "Platform Administration — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Platform Administration — DigiMitra" }] }),
   component: SuperAdminLoginPage,
 });
 
@@ -97,7 +97,7 @@ function SuperAdminLoginPage() {
             </div>
             <Link to="/" className="inline-flex items-center gap-2">
               <span className="font-display text-xl font-bold tracking-tight text-clay">
-                ManaOoru Ops Portal
+                DigiMitra Ops Portal
               </span>
             </Link>
             <p className="mt-2 text-xs font-bold text-muted-foreground uppercase tracking-widest">
@@ -118,7 +118,7 @@ function SuperAdminLoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="ops@manaooru.com"
+                placeholder="ops@digimitra.org"
                 required
                 className="premium-input w-full rounded-2xl px-4 py-3 text-sm text-foreground bg-background"
               />

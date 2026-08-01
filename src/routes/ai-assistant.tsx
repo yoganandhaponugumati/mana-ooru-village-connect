@@ -20,7 +20,7 @@ import { FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/ai-assistant")({
-  head: () => ({ meta: [{ title: "AI Assistant - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "AI Assistant - DigiMitra" }] }),
   component: AiAssistantPage,
 });
 
@@ -70,7 +70,7 @@ function AiAssistantPage() {
       if (!apiKey) {
         // Real AI Fallback using a free unauthenticated endpoint
         try {
-          const systemPrompt = `You are the ManaOoru AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
+          const systemPrompt = `You are the DigiMitra AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
 Your goal is to assist villagers with agriculture, government schemes, local services, and weather.
 The user is located in ${profile.village || "an unknown village"}${profile.district ? `, ${profile.district}` : ""}${profile.state ? `, ${profile.state}` : ""}.
 Current weather in their village: ${weatherDetails}.
@@ -119,7 +119,7 @@ CRITICAL RULES:
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
       
-      const systemPrompt = `You are the ManaOoru AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
+      const systemPrompt = `You are the DigiMitra AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
 Your goal is to assist villagers with agriculture, government schemes, local services, and weather.
 The user is located in ${profile.village || "an unknown village"}${profile.district ? `, ${profile.district}` : ""}${profile.state ? `, ${profile.state}` : ""}.
 Current weather in their village: ${weatherDetails}.
@@ -222,7 +222,7 @@ CRITICAL RULES:
 
   return (
     <PageLayout
-      title="ManaOoru AI Village Assistant"
+      title="DigiMitra AI Village Assistant"
       subtitle="Voice and text support for farming, services, weather, and government schemes in Telugu, English, or Hindi."
       icon={<Bot className="size-6 text-primary" />}
       heroAction={
@@ -280,7 +280,7 @@ CRITICAL RULES:
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
-                    ManaOoru AI
+                    DigiMitra AI
                   </p>
                   <h2 className="font-display text-2xl font-semibold">Village support chat</h2>
                 </div>

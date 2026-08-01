@@ -7,7 +7,7 @@ import { logContact } from "@/lib/local-actions";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/transport")({
-  head: () => ({ meta: [{ title: "Transport - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Transport - DigiMitra" }] }),
   component: TransportPage,
 });
 

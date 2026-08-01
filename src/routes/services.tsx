@@ -37,7 +37,7 @@ export const Route = createFileRoute("/services")({
   validateSearch: (search: Record<string, unknown>) => ({
     kind: search.kind === "shops" ? "shops" : "services",
   }),
-  head: () => ({ meta: [{ title: "Local Services — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Local Services — DigiMitra" }] }),
   component: ServicesPage,
 });
 

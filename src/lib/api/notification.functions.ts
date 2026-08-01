@@ -98,8 +98,8 @@ export const sendLoginNotification = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message || "Could not load user profile.");
 
     const delivery = await sendFcmPush(profile?.fcm_token ? [profile.fcm_token] : [], {
-      title: "ManaOoru • Security & Login",
-      body: "You successfully signed in to ManaOoru. Tap to view your civic profile.",
+      title: "DigiMitra • Security & Login",
+      body: "You successfully signed in to DigiMitra. Tap to view your civic profile.",
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",
       url: "/profile",
@@ -122,8 +122,8 @@ export const sendTestPushNotification = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message || "Could not load user profile.");
 
     const delivery = await sendFcmPush(profile?.fcm_token ? [profile.fcm_token] : [], {
-      title: "ManaOoru • Push Verification",
-      body: "Excellent! Your device is connected to ManaOoru instant alerts. Tap to open dashboard.",
+      title: "DigiMitra • Push Verification",
+      body: "Excellent! Your device is connected to DigiMitra instant alerts. Tap to open dashboard.",
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",
       url: "/dashboard",
@@ -319,7 +319,7 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
     const titleLabel = typeLabels[listing.type] || "Village Timeline Update";
 
     const delivery = await sendFcmPush(tokens, {
-      title: `ManaOoru • ${titleLabel}`,
+      title: `DigiMitra • ${titleLabel}`,
       body: `${username} posted: "${listing.title}". Tap to open & inspect details.`,
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",

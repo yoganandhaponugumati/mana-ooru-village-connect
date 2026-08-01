@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { applyAsDealer, dealerCategories, type DealerCategory } from "@/lib/supabase/auth";
 
 export const Route = createFileRoute("/dealer-registration")({
-  head: () => ({ meta: [{ title: "Become a Dealer — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Become a Dealer — DigiMitra" }] }),
   component: () => (
     <ProtectedRoute>
       <DealerRegistrationPage />
@@ -134,7 +134,7 @@ function DealerRegistrationPage() {
                 Register as a Dealer
               </h1>
               <p className="text-sm text-muted-foreground">
-                Set up your shop profile and start selling on ManaOoru
+                Set up your shop profile and start selling on DigiMitra
               </p>
             </div>
           </div>

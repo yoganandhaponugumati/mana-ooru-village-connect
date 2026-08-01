@@ -34,7 +34,7 @@ import { getRoleDisplayName } from "@/lib/supabase/auth";
 import { formatVillageProfile, useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/dashboard")({
-  head: () => ({ meta: [{ title: "Dashboard - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Dashboard - DigiMitra" }] }),
   component: () => (
     <ProtectedRoute>
       <DashboardPage />

@@ -142,7 +142,7 @@ export function useGovernmentWorks() {
       void sendVillagePushNotification({
         data: {
           villageId: profile?.village_id || null,
-          title: "ManaOoru • Gram Panchayat Work Progress",
+          title: "DigiMitra • Gram Panchayat Work Progress",
           body: `Sarpanch updated progress: "${input.title}" (${input.status.replace("_", " ")}). Tap to open & view photos.`,
           url: "/official",
           tag: `work:${workId}`,

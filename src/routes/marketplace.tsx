@@ -30,7 +30,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace")({
-  head: () => ({ meta: [{ title: "Village Marketplace & 0% Brokerage Trade — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Village Marketplace & 0% Brokerage Trade — DigiMitra" }] }),
   component: MarketPage,
 });
 
@@ -98,7 +98,7 @@ function MarketPage() {
 
   const contactWhatsApp = (phone: string, title: string, price: string) => {
     const cleanPhone = phone.replace(/\D/g, "");
-    const msg = `🙏 Namaste! I saw your ManaOoru listing:\n*Item:* ${title}\n*Price:* ${price || "As listed"}\n\nIs this currently available for immediate trade?`;
+    const msg = `🙏 Namaste! I saw your DigiMitra listing:\n*Item:* ${title}\n*Price:* ${price || "As listed"}\n\nIs this currently available for immediate trade?`;
     window.open(
       `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(msg)}`,
       "_blank",
@@ -135,7 +135,7 @@ function MarketPage() {
               Zero Middlemen · Zero Commission (`0% Brokerage`)
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              ManaOoru connects buyers and sellers directly. Call or WhatsApp the seller directly to
+              DigiMitra connects buyers and sellers directly. Call or WhatsApp the seller directly to
               agree on price and pickup.
             </p>
           </div>

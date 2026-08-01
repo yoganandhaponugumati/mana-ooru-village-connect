@@ -30,7 +30,7 @@ type AuthSearch = {
 };
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Sign in — DigiMitra" }] }),
   validateSearch: (search: Record<string, unknown>): AuthSearch => {
     return {
       redirect: typeof search.redirect === "string" ? search.redirect : undefined,
@@ -196,7 +196,7 @@ function AuthPage() {
           setBusy(false);
           return;
         }
-        toast.success("Welcome to ManaOoru!");
+        toast.success("Welcome to DigiMitra!");
         navigate({ to: redirect || getRoleDashboardPath("citizen") });
       } else {
         // Sign In
@@ -363,7 +363,7 @@ function AuthPage() {
             >
               <ArrowLeft className="size-4 animate-pulse" /> Back to Home
             </button>
-            <span className="font-extrabold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">ManaOoru Village Connect</span>
+            <span className="font-extrabold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">DigiMitra Village Connect</span>
           </div>
 
           {message === "signin_to_post" && (

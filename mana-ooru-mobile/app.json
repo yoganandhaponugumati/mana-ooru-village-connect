@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "mana-ooru-mobile",
-    "slug": "mana-ooru-mobile",
+    "name": "DigiMitra Mobile",
+    "slug": "digimitra-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

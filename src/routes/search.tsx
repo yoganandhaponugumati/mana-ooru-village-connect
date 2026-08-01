@@ -12,7 +12,7 @@ export const Route = createFileRoute("/search")({
   validateSearch: z.object({
     q: z.string().catch(""),
   }),
-  head: () => ({ meta: [{ title: "Search - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Search - DigiMitra" }] }),
   component: SearchPage,
 });
 

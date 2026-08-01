@@ -15,7 +15,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/land")({
-  head: () => ({ meta: [{ title: "Land for Lease — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Land for Lease — DigiMitra" }] }),
   component: LandPage,
 });
 

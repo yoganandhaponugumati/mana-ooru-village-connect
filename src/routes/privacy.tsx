@@ -16,11 +16,11 @@ import { AppLinkButton, SectionHeader, SurfaceCard } from "@/components/design-s
 export const Route = createFileRoute("/privacy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy & Data Safety — ManaOoru" },
+      { title: "Privacy Policy & Data Safety — DigiMitra" },
       {
         name: "description",
         content:
-          "Official Privacy Policy and Google Play Data Safety disclosure for the ManaOoru Digital Village Ecosystem.",
+          "Official Privacy Policy and Google Play Data Safety disclosure for the DigiMitra Digital Village Ecosystem.",
       },
     ],
   }),
@@ -31,7 +31,7 @@ export function PrivacyPolicyPage() {
   return (
     <PageLayout
       title="Privacy Policy & Data Safety"
-      subtitle="Transparent documentation on how ManaOoru collects, secures, and honors your personal village data in compliance with Google Play Store rules."
+      subtitle="Transparent documentation on how DigiMitra collects, secures, and honors your personal village data in compliance with Google Play Store rules."
       icon={<ShieldCheck className="size-7 text-primary" />}
     >
       <div className="mx-auto max-w-4xl space-y-10">
@@ -50,11 +50,11 @@ export function PrivacyPolicyPage() {
             </p>
           </div>
           <p className="mt-6 text-sm sm:text-base leading-7 text-muted-foreground">
-            Welcome to <strong className="text-foreground">ManaOoru</strong> (the
+            Welcome to <strong className="text-foreground">DigiMitra</strong> (the
             &ldquo;Platform&rdquo;), India&rsquo;s living digital village ecosystem connecting rural
             citizens, farmers, local dealers, and Gram Panchayats. This Privacy Policy applies to
             our website, mobile application (`Android APK/AAB`), and Trusted Web Activities. By
-            using ManaOoru, you trust us with your local identity. We never sell your personal data
+            using DigiMitra, you trust us with your local identity. We never sell your personal data
             to third-party ad brokers or data aggregators.
           </p>
         </SurfaceCard>
@@ -170,7 +170,7 @@ export function PrivacyPolicyPage() {
             content, and you can only update or delete your own records.
             <br />
             <br />
-            Because ManaOoru operates as a{" "}
+            Because DigiMitra operates as a{" "}
             <strong className="text-foreground">100% Zero-Brokerage (`0% commission`)</strong>{" "}
             digital commons, when you post a listing with your contact number, your neighbours
             contact you directly. We do not intercept transactions, charge commission cuts, or share
@@ -226,15 +226,15 @@ export function PrivacyPolicyPage() {
           </div>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
             If you have any questions, privacy concerns, or requests regarding this Privacy Policy
-            or your personal data across the ManaOoru network, please reach out directly to our
+            or your personal data across the DigiMitra network, please reach out directly to our
             dedicated support desk:
           </p>
           <div className="mt-4 rounded-2xl bg-muted/60 p-4 text-sm space-y-1">
             <p>
-              <strong className="text-foreground">Grievance Email:</strong> privacy@manaooru.org
+              <strong className="text-foreground">Grievance Email:</strong> privacy@digimitra.org
             </p>
             <p>
-              <strong className="text-foreground">Support Desk:</strong> hello@manaooru.org
+              <strong className="text-foreground">Support Desk:</strong> hello@digimitra.org
             </p>
             <p>
               <strong className="text-foreground">Platform Scope:</strong> Rural India Digital

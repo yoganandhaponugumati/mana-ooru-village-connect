@@ -212,7 +212,7 @@ export function VillageLocationPicker({
           const { latitude, longitude } = position.coords;
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`,
-            { headers: { "User-Agent": "ManaOoru-Village-App/1.0" } }
+            { headers: { "User-Agent": "DigiMitra-Village-App/1.0" } }
           );
           if (!res.ok) throw new Error("Failed to fetch location data");
           const data = await res.json();

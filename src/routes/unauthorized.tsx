@@ -4,7 +4,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { AppLinkButton } from "@/components/design-system";
 
 export const Route = createFileRoute("/unauthorized")({
-  head: () => ({ meta: [{ title: "Unauthorized — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Unauthorized — DigiMitra" }] }),
   component: UnauthorizedPage,
 });
 

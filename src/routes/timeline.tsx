@@ -285,7 +285,7 @@ const filters = [
 const historyFilters = ["This Month", "Last Month", "Last Year"] as const;
 
 export const Route = createFileRoute("/timeline")({
-  head: () => ({ meta: [{ title: "Village Timeline - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Village Timeline - DigiMitra" }] }),
   component: () => (
     <ProtectedRoute>
       <TimelinePage />
@@ -470,7 +470,7 @@ function TimelinePage() {
         title: `${listingVerb(item, type)}: ${item.title}`,
         body: item.description || item.category || "New village activity was posted.",
         village: item.location || villageName || "Your village",
-        author: item.owner_id ? "Village member" : "ManaOoru demo",
+        author: item.owner_id ? "Village member" : "DigiMitra demo",
         createdAt: item.createdAt,
         href:
           item.type === "announcement"
@@ -521,7 +521,7 @@ function TimelinePage() {
                 : "Live weather updated",
               body: `${weather.condition}. ${weather.rain}. Temperature ${weather.temp ?? "--"}°C.`,
               village: villageName,
-              author: "ManaOoru Weather",
+              author: "DigiMitra Weather",
               createdAt: Date.now(),
               href: "/weather",
               isEmergency: /heavy|thunder|storm/i.test(`${weather.condition} ${weather.rain}`),

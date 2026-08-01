@@ -36,7 +36,7 @@ import { useGovernmentWorks, type GovernmentWorkInput } from "@/lib/government-w
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/announcements")({
-  head: () => ({ meta: [{ title: "Village Notice Board & Sarpanch Pragati — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Village Notice Board & Sarpanch Pragati — DigiMitra" }] }),
   component: AnnPage,
 });
 
@@ -125,7 +125,7 @@ function AnnPage() {
 
   const shareToWhatsApp = (title: string, text: string) => {
     const url = window.location.href;
-    const msg = `🏛️ *ManaOoru Village Update*\n*${title}*\n${text}\n\nCheck live updates here: ${url}`;
+    const msg = `🏛️ *DigiMitra Village Update*\n*${title}*\n${text}\n\nCheck live updates here: ${url}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, "_blank");
   };
 

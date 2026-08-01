@@ -323,7 +323,7 @@ export function useListings(type?: ListingType) {
             await (supabase as any).from("notifications").insert({
               recipient_id: item.owner_id,
               created_by: user?.id || null,
-              title: "ManaOoru • Civic Report Status Updated",
+              title: "DigiMitra • Civic Report Status Updated",
               body: `Update: Your report "${item.title}" is marked: ${statusLabel}.${noteText}`,
               type: "status_update",
               action_url: "/problems",
@@ -335,7 +335,7 @@ export function useListings(type?: ListingType) {
           void sendDirectUserPushNotification({
             data: {
               targetUserId: item.owner_id,
-              title: "ManaOoru • Complaint Status Updated",
+              title: "DigiMitra • Complaint Status Updated",
               body: `Update: Your civic report "${item.title}" is marked: ${statusLabel}.${noteText} Tap to open & verify.`,
               url: "/problems",
               tag: `complaint_status:${id}`,

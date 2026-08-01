@@ -28,7 +28,7 @@ import { useAuth } from "@/lib/auth";
 import { useGovernmentWorks, type GovernmentWorkInput } from "@/lib/government-works";
 
 export const Route = createFileRoute("/official")({
-  head: () => ({ meta: [{ title: "Official Workspace - ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Official Workspace - DigiMitra" }] }),
   component: () => (
     <ProtectedRoute roles={["village_admin", "super_admin"]}>
       <OfficialPage />

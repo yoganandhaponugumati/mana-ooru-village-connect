@@ -121,7 +121,7 @@ export function InstallAppButton({
           className={`inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-primary px-6 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-emerald-500/25 active:scale-95 ${className}`}
         >
           <Download className="size-4" />
-          <span>Install ManaOoru Mobile App</span>
+          <span>Install DigiMitra Mobile App</span>
         </button>
       )}
 
@@ -159,7 +159,7 @@ export function InstallAppButton({
               </div>
 
               <h3 className="text-center font-display text-xl font-bold text-clay dark:text-white">
-                Install ManaOoru App
+                Install DigiMitra App
               </h3>
               <p className="mt-1 text-center text-xs text-muted-foreground">
                 మా ఊరు యాప్ మీ ఫోన్‌లో ఇన్స్టాల్ చేసుకోండి

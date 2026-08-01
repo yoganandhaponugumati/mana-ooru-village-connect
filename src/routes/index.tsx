@@ -58,13 +58,13 @@ import workersImg from "@/assets/workers-premium.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "ManaOoru — A Digital Home for Every Village" },
+      { title: "DigiMitra — A Digital Home for Every Village" },
       {
         name: "description",
         content:
           "Find workers, lease land, buy local produce, hire services, and stay updated with village announcements — all in one place.",
       },
-      { property: "og:title", content: "ManaOoru — A Digital Home for Every Village" },
+      { property: "og:title", content: "DigiMitra — A Digital Home for Every Village" },
       {
         property: "og:description",
         content: "One platform for farmers, workers, services, and villagers. మా ఊరు, మన చేతుల్లో.",
@@ -787,7 +787,7 @@ function Index() {
 
                 <div>
                   <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
-                    Learn How to Use <span className="text-emerald-400">ManaOoru</span>
+                    Learn How to Use <span className="text-emerald-400">DigiMitra</span>
                   </h2>
                   <p className="mt-1.5 text-xs sm:text-sm font-semibold text-emerald-100/90 leading-relaxed">
                     1 నిమిషంలో నేర్చుకోండి — రైతులు, కూలీలు, వ్యాపారులు మరియు గ్రామ ప్రజలందరి కోసం రూపొందించబడిన డిజిటల్ వేదిక!
@@ -989,7 +989,7 @@ function Index() {
                 <Bot className="size-5" />
               </div>
               <div>
-                <p className="font-display text-[13px] font-bold text-clay dark:text-zinc-100 leading-tight">ManaOoru AI</p>
+                <p className="font-display text-[13px] font-bold text-clay dark:text-zinc-100 leading-tight">DigiMitra AI</p>
                 <p className="text-[10px] font-medium text-muted-foreground mt-0.5">Crop & schemes help</p>
               </div>
             </Link>
@@ -1294,7 +1294,7 @@ function Index() {
       <section className="mx-auto mt-20 max-w-7xl px-4 sm:mt-28 sm:px-6">
         <div className="mb-10 max-w-2xl">
           <span className="text-xs font-bold uppercase tracking-widest text-secondary">
-            How ManaOoru works
+            How DigiMitra works
           </span>
           <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
             Three simple steps. No paperwork, no middlemen.
@@ -1705,7 +1705,7 @@ function Index() {
         <div className="grid gap-4 md:grid-cols-3">
           {[
             [
-              "Is ManaOoru free?",
+              "Is DigiMitra free?",
               "Yes, villagers can browse and post local needs without commission.",
             ],
             [
@@ -1773,7 +1773,7 @@ function Index() {
             </h2>
             <p className="mt-4 text-pretty text-zinc-200 sm:text-lg leading-relaxed font-semibold drop-shadow">
               Whether you grow rice, fix motors, drive tractors, or run a small shop — there&apos;s a
-              place for you on ManaOoru. Free for every villager, forever.
+              place for you on DigiMitra. Free for every villager, forever.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
               <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/30 rounded-2xl transition-all scale-100 hover:scale-[1.02]">
@@ -1796,12 +1796,12 @@ function Index() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-6 px-4 py-10 sm:flex-row sm:px-6">
           <div className="flex items-center gap-2">
             <div className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground font-display italic">
-              M
+              D
             </div>
-            <span className="font-display text-lg font-semibold text-clay">ManaOoru</span>
+            <span className="font-display text-lg font-semibold text-clay">DigiMitra</span>
           </div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground text-center">
-            © {new Date().getFullYear()} ManaOoru · Built with care for our villages.
+            © {new Date().getFullYear()} DigiMitra · Built with care for our villages.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
             <Link to="/announcements" className="transition hover:text-primary">

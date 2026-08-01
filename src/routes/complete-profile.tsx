@@ -26,7 +26,7 @@ import {
 } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/complete-profile")({
-  head: () => ({ meta: [{ title: "Complete your profile — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Complete your profile — DigiMitra" }] }),
   component: () => (
     <ProtectedRoute requireCompleteProfile={false} dealerMustBeApproved={false}>
       <CompleteProfilePage />
@@ -156,7 +156,7 @@ function CompleteProfilePage() {
       saveVillageProfilePreference(selectedProfile);
       saveLanguagePreference(language);
       await refreshProfile();
-      toast.success("Profile complete. Welcome to ManaOoru!");
+      toast.success("Profile complete. Welcome to DigiMitra!");
       navigate({ to: getRoleDashboardPath(profile?.role) });
     } catch (err) {
       const message = err instanceof Error ? err.message : "Could not save your profile.";

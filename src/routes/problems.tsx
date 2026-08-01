@@ -34,7 +34,7 @@ import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/problems")({
-  head: () => ({ meta: [{ title: "Citizen Problem Desk & Civic Accountability — ManaOoru" }] }),
+  head: () => ({ meta: [{ title: "Citizen Problem Desk & Civic Accountability — DigiMitra" }] }),
   component: ProblemsPage,
 });
 
@@ -109,7 +109,7 @@ function ProblemsPage() {
 
   const shareToWhatsApp = (title: string, desc: string, loc: string) => {
     const url = window.location.href;
-    const msg = `🚨 *ManaOoru Citizen Issue Reported*\n*Problem:* ${title}\n*Location:* ${loc}\n*Details:* ${desc}\n\nSupport this civic report here: ${url}`;
+    const msg = `🚨 *DigiMitra Citizen Issue Reported*\n*Problem:* ${title}\n*Location:* ${loc}\n*Details:* ${desc}\n\nSupport this civic report here: ${url}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
