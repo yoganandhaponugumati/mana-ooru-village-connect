@@ -38,9 +38,34 @@ export function VillageStories() {
   const [activeStory, setActiveStory] = useState<any | null>(null);
   const [showMenu, setShowMenu] = useState(false);
   const [reactions, setReactions] = useState<Record<string, { username: string; emoji: string }[]>>({});
+  const [isPaused, setIsPaused] = useState(false);
+  const [storyDuration, setStoryDuration] = useState(7);
   const triggerHaptic = useUIStore((s) => s.triggerHaptic);
   const { user, role, profile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    if (activeStory) {
+      setIsPaused(false);
+      setShowMenu(false);
+      setStoryDuration(activeStory.mediaType === "video" ? 35 : 7);
+    }
+  }, [activeStory]);
+
+  const handlePointerDown = () => {
+    setIsPaused(true);
+    if (videoRef.current) {
+      videoRef.current.pause();
+    }
+  };
+
+  const handlePointerUp = () => {
+    setIsPaused(false);
+    if (videoRef.current) {
+      videoRef.current.play().catch(() => {});
+    }
+  };
 
   const handleAddReaction = (storyId: string, emoji: string) => {
     const currentUsername = profile?.full_name || profile?.username || user?.email?.split("@")[0] || "Villager";
@@ -349,18 +374,26 @@ export function VillageStories() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 z-[9999999] flex flex-col bg-black text-white overflow-hidden"
+              onPointerDown={handlePointerDown}
+              onPointerUp={handlePointerUp}
+              onPointerLeave={handlePointerUp}
+              className="fixed inset-0 z-[9999999] flex flex-col bg-black text-white overflow-hidden select-none"
             >
               {/* Top Bar: Progress Bar + User Info + 3-Dots Menu + Close/Back */}
-              <div className="absolute top-0 inset-x-0 z-30 flex flex-col bg-gradient-to-b from-black/95 via-black/50 to-transparent pt-3 pb-8 px-4">
+              <div className={`absolute top-0 inset-x-0 z-30 flex flex-col bg-gradient-to-b from-black/95 via-black/50 to-transparent pt-3 pb-8 px-4 transition-opacity duration-200 ${isPaused ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
                 
                 {/* Progress Segment */}
                 <div className="w-full bg-white/20 h-1 rounded-full mb-3 overflow-hidden">
                   <motion.div
+                    key={activeStory.id}
                     initial={{ width: "0%" }}
-                    animate={{ width: "100%" }}
-                    transition={{ duration: 7, ease: "linear" }}
-                    onAnimationComplete={closeStory}
+                    animate={{ width: isPaused ? undefined : "100%" }}
+                    transition={{ duration: storyDuration, ease: "linear" }}
+                    onAnimationComplete={() => {
+                      if (!isPaused && activeStory.mediaType !== "video") {
+                        closeStory();
+                      }
+                    }}
                     className="bg-white h-full rounded-full"
                   />
                 </div>
@@ -394,7 +427,10 @@ export function VillageStories() {
                   <div className="flex items-center gap-2 relative">
                     {/* WhatsApp 3-Dots Menu Button */}
                     <button
-                      onClick={() => setShowMenu((prev) => !prev)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setShowMenu((prev) => !prev);
+                      }}
                       className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
                       title="More Options"
                     >
@@ -444,10 +480,18 @@ export function VillageStories() {
               <div className="relative flex-1 w-full h-full flex items-center justify-center bg-black">
                 {activeStory.mediaType === "video" ? (
                   <video
+                    ref={videoRef}
                     src={activeStory.mediaUrl}
                     autoPlay
                     playsInline
                     controls
+                    onLoadedMetadata={(e) => {
+                      const dur = e.currentTarget.duration;
+                      if (dur && !isNaN(dur) && isFinite(dur)) {
+                        setStoryDuration(Math.max(5, Math.ceil(dur)));
+                      }
+                    }}
+                    onEnded={closeStory}
                     className="w-full h-full object-contain max-h-screen"
                   />
                 ) : (
@@ -460,7 +504,7 @@ export function VillageStories() {
               </div>
 
               {/* Bottom Caption, Reactions & Who Reacted List (WhatsApp Status Style) */}
-              <div className="absolute bottom-0 inset-x-0 z-30 flex flex-col items-center bg-gradient-to-t from-black/95 via-black/75 to-transparent pt-12 pb-6 px-4 gap-3">
+              <div className={`absolute bottom-0 inset-x-0 z-30 flex flex-col items-center bg-gradient-to-t from-black/95 via-black/75 to-transparent pt-12 pb-6 px-4 gap-3 transition-opacity duration-200 ${isPaused ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
                 {/* Caption Text - High Contrast & Large */}
                 {activeStory.caption && (
                   <div className="w-full max-w-lg bg-black/60 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl text-center shadow-xl">
@@ -488,7 +532,10 @@ export function VillageStories() {
                   {["❤️", "🙏", "👏", "👍", "🔥", "😮"].map((emoji) => (
                     <button
                       key={emoji}
-                      onClick={() => handleAddReaction(activeStory.id, emoji)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleAddReaction(activeStory.id, emoji);
+                      }}
                       className="text-xl p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-125 transition backdrop-blur-sm shadow-md"
                     >
                       {emoji}
