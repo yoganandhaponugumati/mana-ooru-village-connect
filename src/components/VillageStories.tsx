@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Play, ShieldCheck, Plus, Upload, Trash2 } from "lucide-react";
+import { X, Play, ShieldCheck, Plus, Upload, Trash2, ArrowLeft } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -291,72 +291,118 @@ export function VillageStories() {
         ))}
       </div>
 
-      {/* Fullscreen Modal (WhatsApp Status Style) */}
+      {/* Fullscreen WhatsApp Status Style Story Viewer */}
       <AnimatePresence>
         {activeStory && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="fixed inset-0 z-[100] flex flex-col bg-black/95 backdrop-blur-xl"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[9999] flex flex-col bg-black text-white"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 bg-gradient-to-b from-black/60 to-transparent absolute top-0 w-full z-10">
-              <div className="flex items-center gap-3">
-                <img
-                  src={activeStory.avatarUrl}
-                  className="size-10 rounded-full border border-white/20"
-                  alt={activeStory.author}
+            {/* Top Bar: Progress Bar + User Info + Close/Back */}
+            <div className="absolute top-0 inset-x-0 z-30 flex flex-col bg-gradient-to-b from-black/90 via-black/40 to-transparent pt-3 pb-8 px-4">
+              
+              {/* Progress Segment */}
+              <div className="w-full bg-white/20 h-1 rounded-full mb-3 overflow-hidden">
+                <motion.div
+                  initial={{ width: "0%" }}
+                  animate={{ width: "100%" }}
+                  transition={{ duration: 7, ease: "linear" }}
+                  onAnimationComplete={closeStory}
+                  className="bg-white h-full rounded-full"
                 />
-                <div className="flex flex-col">
-                  <div className="flex items-center gap-1 text-white font-semibold text-sm">
-                    {activeStory.author}
-                    {activeStory.isVerified && <ShieldCheck className="size-3 text-blue-400" />}
-                  </div>
-                  <span className="text-white/60 text-xs">{activeStory.timeAgo}</span>
-                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {(isAdmin || user?.id === activeStory?.authorId) && (
+
+              {/* Header Info */}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  {/* Back Arrow Button */}
                   <button
-                    onClick={() => handleDeleteStory(activeStory.id)}
-                    className="grid size-10 place-items-center rounded-full bg-red-500/20 text-red-500 hover:bg-red-500/40 transition backdrop-blur-md"
+                    onClick={closeStory}
+                    className="grid size-9 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-95 transition"
                   >
-                    <Trash2 className="size-5" />
+                    <ArrowLeft className="size-5" />
                   </button>
-                )}
-                <button
-                  onClick={closeStory}
-                  className="grid size-10 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition backdrop-blur-md"
-                >
-                  <X className="size-5" />
-                </button>
+
+                  <img
+                    src={activeStory.avatarUrl}
+                    className="size-10 rounded-full border border-white/30 object-cover"
+                    alt={activeStory.author}
+                  />
+                  <div className="flex flex-col">
+                    <div className="flex items-center gap-1.5 font-bold text-sm text-white drop-shadow">
+                      {activeStory.author}
+                      {activeStory.isVerified && <ShieldCheck className="size-4 text-blue-400 fill-blue-500/20" />}
+                    </div>
+                    <span className="text-white/70 text-xs">{activeStory.timeAgo}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {(isAdmin || user?.id === activeStory?.authorId) && (
+                    <button
+                      onClick={(e) => handleDeleteStory(activeStory.id, e)}
+                      className="grid size-9 place-items-center rounded-full bg-red-500/30 text-red-400 hover:bg-red-500/50 transition"
+                      title="Delete Story"
+                    >
+                      <Trash2 className="size-4" />
+                    </button>
+                  )}
+                  <button
+                    onClick={closeStory}
+                    className="grid size-9 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition"
+                  >
+                    <X className="size-5" />
+                  </button>
+                </div>
               </div>
             </div>
 
-            {/* Media Content */}
-            <div className="flex-1 flex items-center justify-center relative overflow-hidden px-2">
+            {/* Media Area (Full Screen Center) */}
+            <div className="relative flex-1 w-full h-full flex items-center justify-center bg-black">
               {activeStory.mediaType === "video" ? (
                 <video
                   src={activeStory.mediaUrl}
                   autoPlay
+                  playsInline
                   controls
-                  className="max-h-[85vh] w-full max-w-md rounded-2xl object-cover"
+                  className="w-full h-full object-contain max-h-screen"
                 />
               ) : (
                 <img
                   src={activeStory.mediaUrl}
                   alt={activeStory.caption}
-                  className="max-h-[85vh] w-full max-w-md rounded-2xl object-cover"
+                  className="w-full h-full object-contain max-h-screen"
                 />
               )}
             </div>
 
-            {/* Caption */}
-            <div className="absolute bottom-10 w-full px-6 flex justify-center">
-              <div className="bg-black/60 backdrop-blur-md text-white px-5 py-3 rounded-2xl max-w-md text-center border border-white/10 shadow-2xl">
-                <p className="text-sm font-medium">{activeStory.caption}</p>
+            {/* Bottom Caption & Reactions (WhatsApp Status Style) */}
+            <div className="absolute bottom-0 inset-x-0 z-30 flex flex-col items-center bg-gradient-to-t from-black/95 via-black/70 to-transparent pt-12 pb-6 px-4 gap-3">
+              {/* Caption Text - High Contrast & Large */}
+              {activeStory.caption && (
+                <div className="w-full max-w-lg bg-black/60 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl text-center shadow-xl">
+                  <p className="text-sm md:text-base font-semibold text-white leading-relaxed">
+                    {activeStory.caption}
+                  </p>
+                </div>
+              )}
+
+              {/* WhatsApp Quick Reactions */}
+              <div className="flex items-center justify-center gap-3 w-full max-w-sm pt-1">
+                {["❤️", "🙏", "👏", "👍", "🔥", "😮"].map((emoji) => (
+                  <button
+                    key={emoji}
+                    onClick={() => {
+                      toast.success(`Reacted ${emoji}`);
+                      triggerHaptic("light");
+                    }}
+                    className="text-xl p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-125 transition backdrop-blur-sm shadow-md"
+                  >
+                    {emoji}
+                  </button>
+                ))}
               </div>
             </div>
           </motion.div>
