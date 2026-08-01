@@ -404,7 +404,7 @@ function TimelinePage() {
   const [comments, setComments] = useState<Record<string, string[]>>({});
   const [liked, setLiked] = useState<Record<string, boolean>>({});
   const villageName = authProfile?.village || profile.village || "";
-  const isAdmin = role === "village_admin" || role === "super_admin";
+  const isAdmin = role === "village_admin" || role === "super_admin" || role === "platform_admin" || authProfile?.designation === "Sarpanch";
   const isSuperAdmin = role === "super_admin";
   const activeVillageId = authProfile?.village_id;
 
