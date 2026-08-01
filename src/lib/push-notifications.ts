@@ -154,36 +154,25 @@ export function useBrowserPushNotifications() {
               : undefined,
           });
 
-          if (
-            Notification.permission === "granted" &&
-            document.visibilityState !== "visible"
-          ) {
-            navigator.serviceWorker
-              .getRegistration("/firebase-messaging-sw.js")
-              .then((registration) => {
-                registration?.showNotification(
-                  notification.title ?? "ManaOoru • Village Alert",
-                  {
-                    body: notification.body,
-                    icon: "/site-icon.svg",
-                    badge: "/notification-badge.svg",
-                    tag:
-                      notification.dedupe_key ??
-                      `manaooru-push-${Date.now()}`,
-                    renotify: true,
-                    vibrate: [200, 100, 200],
-                    actions: [
-                      {
-                        action: "open",
-                        title: "👀 Tap to Open in ManaOoru",
-                      },
-                    ],
-                    data: {
-                      url: notification.action_url ?? "/",
-                    },
-                  } as any
-                );
+          if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+            try {
+              new Notification(notification.title, {
+                body: notification.body,
+                icon: "/site-icon.svg",
               });
+            } catch {
+              navigator.serviceWorker
+                ?.getRegistration()
+                ?.then((registration) => {
+                  registration?.showNotification(
+                    notification.title ?? "ManaOoru • Village Alert",
+                    {
+                      body: notification.body,
+                      icon: "/site-icon.svg",
+                    } as any
+                  );
+                });
+            }
           }
         }
       )

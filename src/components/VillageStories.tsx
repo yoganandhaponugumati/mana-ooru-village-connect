@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, ShieldCheck, Plus, Upload, Trash2, ArrowLeft, MoreVertical, Eye, Flag } from "lucide-react";
+import { X, ShieldCheck, Plus, Upload, Trash2, ArrowLeft, MoreVertical, Eye, Flag, Volume2, VolumeX } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -41,6 +41,8 @@ export function VillageStories() {
   const [showMenu, setShowMenu] = useState(false);
   const [reactions, setReactions] = useState<Record<string, { username: string; emoji: string }[]>>({});
   const [isPaused, setIsPaused] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const [videoProgress, setVideoProgress] = useState(0);
   const [storyDuration, setStoryDuration] = useState(7);
   const triggerHaptic = useUIStore((s) => s.triggerHaptic);
   const { user, role, profile } = useAuth();
@@ -51,6 +53,7 @@ export function VillageStories() {
     if (activeStory) {
       setIsPaused(false);
       setShowMenu(false);
+      setVideoProgress(0);
       setStoryDuration(activeStory.mediaType === "video" ? 35 : 7);
     }
   }, [activeStory]);
@@ -80,6 +83,28 @@ export function VillageStories() {
         [storyId]: [...filtered, { username: currentUsername, emoji }],
       };
     });
+
+    // Instant notification to author
+    if (activeStory?.authorId && activeStory.authorId !== user?.id) {
+      try {
+        void (supabase as any).from("notifications").insert({
+          recipient_id: activeStory.authorId,
+          created_by: user?.id,
+          title: `❤️ Reaction on your story`,
+          body: `${currentUsername} reacted ${emoji} to your village story update!`,
+          type: "story_reaction",
+          action_url: "/",
+        });
+        if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+          new Notification("❤️ New Story Reaction", {
+            body: `${currentUsername} reacted ${emoji} to your village story update!`,
+            icon: "/site-icon.svg",
+          });
+        }
+      } catch (e) {
+        console.warn("Reaction notification error:", e);
+      }
+    }
 
     toast.success(`Reacted ${emoji}`);
     triggerHaptic("light");
@@ -398,18 +423,25 @@ export function VillageStories() {
                 
                 {/* Progress Segment */}
                 <div className="w-full bg-white/20 h-1 rounded-full mb-3 overflow-hidden">
-                  <motion.div
-                    key={activeStory.id}
-                    initial={{ width: "0%" }}
-                    animate={{ width: isPaused ? undefined : "100%" }}
-                    transition={{ duration: storyDuration, ease: "linear" }}
-                    onAnimationComplete={() => {
-                      if (!isPaused && activeStory.mediaType !== "video") {
-                        closeStory();
-                      }
-                    }}
-                    className="bg-white h-full rounded-full"
-                  />
+                  {activeStory.mediaType === "video" ? (
+                    <div
+                      className="bg-white h-full rounded-full transition-all duration-100 ease-linear"
+                      style={{ width: `${videoProgress}%` }}
+                    />
+                  ) : (
+                    <motion.div
+                      key={activeStory.id}
+                      initial={{ width: "0%" }}
+                      animate={{ width: isPaused ? undefined : "100%" }}
+                      transition={{ duration: storyDuration, ease: "linear" }}
+                      onAnimationComplete={() => {
+                        if (!isPaused) {
+                          closeStory();
+                        }
+                      }}
+                      className="bg-white h-full rounded-full"
+                    />
+                  )}
                 </div>
 
                 {/* Header Info */}
@@ -439,6 +471,21 @@ export function VillageStories() {
                   </div>
 
                   <div className="flex items-center gap-2 relative">
+                    {/* Mute/Unmute Audio Button */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsMuted((prev) => !prev);
+                        if (videoRef.current) {
+                          videoRef.current.muted = !isMuted;
+                        }
+                      }}
+                      className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
+                      title={isMuted ? "Unmute Audio" : "Mute Audio"}
+                    >
+                      {isMuted ? <VolumeX className="size-5 text-red-400" /> : <Volume2 className="size-5 text-emerald-400" />}
+                    </button>
+
                     {/* WhatsApp 3-Dots Menu Button */}
                     <button
                       onClick={(e) => {
@@ -498,11 +545,11 @@ export function VillageStories() {
                     src={activeStory.mediaUrl}
                     autoPlay
                     playsInline
-                    controls
-                    onLoadedMetadata={(e) => {
-                      const dur = e.currentTarget.duration;
-                      if (dur && !isNaN(dur) && isFinite(dur)) {
-                        setStoryDuration(Math.max(5, Math.ceil(dur)));
+                    muted={isMuted}
+                    onTimeUpdate={(e) => {
+                      const v = e.currentTarget;
+                      if (v.duration && !isNaN(v.duration) && v.duration > 0) {
+                        setVideoProgress((v.currentTime / v.duration) * 100);
                       }
                     }}
                     onEnded={closeStory}
