@@ -215,6 +215,36 @@ export function VillageStories() {
           authorId: user.id,
         };
         setStories(prev => [newStory, ...prev]);
+
+        // 5. Dispatch instant live notifications to all villagers in this village!
+        try {
+          const authorName = profile?.full_name || profile?.designation || role || "Village Official";
+          let notifQuery = (supabase as any).from("profiles").select("id");
+          if (villageId) {
+            notifQuery = notifQuery.eq("village_id", villageId);
+          }
+          const { data: villagers } = await notifQuery;
+
+          if (villagers && villagers.length > 0) {
+            const notifItems = villagers
+              .filter((v: any) => v.id !== user.id)
+              .map((v: any) => ({
+                recipient_id: v.id,
+                created_by: user.id,
+                village_id: villageId || null,
+                title: `📸 New Update from ${authorName}`,
+                body: caption ? `"${caption}"` : "A new story update was posted in your village. Tap to view!",
+                type: "story",
+                action_url: "/timeline",
+              }));
+
+            if (notifItems.length > 0) {
+              await (supabase as any).from("notifications").insert(notifItems);
+            }
+          }
+        } catch (notifErr) {
+          console.warn("[VillageStories] Story notification warning:", notifErr);
+        }
       },
       {
         loading: isVideo ? "Uploading video..." : "Optimizing & posting update...",
