@@ -225,16 +225,35 @@ export function VillageStories() {
     }
   };
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || !user) return;
-    
+
+    const isVideo = file.type.startsWith("video/");
+
+    // 1. File size safeguards (Max 25MB for videos, Max 15MB for images)
+    if (isVideo && file.size > 25 * 1024 * 1024) {
+      toast.error("Video file is too large (max 25MB for stories). Please select a shorter video clip.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    if (!isVideo && file.size > 15 * 1024 * 1024) {
+      toast.error("Image file is too large (max 15MB). Please select a smaller photo.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
     const caption = window.prompt("Enter a description for your update:");
-    if (caption === null) return; // Cancelled
-    
+    if (caption === null) {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return; // Cancelled
+    }
+
     const rateCheck = checkRateLimit(user.id, "upload_story", DEFAULT_STORY_LIMIT);
     if (!rateCheck.allowed) {
       toast.error(`Please wait ${rateCheck.waitSeconds}s before uploading another story update.`);
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
@@ -242,96 +261,138 @@ export function VillageStories() {
       const spamCheck = checkContentSpam(caption);
       if (!spamCheck.isClean) {
         toast.error(spamCheck.reason || "Spam or profanity detected.");
+        if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
     }
-    
-    const isVideo = file.type.startsWith("video/");
-    
+
+    // 2. Create instant local Blob URL for immediate optimistic UI preview
+    const tempId = `temp-${Date.now()}`;
+    const localBlobUrl = URL.createObjectURL(file);
+
+    const optimisticStory = {
+      id: tempId,
+      author: profile?.full_name || profile?.designation || role || "Official",
+      avatarUrl: profile?.photo_url || "https://i.pravatar.cc/150?img=11",
+      mediaUrl: localBlobUrl,
+      mediaType: isVideo ? ("video" as const) : ("image" as const),
+      caption: caption || "New village update",
+      timeAgo: "Just now",
+      isVerified: true,
+      authorId: user.id,
+    };
+
+    setStories((prev) => [optimisticStory, ...prev]);
+
     toast.promise(
       async () => {
-        // 1. Fast client-side image compression for ultra-fast uploads
-        const fileToUpload = isVideo ? file : await compressImage(file);
-        
-        // 2. Upload to Supabase Storage
-        const uploaded = await uploadUserFile("events", user.id, fileToUpload);
-        
-        // 3. Build insert payload
-        const villageId = profile?.village_id;
-        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+        try {
+          // 3. Fast client-side image compression for photos
+          const fileToUpload = isVideo ? file : await compressImage(file);
 
-        const payload: Record<string, any> = {
-          author_id: user.id,
-          media_url: uploaded.url,
-          media_type: isVideo ? "video" : "image",
-          caption: caption || null,
-          expires_at: expiresAt,
-        };
+          // 4. Upload to Supabase Storage with a strict timeout (30s for video, 15s for photo)
+          const timeoutMs = isVideo ? 30000 : 15000;
+          const uploadPromise = uploadUserFile("events", user.id, fileToUpload);
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(
+              () =>
+                reject(
+                  new Error(
+                    "Upload network request timed out (connection slow or video file too large)."
+                  )
+                ),
+              timeoutMs
+            )
+          );
 
-        if (villageId) {
-          payload.village_id = villageId;
-        }
-        
-        const { error } = await (supabase as any).from("village_stories").insert(payload);
-        
-        if (error) {
-          console.error("[VillageStories] insert error:", JSON.stringify(error));
-          throw error;
-        }
-        
-        // 4. Add to UI immediately
-        const newStory = {
-          id: Date.now().toString(),
-          author: profile?.full_name || profile?.designation || role || "Official",
-          avatarUrl: profile?.photo_url || "https://i.pravatar.cc/150?img=11",
-          mediaUrl: uploaded.url,
-          mediaType: isVideo ? "video" : "image",
-          caption: caption || "New village update",
-          timeAgo: "Just now",
-          isVerified: true,
-          authorId: user.id,
-        };
-        setStories(prev => [newStory, ...prev]);
+          const uploaded = await Promise.race([uploadPromise, timeoutPromise]);
 
-        // 5. Dispatch instant live notifications asynchronously in background without blocking upload resolution!
-        void (async () => {
-          try {
-            const authorName = profile?.full_name || profile?.designation || role || "Village Official";
-            let notifQuery = (supabase as any).from("profiles").select("id");
-            if (villageId) {
-              notifQuery = notifQuery.eq("village_id", villageId);
-            }
-            const { data: villagers } = await notifQuery;
+          // 5. Build insert payload
+          const villageId = profile?.village_id;
+          const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-            if (villagers && villagers.length > 0) {
-              const notifItems = villagers
-                .filter((v: any) => v.id !== user.id)
-                .map((v: any) => ({
-                  recipient_id: v.id,
-                  created_by: user.id,
-                  village_id: villageId || null,
-                  title: `📸 New Update from ${authorName}`,
-                  body: caption ? `"${caption}"` : "A new story update was posted in your village. Tap to view!",
-                  type: "story",
-                  action_url: "/timeline",
-                }));
+          const payload: Record<string, any> = {
+            author_id: user.id,
+            media_url: uploaded.url,
+            media_type: isVideo ? "video" : "image",
+            caption: caption || null,
+            expires_at: expiresAt,
+          };
 
-              if (notifItems.length > 0) {
-                await (supabase as any).from("notifications").insert(notifItems);
-              }
-            }
-          } catch (notifErr) {
-            console.warn("[VillageStories] Story notification warning:", notifErr);
+          if (villageId) {
+            payload.village_id = villageId;
           }
-        })();
+
+          const { data: dbInsertData, error: dbError } = await (supabase as any)
+            .from("village_stories")
+            .insert(payload)
+            .select("id")
+            .maybeSingle();
+
+          if (dbError) {
+            console.error("[VillageStories] insert error:", JSON.stringify(dbError));
+            throw new Error(dbError.message || "Database failed to save story.");
+          }
+
+          // Swap temp ID with actual database row ID & public URL
+          const realId = dbInsertData?.id || tempId;
+          setStories((prev) =>
+            prev.map((s) =>
+              s.id === tempId
+                ? { ...s, id: realId, mediaUrl: uploaded.url }
+                : s
+            )
+          );
+
+          // 6. Dispatch live notifications asynchronously in background without blocking UI
+          void (async () => {
+            try {
+              const authorName =
+                profile?.full_name || profile?.designation || role || "Village Official";
+              let notifQuery = (supabase as any).from("profiles").select("id");
+              if (villageId) {
+                notifQuery = notifQuery.eq("village_id", villageId);
+              }
+              const { data: villagers } = await notifQuery;
+
+              if (villagers && villagers.length > 0) {
+                const notifItems = villagers
+                  .filter((v: any) => v.id !== user.id)
+                  .map((v: any) => ({
+                    recipient_id: v.id,
+                    created_by: user.id,
+                    village_id: villageId || null,
+                    title: `📸 New Update from ${authorName}`,
+                    body: caption
+                      ? `"${caption}"`
+                      : "A new story update was posted in your village. Tap to view!",
+                    type: "story",
+                    action_url: "/timeline",
+                  }));
+
+                if (notifItems.length > 0) {
+                  await (supabase as any).from("notifications").insert(notifItems);
+                }
+              }
+            } catch (notifErr) {
+              console.warn("[VillageStories] Story notification warning:", notifErr);
+            }
+          })();
+        } catch (uploadErr: any) {
+          // Remove optimistic story if upload failed or timed out
+          setStories((prev) => prev.filter((s) => s.id !== tempId));
+          URL.revokeObjectURL(localBlobUrl);
+          throw uploadErr;
+        }
       },
       {
         loading: isVideo ? "Uploading video..." : "Posting update...",
         success: "Story posted successfully! Live for 24 hours.",
-        error: (err: any) => `Error [${err.code || "Upload"}]: ${err.message || "Failed to post story."}`
+        error: (err: any) =>
+          `Upload Failed: ${err?.message || "Could not upload video. Try a smaller file."}`,
       }
     );
-    
+
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
