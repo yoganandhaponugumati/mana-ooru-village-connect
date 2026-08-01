@@ -27,6 +27,7 @@ import { logContact, useSavedItems } from "@/lib/local-actions";
 import { deleteUserFile, uploadUserFile, type StorageBucket } from "@/lib/supabase/storage";
 import { useListings, type Listing, timeAgo } from "@/lib/store";
 import { StatusBadge } from "./design-system";
+import { checkContentSafety, checkRateLimit } from "@/lib/moderation";
 
 type Field = {
   name: keyof Omit<Listing, "id" | "createdAt" | "type">;
@@ -211,6 +212,22 @@ export function ListingForm({
     }
 
     setSubmitting(true);
+
+    if (!checkRateLimit("post_listing", 5, 60 * 60 * 1000)) {
+      toast.error("You are posting too fast. Please wait an hour before posting again.");
+      setSubmitting(false);
+      return;
+    }
+
+    const titleSafety = await checkContentSafety(values.title || "");
+    const descSafety = await checkContentSafety(values.description || "");
+
+    if (!titleSafety.isSafe || !descSafety.isSafe) {
+      toast.error(titleSafety.reason || descSafety.reason || "Content flagged by moderation.");
+      setSubmitting(false);
+      return;
+    }
+
     const bucket = bucketByType[type];
     let uploadedStoragePath: string | undefined;
     try {

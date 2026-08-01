@@ -25,10 +25,14 @@ import { Route as PrivacyPolicyRouteImport } from './routes/privacy-policy'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PostWorkerRouteImport } from './routes/post-worker'
 import { Route as PostWorkRouteImport } from './routes/post-work'
+import { Route as PollsRouteImport } from './routes/polls'
 import { Route as OfficialRouteImport } from './routes/official'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LandRouteImport } from './routes/land'
+import { Route as HealthRouteImport } from './routes/health'
+import { Route as GovernmentRouteImport } from './routes/government'
 import { Route as EmergencyRouteImport } from './routes/emergency'
+import { Route as EducationRouteImport } from './routes/education'
 import { Route as DeleteAccountRouteImport } from './routes/delete-account'
 import { Route as DealerRegistrationRouteImport } from './routes/dealer-registration'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -36,6 +40,7 @@ import { Route as CompleteProfileRouteImport } from './routes/complete-profile'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnnouncementsRouteImport } from './routes/announcements'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
+import { Route as AgricultureRouteImport } from './routes/agriculture'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperAdminLoginRouteImport } from './routes/super-admin.login'
 
@@ -119,6 +124,11 @@ const PostWorkRoute = PostWorkRouteImport.update({
   path: '/post-work',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PollsRoute = PollsRouteImport.update({
+  id: '/polls',
+  path: '/polls',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OfficialRoute = OfficialRouteImport.update({
   id: '/official',
   path: '/official',
@@ -134,9 +144,24 @@ const LandRoute = LandRouteImport.update({
   path: '/land',
   getParentRoute: () => rootRouteImport,
 } as any)
+const HealthRoute = HealthRouteImport.update({
+  id: '/health',
+  path: '/health',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GovernmentRoute = GovernmentRouteImport.update({
+  id: '/government',
+  path: '/government',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EmergencyRoute = EmergencyRouteImport.update({
   id: '/emergency',
   path: '/emergency',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EducationRoute = EducationRouteImport.update({
+  id: '/education',
+  path: '/education',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DeleteAccountRoute = DeleteAccountRouteImport.update({
@@ -174,6 +199,11 @@ const AiAssistantRoute = AiAssistantRouteImport.update({
   path: '/ai-assistant',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AgricultureRoute = AgricultureRouteImport.update({
+  id: '/agriculture',
+  path: '/agriculture',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -187,6 +217,7 @@ const SuperAdminLoginRoute = SuperAdminLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/agriculture': typeof AgricultureRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
@@ -194,10 +225,14 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/dealer-registration': typeof DealerRegistrationRoute
   '/delete-account': typeof DeleteAccountRoute
+  '/education': typeof EducationRoute
   '/emergency': typeof EmergencyRoute
+  '/government': typeof GovernmentRoute
+  '/health': typeof HealthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/official': typeof OfficialRoute
+  '/polls': typeof PollsRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
   '/privacy': typeof PrivacyRoute
@@ -218,6 +253,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/agriculture': typeof AgricultureRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
@@ -225,10 +261,14 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/dealer-registration': typeof DealerRegistrationRoute
   '/delete-account': typeof DeleteAccountRoute
+  '/education': typeof EducationRoute
   '/emergency': typeof EmergencyRoute
+  '/government': typeof GovernmentRoute
+  '/health': typeof HealthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/official': typeof OfficialRoute
+  '/polls': typeof PollsRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
   '/privacy': typeof PrivacyRoute
@@ -250,6 +290,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/agriculture': typeof AgricultureRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
   '/auth': typeof AuthRoute
@@ -257,10 +298,14 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/dealer-registration': typeof DealerRegistrationRoute
   '/delete-account': typeof DeleteAccountRoute
+  '/education': typeof EducationRoute
   '/emergency': typeof EmergencyRoute
+  '/government': typeof GovernmentRoute
+  '/health': typeof HealthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
   '/official': typeof OfficialRoute
+  '/polls': typeof PollsRoute
   '/post-work': typeof PostWorkRoute
   '/post-worker': typeof PostWorkerRoute
   '/privacy': typeof PrivacyRoute
@@ -283,6 +328,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/agriculture'
     | '/ai-assistant'
     | '/announcements'
     | '/auth'
@@ -290,10 +336,14 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer-registration'
     | '/delete-account'
+    | '/education'
     | '/emergency'
+    | '/government'
+    | '/health'
     | '/land'
     | '/marketplace'
     | '/official'
+    | '/polls'
     | '/post-work'
     | '/post-worker'
     | '/privacy'
@@ -314,6 +364,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/agriculture'
     | '/ai-assistant'
     | '/announcements'
     | '/auth'
@@ -321,10 +372,14 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer-registration'
     | '/delete-account'
+    | '/education'
     | '/emergency'
+    | '/government'
+    | '/health'
     | '/land'
     | '/marketplace'
     | '/official'
+    | '/polls'
     | '/post-work'
     | '/post-worker'
     | '/privacy'
@@ -345,6 +400,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/agriculture'
     | '/ai-assistant'
     | '/announcements'
     | '/auth'
@@ -352,10 +408,14 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/dealer-registration'
     | '/delete-account'
+    | '/education'
     | '/emergency'
+    | '/government'
+    | '/health'
     | '/land'
     | '/marketplace'
     | '/official'
+    | '/polls'
     | '/post-work'
     | '/post-worker'
     | '/privacy'
@@ -377,6 +437,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AgricultureRoute: typeof AgricultureRoute
   AiAssistantRoute: typeof AiAssistantRoute
   AnnouncementsRoute: typeof AnnouncementsRoute
   AuthRoute: typeof AuthRoute
@@ -384,10 +445,14 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   DealerRegistrationRoute: typeof DealerRegistrationRoute
   DeleteAccountRoute: typeof DeleteAccountRoute
+  EducationRoute: typeof EducationRoute
   EmergencyRoute: typeof EmergencyRoute
+  GovernmentRoute: typeof GovernmentRoute
+  HealthRoute: typeof HealthRoute
   LandRoute: typeof LandRoute
   MarketplaceRoute: typeof MarketplaceRoute
   OfficialRoute: typeof OfficialRoute
+  PollsRoute: typeof PollsRoute
   PostWorkRoute: typeof PostWorkRoute
   PostWorkerRoute: typeof PostWorkerRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -521,6 +586,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostWorkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/polls': {
+      id: '/polls'
+      path: '/polls'
+      fullPath: '/polls'
+      preLoaderRoute: typeof PollsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/official': {
       id: '/official'
       path: '/official'
@@ -542,11 +614,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LandRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/health': {
+      id: '/health'
+      path: '/health'
+      fullPath: '/health'
+      preLoaderRoute: typeof HealthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/government': {
+      id: '/government'
+      path: '/government'
+      fullPath: '/government'
+      preLoaderRoute: typeof GovernmentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/emergency': {
       id: '/emergency'
       path: '/emergency'
       fullPath: '/emergency'
       preLoaderRoute: typeof EmergencyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/education': {
+      id: '/education'
+      path: '/education'
+      fullPath: '/education'
+      preLoaderRoute: typeof EducationRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/delete-account': {
@@ -598,6 +691,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AiAssistantRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/agriculture': {
+      id: '/agriculture'
+      path: '/agriculture'
+      fullPath: '/agriculture'
+      preLoaderRoute: typeof AgricultureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -617,6 +717,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AgricultureRoute: AgricultureRoute,
   AiAssistantRoute: AiAssistantRoute,
   AnnouncementsRoute: AnnouncementsRoute,
   AuthRoute: AuthRoute,
@@ -624,10 +725,14 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   DealerRegistrationRoute: DealerRegistrationRoute,
   DeleteAccountRoute: DeleteAccountRoute,
+  EducationRoute: EducationRoute,
   EmergencyRoute: EmergencyRoute,
+  GovernmentRoute: GovernmentRoute,
+  HealthRoute: HealthRoute,
   LandRoute: LandRoute,
   MarketplaceRoute: MarketplaceRoute,
   OfficialRoute: OfficialRoute,
+  PollsRoute: PollsRoute,
   PostWorkRoute: PostWorkRoute,
   PostWorkerRoute: PostWorkerRoute,
   PrivacyRoute: PrivacyRoute,

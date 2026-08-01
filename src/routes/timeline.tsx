@@ -38,7 +38,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { toast } from "sonner";
 import { PageLayout } from "@/components/PageLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { AppButton, EmptyState, SurfaceCard } from "@/components/design-system";
+import { AppButton, EmptyState, SurfaceCard, SkeletonCard } from "@/components/design-system";
 import { supabase } from "@/integrations/supabase/client";
 import { fallbackListings } from "@/lib/app-data";
 import { useAuth } from "@/lib/auth";
@@ -701,7 +701,9 @@ function TimelinePage() {
         </div>
       </SurfaceCard>
 
-      {filtered.length === 0 ? (
+      {timelineQuery.isPending ? (
+        <SkeletonCard count={4} />
+      ) : filtered.length === 0 ? (
         <EmptyState
           icon={<Sparkles className="size-6" />}
           title="No timeline activity found"

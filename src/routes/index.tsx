@@ -163,7 +163,7 @@ const villageNeeds = [
   {
     icon: Sprout,
     label: "Agriculture",
-    to: "/schemes" as const,
+    to: "/agriculture" as any,
     description: "Government farm schemes, subsidies, and crop support programs.",
   },
   {
@@ -175,7 +175,7 @@ const villageNeeds = [
   {
     icon: Building2,
     label: "Government",
-    to: "/schemes" as const,
+    to: "/government" as any,
     description: "Certificates, records, and official village scheme updates.",
   },
   {
@@ -187,13 +187,13 @@ const villageNeeds = [
   {
     icon: GraduationCap,
     label: "Education",
-    to: "/announcements" as const,
+    to: "/education" as any,
     description: "School notices, scholarships, and learning updates.",
   },
   {
     icon: HeartPulse,
     label: "Health",
-    to: "/emergency" as const,
+    to: "/health" as any,
     description: "Health centre details and nearby medical contacts.",
   },
   {

@@ -188,16 +188,16 @@ function SchemesPage() {
               </div>
               <div className="min-w-0 flex-1">
                 <div className="flex items-start justify-between gap-2">
-                   <div className="min-w-0">
+                   <div className="min-w-0 flex-1">
                      <p className="font-display text-base font-bold text-clay dark:text-zinc-100 truncate">{service.title}</p>
                      <p className="text-[10px] font-semibold text-secondary truncate">{service.category}</p>
                    </div>
                    <ExternalLink className="size-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
                 </div>
-                <p className="mt-1.5 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2">
+                <p className="mt-1.5 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2 break-words whitespace-normal">
                   {service.description}
                 </p>
-                <div className="mt-2.5 flex items-center gap-1.5 min-w-0">
+                <div className="mt-2.5 flex items-center gap-1.5 min-w-0 w-full overflow-hidden">
                   <span className="inline-flex shrink-0 items-center rounded-full bg-secondary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-secondary">
                     <FileText className="mr-1 size-2.5" /> Keep Ready
                   </span>

@@ -2,6 +2,7 @@ import { Loader2, ShieldCheck, UserCog } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { AppButton, FeatureIcon, SurfaceCard } from "@/components/design-system";
 
 type ManagedRole = "citizen" | "village_admin" | "super_admin";
@@ -19,6 +20,7 @@ function accountTypeForRole(role: ManagedRole) {
 }
 
 export function AdminRoleManager() {
+  const { user } = useAuth();
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<ManagedRole>("village_admin");
   const [busy, setBusy] = useState(false);
@@ -54,6 +56,16 @@ export function AdminRoleManager() {
         .eq("id", profile.id);
 
       if (updateError) throw updateError;
+
+      // Log the action to audit_logs
+      if (user) {
+        await supabase.from("audit_logs").insert({
+          action: "ROLE_CHANGE",
+          actor_id: user.id,
+          target_id: profile.id,
+          details: { old_role: profile.role || null, new_role: role, target_email: profile.email },
+        });
+      }
 
       toast.success(
         `${profile.display_name || profile.email || "User"} is now ${roleLabels[role]}`,

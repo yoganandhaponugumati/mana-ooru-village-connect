@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X, Play, ShieldCheck, Plus, Upload } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
-import { useRef } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { uploadUserFile } from "@/lib/supabase/storage";
+import { timeAgo as getTimeAgo } from "@/lib/store";
 
 const dummyStories = [
   {
@@ -26,28 +28,64 @@ const dummyStories = [
     caption: "New subsidized seeds available at the panchayat office.",
     timeAgo: "5h ago",
     isVerified: true,
-  },
-  {
-    id: "3",
-    author: "Primary Health Center",
-    avatarUrl: "https://i.pravatar.cc/150?img=5",
-    mediaUrl: "https://images.unsplash.com/photo-1584362917165-526a968579e8?q=80&w=600",
-    mediaType: "image",
-    caption: "Free eye checkup camp this Sunday! Everyone is welcome.",
-    timeAgo: "8h ago",
-    isVerified: true,
-  },
+  }
 ];
 
 export function VillageStories() {
-  const [activeStory, setActiveStory] = useState<typeof dummyStories[0] | null>(null);
+  const [stories, setStories] = useState<any[]>(dummyStories);
+  const [activeStory, setActiveStory] = useState<any | null>(null);
   const triggerHaptic = useUIStore((s) => s.triggerHaptic);
-  const { role, profile } = useAuth();
+  const { user, role, profile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isAdmin = role === "admin" || role === "super_admin" || profile?.designation === "Sarpanch";
+  const isAdmin = role === "village_admin" || role === "super_admin" || profile?.designation === "Sarpanch";
 
-  const handleStoryClick = (story: typeof dummyStories[0]) => {
+  useEffect(() => {
+    const fetchStories = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("village_stories")
+          .select(`
+            id,
+            media_url,
+            media_type,
+            caption,
+            created_at,
+            profiles:author_id (
+              full_name,
+              photo_url,
+              role,
+              is_verified,
+              designation
+            )
+          `)
+          .gt("expires_at", new Date().toISOString())
+          .order("created_at", { ascending: false });
+
+        if (data && !error) {
+          const mapped = data.map((s: any) => {
+            const p = Array.isArray(s.profiles) ? s.profiles[0] : s.profiles;
+            return {
+              id: s.id,
+              author: p?.full_name || p?.designation || "Official",
+              avatarUrl: p?.photo_url || "https://i.pravatar.cc/150?img=11",
+              mediaUrl: s.media_url,
+              mediaType: s.media_type as "image" | "video",
+              caption: s.caption || "",
+              timeAgo: getTimeAgo(new Date(s.created_at).getTime()),
+              isVerified: p?.is_verified || false,
+            };
+          });
+          setStories([...mapped, ...dummyStories]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch stories:", err);
+      }
+    };
+    fetchStories();
+  }, []);
+
+  const handleStoryClick = (story: any) => {
     triggerHaptic("medium");
     setActiveStory(story);
   };
@@ -55,6 +93,56 @@ export function VillageStories() {
   const closeStory = () => {
     triggerHaptic("light");
     setActiveStory(null);
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    
+    const caption = window.prompt("Enter a description for your update:");
+    if (caption === null) return; // Cancelled
+    
+    const isVideo = file.type.startsWith("video/");
+    
+    toast.promise(
+      async () => {
+        // 1. Upload to Supabase Storage
+        const uploaded = await uploadUserFile("events", user.id, file);
+        
+        // 2. Save metadata to DB
+        const villageId = profile?.village_id || "00000000-0000-0000-0000-000000000000";
+        
+        const { error } = await supabase.from("village_stories").insert({
+          author_id: user.id,
+          village_id: villageId,
+          media_url: uploaded.url,
+          media_type: isVideo ? "video" : "image",
+          caption: caption
+        });
+        
+        if (error) throw error;
+        
+        // 3. Add to UI immediately
+        const newStory = {
+          id: Date.now().toString(),
+          author: profile?.full_name || profile?.designation || role || "Official",
+          avatarUrl: profile?.photo_url || "https://i.pravatar.cc/150?img=11",
+          mediaUrl: uploaded.url,
+          mediaType: isVideo ? "video" : "image",
+          caption: caption || "New village update",
+          timeAgo: "Just now",
+          isVerified: true,
+        };
+        setStories(prev => [newStory, ...prev]);
+      },
+      {
+        loading: isVideo ? "Uploading video (this may take a moment)..." : "Uploading image...",
+        success: "Story posted successfully! Live for 24 hours.",
+        error: "Failed to post story. Please ensure you have permission."
+      }
+    );
+    
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   return (
@@ -80,19 +168,12 @@ export function VillageStories() {
               accept="video/*,image/*" 
               className="hidden" 
               ref={fileInputRef}
-              onChange={(e) => {
-                if (e.target.files && e.target.files.length > 0) {
-                  toast.loading("Encrypting and uploading media...", { id: "story-upload" });
-                  setTimeout(() => {
-                    toast.success("Story posted successfully! Live for 24 hours.", { id: "story-upload" });
-                  }, 2000);
-                }
-              }}
+              onChange={handleUpload}
             />
           </div>
         )}
 
-        {dummyStories.map((story) => (
+        {stories.map((story) => (
           <div
             key={story.id}
             onClick={() => handleStoryClick(story)}

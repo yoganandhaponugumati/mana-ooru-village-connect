@@ -10,7 +10,7 @@ import { z } from "zod";
 
 export const Route = createFileRoute("/search")({
   validateSearch: z.object({
-    q: z.string().optional(),
+    q: z.string().catch(""),
   }),
   head: () => ({ meta: [{ title: "Search - ManaOoru" }] }),
   component: SearchPage,

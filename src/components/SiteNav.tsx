@@ -47,6 +47,7 @@ const navLinks = [
   { to: "/services", key: "services", icon: Wrench, label: "Services" },
   { to: "/problems", key: "problems", icon: AlertTriangle, label: "Problems" },
   { to: "/announcements", key: "notices", icon: Megaphone, label: "Notices" },
+  { to: "/polls", key: "polls", icon: CheckCircle2, label: "Polls" },
   { to: "/timeline", key: "timeline", icon: Newspaper, label: "Timeline" },
   { to: "/ai-assistant", key: "ai", icon: Bot, label: "AI Help" },
 ] as const;
@@ -199,7 +200,7 @@ export function SiteNav() {
 
         {/* Desktop Nav Links — visible from lg (1024px) */}
         <div className="hidden lg:flex items-center gap-0.5 text-xs font-bold flex-1 justify-center text-muted-foreground dark:text-zinc-400">
-          {navLinks.slice(0, 7).map((l) => (
+          {navLinks.slice(0, 8).map((l) => (
             <Link
               key={l.to}
               to={l.to}

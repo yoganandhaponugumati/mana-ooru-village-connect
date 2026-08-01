@@ -2,12 +2,36 @@
  * Integration with Google's Perspective API for content moderation.
  * Helps prevent spam, profanity, and harassment on the platform.
  */
+
+export const PROFANITY_WORDS = [
+  // Add common english and telugu profanity words / spam markers
+  "spam", "scam", "click here", "free money", "lottery",
+  "fuck", "shit", "bitch", "asshole", "dick",
+  "lathkor", "lanja", "na kodaka", "erri", "puku",
+];
+
 export async function checkContentSafety(text: string): Promise<{ isSafe: boolean; reason?: string }> {
   if (!text || text.trim().length === 0) return { isSafe: true };
   
+  // 1. First run a local check (super fast and covers basic bad words)
+  const normalized = text.toLowerCase().replace(/[^\w\s\u0C00-\u0C7F]/gi, ""); // Remove punctuation, keep english & telugu
+  const words = normalized.split(/\s+/);
+  
+  for (const word of words) {
+    if (PROFANITY_WORDS.some(bad => word.includes(bad) || normalized.includes(bad))) {
+      return { isSafe: false, reason: "Inappropriate language or spam detected." };
+    }
+  }
+
+  // Check for repeated character spam (e.g. "aaaaaaa")
+  if (/(.)\1{5,}/.test(text)) {
+    return { isSafe: false, reason: "Excessive repeated characters detected (spam)." };
+  }
+
+  // 2. Then try Perspective API
   const API_KEY = import.meta.env.VITE_PERSPECTIVE_API_KEY;
   if (!API_KEY) {
-    console.warn("VITE_PERSPECTIVE_API_KEY is not set. Skipping content moderation.");
+    console.warn("VITE_PERSPECTIVE_API_KEY is not set. Falling back to local moderation only.");
     return { isSafe: true };
   }
 
@@ -49,5 +73,31 @@ export async function checkContentSafety(text: string): Promise<{ isSafe: boolea
   } catch (error) {
     console.error("Moderation check failed:", error);
     return { isSafe: true }; // Fail open
+  }
+}
+
+// Simple local storage rate limiter for client-side
+export function checkRateLimit(action: string, limitCount: number, timeWindowMs: number): boolean {
+  if (typeof window === "undefined") return true;
+  try {
+    const key = `ratelimit_${action}`;
+    const now = Date.now();
+    const historyStr = localStorage.getItem(key);
+    let history: number[] = historyStr ? JSON.parse(historyStr) : [];
+    
+    // Filter history to only include timestamps within the timeWindowMs
+    history = history.filter(time => now - time < timeWindowMs);
+    
+    if (history.length >= limitCount) {
+      return false; // Rate limit exceeded
+    }
+    
+    // Add current action timestamp
+    history.push(now);
+    localStorage.setItem(key, JSON.stringify(history));
+    return true; // Allowed
+  } catch (err) {
+    console.error("Rate limit check failed, allowing by default", err);
+    return true;
   }
 }

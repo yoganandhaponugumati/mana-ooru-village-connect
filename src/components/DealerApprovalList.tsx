@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Check, Clock, Loader2, MapPin, ShieldAlert, ShoppingBag, Store, X } from "lucide-react";
 import { toast } from "sonner";
-import { SurfaceCard } from "@/components/design-system";
+import { SurfaceCard, SkeletonCard } from "@/components/design-system";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
 import {
@@ -109,9 +109,8 @@ export function DealerApprovalList({ statusFilter = "pending" }: DealerApprovalL
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center py-12 text-sm text-muted-foreground">
-        <Loader2 className="mr-2 size-4 animate-spin" />
-        Loading dealer applications...
+      <div className="py-4">
+        <SkeletonCard count={3} />
       </div>
     );
   }
