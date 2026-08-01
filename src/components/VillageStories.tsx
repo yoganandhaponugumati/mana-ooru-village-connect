@@ -133,16 +133,24 @@ export function VillageStories() {
         // 1. Upload to Supabase Storage
         const uploaded = await uploadUserFile("events", user.id, file);
         
-        // 2. Save metadata to DB
-        const villageId = profile?.village_id || "00000000-0000-0000-0000-000000000000";
-        
-        const { error } = await (supabase as any).from("village_stories").insert({
+        // 2. Build insert payload — only include village_id if it's a real value
+        const villageId = profile?.village_id;
+        const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
+
+        const payload: Record<string, any> = {
           author_id: user.id,
-          village_id: villageId,
           media_url: uploaded.url,
           media_type: isVideo ? "video" : "image",
-          caption: caption
-        });
+          caption: caption || null,
+          expires_at: expiresAt,
+        };
+
+        // Only attach village_id if profile has a real one
+        if (villageId) {
+          payload.village_id = villageId;
+        }
+        
+        const { error } = await (supabase as any).from("village_stories").insert(payload);
         
         if (error) throw error;
         
@@ -168,6 +176,7 @@ export function VillageStories() {
     
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
+
 
   return (
     <div className="w-full bg-transparent pb-4 pt-2">
