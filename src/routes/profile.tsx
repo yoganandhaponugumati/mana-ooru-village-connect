@@ -320,7 +320,7 @@ function ProfilePage() {
         <div className="relative mx-auto mt-4 size-24 rounded-full overflow-hidden border-4 border-card bg-gradient-to-br from-primary to-secondary font-display text-3xl font-semibold text-white shadow-md aspect-square flex items-center justify-center">
           {photoPreview || authProfile?.photo_url ? (
             <img
-              src={photoPreview || authProfile?.photo_url}
+              src={(photoPreview || authProfile?.photo_url) ?? undefined}
               alt={user?.email || "Profile photo"}
               className="size-full rounded-full object-cover aspect-square"
             />

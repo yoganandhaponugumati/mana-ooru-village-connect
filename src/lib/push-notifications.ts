@@ -23,7 +23,7 @@ async function unregisterOldPushServiceWorker() {
   }
 }
 
-export async function subscribeToPush() {
+export async function subscribeToPush(_reason?: string) {
   if (typeof window === "undefined") {
     console.warn("[Push] Skipping subscription outside the browser.");
     return false;

@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Check, Clock, Loader2, MapPin, ShieldAlert, ShoppingBag, Store, X } from "lucide-react";
+import { Check, Clock, MapPin, ShieldAlert, ShoppingBag, Store, X } from "lucide-react";
 import { toast } from "sonner";
 import { SurfaceCard, SkeletonCard } from "@/components/design-system";
 import { supabase } from "@/integrations/supabase/client";

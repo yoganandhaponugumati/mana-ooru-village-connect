@@ -58,7 +58,7 @@ export function AdminRoleManager() {
       if (updateError) throw updateError;
 
       // Log the action to audit_logs
-      const { error: logError } = await (supabase as any).from("audit_logs").insert({
+      await (supabase as any).from("audit_logs").insert({
           action: "ROLE_CHANGE",
           actor_id: user?.id,
           target_id: profile.id,

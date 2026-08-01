@@ -26,7 +26,6 @@ import {
   Map,
   Bot,
   Plus,
-  Edit,
   CloudSun,
   ArrowLeft,
   CheckCircle2,

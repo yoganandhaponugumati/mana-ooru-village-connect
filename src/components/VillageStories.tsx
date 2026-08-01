@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Play, ShieldCheck, Plus, Upload, Trash2, ArrowLeft, MoreVertical, Eye, Flag } from "lucide-react";
+import { X, ShieldCheck, Plus, Upload, Trash2, ArrowLeft, MoreVertical, Eye, Flag } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -86,7 +86,7 @@ export function VillageStories() {
   const isAdmin = 
     role === "village_admin" || 
     role === "super_admin" || 
-    role === "platform_admin" ||
+    (role as string) === "platform_admin" ||
     profile?.designation === "Sarpanch";
 
   const compressImage = (file: File): Promise<File> =>
