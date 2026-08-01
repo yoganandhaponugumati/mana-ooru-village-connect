@@ -49,7 +49,7 @@ function PollsPage() {
   const pollsQuery = useQuery({
     queryKey: ["polls", villageId],
     queryFn: async () => {
-      let q = supabase
+      let q = (supabase as any)
         .from("village_polls")
         .select("*")
         .order("created_at", { ascending: false });
@@ -68,7 +68,7 @@ function PollsPage() {
   const votesQuery = useQuery({
     queryKey: ["poll_votes", user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("poll_votes")
         .select("*")
         .eq("voter_id", user?.id);
@@ -82,7 +82,7 @@ function PollsPage() {
   const allVotesQuery = useQuery({
     queryKey: ["all_poll_votes"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data, error } = await (supabase as any)
         .from("poll_votes")
         .select("poll_id, option_id");
       if (error) throw error;
@@ -96,7 +96,7 @@ function PollsPage() {
       if (options.length < 2) throw new Error("At least 2 options are required");
       if (options.some(o => !o.label.trim())) throw new Error("All options must have text");
 
-      const { error } = await supabase.from("village_polls").insert({
+      const { error } = await (supabase as any).from("village_polls").insert({
         question,
         description,
         options,
@@ -119,7 +119,7 @@ function PollsPage() {
 
   const voteMutation = useMutation({
     mutationFn: async ({ pollId, optionId }: { pollId: string; optionId: string }) => {
-      const { error } = await supabase.from("poll_votes").insert({
+      const { error } = await (supabase as any).from("poll_votes").insert({
         poll_id: pollId,
         option_id: optionId,
         voter_id: user?.id,
