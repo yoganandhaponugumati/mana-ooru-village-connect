@@ -188,6 +188,43 @@ export function useListings(type?: ListingType) {
       qc.invalidateQueries({ queryKey: ["timeline-activities"] });
       const listing = toListing(data as Row);
 
+      // Dispatch live in-app notifications for all village members
+      try {
+        const villageId = item.villageId || profile?.village_id;
+        let notifQuery = (supabase as any).from("profiles").select("id");
+        if (villageId) notifQuery = notifQuery.eq("village_id", villageId);
+        const { data: villagers } = await notifQuery;
+
+        if (villagers && villagers.length > 0) {
+          const typeLabels: Record<string, string> = {
+            complaint: "🚨 New Problem Reported",
+            announcement: "📢 Official Announcement",
+            work: "💼 New Work Opportunity",
+            worker: "🛠️ New Worker Listing",
+            market: "🛍️ New Market Item",
+            service: "🚜 New Service",
+          };
+          const titleText = typeLabels[item.type] || `📌 New Post: ${item.title}`;
+          const notifRows = villagers
+            .filter((v: any) => v.id !== user?.id)
+            .map((v: any) => ({
+              recipient_id: v.id,
+              created_by: user?.id || null,
+              village_id: villageId || null,
+              title: titleText,
+              body: `"${item.title}" - Tap to open and view details.`,
+              type: `post_${item.type}`,
+              action_url: item.type === "complaint" ? "/problems" : "/timeline",
+            }));
+
+          if (notifRows.length > 0) {
+            await (supabase as any).from("notifications").insert(notifRows);
+          }
+        }
+      } catch (notifErr) {
+        console.warn("[store] Post notification insert warning:", notifErr);
+      }
+
       void sendNewPostPushNotifications({ data: { postId: listing.id } }).catch((err) => {
         console.error("Could not send push notifications", err);
       });
@@ -281,6 +318,20 @@ export function useListings(type?: ListingType) {
             : item.officialResponse
               ? ` Note: "${item.officialResponse}".`
               : "";
+
+          try {
+            await (supabase as any).from("notifications").insert({
+              recipient_id: item.owner_id,
+              created_by: user?.id || null,
+              title: "ManaOoru • Civic Report Status Updated",
+              body: `Update: Your report "${item.title}" is marked: ${statusLabel}.${noteText}`,
+              type: "status_update",
+              action_url: "/problems",
+            });
+          } catch (notifInsertErr) {
+            console.warn("[store] status notification insert warning:", notifInsertErr);
+          }
+
           void sendDirectUserPushNotification({
             data: {
               targetUserId: item.owner_id,
