@@ -138,7 +138,7 @@ export function VillageStories() {
       {
         loading: isVideo ? "Uploading video (this may take a moment)..." : "Uploading image...",
         success: "Story posted successfully! Live for 24 hours.",
-        error: "Failed to post story. Please ensure you have permission."
+        error: (err: any) => `Failed to post story: ${err.message || "Please ensure you have permission."}`
       }
     );
     
