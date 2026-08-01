@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, Play, ShieldCheck, Plus, Upload, Trash2, ArrowLeft } from "lucide-react";
+import { X, Play, ShieldCheck, Plus, Upload, Trash2, ArrowLeft, MoreVertical, Eye, Flag } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -35,9 +36,27 @@ const dummyStories = [
 export function VillageStories() {
   const [stories, setStories] = useState<any[]>(dummyStories);
   const [activeStory, setActiveStory] = useState<any | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
+  const [reactions, setReactions] = useState<Record<string, { username: string; emoji: string }[]>>({});
   const triggerHaptic = useUIStore((s) => s.triggerHaptic);
   const { user, role, profile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleAddReaction = (storyId: string, emoji: string) => {
+    const currentUsername = profile?.full_name || profile?.username || user?.email?.split("@")[0] || "Villager";
+    
+    setReactions((prev) => {
+      const existing = prev[storyId] || [];
+      const filtered = existing.filter((r) => r.username !== currentUsername);
+      return {
+        ...prev,
+        [storyId]: [...filtered, { username: currentUsername, emoji }],
+      };
+    });
+
+    toast.success(`Reacted ${emoji}`);
+    triggerHaptic("light");
+  };
 
   const isAdmin = 
     role === "village_admin" || 
@@ -322,123 +341,166 @@ export function VillageStories() {
         ))}
       </div>
 
-      {/* Fullscreen WhatsApp Status Style Story Viewer */}
-      <AnimatePresence>
-        {activeStory && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[999999] flex flex-col bg-black text-white"
-          >
-            {/* Top Bar: Progress Bar + User Info + Close/Back */}
-            <div className="absolute top-0 inset-x-0 z-30 flex flex-col bg-gradient-to-b from-black/90 via-black/40 to-transparent pt-3 pb-8 px-4">
-              
-              {/* Progress Segment */}
-              <div className="w-full bg-white/20 h-1 rounded-full mb-3 overflow-hidden">
-                <motion.div
-                  initial={{ width: "0%" }}
-                  animate={{ width: "100%" }}
-                  transition={{ duration: 7, ease: "linear" }}
-                  onAnimationComplete={closeStory}
-                  className="bg-white h-full rounded-full"
-                />
-              </div>
-
-              {/* Header Info */}
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {/* Back Arrow Button */}
-                  <button
-                    onClick={closeStory}
-                    className="grid size-9 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 active:scale-95 transition"
-                  >
-                    <ArrowLeft className="size-5" />
-                  </button>
-
-                  <img
-                    src={activeStory.avatarUrl}
-                    className="size-10 rounded-full border border-white/30 object-cover"
-                    alt={activeStory.author}
+      {/* Fullscreen WhatsApp Status Style Story Viewer via Portal to document.body */}
+      {typeof document !== "undefined" && createPortal(
+        <AnimatePresence>
+          {activeStory && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999999] flex flex-col bg-black text-white overflow-hidden"
+            >
+              {/* Top Bar: Progress Bar + User Info + 3-Dots Menu + Close/Back */}
+              <div className="absolute top-0 inset-x-0 z-30 flex flex-col bg-gradient-to-b from-black/95 via-black/50 to-transparent pt-3 pb-8 px-4">
+                
+                {/* Progress Segment */}
+                <div className="w-full bg-white/20 h-1 rounded-full mb-3 overflow-hidden">
+                  <motion.div
+                    initial={{ width: "0%" }}
+                    animate={{ width: "100%" }}
+                    transition={{ duration: 7, ease: "linear" }}
+                    onAnimationComplete={closeStory}
+                    className="bg-white h-full rounded-full"
                   />
-                  <div className="flex flex-col">
-                    <div className="flex items-center gap-1.5 font-bold text-sm text-white drop-shadow">
-                      {activeStory.author}
-                      {activeStory.isVerified && <ShieldCheck className="size-4 text-blue-400 fill-blue-500/20" />}
+                </div>
+
+                {/* Header Info */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    {/* Back Arrow Button */}
+                    <button
+                      onClick={closeStory}
+                      className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 active:scale-95 transition"
+                      aria-label="Back"
+                    >
+                      <ArrowLeft className="size-5" />
+                    </button>
+
+                    <img
+                      src={activeStory.avatarUrl}
+                      className="size-10 rounded-full border border-white/30 object-cover"
+                      alt={activeStory.author}
+                    />
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-1.5 font-bold text-sm text-white drop-shadow">
+                        {activeStory.author}
+                        {activeStory.isVerified && <ShieldCheck className="size-4 text-blue-400 fill-blue-500/20" />}
+                      </div>
+                      <span className="text-white/70 text-xs">{activeStory.timeAgo}</span>
                     </div>
-                    <span className="text-white/70 text-xs">{activeStory.timeAgo}</span>
+                  </div>
+
+                  <div className="flex items-center gap-2 relative">
+                    {/* WhatsApp 3-Dots Menu Button */}
+                    <button
+                      onClick={() => setShowMenu((prev) => !prev)}
+                      className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
+                      title="More Options"
+                    >
+                      <MoreVertical className="size-5" />
+                    </button>
+
+                    {/* WhatsApp Style 3-Dots Dropdown Menu */}
+                    {showMenu && (
+                      <div className="absolute top-11 right-0 w-44 rounded-2xl bg-zinc-900/95 border border-white/15 text-white shadow-2xl p-1.5 z-50 backdrop-blur-xl">
+                        {isAdmin && (
+                          <button
+                            onClick={(e) => {
+                              setShowMenu(false);
+                              handleDeleteStory(activeStory.id, e);
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/20 rounded-xl transition font-medium"
+                          >
+                            <Trash2 className="size-4" />
+                            Delete Update
+                          </button>
+                        )}
+                        <button
+                          onClick={() => {
+                            setShowMenu(false);
+                            toast.success("Story reported for review.");
+                          }}
+                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white/90 hover:bg-white/10 rounded-xl transition"
+                        >
+                          <Flag className="size-4" />
+                          Report Update
+                        </button>
+                      </div>
+                    )}
+
+                    {/* Close Button */}
+                    <button
+                      onClick={closeStory}
+                      className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
+                    >
+                      <X className="size-5" />
+                    </button>
                   </div>
                 </div>
+              </div>
 
-                <div className="flex items-center gap-2">
-                  {isAdmin && (
+              {/* Media Area (Full Screen Center) */}
+              <div className="relative flex-1 w-full h-full flex items-center justify-center bg-black">
+                {activeStory.mediaType === "video" ? (
+                  <video
+                    src={activeStory.mediaUrl}
+                    autoPlay
+                    playsInline
+                    controls
+                    className="w-full h-full object-contain max-h-screen"
+                  />
+                ) : (
+                  <img
+                    src={activeStory.mediaUrl}
+                    alt={activeStory.caption}
+                    className="w-full h-full object-contain max-h-screen"
+                  />
+                )}
+              </div>
+
+              {/* Bottom Caption, Reactions & Who Reacted List (WhatsApp Status Style) */}
+              <div className="absolute bottom-0 inset-x-0 z-30 flex flex-col items-center bg-gradient-to-t from-black/95 via-black/75 to-transparent pt-12 pb-6 px-4 gap-3">
+                {/* Caption Text - High Contrast & Large */}
+                {activeStory.caption && (
+                  <div className="w-full max-w-lg bg-black/60 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl text-center shadow-xl">
+                    <p className="text-sm md:text-base font-semibold text-white leading-relaxed">
+                      {activeStory.caption}
+                    </p>
+                  </div>
+                )}
+
+                {/* Who Reacted Display with Usernames */}
+                {(reactions[activeStory.id]?.length ?? 0) > 0 && (
+                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 text-xs text-white/90 shadow-md">
+                    <Eye className="size-3.5 text-emerald-400" />
+                    <span className="font-medium">
+                      Reacted:{" "}
+                      {reactions[activeStory.id]
+                        .map((r) => `${r.emoji} ${r.username}`)
+                        .join(", ")}
+                    </span>
+                  </div>
+                )}
+
+                {/* WhatsApp Quick Emoji Reactions */}
+                <div className="flex items-center justify-center gap-3 w-full max-w-sm pt-1">
+                  {["❤️", "🙏", "👏", "👍", "🔥", "😮"].map((emoji) => (
                     <button
-                      onClick={(e) => handleDeleteStory(activeStory.id, e)}
-                      className="grid size-9 place-items-center rounded-full bg-red-500/30 text-red-400 hover:bg-red-500/50 transition"
-                      title="Delete Story"
+                      key={emoji}
+                      onClick={() => handleAddReaction(activeStory.id, emoji)}
+                      className="text-xl p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-125 transition backdrop-blur-sm shadow-md"
                     >
-                      <Trash2 className="size-4" />
+                      {emoji}
                     </button>
-                  )}
-                  <button
-                    onClick={closeStory}
-                    className="grid size-9 place-items-center rounded-full bg-white/10 text-white hover:bg-white/20 transition"
-                  >
-                    <X className="size-5" />
-                  </button>
+                  ))}
                 </div>
               </div>
-            </div>
-
-            {/* Media Area (Full Screen Center) */}
-            <div className="relative flex-1 w-full h-full flex items-center justify-center bg-black">
-              {activeStory.mediaType === "video" ? (
-                <video
-                  src={activeStory.mediaUrl}
-                  autoPlay
-                  playsInline
-                  controls
-                  className="w-full h-full object-contain max-h-screen"
-                />
-              ) : (
-                <img
-                  src={activeStory.mediaUrl}
-                  alt={activeStory.caption}
-                  className="w-full h-full object-contain max-h-screen"
-                />
-              )}
-            </div>
-
-            {/* Bottom Caption & Reactions (WhatsApp Status Style) */}
-            <div className="absolute bottom-0 inset-x-0 z-30 flex flex-col items-center bg-gradient-to-t from-black/95 via-black/70 to-transparent pt-12 pb-6 px-4 gap-3">
-              {/* Caption Text - High Contrast & Large */}
-              {activeStory.caption && (
-                <div className="w-full max-w-lg bg-black/60 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl text-center shadow-xl">
-                  <p className="text-sm md:text-base font-semibold text-white leading-relaxed">
-                    {activeStory.caption}
-                  </p>
-                </div>
-              )}
-
-              {/* WhatsApp Quick Reactions */}
-              <div className="flex items-center justify-center gap-3 w-full max-w-sm pt-1">
-                {["❤️", "🙏", "👏", "👍", "🔥", "😮"].map((emoji) => (
-                  <button
-                    key={emoji}
-                    onClick={() => {
-                      toast.success(`Reacted ${emoji}`);
-                      triggerHaptic("light");
-                    }}
-                    className="text-xl p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-125 transition backdrop-blur-sm shadow-md"
-                  >
-                    {emoji}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+            </motion.div>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </div>
   );
 }
