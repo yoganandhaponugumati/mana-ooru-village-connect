@@ -22,7 +22,7 @@ export function PageLayout({
       <SiteNav />
 
       {/* Main Content Area with perfect spacing to clear the fixed 56px Top Nav */}
-      <main className="flex-1 pb-24 pt-20 sm:pt-24 px-4 max-w-2xl mx-auto w-full">
+      <main id="main-content" className="flex-1 pb-24 pt-20 sm:pt-24 px-4 max-w-2xl mx-auto w-full">
         {/* Clean, Simple Header */}
         <div className="mb-6 sm:mb-8 mt-2">
           <h1 className="font-display text-[22px] sm:text-2xl font-extrabold text-clay dark:text-zinc-100 flex items-center gap-2.5 leading-tight">

@@ -624,7 +624,7 @@ function Index() {
     navigate({ to: "/search", search: { q: searchQuery } });
   };
   return (
-    <div className="village-site-bg min-h-screen text-foreground">
+    <main id="main-content" className="village-site-bg min-h-screen text-foreground">
       <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
 
       {/* Desktop Hero - Hidden on mobile */}
@@ -706,6 +706,7 @@ function Index() {
                 <button
                   type="button"
                   onClick={startVoiceSearch}
+                  aria-label="Start voice search"
                   className={`grid size-10 place-items-center rounded-xl transition shadow-sm ${
                     isListening
                       ? "bg-red-500 text-white animate-pulse"
@@ -1972,6 +1973,6 @@ function Index() {
           </div>
         </div>
       </footer>
-    </div>
+    </main>
   );
 }

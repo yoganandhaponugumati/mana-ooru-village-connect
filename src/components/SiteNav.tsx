@@ -180,7 +180,7 @@ export function SiteNav() {
                 <ArrowLeft className="size-4" />
               </button>
             )}
-            <Link to="/" className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5">
+            <Link to="/" aria-label="GramMitra Home" className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5">
               <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
                 <img src="/logo.png" alt="GramMitra Emblem" className="size-full object-cover" />
               </div>
@@ -194,7 +194,7 @@ export function SiteNav() {
 
           {/* Mobile Centered Weather (Matches Mockup exactly) */}
           <div className="absolute inset-x-0 flex justify-center pointer-events-none md:hidden">
-            <Link to="/weather" className="flex flex-col items-center pointer-events-auto mt-1">
+            <Link to="/weather" aria-label="Village Weather Forecast" className="flex flex-col items-center pointer-events-auto mt-1">
               <div className="flex items-center gap-1 font-bold text-sm text-foreground">
                 <CloudSun className="size-4 text-amber-500" />
                 <span>{weather.temp != null ? `${weather.temp}°C` : "28°C"}</span>
@@ -225,6 +225,7 @@ export function SiteNav() {
             {/* Weather pill — md+ */}
             <Link
               to="/weather"
+              aria-label="Village Weather Forecast"
               className="hidden md:inline-flex h-8 items-center gap-1.5 rounded-full border border-border bg-card px-2.5 text-xs font-bold text-foreground shadow-sm transition shrink-0 hover:border-primary hover:text-primary dark:bg-zinc-900 dark:border-zinc-700"
               title="Live Village Weather"
             >
