@@ -23,6 +23,7 @@ import { AppLinkButton, FeatureIcon, SurfaceCard } from "@/components/design-sys
 import { EmptyState } from "@/components/EmptyState";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
+import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/workers")({
   head: () => ({ meta: [{ title: "Find Workers — GramMitra" }] }),
@@ -45,6 +46,7 @@ const workerCategories = [
 ];
 
 function WorkersPage() {
+  const { t } = useVillagePreferences();
   const { items, remove } = useListings("worker");
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "worker");
@@ -57,8 +59,8 @@ function WorkersPage() {
   );
   return (
     <PageLayout
-      title="Find Skilled Village Workers"
-      subtitle="Connect directly with local farm laborers, tractor drivers, mechanics, electricians, and builders in your area."
+      title={t.workersTitle}
+      subtitle={t.workersSubtitle}
       icon={<Users className="size-6 text-primary" />}
       heroAction={
         <AppLinkButton

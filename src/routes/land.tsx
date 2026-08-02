@@ -8,6 +8,7 @@ import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/land")({
   head: () => ({ meta: [{ title: "Land for Lease — GramMitra" }] }),
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/land")({
 });
 
 function LandPage() {
+  const { t } = useVillagePreferences();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { items, remove } = useListings("land");
@@ -39,8 +41,8 @@ function LandPage() {
 
   return (
     <PageLayout
-      title="Lease & Find Village Farmland"
-      subtitle="Explore seasonal agricultural fields, verify water sources and soil types, or list your own land for lease."
+      title={t.landTitle}
+      subtitle={t.landSubtitle}
       icon={<Wheat className="size-6 text-primary" />}
       heroAction={
         <AppButton

@@ -24,9 +24,10 @@ import { fallbackListings } from "@/lib/app-data";
 import { useListings, timeAgo } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/marketplace")({
-  head: () => ({ meta: [{ title: "Village Marketplace & 0% Brokerage Trade — GramMitra" }] }),
+  head: () => ({ meta: [{ title: "Village Marketplace — GramMitra" }] }),
   component: MarketPage,
 });
 
@@ -58,6 +59,7 @@ const categoryIcons: Record<string, ComponentType<{ className?: string }>> = {
 };
 
 function MarketPage() {
+  const { t } = useVillagePreferences();
   const { user, role } = useAuth();
   const navigate = useNavigate();
   const { items, remove } = useListings("market");
@@ -103,8 +105,8 @@ function MarketPage() {
 
   return (
     <PageLayout
-      title="Village Marketplace & Bazaar"
-      subtitle="Direct peer-to-peer trade with zero commission. Buy and sell crops, cattle, tractors, seeds, and local goods directly with neighbours."
+      title={t.marketplaceTitle}
+      subtitle={t.marketplaceSubtitle}
       icon={<ShoppingBasket className="size-6 text-emerald-600" />}
       heroAction={
         <AppButton

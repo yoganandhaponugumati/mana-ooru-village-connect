@@ -42,7 +42,10 @@ const issueTypes = [
   { label: "Other Civic Issue", icon: AlertTriangle },
 ];
 
+import { useVillagePreferences } from "@/lib/village-preferences";
+
 function ProblemsPage() {
+  const { t } = useVillagePreferences();
   const { user, role } = useAuth();
   const navigate = useNavigate();
   const formRef = useRef<HTMLDivElement>(null);
@@ -115,8 +118,8 @@ function ProblemsPage() {
 
   return (
     <PageLayout
-      title="Citizen Problem & Civic Action Desk"
-      subtitle="Public photo reporting with community upvoting. Every report is visible to the entire village and Gram Panchayat."
+      title={t.problemsTitle}
+      subtitle={t.problemsSubtitle}
       icon={<AlertTriangle className="size-6 text-red-600" />}
       heroAction={
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">

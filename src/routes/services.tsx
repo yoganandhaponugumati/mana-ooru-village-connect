@@ -27,6 +27,7 @@ import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
+import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/services")({
   validateSearch: (search: Record<string, unknown>) => ({
@@ -53,28 +54,35 @@ const serviceCategories = [
   { label: "Tractor", icon: Tractor },
   { label: "Transport", icon: Truck },
   { label: "Electrician", icon: Cable },
-  { label: "Plumbing", icon: ShowerHead },
-  { label: "Borewell", icon: Waves },
-  { label: "Photography", icon: Camera },
+  { label: "Plumber", icon: Wrench },
+  { label: "Mechanic", icon: Wrench },
+  { label: "Borewell", icon: Droplets },
   { label: "Catering", icon: Cake },
-  { label: "Other service", icon: Wrench },
+  { label: "Decoration", icon: Sparkles },
 ] as const;
 
 const shopOptions = shopCategories.map((item) => item.label);
 const serviceOptions = serviceCategories.map((item) => item.label);
 
 function ServicesPage() {
+  const { t } = useVillagePreferences();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { kind } = useSearch({ from: "/services" });
+  const { kind } = Route.useSearch();
+  const mode = kind === "shops" ? "shops" : "services";
   const { items, remove } = useListings("service");
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "service");
   const [showForm, setShowForm] = useState(false);
-  const [mode, setMode] = useState<"services" | "shops">(kind === "shops" ? "shops" : "services");
+  const [q, setQ] = useState("");
   const visibleCategories = mode === "shops" ? shopCategories : serviceCategories;
   const visibleOptions = (mode === "shops" ? shopOptions : serviceOptions) as string[];
-  const shownItems = displayItems.filter((item) => visibleOptions.includes(item.category || ""));
+  
+  const filtered = displayItems.filter((i) =>
+    [i.title, i.description, i.location, i.category].join(" ").toLowerCase().includes(q.toLowerCase()),
+  );
+  
+  const shownItems = filtered.filter((item) => visibleOptions.includes(item.category || ""));
   const hasShownItems = shownItems.length > 0;
 
   const handlePostClick = () => {
@@ -94,8 +102,8 @@ function ServicesPage() {
 
   return (
     <PageLayout
-      title="Village Services & Shops Directory"
-      subtitle="Find and book trusted local providers for tractors, repairs, borewells, transport, and explore village shops."
+      title={t.servicesTitle}
+      subtitle={t.servicesSubtitle}
       icon={<Wrench className="size-6 text-primary" />}
       heroAction={
         <div className="flex flex-wrap items-center justify-center gap-3">

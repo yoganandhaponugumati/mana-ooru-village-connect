@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { SurfaceCard } from "@/components/design-system";
+import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/health")({
   head: () => ({ meta: [{ title: "Health & Medical Hub - GramMitra" }] }),
@@ -81,10 +82,11 @@ const MEDICAL_SHOPS = [
 ];
 
 function HealthPage() {
+  const { t } = useVillagePreferences();
   return (
     <PageLayout
-      title="Health & Medical Hub (ఆరోగ్య కేంద్రం)"
-      subtitle="108 Emergency ambulance, local PHC hospital, ANM/ASHA staff directory, and health camps."
+      title={t.healthTitle}
+      subtitle={t.healthSubtitle}
       icon={<HeartPulse className="size-7 text-red-500" />}
     >
       <div className="space-y-8">

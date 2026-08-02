@@ -21,7 +21,7 @@ export const Route = createFileRoute("/weather")({
 });
 
 function WeatherPage() {
-  const { profile, setProfile, weather } = useVillagePreferences();
+  const { profile, setProfile, weather, t } = useVillagePreferences();
   const isRaining = weather.rain.toLowerCase().includes("rain now");
   const hasLiveWeather = weather.live && weather.temp !== null;
   const workWindow = !hasLiveWeather
@@ -57,8 +57,8 @@ function WeatherPage() {
 
   return (
     <PageLayout
-      title="Village Weather"
-      subtitle="Live current weather, rain status, and crop suggestions for the selected village."
+      title={t.weatherTitle}
+      subtitle={t.weatherSubtitle}
       icon={<CloudSun className="size-7" />}
     >
       <SectionHeader

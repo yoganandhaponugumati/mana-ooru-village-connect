@@ -71,11 +71,14 @@ const MEESEVA_SERVICES = [
   },
 ];
 
+import { useVillagePreferences } from "@/lib/village-preferences";
+
 function GovernmentPage() {
+  const { t } = useVillagePreferences();
   return (
     <PageLayout
-      title="Gram Panchayat & Govt Services (గ్రామ పంచాయతీ)"
-      subtitle="Panchayat officers, MeeSeva online certificates, land records, and Gram Sabha updates."
+      title={t.governmentTitle}
+      subtitle={t.governmentSubtitle}
       icon={<Building2 className="size-7 text-primary" />}
     >
       <div className="space-y-8">

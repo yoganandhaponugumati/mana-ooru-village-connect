@@ -102,7 +102,7 @@ function getSchemeImage(category: string, title: string): string {
 }
 
 function SchemesPage() {
-  const { profile } = useVillagePreferences();
+  const { profile, t } = useVillagePreferences();
   const [selectedProfile, setSelectedProfile] = useState<string>("all");
 
   const filterScheme = (cat: string, title: string, desc: string) => {
@@ -125,8 +125,8 @@ function SchemesPage() {
 
   return (
     <PageLayout
-      title="Government Schemes Matcher & Assistant"
-      subtitle="Interactive profile matching with required document checklists and direct application assistance."
+      title={t.schemesTitle}
+      subtitle={t.schemesSubtitle}
       icon={<Landmark className="size-7 text-primary" />}
     >
       {/* Live sync banner */}

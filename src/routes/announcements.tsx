@@ -47,6 +47,7 @@ function AnnPage() {
   const [activeTab, setActiveTab] = useState<"notices" | "sarpanch_works">("notices");
 
   // Notice board data
+  const { t } = useVillagePreferences();
   const { items, remove, update } = useListings("announcement");
   const { user, role } = useAuth();
   const displayItems =
@@ -171,8 +172,8 @@ function AnnPage() {
 
   return (
     <PageLayout
-      title="Village Notice Board & Sarpanch Pragati"
-      subtitle="Public Panchayat announcements, urgent civic alerts, and transparent tracking of all Sarpanch development works."
+      title={t.noticesTitle}
+      subtitle={t.noticesSubtitle}
       icon={<Megaphone className="size-6 text-primary" />}
       heroAction={
         <div className="flex flex-wrap items-center justify-center gap-3">
