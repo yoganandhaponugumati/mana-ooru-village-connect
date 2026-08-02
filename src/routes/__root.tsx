@@ -131,17 +131,28 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "stylesheet",
         href: appCss,
       },
+      // Preconnect to critical third-party origins
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "preconnect", href: "https://images.pexels.com" },
+      { rel: "dns-prefetch", href: "https://images.pexels.com" },
+      { rel: "dns-prefetch", href: "https://storage.googleapis.com" },
+      // Preload the LCP hero image so the browser discovers it ASAP
       {
         rel: "preload",
-        as: "style",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap",
+        as: "image",
+        href: "/village-life-bg.webp",
+        // @ts-ignore
+        fetchpriority: "high",
+        type: "image/webp",
       },
+      // Non-render-blocking font load: load as print, then swap to all
+      // This avoids the 650ms render-blocking penalty from Google Fonts
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap",
+        media: "print",
+        // @ts-ignore
+        onload: "this.media='all'",
       },
     ],
   }),

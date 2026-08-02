@@ -511,11 +511,16 @@ function HeroVillageOSCard({
         {/* Embedded Animated Village Feed Strip (Sleek and clear preview inside the hero right card!) */}
         <div className="mt-4 relative rounded-2xl overflow-hidden border border-white/15 bg-black h-36 sm:h-40 group shadow-inner">
           {/* Real Sunrise Village Photo with continuous Ken-Burns style slow zoom and pan */}
-          <img
-            src="/village-life-bg.jpg"
-            alt="Live Village Feed"
-            className="absolute inset-0 h-full w-full object-cover brightness-105 contrast-108 animate-[pulse_6s_ease-in-out_infinite] scale-110 transition-transform duration-[8000ms] group-hover:scale-100"
-          />
+          <picture>
+            <source srcSet="/village-life-bg.webp" type="image/webp" />
+            <img
+              src="/village-life-bg.jpg"
+              alt="Live Village Feed"
+              loading="lazy"
+              decoding="async"
+              className="absolute inset-0 h-full w-full object-cover brightness-105 contrast-108 animate-[pulse_6s_ease-in-out_infinite] scale-110 transition-transform duration-[8000ms] group-hover:scale-100"
+            />
+          </picture>
 
           {/* Animated Shimmer Overlays across the real photo stream */}
           <div className="absolute bottom-[10%] right-[10%] w-1/2 h-5 bg-gradient-to-r from-transparent via-cyan-400/45 to-transparent skew-x-12 blur-[2px] animate-shimmer pointer-events-none" />
@@ -630,13 +635,16 @@ function Index() {
       {/* Desktop Hero - Hidden on mobile */}
       <header className="hidden md:block relative min-h-screen overflow-hidden bg-zinc-950 border-b border-emerald-500/30">
         {/* Full-Screen Animated Village Photo Background */}
-        <img
-          src="/village-life-bg.jpg"
-          alt="Beautiful Indian village with green fields at sunrise"
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 z-0 h-full w-full object-cover opacity-55 scale-105 animate-pulse-subtle"
-        />
+        <picture>
+          <source srcSet="/village-life-bg.webp" type="image/webp" />
+          <img
+            src="/village-life-bg.jpg"
+            alt="Beautiful Indian village with green fields at sunrise"
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-0 z-0 h-full w-full object-cover opacity-55 scale-105 animate-pulse-subtle"
+          />
+        </picture>
 
         {/* Layered Animations (Shimmering river water, drifting breeze across crops, pulsing sunrise light) */}
         <div className="absolute bottom-[10%] right-[15%] w-1/3 h-16 bg-gradient-to-r from-transparent via-cyan-400/35 to-transparent skew-x-12 blur-md animate-shimmer pointer-events-none z-1" />
@@ -879,11 +887,16 @@ function Index() {
 
         {/* Mobile Top Image Banner */}
         <div className="mb-6 mt-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
-          <img
-            src="/village-life-bg.jpg"
-            alt="Village"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
+          <picture>
+            <source srcSet="/village-life-bg.webp" type="image/webp" />
+            <img
+              src="/village-life-bg.jpg"
+              alt="Village"
+              fetchPriority="high"
+              decoding="async"
+              className="absolute inset-0 w-full h-full object-cover"
+            />
+          </picture>
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <div className="absolute bottom-4 left-5 right-5 text-white">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow-sm">
@@ -926,14 +939,8 @@ function Index() {
             {/* Card 1 — Sarpanch / Contact */}
             <Link
               to="/emergency"
-              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
+              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden bg-gradient-to-br from-amber-500 to-yellow-600"
             >
-              <div className="absolute inset-0 bg-[#eab308]/90 mix-blend-multiply z-10" />
-              <img
-                src="/village-life-bg.jpg"
-                className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700"
-                alt=""
-              />
               <div className="relative z-20 flex items-center gap-2 mb-1.5">
                 <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <UserRound className="size-4" />
@@ -952,14 +959,8 @@ function Index() {
             {/* Card 2 — Report Problem */}
             <Link
               to="/problems"
-              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
+              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden bg-gradient-to-br from-red-500 to-rose-700"
             >
-              <div className="absolute inset-0 bg-[#ef4444]/90 mix-blend-multiply z-10" />
-              <img
-                src="/village-life-bg.jpg"
-                className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700"
-                alt=""
-              />
               <div className="relative z-20 flex items-center gap-2 mb-1.5">
                 <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <AlertTriangle className="size-4" />
@@ -978,14 +979,8 @@ function Index() {
             {/* Card 3 — Government Schemes */}
             <Link
               to="/schemes"
-              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
+              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden bg-gradient-to-br from-emerald-700 to-teal-800"
             >
-              <div className="absolute inset-0 bg-[#065f46]/90 mix-blend-multiply z-10" />
-              <img
-                src="/village-life-bg.jpg"
-                className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700"
-                alt=""
-              />
               <div className="relative z-20 flex items-center gap-2 mb-1.5">
                 <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <Landmark className="size-4" />
@@ -1004,14 +999,8 @@ function Index() {
             {/* Card 4 — Post Notice */}
             <Link
               to="/announcements"
-              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
+              className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden bg-gradient-to-br from-blue-500 to-indigo-600"
             >
-              <div className="absolute inset-0 bg-[#3b82f6]/90 mix-blend-multiply z-10" />
-              <img
-                src="/village-life-bg.jpg"
-                className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700"
-                alt=""
-              />
               <div className="relative z-20 flex items-center gap-2 mb-1.5">
                 <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <Megaphone className="size-4" />
