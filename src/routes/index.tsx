@@ -1,7 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState, type FormEvent } from "react";
+import { useEffect, useState, lazy, Suspense, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { useListingStats, timeAgo } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
@@ -43,13 +42,24 @@ import {
   Mic,
 } from "lucide-react";
 import { SiteNav } from "@/components/SiteNav";
-import { VillageStories } from "@/components/VillageStories";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
-import { ConceptShowcase } from "@/components/ConceptShowcase";
-import { VideoGuideModal } from "@/components/VideoGuideModal";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
+
+// Lazy-loaded heavy components — these pull in framer-motion (361KB) so they
+// must NOT be in the critical JS bundle that blocks the first paint.
+const VillageStories = lazy(() =>
+  import("@/components/VillageStories").then((m) => ({ default: m.VillageStories }))
+);
+const VideoGuideModal = lazy(() =>
+  import("@/components/VideoGuideModal").then((m) => ({ default: m.VideoGuideModal }))
+);
+const ConceptShowcase = lazy(() =>
+  import("@/components/ConceptShowcase").then((m) => ({ default: m.ConceptShowcase }))
+);
+// motion and AnimatePresence imported lazily inside components that need them
+import { AnimatePresence, motion } from "framer-motion";
 
 /**
  * Route definition for the Homepage (/).
@@ -630,7 +640,9 @@ function Index() {
   };
   return (
     <main id="main-content" className="village-site-bg min-h-screen text-foreground">
-      <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
+      <Suspense fallback={null}>
+        <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
+      </Suspense>
 
       {/* Desktop Hero - Hidden on mobile */}
       <header className="hidden md:block relative min-h-screen overflow-hidden bg-zinc-950 border-b border-emerald-500/30">
@@ -670,33 +682,24 @@ function Index() {
               )}
             </div>
 
-            <motion.h1
-              initial={{ opacity: 0, y: 22 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.55, delay: 0.08, ease: [0.32, 0.72, 0, 1] }}
-              className="max-w-4xl text-balance font-display text-2xl sm:text-5xl lg:text-6xl font-black leading-tight text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.58)]"
+            <h1
+              className="max-w-4xl text-balance font-display text-2xl sm:text-5xl lg:text-6xl font-black leading-tight text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.58)] animate-[fadeInUp_0.55s_0.08s_both]"
             >
               Smart{" "}
               <span className="bg-gradient-to-r from-emerald-400 via-teal-200 to-amber-300 bg-clip-text text-transparent">
                 Digital Village
               </span>
-            </motion.h1>
+            </h1>
 
-            <motion.p
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.16, ease: "easeOut" }}
-              className="mt-5 max-w-2xl text-pretty text-sm sm:text-lg font-semibold leading-relaxed text-zinc-200/90"
+            <p
+              className="mt-5 max-w-2xl text-pretty text-sm sm:text-lg font-semibold leading-relaxed text-zinc-200/90 animate-[fadeInUp_0.5s_0.16s_both]"
             >
               {heroSubtitle}
-            </motion.p>
+            </p>
 
-            <motion.form
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.24, ease: "easeOut" }}
+            <form
               onSubmit={submitSearch}
-              className="mt-8 w-full max-w-2xl"
+              className="mt-8 w-full max-w-2xl animate-[fadeInUp_0.5s_0.24s_both]"
             >
               <div className="group flex items-center gap-2 rounded-[24px] border border-white/22 bg-white/92 p-2 shadow-[0_34px_110px_-42px_rgba(0,0,0,0.72)] backdrop-blur-2xl transition focus-within:ring-4 focus-within:ring-secondary/25">
                 <div className="grid size-12 place-items-center rounded-2xl bg-primary/10 text-primary">
@@ -745,13 +748,10 @@ function Index() {
                   </button>
                 ))}
               </div>
-            </motion.form>
+            </form>
 
-            <motion.div
-              initial={{ opacity: 0, y: 18 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.32, ease: "easeOut" }}
-              className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4"
+            <div
+              className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 animate-[fadeInUp_0.5s_0.32s_both]"
             >
               <Link
                 to="/timeline"
@@ -760,7 +760,7 @@ function Index() {
                 <Compass className="size-5" /> {t.explore}
               </Link>
               <HeroFeatureCarousel />
-            </motion.div>
+            </div>
 
             {!hasRealActivity && (
               <p className="mt-8 max-w-xl rounded-2xl border border-white/14 bg-white/10 px-4 py-3 text-sm font-semibold text-white/78 backdrop-blur-xl">
@@ -779,11 +779,8 @@ function Index() {
 
         {/* FULL-WIDTH HERO SHOWCASE CARD SPANNING 100% CONTAINER WIDTH BELOW THE MAIN HERO FOLD */}
         <div className="relative z-20 mx-auto max-w-7xl px-4 pb-20 pt-4 sm:px-6">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full rounded-3xl border-2 border-emerald-400/60 bg-gradient-to-br from-emerald-950/95 via-teal-950/90 to-emerald-900/95 p-6 sm:p-7 text-white shadow-[0_0_60px_rgba(16,185,129,0.35)] backdrop-blur-2xl ring-1 ring-emerald-400/30 overflow-hidden relative"
+          <div
+            className="w-full rounded-3xl border-2 border-emerald-400/60 bg-gradient-to-br from-emerald-950/95 via-teal-950/90 to-emerald-900/95 p-6 sm:p-7 text-white shadow-[0_0_60px_rgba(16,185,129,0.35)] backdrop-blur-2xl ring-1 ring-emerald-400/30 overflow-hidden relative animate-[fadeInUp_0.5s_0.2s_both]"
           >
             {/* Glow Accents */}
             <div className="pointer-events-none absolute -right-12 -top-12 size-64 rounded-full bg-emerald-500/20 blur-3xl" />
@@ -873,7 +870,7 @@ function Index() {
                 </div>
               </div>
             </div>
-          </motion.div>
+          </div>
         </div>
       </header>
 
@@ -883,7 +880,9 @@ function Index() {
           📱 MOBILE HOME DASHBOARD — The new app-style section
       ════════════════════════════════════════════════════════════════════ */}
       <section className="relative z-30 mx-auto pt-20 max-w-7xl px-4 sm:px-6 md:hidden">
-        <VillageStories />
+        <Suspense fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
+          <VillageStories />
+        </Suspense>
 
         {/* Mobile Top Image Banner */}
         <div className="mb-6 mt-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
