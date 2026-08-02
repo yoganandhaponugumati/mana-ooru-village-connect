@@ -126,6 +126,8 @@ export default defineConfig({
         injectRegister: "auto",
         workbox: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,webp,json}"],
+          navigateFallback: "/offline.html",
+          navigateFallbackDenylist: [/^\/api/],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

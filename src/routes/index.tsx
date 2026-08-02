@@ -59,7 +59,6 @@ const ConceptShowcase = lazy(() =>
   import("@/components/ConceptShowcase").then((m) => ({ default: m.ConceptShowcase }))
 );
 // motion and AnimatePresence imported lazily inside components that need them
-import { AnimatePresence, motion } from "framer-motion";
 
 /**
  * Route definition for the Homepage (/).

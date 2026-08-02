@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   X,
   ShieldCheck,
@@ -129,11 +128,7 @@ export function VillageStories() {
     triggerHaptic("light");
   };
 
-  const isAdmin =
-    role === "village_admin" ||
-    role === "super_admin" ||
-    (role as string) === "platform_admin" ||
-    profile?.designation === "Sarpanch";
+  const canPostStory = Boolean(user);
 
   const compressImage = (file: File): Promise<File> =>
     new Promise((resolve) => {
@@ -313,7 +308,7 @@ export function VillageStories() {
     const optimisticStory = {
       id: tempId,
       author: profile?.full_name || profile?.designation || role || "Official",
-      avatarUrl: profile?.photo_url || "https://i.pravatar.cc/150?img=11",
+      avatarUrl: profile?.photo_url || "/site-icon.png",
       mediaUrl: localBlobUrl,
       mediaType: isVideo ? ("video" as const) : ("image" as const),
       caption: caption || "New village update",
@@ -436,8 +431,8 @@ export function VillageStories() {
     <div className="w-full bg-transparent pb-4 pt-2">
       {/* Scrollable Avatars */}
       <div className="flex gap-4 overflow-x-auto px-4 sm:px-6 no-scrollbar snap-x items-start">
-        {/* Admin Post Button */}
-        {isAdmin && (
+        {/* Story Upload Button */}
+        {canPostStory && (
           <div className="snap-start flex flex-col items-center gap-1 shrink-0">
             <button
               onClick={() => fileInputRef.current?.click()}

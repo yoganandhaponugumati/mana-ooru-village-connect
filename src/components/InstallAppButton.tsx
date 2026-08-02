@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { Download, Smartphone, X, Check, Share } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -140,22 +139,16 @@ export function InstallAppButton({
       )}
 
       {/* Installation Guide Modal */}
-      <AnimatePresence>
-        {showGuideModal && (
-          <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-white dark:bg-zinc-950 p-6 text-foreground shadow-2xl"
+      {showGuideModal && (
+        <div className="fixed inset-0 z-[100000] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-sm overflow-hidden rounded-3xl border border-border bg-white dark:bg-zinc-950 p-6 text-foreground shadow-2xl animate-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={() => setShowGuideModal(false)}
+              className="absolute top-4 right-4 grid size-8 place-items-center rounded-full bg-muted text-muted-foreground hover:bg-muted/80 transition"
             >
-              <button
-                type="button"
-                onClick={() => setShowGuideModal(false)}
-                className="absolute top-4 right-4 grid size-8 place-items-center rounded-full bg-muted text-muted-foreground hover:bg-muted/80"
-              >
-                <X className="size-4" />
-              </button>
+              <X className="size-4" />
+            </button>
 
               <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary">
                 <Smartphone className="size-7" />
@@ -220,10 +213,9 @@ export function InstallAppButton({
               >
                 Got It / సరే
               </button>
-            </motion.div>
           </div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </>
   );
 }

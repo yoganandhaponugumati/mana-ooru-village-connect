@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
-import { motion, useMotionValue, useTransform } from "framer-motion";
 import { ArrowRight, Loader2 } from "lucide-react";
-import { type ButtonHTMLAttributes, type HTMLAttributes, type ReactNode, useRef } from "react";
+import { type ButtonHTMLAttributes, type HTMLAttributes, type ReactNode } from "react";
 import clsx from "clsx";
 
 type Variant = "primary" | "secondary" | "ghost";
@@ -74,7 +73,7 @@ export function AppLinkButton({
   to: string;
 }) {
   return (
-    <motion.div whileTap={{ scale: 0.98 }} className="inline-flex">
+    <div className="inline-flex active:scale-95 transition-transform duration-150">
       <Link
         to={to}
         className={clsx(
@@ -88,7 +87,7 @@ export function AppLinkButton({
         {children}
         {icon && iconPosition === "right" && <span>{icon}</span>}
       </Link>
-    </motion.div>
+    </div>
   );
 }
 
@@ -104,22 +103,17 @@ type SurfaceCardProps = Omit<
 
 export function SurfaceCard({ children, className, hover = true, ...props }: SurfaceCardProps) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, amount: 0.2 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
-      whileHover={hover ? { y: -5 } : undefined}
+    <div
       className={clsx(
         "premium-surface rounded-[22px]",
         hover &&
-          "transition-all duration-300 hover:border-primary/20 hover:shadow-[var(--shadow-lift)]",
+          "transition-all duration-300 hover:border-primary/20 hover:shadow-[var(--shadow-lift)] hover:-translate-y-1",
         className,
       )}
       {...props}
     >
       {children}
-    </motion.div>
+    </div>
   );
 }
 
@@ -178,13 +172,9 @@ export function EmptyState({
   className?: string;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 14, scale: 0.98 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      viewport={{ once: true, amount: 0.25 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
+    <div
       className={clsx(
-        "relative overflow-hidden rounded-[28px] border border-dashed border-primary/25 bg-gradient-to-br from-card/95 via-background to-muted/60 p-10 text-center shadow-[var(--shadow-soft)]",
+        "relative overflow-hidden rounded-[28px] border border-dashed border-primary/25 bg-gradient-to-br from-card/95 via-background to-muted/60 p-10 text-center shadow-[var(--shadow-soft)] animate-fade-up",
         className,
       )}
     >
@@ -200,7 +190,7 @@ export function EmptyState({
         </p>
       )}
       {action && <div className="relative mt-6 flex justify-center">{action}</div>}
-    </motion.div>
+    </div>
   );
 }
 
@@ -212,7 +202,7 @@ export function SkeletonCard({ count = 3 }: { count?: number }) {
           <div className="h-3 w-20 animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
           <div className="mt-4 h-5 w-3/4 animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
           <div className="mt-3 h-3 w-full animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
-          <div className="mt-2 h-3 w-5/6 animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
+          <div className="mt-2 h-5/6 animate-pulse rounded-full bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
           <div className="mt-6 h-10 animate-pulse rounded-2xl bg-gradient-to-r from-muted via-card to-muted bg-[length:200%_100%] [animation:shimmer_1.8s_linear_infinite]" />
         </div>
       ))}
@@ -258,15 +248,14 @@ export function SectionPill({ icon, label }: { icon?: ReactNode; label: string }
 
 export function FeatureIcon({ icon, className }: { icon: ReactNode; className?: string }) {
   return (
-    <motion.div
-      whileHover={{ scale: 1.04, rotate: -1 }}
+    <div
       className={clsx(
-        "grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-primary/12 to-secondary/12 text-primary shadow-sm ring-1 ring-primary/10",
+        "grid size-12 place-items-center rounded-2xl bg-gradient-to-br from-primary/12 to-secondary/12 text-primary shadow-sm ring-1 ring-primary/10 transition-transform duration-200 hover:scale-105",
         className,
       )}
     >
       {icon}
-    </motion.div>
+    </div>
   );
 }
 
@@ -294,70 +283,19 @@ export function InlineAction({
 export function Card3D({
   children,
   className,
-  intensity = 12,
 }: {
   children: ReactNode;
   className?: string;
   intensity?: number;
 }) {
-  const cardRef = useRef<HTMLDivElement>(null);
-  const x = useMotionValue(0.5);
-  const y = useMotionValue(0.5);
-
-  const rotateX = useTransform(y, [0, 1], [intensity, -intensity]);
-  const rotateY = useTransform(x, [0, 1], [-intensity, intensity]);
-
-  const shineX = useTransform(x, [0, 1], ["0%", "100%"]);
-  const shineY = useTransform(y, [0, 1], ["0%", "100%"]);
-
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const width = rect.width;
-    const height = rect.height;
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-
-    x.set(mouseX / width);
-    y.set(mouseY / height);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0.5);
-    y.set(0.5);
-  };
-
   return (
     <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ perspective: 1000 }}
-      className={clsx("relative", className)}
+      className={clsx(
+        "relative transition-all duration-300 hover:-translate-y-1 hover:shadow-lg",
+        className,
+      )}
     >
-      <motion.div
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-        }}
-        transition={{ type: "spring", stiffness: 350, damping: 25 }}
-        className="relative h-full w-full"
-      >
-        <motion.div
-          style={
-            {
-              background:
-                "radial-gradient(circle at var(--shine-x, 50%) var(--shine-y, 50%), rgba(255,255,255,0.15) 0%, transparent 60%)",
-              "--shine-x": shineX,
-              "--shine-y": shineY,
-              transform: "translateZ(1px)",
-            } as React.CSSProperties & Record<string, unknown>
-          }
-          className="pointer-events-none absolute inset-0 z-10 rounded-[inherit]"
-        />
-        {children}
-      </motion.div>
+      {children}
     </div>
   );
 }
@@ -500,4 +438,3 @@ export function ListingSkeletonGrid({ count = 4 }: { count?: number }) {
     </div>
   );
 }
-
