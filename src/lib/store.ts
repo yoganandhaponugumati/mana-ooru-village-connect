@@ -7,6 +7,7 @@ import {
   sendDirectUserPushNotification,
   sendNewPostPushNotifications,
 } from "@/lib/api/notification.functions";
+import { showInstantPushNotification } from "@/lib/push-notifications";
 
 /**
  * ListingType defines the primary category of a user-generated post or official record.
@@ -208,21 +209,36 @@ export function useListings(type?: ListingType) {
             service: "🚜 New Service",
           };
           const titleText = typeLabels[item.type] || `📌 New Post: ${item.title}`;
-          const notifRows = villagers
-            .filter((v: any) => v.id !== user?.id)
-            .map((v: any) => ({
-              recipient_id: v.id,
-              created_by: user?.id || null,
-              village_id: villageId || null,
-              title: titleText,
-              body: `"${item.title}" - Tap to open and view details.`,
-              type: `post_${item.type}`,
-              action_url: item.type === "complaint" ? "/problems" : "/timeline",
-            }));
+          const actionUrl = item.type === "complaint" ? "/problems" : item.type === "announcement" ? "/announcements" : "/timeline";
+
+          // Insert notification for all villagers
+          const notifRows = (villagers || []).map((v: any) => ({
+            recipient_id: v.id,
+            created_by: user?.id || null,
+            village_id: villageId || null,
+            title: titleText,
+            body: `"${item.title}" - Tap to open and view details.`,
+            type: `post_${item.type}`,
+            action_url: actionUrl,
+          }));
 
           if (notifRows.length > 0) {
             await (supabase as any).from("notifications").insert(notifRows);
           }
+
+          // Trigger immediate local HTML5 system push notification & toast
+          showInstantPushNotification({
+            title: titleText,
+            body: `Posted: "${item.title}". Tap to view in app.`,
+            actionUrl,
+          });
+        } else {
+          // Even if no other villagers registered yet, trigger instant notification for creator
+          showInstantPushNotification({
+            title: `📌 GramMitra Post Published`,
+            body: `Your post "${item.title}" is live!`,
+            actionUrl: item.type === "complaint" ? "/problems" : "/timeline",
+          });
         }
       } catch (notifErr) {
         console.warn("[store] Post notification insert warning:", notifErr);

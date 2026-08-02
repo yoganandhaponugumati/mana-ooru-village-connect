@@ -21,6 +21,7 @@ import {
 import { useRef, useState, type FormEvent } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
+import { showInstantPushNotification } from "@/lib/push-notifications";
 import {
   AppButton,
   EmptyState,
@@ -106,6 +107,11 @@ function AnnPage() {
     setSubmittingWork(true);
     try {
       await createWork({ ...workValues, photos: workPhotos });
+      showInstantPushNotification({
+        title: "📢 Gram Panchayat Notice Published",
+        body: `"${workValues.title}" — Tap to read official announcement.`,
+        actionUrl: "/announcements",
+      });
       toast.success("Sarpanch work update published publicly!");
       setWorkValues({
         title: "",

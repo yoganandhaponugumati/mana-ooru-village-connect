@@ -159,13 +159,13 @@ export function useBrowserPushNotifications() {
             try {
               new Notification(notification.title, {
                 body: notification.body,
-                icon: "/site-icon.svg",
+                icon: "/site-icon.png",
               });
             } catch {
               navigator.serviceWorker?.getRegistration()?.then((registration) => {
                 registration?.showNotification(notification.title ?? "GramMitra • Village Alert", {
                   body: notification.body,
-                  icon: "/site-icon.svg",
+                  icon: "/site-icon.png",
                 } as any);
               });
             }
@@ -179,3 +179,73 @@ export function useBrowserPushNotifications() {
     };
   }, [user]);
 }
+
+/**
+ * Triggers an immediate browser push & toast notification for newly created posts/complaints/notices.
+ * Ensures the creator and active users receive instant feedback even on single-user test environments.
+ */
+export function showInstantPushNotification(options: {
+  title: string;
+  body: string;
+  actionUrl?: string;
+  icon?: string;
+}) {
+  const { title, body, actionUrl = "/", icon = "/site-icon.png" } = options;
+
+  // 1. Toast alert notification
+  toast.success(title, {
+    description: body,
+    duration: 6000,
+    action: {
+      label: "View Post",
+      onClick: () => {
+        if (typeof window !== "undefined") {
+          window.location.assign(actionUrl);
+        }
+      },
+    },
+  });
+
+  // 2. Mobile Haptic Vibration
+  if (typeof navigator !== "undefined" && "vibrate" in navigator) {
+    try {
+      navigator.vibrate([100, 50, 100]);
+    } catch {
+      // Haptic fallback
+    }
+  }
+
+  // 3. System HTML5 Push Notification
+  if (typeof window !== "undefined" && "Notification" in window) {
+    if (Notification.permission === "granted") {
+      try {
+        new Notification(title, {
+          body,
+          icon,
+          badge: "/notification-badge.svg",
+          data: { url: actionUrl },
+        });
+      } catch {
+        navigator.serviceWorker?.getRegistration()?.then((registration) => {
+          registration?.showNotification(title, {
+            body,
+            icon,
+            badge: "/notification-badge.svg",
+            data: { url: actionUrl },
+          } as any);
+        });
+      }
+    } else if (Notification.permission !== "denied") {
+      void Notification.requestPermission().then((perm) => {
+        if (perm === "granted") {
+          try {
+            new Notification(title, { body, icon });
+          } catch {
+            // Ignore
+          }
+        }
+      });
+    }
+  }
+}
+
