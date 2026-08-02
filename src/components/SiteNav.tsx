@@ -58,6 +58,7 @@ const navLinks = [
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const [postMenuOpen, setPostMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -85,6 +86,11 @@ export function SiteNav() {
     setOpen(false);
     setPostMenuOpen(false);
   }, [location.pathname]);
+
+  // Set isMounted on client
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -515,7 +521,7 @@ export function SiteNav() {
         </div>
 
         {/* ── Mobile / Tablet Drawer (Portaled to document.body) ── */}
-        {typeof document !== "undefined" &&
+        {isMounted && typeof document !== "undefined" &&
           createPortal(
             <AnimatePresence>
               {open && (
