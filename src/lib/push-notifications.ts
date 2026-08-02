@@ -182,9 +182,9 @@ export function useBrowserPushNotifications() {
 
 /**
  * Triggers an immediate browser push & toast notification for newly created posts/complaints/notices.
- * Ensures the creator and active users receive instant feedback even on single-user test environments.
+ * Uses ServiceWorkerRegistration.showNotification for 100% Android Chrome, PWA & Desktop compatibility.
  */
-export function showInstantPushNotification(options: {
+export async function showInstantPushNotification(options: {
   title: string;
   body: string;
   actionUrl?: string;
@@ -192,7 +192,7 @@ export function showInstantPushNotification(options: {
 }) {
   const { title, body, actionUrl = "/", icon = "/site-icon.png" } = options;
 
-  // 1. Toast alert notification
+  // 1. Toast alert notification inside app
   toast.success(title, {
     description: body,
     duration: 6000,
@@ -209,43 +209,69 @@ export function showInstantPushNotification(options: {
   // 2. Mobile Haptic Vibration
   if (typeof navigator !== "undefined" && "vibrate" in navigator) {
     try {
-      navigator.vibrate([100, 50, 100]);
+      navigator.vibrate([200, 100, 200]);
     } catch {
       // Haptic fallback
     }
   }
 
-  // 3. System HTML5 Push Notification
-  if (typeof window !== "undefined" && "Notification" in window) {
-    if (Notification.permission === "granted") {
-      try {
-        new Notification(title, {
+  // 3. Mobile Android & Desktop Native System Push Notification
+  if (typeof window === "undefined" || !("Notification" in window)) return;
+
+  const triggerServiceWorkerNotification = async () => {
+    try {
+      let reg: ServiceWorkerRegistration | undefined;
+      if ("serviceWorker" in navigator) {
+        reg = await navigator.serviceWorker.ready.catch(() => undefined);
+        if (!reg) {
+          reg = await navigator.serviceWorker.getRegistration().catch(() => undefined);
+        }
+        if (!reg) {
+          reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/" }).catch(() => undefined);
+        }
+      }
+
+      if (reg && "showNotification" in reg) {
+        await reg.showNotification(title, {
           body,
           icon,
           badge: "/notification-badge.svg",
           data: { url: actionUrl },
-        });
-      } catch {
-        navigator.serviceWorker?.getRegistration()?.then((registration) => {
-          registration?.showNotification(title, {
-            body,
-            icon,
-            badge: "/notification-badge.svg",
-            data: { url: actionUrl },
-          } as any);
-        });
+          vibrate: [200, 100, 200],
+          tag: `post_${Date.now()}`,
+          renotify: true,
+        } as any);
+        return;
       }
-    } else if (Notification.permission !== "denied") {
-      void Notification.requestPermission().then((perm) => {
-        if (perm === "granted") {
-          try {
-            new Notification(title, { body, icon });
-          } catch {
-            // Ignore
-          }
-        }
+    } catch (swErr) {
+      console.warn("[Push] Service Worker showNotification failed:", swErr);
+    }
+
+    // Standard Desktop browser fallback
+    try {
+      new Notification(title, {
+        body,
+        icon,
+        badge: "/notification-badge.svg",
+        data: { url: actionUrl },
       });
+    } catch (err) {
+      console.warn("[Push] Standard Notification API fallback failed:", err);
+    }
+  };
+
+  if (Notification.permission === "granted") {
+    await triggerServiceWorkerNotification();
+  } else if (Notification.permission !== "denied") {
+    try {
+      const perm = await Notification.requestPermission();
+      if (perm === "granted") {
+        await triggerServiceWorkerNotification();
+      }
+    } catch (permErr) {
+      console.warn("[Push] Permission request error:", permErr);
     }
   }
 }
+
 
