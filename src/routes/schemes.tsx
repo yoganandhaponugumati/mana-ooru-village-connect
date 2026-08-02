@@ -17,53 +17,89 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
-import {
-  SectionHeader,
-  SurfaceCard,
-} from "@/components/design-system";
+import { SectionHeader, SurfaceCard } from "@/components/design-system";
 import { citizenServices, schemes } from "@/lib/app-data";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/schemes")({
-  head: () => ({ meta: [{ title: "Government Schemes Matcher & Assistant — DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Government Schemes Matcher & Assistant — GramMitra" }] }),
   component: SchemesPage,
 });
 
 const PROFILE_CHIPS = [
-  { id: "all", label: "All Schemes", icon: Sparkles, img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=200&q=70&auto=format&fit=crop" },
-  { id: "agriculture", label: "Farmers & Agriculture", icon: Tractor, img: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=200&q=70&auto=format&fit=crop" },
-  { id: "women", label: "Women & SHGs", icon: Heart, img: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=200&q=70&auto=format&fit=crop" },
-  { id: "education", label: "Students & Youth", icon: GraduationCap, img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&q=70&auto=format&fit=crop" },
-  { id: "housing", label: "Housing & Loans", icon: Home, img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=200&q=70&auto=format&fit=crop" },
-  { id: "pension", label: "Seniors & Pensions", icon: Users, img: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=200&q=70&auto=format&fit=crop" },
+  {
+    id: "all",
+    label: "All Schemes",
+    icon: Sparkles,
+    img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=200&q=70&auto=format&fit=crop",
+  },
+  {
+    id: "agriculture",
+    label: "Farmers & Agriculture",
+    icon: Tractor,
+    img: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=200&q=70&auto=format&fit=crop",
+  },
+  {
+    id: "women",
+    label: "Women & SHGs",
+    icon: Heart,
+    img: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=200&q=70&auto=format&fit=crop",
+  },
+  {
+    id: "education",
+    label: "Students & Youth",
+    icon: GraduationCap,
+    img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&q=70&auto=format&fit=crop",
+  },
+  {
+    id: "housing",
+    label: "Housing & Loans",
+    icon: Home,
+    img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=200&q=70&auto=format&fit=crop",
+  },
+  {
+    id: "pension",
+    label: "Seniors & Pensions",
+    icon: Users,
+    img: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=200&q=70&auto=format&fit=crop",
+  },
 ] as const;
 
 // Map scheme category to a relevant Unsplash image
 const SCHEME_CATEGORY_IMAGES: Record<string, string> = {
-  agriculture: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=70&auto=format&fit=crop",
-  farmers: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&q=70&auto=format&fit=crop",
-  women: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=400&q=70&auto=format&fit=crop",
-  education: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=70&auto=format&fit=crop",
-  housing: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=70&auto=format&fit=crop",
-  pension: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=70&auto=format&fit=crop",
-  health: "https://images.unsplash.com/photo-1588776814546-1ffbb043e5c8?w=400&q=70&auto=format&fit=crop",
-  general: "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&q=70&auto=format&fit=crop",
-  default: "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&q=70&auto=format&fit=crop",
+  agriculture:
+    "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=70&auto=format&fit=crop",
+  farmers:
+    "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&q=70&auto=format&fit=crop",
+  women:
+    "https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=400&q=70&auto=format&fit=crop",
+  education:
+    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=70&auto=format&fit=crop",
+  housing:
+    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=70&auto=format&fit=crop",
+  pension:
+    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=70&auto=format&fit=crop",
+  health:
+    "https://images.unsplash.com/photo-1588776814546-1ffbb043e5c8?w=400&q=70&auto=format&fit=crop",
+  general:
+    "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&q=70&auto=format&fit=crop",
+  default:
+    "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&q=70&auto=format&fit=crop",
 };
 
 function getSchemeImage(category: string, title: string): string {
   const cat = (category || "").toLowerCase();
   const ttl = (title || "").toLowerCase();
-  if (/tractor|farm|agri|crop|kisan|rythu|land|seed|harvest/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.agriculture;
+  if (/tractor|farm|agri|crop|kisan|rythu|land|seed|harvest/i.test(ttl))
+    return SCHEME_CATEGORY_IMAGES.agriculture;
   if (/women|mahila|shg|lakshmi|mother|kalyana/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.women;
   if (/house|awas|indiramma|home|shelter/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.housing;
-  if (/student|school|scholar|youth|vidya|skill/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.education;
+  if (/student|school|scholar|youth|vidya|skill/i.test(ttl))
+    return SCHEME_CATEGORY_IMAGES.education;
   if (/pension|senior|aasara|old age|widow/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.pension;
   if (/health|medical|hospital/i.test(ttl)) return SCHEME_CATEGORY_IMAGES.health;
   return SCHEME_CATEGORY_IMAGES[cat] || SCHEME_CATEGORY_IMAGES.default;
 }
-
-
 
 function SchemesPage() {
   const { profile } = useVillagePreferences();
@@ -105,12 +141,14 @@ function SchemesPage() {
               <span className="inline-flex size-2 rounded-full bg-emerald-500" />
             </div>
             <p className="text-xs text-clay dark:text-zinc-300 font-semibold mt-0.5">
-              Live link to DBT-Bharat & State welfare database. Auto-updated every time the government publishes new schemes or criteria.
+              Live link to DBT-Bharat & State welfare database. Auto-updated every time the
+              government publishes new schemes or criteria.
             </p>
           </div>
         </div>
         <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-3 py-1 text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-400 tracking-wider shrink-0 self-start sm:self-center">
-          Last Check: Today, {new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' })}
+          Last Check: Today,{" "}
+          {new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
         </span>
       </div>
 
@@ -167,43 +205,50 @@ function SchemesPage() {
             compact
             className="mt-8"
           />
-      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-        {citizenServices.map((service, index) => {
-          const Icon = [Fingerprint, FileText, SearchCheck, ShieldCheck][index % 4];
-          return (
-            <a
-              key={service.id}
-              href={service.apply}
-              target="_blank"
-              rel="noreferrer"
-              className="group relative flex items-start gap-4 rounded-[24px] border border-border/60 bg-white/60 p-4 transition-all hover:bg-white hover:shadow-xl hover:shadow-primary/5 dark:bg-zinc-900/50 dark:hover:bg-zinc-900"
-            >
-              <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-inner">
-                <Icon className="size-6 transition-transform group-hover:scale-110" strokeWidth={1.8} />
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-start justify-between gap-2">
-                   <div className="min-w-0 flex-1">
-                     <p className="font-display text-base font-bold text-clay dark:text-zinc-100 truncate">{service.title}</p>
-                     <p className="text-[10px] font-semibold text-secondary truncate">{service.category}</p>
-                   </div>
-                   <ExternalLink className="size-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
-                </div>
-                <p className="mt-1.5 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2 break-words whitespace-normal">
-                  {service.description}
-                </p>
-                <div className="mt-2.5 flex items-center gap-1.5 min-w-0 w-full overflow-hidden">
-                  <span className="inline-flex shrink-0 items-center rounded-full bg-secondary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-secondary">
-                    <FileText className="mr-1 size-2.5" /> Keep Ready
-                  </span>
-                  <span className="truncate min-w-0 flex-1 text-[10px] font-semibold text-muted-foreground">
-                    {service.documents.join(", ")}
-                  </span>
-                </div>
-              </div>
-            </a>
-            );
-          })}
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {citizenServices.map((service, index) => {
+              const Icon = [Fingerprint, FileText, SearchCheck, ShieldCheck][index % 4];
+              return (
+                <a
+                  key={service.id}
+                  href={service.apply}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="group relative flex items-start gap-4 rounded-[24px] border border-border/60 bg-white/60 p-4 transition-all hover:bg-white hover:shadow-xl hover:shadow-primary/5 dark:bg-zinc-900/50 dark:hover:bg-zinc-900"
+                >
+                  <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-inner">
+                    <Icon
+                      className="size-6 transition-transform group-hover:scale-110"
+                      strokeWidth={1.8}
+                    />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="min-w-0 flex-1">
+                        <p className="font-display text-base font-bold text-clay dark:text-zinc-100 truncate">
+                          {service.title}
+                        </p>
+                        <p className="text-[10px] font-semibold text-secondary truncate">
+                          {service.category}
+                        </p>
+                      </div>
+                      <ExternalLink className="size-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                    </div>
+                    <p className="mt-1.5 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2 break-words whitespace-normal">
+                      {service.description}
+                    </p>
+                    <div className="mt-2.5 flex items-center gap-1.5 min-w-0 w-full overflow-hidden">
+                      <span className="inline-flex shrink-0 items-center rounded-full bg-secondary/10 px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider text-secondary">
+                        <FileText className="mr-1 size-2.5" /> Keep Ready
+                      </span>
+                      <span className="truncate min-w-0 flex-1 text-[10px] font-semibold text-muted-foreground">
+                        {service.documents.join(", ")}
+                      </span>
+                    </div>
+                  </div>
+                </a>
+              );
+            })}
           </div>
         </>
       )}

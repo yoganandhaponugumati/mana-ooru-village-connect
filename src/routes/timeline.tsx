@@ -285,7 +285,7 @@ const filters = [
 const historyFilters = ["This Month", "Last Month", "Last Year"] as const;
 
 export const Route = createFileRoute("/timeline")({
-  head: () => ({ meta: [{ title: "Village Timeline - DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Village Timeline - GramMitra" }] }),
   component: () => (
     <ProtectedRoute>
       <TimelinePage />
@@ -405,7 +405,11 @@ function TimelinePage() {
   const [comments, setComments] = useState<Record<string, string[]>>({});
   const [liked, setLiked] = useState<Record<string, boolean>>({});
   const villageName = authProfile?.village || profile.village || "";
-  const isAdmin = role === "village_admin" || role === "super_admin" || (role as string) === "platform_admin" || authProfile?.designation === "Sarpanch";
+  const isAdmin =
+    role === "village_admin" ||
+    role === "super_admin" ||
+    (role as string) === "platform_admin" ||
+    authProfile?.designation === "Sarpanch";
   const isSuperAdmin = role === "super_admin";
   const activeVillageId = authProfile?.village_id;
 
@@ -470,7 +474,7 @@ function TimelinePage() {
         title: `${listingVerb(item, type)}: ${item.title}`,
         body: item.description || item.category || "New village activity was posted.",
         village: item.location || villageName || "Your village",
-        author: item.owner_id ? "Village member" : "DigiMitra demo",
+        author: item.owner_id ? "Village member" : "GramMitra demo",
         createdAt: item.createdAt,
         href:
           item.type === "announcement"
@@ -521,7 +525,7 @@ function TimelinePage() {
                 : "Live weather updated",
               body: `${weather.condition}. ${weather.rain}. Temperature ${weather.temp ?? "--"}°C.`,
               village: villageName,
-              author: "DigiMitra Weather",
+              author: "GramMitra Weather",
               createdAt: Date.now(),
               href: "/weather",
               isEmergency: /heavy|thunder|storm/i.test(`${weather.condition} ${weather.rain}`),
@@ -590,18 +594,25 @@ function TimelinePage() {
 
   const handleDelete = async (id: string, sourceTable?: string, sourceId?: string) => {
     if (!window.confirm("Are you sure you want to delete this post?")) return;
-    
+
     // Fallback: If it's a direct timeline_activities row without a source_table, or we have the source.
     const tableToDeleteFrom = sourceTable || "timeline_activities";
     const idToDelete = sourceId || id;
-    
+
     toast.promise(
       async () => {
-        const { error } = await supabase.from(tableToDeleteFrom as any).delete().eq("id", idToDelete);
+        const { error } = await supabase
+          .from(tableToDeleteFrom as any)
+          .delete()
+          .eq("id", idToDelete);
         if (error) throw error;
         await queryClient.invalidateQueries({ queryKey: ["timeline-activities"] });
       },
-      { loading: "Deleting...", success: "Post deleted successfully.", error: (e: any) => `Delete failed: ${e.message}` }
+      {
+        loading: "Deleting...",
+        success: "Post deleted successfully.",
+        error: (e: any) => `Delete failed: ${e.message}`,
+      },
     );
   };
 
@@ -621,7 +632,6 @@ function TimelinePage() {
         </AppButton>
       }
     >
-
       <div className="mb-8 grid gap-4 lg:grid-cols-[1fr_0.72fr]">
         <SurfaceCard className="overflow-hidden p-0">
           <div className="relative min-h-64 bg-[linear-gradient(135deg,#143120,#256b2b_45%,#18a999)] p-6 text-white sm:p-8">
@@ -789,9 +799,7 @@ function TimelinePage() {
                     }
                     onReport={() => toast.success("Report received for review")}
                     onDelete={
-                      isAdmin
-                        ? () => handleDelete(item.id, item.source, item.sourceId)
-                        : undefined
+                      isAdmin ? () => handleDelete(item.id, item.source, item.sourceId) : undefined
                     }
                     onToggleComments={() =>
                       setCommentOpen(commentOpen === item.id ? null : item.id)
@@ -926,10 +934,12 @@ function TimelineCard({
 
           <div className="mt-5 flex flex-wrap items-center gap-2 text-xs font-semibold text-muted-foreground">
             <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <MapPin className="size-3.5 shrink-0" /> <span className="truncate min-w-0 flex-1">{item.village}</span>
+              <MapPin className="size-3.5 shrink-0" />{" "}
+              <span className="truncate min-w-0 flex-1">{item.village}</span>
             </span>
             <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <Users className="size-3.5 shrink-0" /> <span className="truncate min-w-0 flex-1">{item.author}</span>
+              <Users className="size-3.5 shrink-0" />{" "}
+              <span className="truncate min-w-0 flex-1">{item.author}</span>
             </span>
           </div>
 
@@ -965,7 +975,7 @@ function TimelineCard({
                 <Flag className="size-4" />
                 <span className="hidden sm:inline">Report</span>
               </button>
-              
+
               {onDelete && (
                 <button
                   onClick={onDelete}

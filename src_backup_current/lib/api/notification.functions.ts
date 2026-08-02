@@ -47,10 +47,7 @@ function listingUrl(type: string, id: string) {
   return `${base}?post=${id}`;
 }
 
-async function sendFcmPush(
-  tokens: string[],
-  payload: z.infer<typeof pushPayloadSchema>,
-) {
+async function sendFcmPush(tokens: string[], payload: z.infer<typeof pushPayloadSchema>) {
   const { sendFcmNotification } = await import("@/lib/firebase-admin.server");
   const result = await sendFcmNotification(tokens, payload);
 
@@ -168,9 +165,7 @@ export const sendVillagePushNotification = createServerFn({ method: "POST" })
         .eq("village_id", data.villageId);
 
       if (!profileError && villageProfiles) {
-        targetUserIds = villageProfiles
-          .map((p) => p.id)
-          .filter((id) => id !== context.userId);
+        targetUserIds = villageProfiles.map((p) => p.id).filter((id) => id !== context.userId);
       }
     }
 
@@ -280,9 +275,7 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
         .select("id")
         .eq("village_id", targetVillageId);
       if (villageProfiles) {
-        targetUserIds = villageProfiles
-          .map((p) => p.id)
-          .filter((id) => id !== context.userId);
+        targetUserIds = villageProfiles.map((p) => p.id).filter((id) => id !== context.userId);
       }
     }
 
@@ -351,4 +344,3 @@ export const saveFcmToken = createServerFn({ method: "POST" })
 
     return { success: true as const };
   });
-

@@ -20,7 +20,7 @@ import { FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/ai-assistant")({
-  head: () => ({ meta: [{ title: "AI Assistant - DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "AI Assistant - GramMitra" }] }),
   component: AiAssistantPage,
 });
 
@@ -57,11 +57,8 @@ function AiAssistantPage() {
 
   const send = async (text = message) => {
     if (!text.trim() || isLoading) return;
-    
-    setChat((items) => [
-      ...items,
-      { role: "user", text: text.trim() },
-    ]);
+
+    setChat((items) => [...items, { role: "user", text: text.trim() }]);
     setMessage("");
     setIsLoading(true);
 
@@ -70,11 +67,11 @@ function AiAssistantPage() {
       if (!apiKey) {
         // Real AI Fallback using a free unauthenticated endpoint
         try {
-          const systemPrompt = `You are the DigiMitra AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
+          const systemPrompt = `You are the GramMitra AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
 Your goal is to assist villagers with agriculture, government schemes, local services, and weather.
 The user is located in ${profile.village || "an unknown village"}${profile.district ? `, ${profile.district}` : ""}${profile.state ? `, ${profile.state}` : ""}.
 Current weather in their village: ${weatherDetails}.
-The user prefers to speak in ${language === 'te' ? 'Telugu' : language === 'hi' ? 'Hindi' : 'English'}.
+The user prefers to speak in ${language === "te" ? "Telugu" : language === "hi" ? "Hindi" : "English"}.
 
 CRITICAL RULES:
 1. Always reply IN THE EXACT LANGUAGE the user types in, or their preferred language (${language}). If they type in Telugu, YOU MUST reply in Telugu perfectly without grammatical errors. If they type in English, reply in English.
@@ -84,8 +81,8 @@ CRITICAL RULES:
 
           const pollinationsMessages = [
             { role: "system", content: systemPrompt },
-            ...chat.slice(1).map(c => ({ role: c.role, content: c.text })),
-            { role: "user", content: text.trim() }
+            ...chat.slice(1).map((c) => ({ role: c.role, content: c.text })),
+            { role: "user", content: text.trim() },
           ];
 
           const response = await fetch("https://text.pollinations.ai/", {
@@ -94,36 +91,39 @@ CRITICAL RULES:
             body: JSON.stringify({
               messages: pollinationsMessages,
               model: "mistral",
-              seed: Math.floor(Math.random() * 1000)
-            })
+              seed: Math.floor(Math.random() * 1000),
+            }),
           });
-          
+
           if (!response.ok) throw new Error("Fallback AI failed");
-          
+
           const responseText = await response.text();
-          
-          setChat((items) => [
-            ...items,
-            { role: "assistant", text: responseText },
-          ]);
+
+          setChat((items) => [...items, { role: "assistant", text: responseText }]);
         } catch (e) {
           console.error("Fallback AI error:", e);
           setChat((items) => [
             ...items,
-            { role: "assistant", text: language === "te" ? "క్షమించండి, సర్వర్ బిజీగా ఉంది. దయచేసి మళ్లీ ప్రయత్నించండి." : "I'm sorry, the AI service is currently busy. Please try again in a moment." },
+            {
+              role: "assistant",
+              text:
+                language === "te"
+                  ? "క్షమించండి, సర్వర్ బిజీగా ఉంది. దయచేసి మళ్లీ ప్రయత్నించండి."
+                  : "I'm sorry, the AI service is currently busy. Please try again in a moment.",
+            },
           ]);
         }
         return;
       }
-      
+
       const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-      
-      const systemPrompt = `You are the DigiMitra AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
+
+      const systemPrompt = `You are the GramMitra AI Assistant, a helpful and deeply knowledgeable guide for villages in India.
 Your goal is to assist villagers with agriculture, government schemes, local services, and weather.
 The user is located in ${profile.village || "an unknown village"}${profile.district ? `, ${profile.district}` : ""}${profile.state ? `, ${profile.state}` : ""}.
 Current weather in their village: ${weatherDetails}.
-The user prefers to speak in ${language === 'te' ? 'Telugu' : language === 'hi' ? 'Hindi' : 'English'}.
+The user prefers to speak in ${language === "te" ? "Telugu" : language === "hi" ? "Hindi" : "English"}.
 
 CRITICAL RULES:
 1. Always reply IN THE EXACT LANGUAGE the user types in, or their preferred language (${language}). If they type in Telugu, YOU MUST reply in Telugu perfectly without grammatical errors. If they type in English, reply in English.
@@ -131,30 +131,28 @@ CRITICAL RULES:
 3. Do not use complex markdown that is hard to read on mobile. Use simple bullet points if needed.
 4. Always incorporate the provided village location and live weather into your advice if relevant (e.g., advising on crop watering based on rain alert).`;
 
-      const history = chat
-        .slice(1)
-        .map(c => ({
-          role: c.role === "user" ? "user" : "model",
-          parts: [{ text: c.text }]
-        }));
-      
+      const history = chat.slice(1).map((c) => ({
+        role: c.role === "user" ? "user" : "model",
+        parts: [{ text: c.text }],
+      }));
+
       const chatSession = model.startChat({
         history,
-        systemInstruction: systemPrompt
+        systemInstruction: systemPrompt,
       });
 
       const result = await chatSession.sendMessage(text.trim());
       const response = result.response.text();
-      
-      setChat((items) => [
-        ...items,
-        { role: "assistant", text: response },
-      ]);
+
+      setChat((items) => [...items, { role: "assistant", text: response }]);
     } catch (error) {
       console.error(error);
       setChat((items) => [
         ...items,
-        { role: "assistant", text: "I'm sorry, I cannot connect to the AI service right now. Please check your internet connection and try again." },
+        {
+          role: "assistant",
+          text: "I'm sorry, I cannot connect to the AI service right now. Please check your internet connection and try again.",
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -222,7 +220,7 @@ CRITICAL RULES:
 
   return (
     <PageLayout
-      title="DigiMitra AI Village Assistant"
+      title="GramMitra AI Village Assistant"
       subtitle="Voice and text support for farming, services, weather, and government schemes in Telugu, English, or Hindi."
       icon={<Bot className="size-6 text-primary" />}
       heroAction={
@@ -233,7 +231,9 @@ CRITICAL RULES:
             className="inline-flex items-center justify-center gap-2 rounded-2xl bg-primary px-8 py-4 text-base font-extrabold text-white shadow-xl shadow-primary/30 transition hover:scale-105"
           >
             <Mic className="size-5" />
-            <span>{listening ? "🔴 Listening... Speak Now" : "⚡ Speak Your Question (Voice AI)"}</span>
+            <span>
+              {listening ? "🔴 Listening... Speak Now" : "⚡ Speak Your Question (Voice AI)"}
+            </span>
           </button>
         </div>
       }
@@ -252,9 +252,7 @@ CRITICAL RULES:
               <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary">
                 Weather aware
               </p>
-              <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {weatherDetails}
-              </p>
+              <p className="mt-2 text-sm leading-6 text-muted-foreground">{weatherDetails}</p>
             </div>
           </SurfaceCard>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
@@ -280,7 +278,7 @@ CRITICAL RULES:
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-white/70">
-                    DigiMitra AI
+                    GramMitra AI
                   </p>
                   <h2 className="font-display text-2xl font-semibold">Village support chat</h2>
                 </div>
@@ -329,25 +327,25 @@ CRITICAL RULES:
                 className="premium-input min-w-0 flex-1 rounded-[18px] px-4 text-sm h-12"
               />
               <div className="absolute inset-y-0 right-1.5 flex items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={startVoice}
-                    className={`grid size-9 place-items-center rounded-full transition-all ${
-                      listening
-                        ? "bg-red-500/20 text-red-600 dark:bg-red-500/30 dark:text-red-400 animate-pulse"
-                        : "bg-muted text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700"
-                    }`}
-                  >
-                    <Mic className="size-4" />
-                  </button>
-                  <button
-                    type="submit"
-                    onClick={() => send()}
-                    disabled={!message.trim() || isLoading}
-                    className="flex h-9 items-center justify-center gap-2 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground transition-all hover:bg-secondary active:scale-95 disabled:opacity-50"
-                  >
-                    {isLoading ? "Thinking..." : "Send"} <Send className="size-3" />
-                  </button>
+                <button
+                  type="button"
+                  onClick={startVoice}
+                  className={`grid size-9 place-items-center rounded-full transition-all ${
+                    listening
+                      ? "bg-red-500/20 text-red-600 dark:bg-red-500/30 dark:text-red-400 animate-pulse"
+                      : "bg-muted text-muted-foreground hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                  }`}
+                >
+                  <Mic className="size-4" />
+                </button>
+                <button
+                  type="submit"
+                  onClick={() => send()}
+                  disabled={!message.trim() || isLoading}
+                  className="flex h-9 items-center justify-center gap-2 rounded-full bg-primary px-4 text-xs font-bold text-primary-foreground transition-all hover:bg-secondary active:scale-95 disabled:opacity-50"
+                >
+                  {isLoading ? "Thinking..." : "Send"} <Send className="size-3" />
+                </button>
               </div>
             </div>
             <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">

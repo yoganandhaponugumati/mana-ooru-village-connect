@@ -36,7 +36,7 @@ import { useGovernmentWorks, type GovernmentWorkInput } from "@/lib/government-w
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/announcements")({
-  head: () => ({ meta: [{ title: "Village Notice Board & Sarpanch Pragati — DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Village Notice Board & Sarpanch Pragati — GramMitra" }] }),
   component: AnnPage,
 });
 
@@ -86,11 +86,14 @@ function AnnPage() {
       return;
     }
     setShowNoticeForm((v) => {
-        const next = !v;
-        if (next) {
-          setTimeout(() => noticeFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-        }
-        return next;
+      const next = !v;
+      if (next) {
+        setTimeout(
+          () => noticeFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+          100,
+        );
+      }
+      return next;
     });
   };
 
@@ -125,7 +128,7 @@ function AnnPage() {
 
   const shareToWhatsApp = (title: string, text: string) => {
     const url = window.location.href;
-    const msg = `🏛️ *DigiMitra Village Update*\n*${title}*\n${text}\n\nCheck live updates here: ${url}`;
+    const msg = `🏛️ *GramMitra Village Update*\n*${title}*\n${text}\n\nCheck live updates here: ${url}`;
     window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, "_blank");
   };
 
@@ -186,7 +189,11 @@ function AnnPage() {
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-6 py-4 text-sm font-bold text-primary shadow-sm transition hover:bg-primary/20"
           >
             <Shield className="size-4" />
-            <span>{canManageNotices ? "⚡ Add Sarpanch Work Progress +" : "View Sarpanch Pragati Tracker"}</span>
+            <span>
+              {canManageNotices
+                ? "⚡ Add Sarpanch Work Progress +"
+                : "View Sarpanch Pragati Tracker"}
+            </span>
           </button>
         </div>
       }
@@ -267,53 +274,53 @@ function AnnPage() {
           {showNoticeForm && (
             <div ref={noticeFormRef}>
               <SurfaceCard className="mb-8 p-6 sm:p-8 border-primary/20 ring-2 ring-primary/20">
-              <ListingForm
-                type="announcement"
-                title="Notice details"
-                redirectTo="/announcements"
-                photoLabel="Add notice photo / poster"
-                photoHint="Attach a circular, official letter, event flyer, or location photo when useful."
-                fields={[
-                  {
-                    name: "title",
-                    label: "Notice title",
-                    placeholder: "e.g. Water tank cleaning Sunday morning",
-                    required: true,
-                  },
-                  {
-                    name: "category",
-                    label: "Category",
-                    placeholder: "",
-                    options: [
-                      "Panchayat Alert",
-                      "Water Supply",
-                      "Power Schedule",
-                      "Gram Sabha",
-                      "Health Camp",
-                      "School Event",
-                      "Festival",
-                      "Emergency",
-                    ],
-                    required: true,
-                  },
-                  {
-                    name: "description",
-                    label: "Details",
-                    placeholder: "Exact date, timing, and instructions for villagers...",
-                    textarea: true,
-                    required: true,
-                  },
-                  { name: "location", label: "Location", placeholder: "Village / Ward / Street" },
-                  {
-                    name: "contact",
-                    label: "Official contact number",
-                    placeholder: "10-digit mobile",
-                    required: true,
-                  },
-                ]}
-              />
-            </SurfaceCard>
-          </div>
+                <ListingForm
+                  type="announcement"
+                  title="Notice details"
+                  redirectTo="/announcements"
+                  photoLabel="Add notice photo / poster"
+                  photoHint="Attach a circular, official letter, event flyer, or location photo when useful."
+                  fields={[
+                    {
+                      name: "title",
+                      label: "Notice title",
+                      placeholder: "e.g. Water tank cleaning Sunday morning",
+                      required: true,
+                    },
+                    {
+                      name: "category",
+                      label: "Category",
+                      placeholder: "",
+                      options: [
+                        "Panchayat Alert",
+                        "Water Supply",
+                        "Power Schedule",
+                        "Gram Sabha",
+                        "Health Camp",
+                        "School Event",
+                        "Festival",
+                        "Emergency",
+                      ],
+                      required: true,
+                    },
+                    {
+                      name: "description",
+                      label: "Details",
+                      placeholder: "Exact date, timing, and instructions for villagers...",
+                      textarea: true,
+                      required: true,
+                    },
+                    { name: "location", label: "Location", placeholder: "Village / Ward / Street" },
+                    {
+                      name: "contact",
+                      label: "Official contact number",
+                      placeholder: "10-digit mobile",
+                      required: true,
+                    },
+                  ]}
+                />
+              </SurfaceCard>
+            </div>
           )}
 
           {displayItems.length === 0 ? (
@@ -476,9 +483,11 @@ function AnnPage() {
                               <p className="text-[13px] leading-5 text-muted-foreground line-clamp-2">
                                 {a.description}
                               </p>
-                              <button className="text-[10px] font-bold text-primary mt-0.5 hover:underline flex items-center gap-0.5">Read full notice →</button>
+                              <button className="text-[10px] font-bold text-primary mt-0.5 hover:underline flex items-center gap-0.5">
+                                Read full notice →
+                              </button>
                             </div>
-                            
+
                             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-2.5">
                               <div className="flex items-center gap-2 text-[10px] font-semibold text-muted-foreground">
                                 <span className="inline-flex items-center gap-1 rounded-md bg-muted px-1.5 py-1">

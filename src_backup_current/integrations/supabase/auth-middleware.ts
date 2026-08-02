@@ -108,17 +108,15 @@ export const requireSupabaseAuth = createMiddleware({ type: "function" }).server
     console.log("================================");
 
     if (error || !data?.user) {
-        throw new Error(
-          `Unauthorized: ${error?.message ?? "No user"}`
-        );
+      throw new Error(`Unauthorized: ${error?.message ?? "No user"}`);
     }
 
     return next({
       context: {
-      supabase,
-      userId: data.user.id,
-      claims: data.user,
-    },
-  });
+        supabase,
+        userId: data.user.id,
+        claims: data.user,
+      },
+    });
   },
 );

@@ -47,10 +47,7 @@ function listingUrl(type: string, id: string) {
   return `${base}?post=${id}`;
 }
 
-async function sendFcmPush(
-  tokens: string[],
-  payload: z.infer<typeof pushPayloadSchema>,
-) {
+async function sendFcmPush(tokens: string[], payload: z.infer<typeof pushPayloadSchema>) {
   const { sendFcmNotification } = await import("@/lib/firebase-admin.server");
   const result = await sendFcmNotification(tokens, payload);
 
@@ -98,8 +95,8 @@ export const sendLoginNotification = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message || "Could not load user profile.");
 
     const delivery = await sendFcmPush(profile?.fcm_token ? [profile.fcm_token] : [], {
-      title: "DigiMitra • Security & Login",
-      body: "You successfully signed in to DigiMitra. Tap to view your civic profile.",
+      title: "GramMitra • Security & Login",
+      body: "You successfully signed in to GramMitra. Tap to view your civic profile.",
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",
       url: "/profile",
@@ -122,8 +119,8 @@ export const sendTestPushNotification = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message || "Could not load user profile.");
 
     const delivery = await sendFcmPush(profile?.fcm_token ? [profile.fcm_token] : [], {
-      title: "DigiMitra • Push Verification",
-      body: "Excellent! Your device is connected to DigiMitra instant alerts. Tap to open dashboard.",
+      title: "GramMitra • Push Verification",
+      body: "Excellent! Your device is connected to GramMitra instant alerts. Tap to open dashboard.",
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",
       url: "/dashboard",
@@ -165,9 +162,7 @@ export const sendVillagePushNotification = createServerFn({ method: "POST" })
         .eq("village_id", data.villageId);
 
       if (!profileError && villageProfiles) {
-        targetUserIds = villageProfiles
-          .map((p) => p.id)
-          .filter((id) => id !== context.userId);
+        targetUserIds = villageProfiles.map((p) => p.id).filter((id) => id !== context.userId);
       }
     }
 
@@ -277,9 +272,7 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
         .select("id")
         .eq("village_id", targetVillageId);
       if (villageProfiles) {
-        targetUserIds = villageProfiles
-          .map((p) => p.id)
-          .filter((id) => id !== context.userId);
+        targetUserIds = villageProfiles.map((p) => p.id).filter((id) => id !== context.userId);
       }
     }
 
@@ -319,7 +312,7 @@ export const sendNewPostPushNotifications = createServerFn({ method: "POST" })
     const titleLabel = typeLabels[listing.type] || "Village Timeline Update";
 
     const delivery = await sendFcmPush(tokens, {
-      title: `DigiMitra • ${titleLabel}`,
+      title: `GramMitra • ${titleLabel}`,
       body: `${username} posted: "${listing.title}". Tap to open & inspect details.`,
       icon: "/site-icon.svg",
       badge: "/notification-badge.svg",
@@ -348,4 +341,3 @@ export const saveFcmToken = createServerFn({ method: "POST" })
 
     return { success: true as const };
   });
-

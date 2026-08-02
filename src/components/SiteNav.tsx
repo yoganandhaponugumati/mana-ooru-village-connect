@@ -92,7 +92,9 @@ export function SiteNav() {
     } else {
       document.body.style.overflow = "";
     }
-    return () => { document.body.style.overflow = ""; };
+    return () => {
+      document.body.style.overflow = "";
+    };
   }, [open]);
 
   useEffect(() => {
@@ -154,70 +156,70 @@ export function SiteNav() {
   return (
     <>
       <nav className="fixed inset-x-0 top-0 z-[9999] border-b border-[#dfeae2]/80 bg-[#f7fbf2]/95 text-foreground shadow-sm transition-all duration-300 backdrop-blur-2xl dark:bg-zinc-950/95 dark:border-zinc-800/80">
-      <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-3 sm:px-5 lg:px-6 relative">
-
-        {/* Left Side: Back Arrow (if not home) + Logo */}
-        <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 relative z-20">
-          <button
-            className="flex lg:hidden place-items-center justify-center size-8 rounded-full border border-border bg-card text-foreground shadow-sm transition dark:bg-zinc-900 mr-1"
-            onClick={() => setOpen((v) => !v)}
-            aria-label={open ? "Close menu" : "Open menu"}
-          >
-            {open ? <X className="size-4" /> : <Menu className="size-4" />}
-          </button>
-          {location.pathname !== "/" && (
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-3 sm:px-5 lg:px-6 relative">
+          {/* Left Side: Back Arrow (if not home) + Logo */}
+          <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 relative z-20">
             <button
-              type="button"
-              onClick={() => window.history.length > 1 ? window.history.back() : navigate({ to: "/" })}
-              className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition hover:border-primary hover:text-primary dark:bg-zinc-900"
-              aria-label="Go back"
+              className="flex lg:hidden place-items-center justify-center size-8 rounded-full border border-border bg-card text-foreground shadow-sm transition dark:bg-zinc-900 mr-1"
+              onClick={() => setOpen((v) => !v)}
+              aria-label={open ? "Close menu" : "Open menu"}
             >
-              <ArrowLeft className="size-4" />
+              {open ? <X className="size-4" /> : <Menu className="size-4" />}
             </button>
-          )}
-          <Link to="/" className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5">
-            <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
-              <img src="/logo.png" alt="DigiMitra Emblem" className="size-full object-cover" />
-            </div>
-            <div className="flex flex-col leading-none">
-              <span className="font-display text-base font-bold tracking-tight text-clay dark:text-zinc-100 hidden sm:block">
-                DigiMitra
-              </span>
-            </div>
-          </Link>
-        </div>
-
-        {/* Mobile Centered Weather (Matches Mockup exactly) */}
-        <div className="absolute inset-x-0 flex justify-center pointer-events-none md:hidden">
-          <Link to="/weather" className="flex flex-col items-center pointer-events-auto mt-1">
-            <div className="flex items-center gap-1 font-bold text-sm text-foreground">
-              <CloudSun className="size-4 text-amber-500" />
-              <span>{weather.temp != null ? `${weather.temp}°C` : "28°C"}</span>
-            </div>
-            <span className="text-[10px] text-muted-foreground font-semibold">Partly Cloudy</span>
-          </Link>
-        </div>
-
-        {/* Desktop Nav Links — visible from lg (1024px) */}
-        <div className="hidden lg:flex items-center gap-0.5 text-xs font-bold flex-1 justify-center text-muted-foreground dark:text-zinc-400">
-          {navLinks.slice(0, 8).map((l) => (
-            <Link
-              key={l.to}
-              to={l.to}
-              activeOptions={{ exact: l.to === "/" }}
-              className="whitespace-nowrap rounded-lg px-2.5 py-1.5 transition-all hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
-              activeProps={{
-                className: "text-primary font-black bg-primary/10 dark:text-emerald-400",
-              }}
-            >
-              {(t as any)[l.key] ?? l.label}
+            {location.pathname !== "/" && (
+              <button
+                type="button"
+                onClick={() =>
+                  window.history.length > 1 ? window.history.back() : navigate({ to: "/" })
+                }
+                className="grid size-8 shrink-0 place-items-center rounded-full border border-border bg-white text-muted-foreground shadow-sm transition hover:border-primary hover:text-primary dark:bg-zinc-900"
+                aria-label="Go back"
+              >
+                <ArrowLeft className="size-4" />
+              </button>
+            )}
+            <Link to="/" className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5">
+              <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
+                <img src="/logo.png" alt="GramMitra Emblem" className="size-full object-cover" />
+              </div>
+              <div className="flex flex-col leading-none">
+                <span className="font-display text-base font-bold tracking-tight text-clay dark:text-zinc-100 hidden sm:block">
+                  GramMitra
+                </span>
+              </div>
             </Link>
-          ))}
-        </div>
+          </div>
+
+          {/* Mobile Centered Weather (Matches Mockup exactly) */}
+          <div className="absolute inset-x-0 flex justify-center pointer-events-none md:hidden">
+            <Link to="/weather" className="flex flex-col items-center pointer-events-auto mt-1">
+              <div className="flex items-center gap-1 font-bold text-sm text-foreground">
+                <CloudSun className="size-4 text-amber-500" />
+                <span>{weather.temp != null ? `${weather.temp}°C` : "28°C"}</span>
+              </div>
+              <span className="text-[10px] text-muted-foreground font-semibold">Partly Cloudy</span>
+            </Link>
+          </div>
+
+          {/* Desktop Nav Links — visible from lg (1024px) */}
+          <div className="hidden lg:flex items-center gap-0.5 text-xs font-bold flex-1 justify-center text-muted-foreground dark:text-zinc-400">
+            {navLinks.slice(0, 8).map((l) => (
+              <Link
+                key={l.to}
+                to={l.to}
+                activeOptions={{ exact: l.to === "/" }}
+                className="whitespace-nowrap rounded-lg px-2.5 py-1.5 transition-all hover:bg-primary/10 hover:text-primary dark:hover:text-emerald-400"
+                activeProps={{
+                  className: "text-primary font-black bg-primary/10 dark:text-emerald-400",
+                }}
+              >
+                {(t as any)[l.key] ?? l.label}
+              </Link>
+            ))}
+          </div>
 
           {/* Right side icons */}
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 relative z-20">
-
             {/* Weather pill — md+ */}
             <Link
               to="/weather"
@@ -252,7 +254,11 @@ export function SiteNav() {
             {/* Language selector */}
             <div className="nav-menu-container relative">
               <button
-                onClick={() => { setLanguageOpen((v) => !v); setUserMenuOpen(false); setNotificationsOpen(false); }}
+                onClick={() => {
+                  setLanguageOpen((v) => !v);
+                  setUserMenuOpen(false);
+                  setNotificationsOpen(false);
+                }}
                 className="inline-flex h-8 items-center justify-center gap-1 rounded-full border border-border bg-card px-2 text-xs font-semibold text-foreground shadow-sm transition hover:border-primary hover:text-primary dark:bg-zinc-900"
                 aria-label="Language"
               >
@@ -260,9 +266,7 @@ export function SiteNav() {
                 <span className="hidden sm:inline font-bold">
                   {languageOptions.find((i) => i.code === language)?.label}
                 </span>
-                <span className="sm:hidden font-bold uppercase text-[10px]">
-                  {language}
-                </span>
+                <span className="sm:hidden font-bold uppercase text-[10px]">{language}</span>
               </button>
               <AnimatePresence>
                 {languageOpen && (
@@ -315,19 +319,27 @@ export function SiteNav() {
                     >
                       <div className="flex items-center justify-between gap-2 border-b border-zinc-100 dark:border-zinc-800 p-3">
                         <div>
-                          <p className="font-bold text-sm text-zinc-900 dark:text-zinc-100">Notifications</p>
+                          <p className="font-bold text-sm text-zinc-900 dark:text-zinc-100">
+                            Notifications
+                          </p>
                           <p className="text-xs text-zinc-500">
                             {unreadCount > 0 ? `${unreadCount} unread` : "All caught up"}
                           </p>
                         </div>
                         <div className="flex gap-1.5">
                           {unreadCount > 0 && (
-                            <button onClick={() => markAllRead()} className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                            <button
+                              onClick={() => markAllRead()}
+                              className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary"
+                            >
                               Mark read
                             </button>
                           )}
                           {notifications.length > 0 && (
-                            <button onClick={() => clearAll()} className="rounded-full border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 text-xs font-bold text-zinc-500 hover:text-destructive">
+                            <button
+                              onClick={() => clearAll()}
+                              className="rounded-full border border-zinc-200 dark:border-zinc-700 px-2.5 py-1 text-xs font-bold text-zinc-500 hover:text-destructive"
+                            >
                               Clear
                             </button>
                           )}
@@ -339,7 +351,9 @@ export function SiteNav() {
                         ) : notifications.length === 0 ? (
                           <div className="p-5 text-center">
                             <Bell className="mx-auto size-8 text-muted-foreground/40" />
-                            <p className="mt-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400">No notifications yet</p>
+                            <p className="mt-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400">
+                              No notifications yet
+                            </p>
                           </div>
                         ) : (
                           notifications.map((item) => (
@@ -347,14 +361,23 @@ export function SiteNav() {
                               key={item.id}
                               className={`group flex gap-2.5 rounded-xl p-2.5 transition hover:bg-primary/5 ${item.read_at ? "opacity-60" : "bg-primary/5"}`}
                             >
-                              <span className={`mt-1.5 size-2 shrink-0 rounded-full ${item.read_at ? "bg-border" : "bg-red-500"}`} />
+                              <span
+                                className={`mt-1.5 size-2 shrink-0 rounded-full ${item.read_at ? "bg-border" : "bg-red-500"}`}
+                              />
                               <button
                                 type="button"
-                                onClick={() => { markRead(item.id); if (item.action_url) window.location.assign(item.action_url); }}
+                                onClick={() => {
+                                  markRead(item.id);
+                                  if (item.action_url) window.location.assign(item.action_url);
+                                }}
                                 className="min-w-0 flex-1 text-left"
                               >
-                                <span className="block truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">{item.title}</span>
-                                <span className="mt-0.5 line-clamp-2 block text-xs text-zinc-500">{item.body}</span>
+                                <span className="block truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                                  {item.title}
+                                </span>
+                                <span className="mt-0.5 line-clamp-2 block text-xs text-zinc-500">
+                                  {item.body}
+                                </span>
                                 <span className="mt-1 block text-[10px] font-bold uppercase tracking-wide text-primary/60">
                                   {timeAgo(new Date(item.created_at).getTime())}
                                 </span>
@@ -388,12 +411,20 @@ export function SiteNav() {
               <div className="nav-menu-container relative">
                 <button
                   type="button"
-                  onClick={() => { setUserMenuOpen((v) => !v); setLanguageOpen(false); setNotificationsOpen(false); }}
+                  onClick={() => {
+                    setUserMenuOpen((v) => !v);
+                    setLanguageOpen(false);
+                    setNotificationsOpen(false);
+                  }}
                   className="flex flex-col items-center gap-0.5 transition max-w-[80px]"
                 >
                   <div className="relative">
                     {authProfile?.photo_url ? (
-                      <img src={authProfile.photo_url} alt="" className="size-8 rounded-full object-cover shrink-0" />
+                      <img
+                        src={authProfile.photo_url}
+                        alt=""
+                        className="size-8 rounded-full object-cover shrink-0"
+                      />
                     ) : (
                       <div className="grid size-8 shrink-0 place-items-center rounded-full bg-primary/10 text-primary">
                         <UserRound className="size-4" />
@@ -419,7 +450,9 @@ export function SiteNav() {
                         <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
                           {authProfile?.full_name || user.email?.split("@")[0]}
                         </p>
-                        <p className="text-[11px] text-zinc-500 truncate">{user.email || user.phone}</p>
+                        <p className="text-[11px] text-zinc-500 truncate">
+                          {user.email || user.phone}
+                        </p>
                         <span className="mt-1 inline-block rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
                           {getRoleDisplayName(role || "citizen")}
                         </span>
@@ -431,7 +464,10 @@ export function SiteNav() {
                       >
                         <UserRound className="size-3.5" /> Profile &amp; Role
                       </Link>
-                      <InstallAppButton variant={"menuItem" as any} className="rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition" />
+                      <InstallAppButton
+                        variant={"menuItem" as any}
+                        className="rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition"
+                      />
                       {(role === "village_admin" || role === "super_admin") && (
                         <Link
                           to="/dashboard"
@@ -443,7 +479,10 @@ export function SiteNav() {
                       )}
                       <button
                         type="button"
-                        onClick={() => { setUserMenuOpen(false); signOut(); }}
+                        onClick={() => {
+                          setUserMenuOpen(false);
+                          signOut();
+                        }}
                         className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition mt-1"
                       >
                         <LogOut className="size-3.5" /> Sign out
@@ -476,7 +515,6 @@ export function SiteNav() {
                 </Link>
               </div>
             )}
-
           </div>
         </div>
 
@@ -509,7 +547,9 @@ export function SiteNav() {
                         <div className="grid size-7 place-items-center rounded-[10px] bg-[var(--gradient-village)] text-white">
                           <Leaf className="size-4" />
                         </div>
-                        <span className="font-display font-bold text-clay dark:text-zinc-100">DigiMitra</span>
+                        <span className="font-display font-bold text-clay dark:text-zinc-100">
+                          GramMitra
+                        </span>
                       </div>
                       <button
                         onClick={() => setOpen(false)}
@@ -528,7 +568,9 @@ export function SiteNav() {
                           onClick={() => setOpen(false)}
                           activeOptions={{ exact: l.to === "/" }}
                           className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground transition hover:bg-primary/10 hover:text-primary dark:text-zinc-200"
-                          activeProps={{ className: "bg-primary text-primary-foreground font-black" }}
+                          activeProps={{
+                            className: "bg-primary text-primary-foreground font-black",
+                          }}
                         >
                           <l.icon className="size-4 shrink-0" />
                           {(t as any)[l.key] ?? l.label}
@@ -541,7 +583,11 @@ export function SiteNav() {
                       {/* Dark mode */}
                       <div className="flex items-center justify-between rounded-xl border border-border dark:border-zinc-800 bg-muted/40 px-3 py-2.5">
                         <div className="flex items-center gap-2">
-                          {darkMode ? <Sun className="size-4 text-amber-400" /> : <Moon className="size-4 text-indigo-400" />}
+                          {darkMode ? (
+                            <Sun className="size-4 text-amber-400" />
+                          ) : (
+                            <Moon className="size-4 text-indigo-400" />
+                          )}
                           <span className="text-xs font-bold text-foreground dark:text-zinc-200">
                             {darkMode ? "Light Mode" : "Dark Mode"}
                           </span>
@@ -551,7 +597,9 @@ export function SiteNav() {
                           onClick={() => setDarkMode(!darkMode)}
                           className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors ${darkMode ? "bg-primary" : "bg-muted"}`}
                         >
-                          <span className={`pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm ring-0 transition ${darkMode ? "translate-x-4" : "translate-x-0"}`} />
+                          <span
+                            className={`pointer-events-none inline-block size-4 transform rounded-full bg-white shadow-sm ring-0 transition ${darkMode ? "translate-x-4" : "translate-x-0"}`}
+                          />
                         </button>
                       </div>
 
@@ -565,7 +613,10 @@ export function SiteNav() {
                             <button
                               key={item.code}
                               type="button"
-                              onClick={() => { setLanguage(item.code); setOpen(false); }}
+                              onClick={() => {
+                                setLanguage(item.code);
+                                setOpen(false);
+                              }}
                               className={`rounded-lg border py-1.5 text-xs font-bold transition ${
                                 item.code === language
                                   ? "border-primary bg-primary text-primary-foreground"
@@ -593,28 +644,42 @@ export function SiteNav() {
                               <p className="truncate text-xs font-bold text-foreground dark:text-zinc-100">
                                 {authProfile?.full_name || user.email?.split("@")[0]}
                               </p>
-                              <p className="truncate text-[10px] text-muted-foreground">{profile.village || "No village"}</p>
+                              <p className="truncate text-[10px] text-muted-foreground">
+                                {profile.village || "No village"}
+                              </p>
                             </div>
                           </div>
                           {(role === "village_admin" || role === "super_admin") && (
-                            <Link to="/official" onClick={() => setOpen(false)}
-                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white">
+                            <Link
+                              to="/official"
+                              onClick={() => setOpen(false)}
+                              className="flex w-full items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 py-2.5 text-xs font-bold text-white"
+                            >
                               <ShieldCheck className="size-4" /> Admin Portal
                             </Link>
                           )}
                           <div className="grid grid-cols-2 gap-2">
-                            <Link to="/dashboard" onClick={() => setOpen(false)}
-                              className="flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 py-2 text-xs font-bold text-clay dark:text-zinc-200">
+                            <Link
+                              to="/dashboard"
+                              onClick={() => setOpen(false)}
+                              className="flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 py-2 text-xs font-bold text-clay dark:text-zinc-200"
+                            >
                               <LayoutDashboard className="size-3.5 text-blue-600" /> Dashboard
                             </Link>
-                            <Link to="/profile" onClick={() => setOpen(false)}
-                              className="flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 py-2 text-xs font-bold text-clay dark:text-zinc-200">
+                            <Link
+                              to="/profile"
+                              onClick={() => setOpen(false)}
+                              className="flex items-center justify-center gap-1.5 rounded-xl border border-border dark:border-zinc-700 py-2 text-xs font-bold text-clay dark:text-zinc-200"
+                            >
                               <UserRound className="size-3.5 text-amber-600" /> Profile
                             </Link>
                           </div>
                           <button
                             type="button"
-                            onClick={() => { signOut(); setOpen(false); }}
+                            onClick={() => {
+                              signOut();
+                              setOpen(false);
+                            }}
                             className="flex w-full items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 dark:bg-red-950/40 px-4 py-2.5 text-xs font-bold text-red-700 dark:text-red-300"
                           >
                             <LogOut className="size-3.5" /> Sign Out
@@ -634,21 +699,26 @@ export function SiteNav() {
                 </div>
               )}
             </AnimatePresence>,
-            document.body
+            document.body,
           )}
       </nav>
 
       {/* ── Mobile Bottom Dock (Matches Mockup) ─────────────────────────────────────── */}
       <div className="fixed bottom-0 inset-x-0 z-[9995] lg:hidden">
         <div className="border-t border-border/60 bg-white dark:bg-zinc-950 backdrop-blur-2xl shadow-[0_-8px_32px_rgba(0,0,0,0.06)]">
-          <div className="flex items-end justify-around px-2 pb-safe safe-area-pb" style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 8px)' }}>
-
+          <div
+            className="flex items-end justify-around px-2 pb-safe safe-area-pb"
+            style={{ paddingBottom: "max(env(safe-area-inset-bottom), 8px)" }}
+          >
             {/* Home Tab */}
             <Link
               to="/"
               activeOptions={{ exact: true }}
               className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
-              activeProps={{ className: "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary" }}
+              activeProps={{
+                className:
+                  "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary",
+              }}
             >
               <Home className="size-[22px]" />
               <span>Home</span>
@@ -658,7 +728,10 @@ export function SiteNav() {
             <Link
               to="/search"
               className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
-              activeProps={{ className: "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary" }}
+              activeProps={{
+                className:
+                  "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary",
+              }}
             >
               <Search className="size-[22px]" />
               <span>Explore</span>
@@ -675,13 +748,21 @@ export function SiteNav() {
                     transition={{ duration: 0.15 }}
                     className="absolute bottom-[4.5rem] w-48 flex flex-col gap-1.5 p-2 rounded-2xl bg-white dark:bg-zinc-900 border border-border/60 shadow-[0_-8px_30px_rgba(0,0,0,0.12)]"
                   >
-                    <Link to="/announcements" onClick={() => setPostMenuOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors text-sm font-bold text-clay dark:text-zinc-100">
+                    <Link
+                      to="/announcements"
+                      onClick={() => setPostMenuOpen(false)}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors text-sm font-bold text-clay dark:text-zinc-100"
+                    >
                       <div className="grid size-8 place-items-center rounded-full bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400">
                         <Megaphone className="size-4" />
                       </div>
                       Post Notice
                     </Link>
-                    <Link to="/problems" onClick={() => setPostMenuOpen(false)} className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors text-sm font-bold text-clay dark:text-zinc-100">
+                    <Link
+                      to="/problems"
+                      onClick={() => setPostMenuOpen(false)}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors text-sm font-bold text-clay dark:text-zinc-100"
+                    >
                       <div className="grid size-8 place-items-center rounded-full bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-400">
                         <AlertTriangle className="size-4" />
                       </div>
@@ -701,30 +782,36 @@ export function SiteNav() {
               >
                 <Plus className="size-6 transition-transform duration-200" strokeWidth={3} />
               </button>
-              <span className="mt-1 text-[9px] font-extrabold text-[#0c6b45] dark:text-emerald-400 text-center leading-tight">Post / Report</span>
+              <span className="mt-1 text-[9px] font-extrabold text-[#0c6b45] dark:text-emerald-400 text-center leading-tight">
+                Post / Report
+              </span>
             </div>
 
             {/* Timeline Tab */}
             <Link
               to="/timeline"
               className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
-              activeProps={{ className: "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary" }}
+              activeProps={{
+                className:
+                  "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary",
+              }}
             >
               <Newspaper className="size-[22px]" />
               <span>Timeline</span>
             </Link>
 
-
             {/* Profile Tab */}
             <Link
               to="/profile"
               className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
-              activeProps={{ className: "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary" }}
+              activeProps={{
+                className:
+                  "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary",
+              }}
             >
               <UserRound className="size-[22px]" />
               <span>Profile</span>
             </Link>
-
           </div>
         </div>
       </div>
@@ -740,29 +827,63 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <div className="flex items-center gap-2.5">
             <div className="size-8 rounded-full overflow-hidden border border-primary/30 shadow-sm shrink-0 bg-white">
-              <img src="/logo.png" alt="DigiMitra Emblem" className="size-full object-cover" />
+              <img src="/logo.png" alt="GramMitra Emblem" className="size-full object-cover" />
             </div>
-            <span className="font-display text-base font-bold text-clay dark:text-zinc-100">DigiMitra</span>
+            <span className="font-display text-base font-bold text-clay dark:text-zinc-100">
+              GramMitra
+            </span>
           </div>
           <p className="mt-3 text-sm leading-6 text-muted-foreground">
-            A trusted digital village platform for workers, land, services, markets, notices, and community support.
+            A trusted digital village platform for workers, land, services, markets, notices, and
+            community support.
           </p>
         </div>
         <div>
           <p className="text-sm font-semibold text-clay dark:text-zinc-200">About &amp; Legal</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/privacy" className="hover:text-primary transition">Privacy Policy</Link></li>
-            <li><Link to="/terms" className="hover:text-primary transition">Terms of Service</Link></li>
-            <li><Link to="/delete-account" className="hover:text-red-600 transition font-medium text-red-600/80">Delete Account</Link></li>
+            <li>
+              <Link to="/privacy" className="hover:text-primary transition">
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link to="/terms" className="hover:text-primary transition">
+                Terms of Service
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/delete-account"
+                className="hover:text-red-600 transition font-medium text-red-600/80"
+              >
+                Delete Account
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
           <p className="text-sm font-semibold text-clay dark:text-zinc-200">Quick Links</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li><Link to="/workers" className="hover:text-primary transition">Find workers</Link></li>
-            <li><Link to="/land" className="hover:text-primary transition">Lease land</Link></li>
-            <li><Link to="/marketplace" className="hover:text-primary transition">Marketplace</Link></li>
-            <li><Link to="/dealer-registration" className="hover:text-primary transition">Dealer Storefronts</Link></li>
+            <li>
+              <Link to="/workers" className="hover:text-primary transition">
+                Find workers
+              </Link>
+            </li>
+            <li>
+              <Link to="/land" className="hover:text-primary transition">
+                Lease land
+              </Link>
+            </li>
+            <li>
+              <Link to="/marketplace" className="hover:text-primary transition">
+                Marketplace
+              </Link>
+            </li>
+            <li>
+              <Link to="/dealer-registration" className="hover:text-primary transition">
+                Dealer Storefronts
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
@@ -776,19 +897,27 @@ export function SiteFooter() {
         <div>
           <p className="text-sm font-semibold text-clay dark:text-zinc-200">Contact</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>privacy@digimitra.org</li>
-            <li>hello@digimitra.org</li>
+            <li>privacy@grammitra.org</li>
+            <li>hello@grammitra.org</li>
           </ul>
         </div>
       </div>
       <div className="border-t border-border/60">
         <div className="mx-auto flex max-w-7xl flex-col gap-2 px-4 py-3 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between sm:px-6">
-          <p>© {new Date().getFullYear()} DigiMitra · Built for our villages.</p>
+          <p>© {new Date().getFullYear()} GramMitra · Built for our villages.</p>
           <div className="flex flex-wrap gap-3">
-            <Link to="/" className="hover:text-primary transition">Home</Link>
-            <Link to="/announcements" className="hover:text-primary transition">Notices</Link>
-            <Link to="/privacy" className="hover:text-primary transition">Privacy</Link>
-            <Link to="/terms" className="hover:text-primary transition">Terms</Link>
+            <Link to="/" className="hover:text-primary transition">
+              Home
+            </Link>
+            <Link to="/announcements" className="hover:text-primary transition">
+              Notices
+            </Link>
+            <Link to="/privacy" className="hover:text-primary transition">
+              Privacy
+            </Link>
+            <Link to="/terms" className="hover:text-primary transition">
+              Terms
+            </Link>
           </div>
         </div>
       </div>

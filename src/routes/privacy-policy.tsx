@@ -4,11 +4,11 @@ import { PrivacyPolicyPage } from "./privacy";
 export const Route = createFileRoute("/privacy-policy")({
   head: () => ({
     meta: [
-      { title: "Privacy Policy & Data Safety — DigiMitra" },
+      { title: "Privacy Policy & Data Safety — GramMitra" },
       {
         name: "description",
         content:
-          "Official Privacy Policy and Google Play Data Safety disclosure for the DigiMitra Digital Village Ecosystem.",
+          "Official Privacy Policy and Google Play Data Safety disclosure for the GramMitra Digital Village Ecosystem.",
       },
     ],
   }),

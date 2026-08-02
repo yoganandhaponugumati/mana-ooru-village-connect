@@ -83,19 +83,19 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "DigiMitra - Premium Digital Village Platform" },
+      { title: "GramMitra - Smart Village Ecosystem" },
       {
         name: "description",
         content:
           "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and AI support.",
       },
-      { name: "author", content: "DigiMitra" },
-      { property: "og:title", content: "DigiMitra - Premium Digital Village Platform" },
+      { name: "author", content: "GramMitra" },
+      { property: "og:title", content: "GramMitra - Smart Village Ecosystem" },
       { property: "og:description", content: "Everything your village needs. All in one place." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@DigiMitra" },
-      { name: "twitter:title", content: "DigiMitra" },
+      { name: "twitter:site", content: "@GramMitra" },
+      { name: "twitter:title", content: "GramMitra" },
       { name: "twitter:description", content: "Everything your village needs. All in one place." },
       {
         property: "og:image",
@@ -185,9 +185,17 @@ function GlobalErrorListener() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const logErrorToDB = async (message: string, source?: string, lineno?: number, colno?: number, errorObj?: any) => {
+    const logErrorToDB = async (
+      message: string,
+      source?: string,
+      lineno?: number,
+      colno?: number,
+      errorObj?: any,
+    ) => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
         await (supabase as any).from("error_logs").insert({
           message,
           source,
@@ -219,7 +227,7 @@ function GlobalErrorListener() {
       window.removeEventListener("unhandledrejection", handleUnhandledRejection);
     };
   }, []);
-  
+
   return null;
 }
 

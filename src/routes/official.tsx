@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { PageLayout } from "@/components/PageLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoleManager } from "@/components/AdminRoleManager";
+import { AuditLogsViewer } from "@/components/AuditLogsViewer";
 import {
   AppButton,
   AppLinkButton,
@@ -28,7 +29,7 @@ import { useAuth } from "@/lib/auth";
 import { useGovernmentWorks, type GovernmentWorkInput } from "@/lib/government-works";
 
 export const Route = createFileRoute("/official")({
-  head: () => ({ meta: [{ title: "Official Workspace - DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Official Workspace - GramMitra" }] }),
   component: () => (
     <ProtectedRoute roles={["village_admin", "super_admin"]}>
       <OfficialPage />
@@ -291,6 +292,9 @@ function OfficialPage() {
             ))
           )}
         </div>
+
+        {/* Action Tracker Audit Logs */}
+        <AuditLogsViewer />
       </div>
     </PageLayout>
   );

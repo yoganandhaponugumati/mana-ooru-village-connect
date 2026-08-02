@@ -68,7 +68,8 @@ export function DealerApprovalList({ statusFilter = "pending" }: DealerApprovalL
       // If village_admin is viewing, prioritize village matches but don't hide unassigned dealers
       if (role === "village_admin" && profile?.village_id) {
         const villageMatched = results.filter(
-          (d) => d.village_id === profile.village_id || d.village === profile.village || !d.village_id
+          (d) =>
+            d.village_id === profile.village_id || d.village === profile.village || !d.village_id,
         );
         if (villageMatched.length > 0) {
           results = villageMatched;

@@ -120,19 +120,31 @@ export function ListingForm({
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext("2d");
-        if (!ctx) { resolve(file); return; }
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         // Try quality 0.82 first; drop to 0.65 if still big
         canvas.toBlob(
           (blob1) => {
-            if (!blob1) { resolve(file); return; }
+            if (!blob1) {
+              resolve(file);
+              return;
+            }
             if (blob1.size <= 800 * 1024) {
-              resolve(new File([blob1], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+              resolve(
+                new File([blob1], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }),
+              );
               return;
             }
             canvas.toBlob(
               (blob2) => {
-                resolve(new File([blob2 ?? blob1], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+                resolve(
+                  new File([blob2 ?? blob1], file.name.replace(/\.[^.]+$/, ".jpg"), {
+                    type: "image/jpeg",
+                  }),
+                );
               },
               "image/jpeg",
               0.65,
@@ -142,7 +154,10 @@ export function ListingForm({
           0.82,
         );
       };
-      img.onerror = () => { URL.revokeObjectURL(blobUrl); reject(new Error("Could not read image")); };
+      img.onerror = () => {
+        URL.revokeObjectURL(blobUrl);
+        reject(new Error("Could not read image"));
+      };
       img.src = blobUrl;
     });
 
@@ -167,7 +182,9 @@ export function ListingForm({
         setErrors((prev) => ({ ...prev, imageUrl: "" }));
         if (toastId !== undefined) toast.dismiss(toastId);
         if (file.size > 1.5 * 1024 * 1024) {
-          toast.success(`Photo compressed: ${(file.size / (1024 * 1024)).toFixed(1)} MB → ${(compressed.size / 1024).toFixed(0)} KB ✓`);
+          toast.success(
+            `Photo compressed: ${(file.size / (1024 * 1024)).toFixed(1)} MB → ${(compressed.size / 1024).toFixed(0)} KB ✓`,
+          );
         }
       };
       reader.readAsDataURL(compressed);
@@ -176,7 +193,6 @@ export function ListingForm({
       toast.error("Could not read the photo. Please try a different one.");
     }
   };
-
 
   const onSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -230,7 +246,10 @@ export function ListingForm({
           storagePath = uploaded.path;
           uploadedStoragePath = uploaded.path;
         } catch (uploadError) {
-          console.warn("[posting] Supabase storage upload failed, falling back to compressed base64:", uploadError);
+          console.warn(
+            "[posting] Supabase storage upload failed, falling back to compressed base64:",
+            uploadError,
+          );
           imageUrl = photoPreview || "";
         }
       }
@@ -291,12 +310,11 @@ export function ListingForm({
   };
 
   return (
-    <form
-      onSubmit={onSubmit}
-      className="space-y-5"
-    >
+    <form onSubmit={onSubmit} className="space-y-5">
       <div>
-        <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">New listing</p>
+        <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-1">
+          New listing
+        </p>
         <h2 className="font-display text-2xl font-semibold text-clay">{title}</h2>
       </div>
       {fields.map((field) => {
@@ -321,7 +339,9 @@ export function ListingForm({
               >
                 <option value="">Choose one…</option>
                 {field.options.map((option) => (
-                  <option key={option} value={option}>{option}</option>
+                  <option key={option} value={option}>
+                    {option}
+                  </option>
                 ))}
               </select>
             ) : field.textarea ? (
@@ -365,7 +385,9 @@ export function ListingForm({
       <div className="space-y-1.5">
         <label className="text-sm font-semibold text-foreground">
           📷 {photoLabel} {photoRequired && <span className="text-primary">*</span>}
-          <span className="ml-2 text-xs font-normal text-muted-foreground">(any size — auto compressed)</span>
+          <span className="ml-2 text-xs font-normal text-muted-foreground">
+            (any size — auto compressed)
+          </span>
         </label>
         {photoPreview ? (
           <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm">
@@ -380,7 +402,11 @@ export function ListingForm({
               </p>
               <button
                 type="button"
-                onClick={() => { setPhotoPreview(""); setPhotoName(""); setPhotoFile(null); }}
+                onClick={() => {
+                  setPhotoPreview("");
+                  setPhotoName("");
+                  setPhotoFile(null);
+                }}
                 className="inline-flex items-center gap-1.5 rounded-full border border-border px-3 py-1.5 text-xs font-semibold text-muted-foreground transition hover:border-destructive hover:text-destructive"
               >
                 <Trash2 className="size-3.5" /> Remove
@@ -400,7 +426,9 @@ export function ListingForm({
             </div>
             <span className="mt-3 text-sm font-semibold text-clay">{photoLabel}</span>
             <span className="mt-1 text-xs text-muted-foreground">{photoHint}</span>
-            <span className="mt-1 text-[10px] text-muted-foreground/70">📱 High-res mobile photos are automatically compressed</span>
+            <span className="mt-1 text-[10px] text-muted-foreground/70">
+              📱 High-res mobile photos are automatically compressed
+            </span>
             <input
               type="file"
               accept="image/*"
@@ -419,13 +447,16 @@ export function ListingForm({
         className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold shadow-sm transition-all disabled:cursor-progress disabled:opacity-70 ${accentStyles[accent]}`}
       >
         {submitting ? (
-          <><Loader2 className="size-4 animate-spin" /> Posting…</>
+          <>
+            <Loader2 className="size-4 animate-spin" /> Posting…
+          </>
         ) : (
-          <><CheckCircle2 className="size-4" /> Post now</>
+          <>
+            <CheckCircle2 className="size-4" /> Post now
+          </>
         )}
       </button>
     </form>
-
   );
 }
 
@@ -445,7 +476,8 @@ export function ListingCard({
     { role: "seller", text: `Namaste, this is about ${item.title}. How can I help?` },
   ]);
   const isAdmin = profile?.role === "village_admin" || profile?.role === "super_admin";
-  const canDelete = !!onDelete && (!!item.localOnly || (!!user && (user.id === item.owner_id || isAdmin)));
+  const canDelete =
+    !!onDelete && (!!item.localOnly || (!!user && (user.id === item.owner_id || isAdmin)));
   const cleanContact = onlyDigits(item.contact);
   const hasMobileContact = MOBILE_RE.test(cleanContact);
   const mapQuery = encodeURIComponent(`${item.location || item.title}, India`);
@@ -532,10 +564,13 @@ export function ListingCard({
                 <ShieldCheck className="size-3" /> Verified
               </span>
             </div>
-            <h3 className="mt-3 break-words font-display text-lg font-semibold text-clay">{item.title}</h3>
+            <h3 className="mt-3 break-words font-display text-lg font-semibold text-clay">
+              {item.title}
+            </h3>
             {item.location && (
               <p className="mt-2 flex items-center gap-2 text-sm text-muted-foreground max-w-full">
-                <MapPin className="size-4 text-primary shrink-0" /> <span className="truncate">{item.location}</span>
+                <MapPin className="size-4 text-primary shrink-0" />{" "}
+                <span className="truncate">{item.location}</span>
               </p>
             )}
             <p className="mt-2 flex items-center gap-2 text-xs uppercase tracking-[0.2em] text-muted-foreground/80">
@@ -550,7 +585,9 @@ export function ListingCard({
         )}
       </div>
       {item.description && (
-        <p className="mt-4 break-words text-sm leading-7 text-muted-foreground">{item.description}</p>
+        <p className="mt-4 break-words text-sm leading-7 text-muted-foreground">
+          {item.description}
+        </p>
       )}
       {item.type === "complaint" && (
         <div className="mt-4 rounded-2xl border border-red-100 bg-red-50/50 p-3">

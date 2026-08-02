@@ -8,9 +8,7 @@ function initializeFirebaseAdmin() {
   const serviceAccountJson = process.env.FIREBASE_SERVICE_ACCOUNT;
   const privateKey = process.env.FIREBASE_PRIVATE_KEY;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const projectId =
-    process.env.FIREBASE_PROJECT_ID ||
-    process.env.VITE_FIREBASE_PROJECT_ID;
+  const projectId = process.env.FIREBASE_PROJECT_ID || process.env.VITE_FIREBASE_PROJECT_ID;
 
   if (serviceAccountJson) {
     try {
@@ -20,10 +18,7 @@ function initializeFirebaseAdmin() {
         credential: admin.credential.cert(serviceAccount),
       });
     } catch (e) {
-      console.error(
-        "[FCM Server] Failed to parse FIREBASE_SERVICE_ACCOUNT:",
-        e,
-      );
+      console.error("[FCM Server] Failed to parse FIREBASE_SERVICE_ACCOUNT:", e);
     }
   }
 
@@ -37,10 +32,7 @@ function initializeFirebaseAdmin() {
         }),
       });
     } catch (e) {
-      console.error(
-        "[FCM Server] Failed to initialize Firebase Admin:",
-        e,
-      );
+      console.error("[FCM Server] Failed to initialize Firebase Admin:", e);
     }
   }
 
@@ -126,10 +118,8 @@ export async function sendFcmNotification(
     response.responses.forEach((resp, idx) => {
       if (!resp.success && resp.error) {
         if (
-          resp.error.code ===
-            "messaging/invalid-registration-token" ||
-          resp.error.code ===
-            "messaging/registration-token-not-registered"
+          resp.error.code === "messaging/invalid-registration-token" ||
+          resp.error.code === "messaging/registration-token-not-registered"
         ) {
           failedTokens.push(cleanTokens[idx]);
         }

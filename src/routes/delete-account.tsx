@@ -10,11 +10,11 @@ import { deleteMyAccount } from "@/lib/supabase/auth";
 export const Route = createFileRoute("/delete-account")({
   head: () => ({
     meta: [
-      { title: "Account & Data Deletion Portal — DigiMitra" },
+      { title: "Account & Data Deletion Portal — GramMitra" },
       {
         name: "description",
         content:
-          "Official Google Play Store compliant web portal to permanently delete your DigiMitra account and all associated village data.",
+          "Official Google Play Store compliant web portal to permanently delete your GramMitra account and all associated village data.",
       },
     ],
   }),
@@ -66,7 +66,7 @@ function DeleteAccountPortalPage() {
   return (
     <PageLayout
       title="Account & Data Deletion Portal"
-      subtitle="Official Google Play Store web portal for requesting or executing immediate, permanent deletion of your DigiMitra profile and records."
+      subtitle="Official Google Play Store web portal for requesting or executing immediate, permanent deletion of your GramMitra profile and records."
       icon={<UserRoundX className="size-7 text-red-600" />}
     >
       <div className="mx-auto max-w-4xl space-y-10">
@@ -147,7 +147,7 @@ function DeleteAccountPortalPage() {
             <SectionHeader
               eyebrow="No active web session"
               title="Out-of-App Deletion Request Form"
-              description="If you uninstalled the DigiMitra app or are visiting from another browser, submit your registered account details below. Our data verification team will confirm your identity via OTP/email and wipe your records within 7 days."
+              description="If you uninstalled the GramMitra app or are visiting from another browser, submit your registered account details below. Our data verification team will confirm your identity via OTP/email and wipe your records within 7 days."
             />
             {submittedRequest ? (
               <div className="mt-6 rounded-[24px] border border-emerald-500/20 bg-emerald-500/10 p-6 text-center">
@@ -215,7 +215,7 @@ function DeleteAccountPortalPage() {
             <div className="mt-8 border-t border-border/70 pt-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <p className="text-xs text-muted-foreground">
                 Prefer sending an email? Contact our data privacy officer directly:{" "}
-                <strong className="text-foreground">privacy@digimitra.org</strong>
+                <strong className="text-foreground">privacy@grammitra.org</strong>
               </p>
               <AppLinkButton to="/auth" variant="ghost" size="sm">
                 Sign In to Delete Instantly

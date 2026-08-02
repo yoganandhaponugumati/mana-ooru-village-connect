@@ -359,7 +359,9 @@ function HeroFeatureCarousel() {
         >
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${activeItem.accentBg}`}>
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${activeItem.accentBg}`}
+              >
                 {activeItem.badge}
               </span>
               <span className="text-[11px] font-semibold text-white/80">{activeItem.telugu}</span>
@@ -610,7 +612,9 @@ function HeroVillageOSCard({
               className="rounded-2xl border border-white/10 bg-white/5 p-3 text-center backdrop-blur-md transition hover:bg-white/10 hover:border-emerald-400/30 shadow"
             >
               <metric.icon className="mx-auto size-4 text-emerald-400 mb-1" />
-              <p className="font-display text-lg font-black text-white sm:text-xl">{metric.value}</p>
+              <p className="font-display text-lg font-black text-white sm:text-xl">
+                {metric.value}
+              </p>
               <p className="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400">
                 {metric.label}
               </p>
@@ -722,7 +726,6 @@ function Index() {
         <div className="pointer-events-none absolute left-0 top-28 z-10 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div className="hero-life-layer pointer-events-none absolute inset-0 z-10" />
 
-
         {/* Start Home Page Main Hero Grid (Title, Search Bar & Right Side HeroVillageOSCard) */}
         <div className="relative z-20 mx-auto grid min-h-[calc(100vh-8rem)] max-w-7xl items-center gap-10 px-4 pt-28 pb-12 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:items-center">
           <div className="max-w-3xl text-left">
@@ -824,7 +827,12 @@ function Index() {
             )}
           </div>
 
-          <HeroVillageOSCard villageName={villageName} heroWeather={heroWeather} stats={stats} pinnedNotice={announcementItems[0] ?? null} />
+          <HeroVillageOSCard
+            villageName={villageName}
+            heroWeather={heroWeather}
+            stats={stats}
+            pinnedNotice={announcementItems[0] ?? null}
+          />
         </div>
 
         {/* FULL-WIDTH HERO SHOWCASE CARD SPANNING 100% CONTAINER WIDTH BELOW THE MAIN HERO FOLD */}
@@ -856,7 +864,8 @@ function Index() {
                     Learn How to Use <span className="text-emerald-400">ManaOoru</span>
                   </h2>
                   <p className="mt-1.5 text-xs sm:text-sm font-semibold text-emerald-100/90 leading-relaxed">
-                    1 నిమిషంలో నేర్చుకోండి — రైతులు, కూలీలు, వ్యాపారులు మరియు గ్రామ ప్రజలందరి కోసం రూపొందించబడిన డిజిటల్ వేదిక!
+                    1 నిమిషంలో నేర్చుకోండి — రైతులు, కూలీలు, వ్యాపారులు మరియు గ్రామ ప్రజలందరి కోసం
+                    రూపొందించబడిన డిజిటల్ వేదిక!
                   </p>
                 </div>
 
@@ -976,73 +985,80 @@ function Index() {
             {/* Red urgency strip */}
             <div className="h-1.5 w-full bg-gradient-to-r from-red-500 via-rose-500 to-red-600" />
             <div className="p-6">
-            <div>
-              <div className="mb-4 flex items-center justify-between gap-3">
-                <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 dark:bg-red-950/50 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
-                    <span className="relative flex size-1.5">
-                      <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
-                      <span className="relative inline-flex size-1.5 rounded-full bg-red-500" />
-                    </span>
-                    <AlertTriangle className="size-3" /> URGENT · Action Required
-                  </span>
-                  <h3 className="mt-2 font-display text-2xl font-bold text-clay">
-                    Citizen Problem Reports
-                  </h3>
-                </div>
-                <Link
-                  to="/problems"
-                  className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200 transition"
-                >
-                  View All ({problemItems.length}) →
-                </Link>
-              </div>
-
-              {problemItems.length === 0 ? (
-                <div className="rounded-2xl border border-dashed border-red-200 bg-red-50/50 p-6 text-center text-sm text-muted-foreground">
-                  <AlertTriangle className="mx-auto mb-2 size-8 text-red-400" />
-                  No road, drainage, or water problems posted yet.
-                  <p className="mt-2">
-                    <Link to="/problems" className="font-bold text-red-600 hover:underline">
-                      + Report a problem with photo proof
-                    </Link>
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-3">
-                  {problemItems.slice(0, 3).map((item) => (
-                    <Link
-                      key={item.id}
-                      to="/problems"
-                      className="flex gap-3 rounded-2xl border border-border bg-white p-3 shadow-sm transition hover:border-red-300 hover:bg-red-50/40"
-                    >
-                      {item.imageUrl ? (
-                        <img
-                          src={item.imageUrl}
-                          alt={item.title}
-                          className="size-16 rounded-xl object-cover shrink-0"
-                        />
-                      ) : (
-                        <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-red-100 text-red-600 font-bold">
-                          <AlertTriangle className="size-6" />
-                        </span>
-                      )}
-                      <span className="min-w-0 flex-1">
-                        <span className="block truncate font-bold text-clay text-base">{item.title}</span>
-                        <span className="mt-1 block truncate text-xs text-muted-foreground">
-                          📍 {item.location || item.category || "Village issue"} · {timeAgo(item.createdAt)}
-                        </span>
-                        <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">
-                          {item.status === "completed" ? "✅ Resolved" : item.status === "in_progress" ? "🛠️ In Progress" : "⏳ Pending"}
-                        </span>
+              <div>
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <div>
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-100 dark:bg-red-950/50 px-3 py-1 text-xs font-black uppercase tracking-[0.18em] text-red-700 dark:text-red-400 border border-red-200 dark:border-red-800">
+                      <span className="relative flex size-1.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
+                        <span className="relative inline-flex size-1.5 rounded-full bg-red-500" />
                       </span>
-                    </Link>
-                  ))}
+                      <AlertTriangle className="size-3" /> URGENT · Action Required
+                    </span>
+                    <h3 className="mt-2 font-display text-2xl font-bold text-clay">
+                      Citizen Problem Reports
+                    </h3>
+                  </div>
+                  <Link
+                    to="/problems"
+                    className="inline-flex items-center gap-1 rounded-full bg-red-100 px-3.5 py-1.5 text-xs font-bold text-red-700 hover:bg-red-200 transition"
+                  >
+                    View All ({problemItems.length}) →
+                  </Link>
                 </div>
-              )}
+
+                {problemItems.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-red-200 bg-red-50/50 p-6 text-center text-sm text-muted-foreground">
+                    <AlertTriangle className="mx-auto mb-2 size-8 text-red-400" />
+                    No road, drainage, or water problems posted yet.
+                    <p className="mt-2">
+                      <Link to="/problems" className="font-bold text-red-600 hover:underline">
+                        + Report a problem with photo proof
+                      </Link>
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {problemItems.slice(0, 3).map((item) => (
+                      <Link
+                        key={item.id}
+                        to="/problems"
+                        className="flex gap-3 rounded-2xl border border-border bg-white p-3 shadow-sm transition hover:border-red-300 hover:bg-red-50/40"
+                      >
+                        {item.imageUrl ? (
+                          <img
+                            src={item.imageUrl}
+                            alt={item.title}
+                            className="size-16 rounded-xl object-cover shrink-0"
+                          />
+                        ) : (
+                          <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-red-100 text-red-600 font-bold">
+                            <AlertTriangle className="size-6" />
+                          </span>
+                        )}
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate font-bold text-clay text-base">
+                            {item.title}
+                          </span>
+                          <span className="mt-1 block truncate text-xs text-muted-foreground">
+                            📍 {item.location || item.category || "Village issue"} ·{" "}
+                            {timeAgo(item.createdAt)}
+                          </span>
+                          <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-0.5 text-[10px] font-bold text-amber-800">
+                            {item.status === "completed"
+                              ? "✅ Resolved"
+                              : item.status === "in_progress"
+                                ? "🛠️ In Progress"
+                                : "⏳ Pending"}
+                          </span>
+                        </span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-            </div>
         </div>
       </section>
 
@@ -1069,13 +1085,19 @@ function Index() {
                   className="premium-action-card group flex items-center gap-3 rounded-[18px] p-4 text-left"
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}>
+                  <div
+                    className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}
+                  >
                     <a.icon className="size-5" strokeWidth={1.9} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-display text-sm font-bold text-foreground leading-tight">{a.label}</p>
+                    <p className="font-display text-sm font-bold text-foreground leading-tight">
+                      {a.label}
+                    </p>
                     <p className="text-[10px] font-semibold text-primary truncate">{a.te}</p>
-                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">{a.description}</p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                      {a.description}
+                    </p>
                   </div>
                   <ArrowRight className="size-3.5 shrink-0 text-muted-foreground/50 group-hover:text-primary transition" />
                 </a>
@@ -1088,13 +1110,19 @@ function Index() {
                   className="premium-action-card group flex items-center gap-3 rounded-[18px] p-4 text-left"
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}>
+                  <div
+                    className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}
+                  >
                     <a.icon className="size-5" strokeWidth={1.9} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-display text-sm font-bold text-foreground leading-tight">{a.label}</p>
+                    <p className="font-display text-sm font-bold text-foreground leading-tight">
+                      {a.label}
+                    </p>
                     <p className="text-[10px] font-semibold text-primary truncate">{a.te}</p>
-                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">{a.description}</p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                      {a.description}
+                    </p>
                   </div>
                   <ArrowRight className="size-3.5 shrink-0 text-muted-foreground/50 group-hover:text-primary transition" />
                 </Link>
@@ -1119,10 +1147,14 @@ function Index() {
               </span>
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-black text-clay dark:text-zinc-100">
-              Government Help Desk &amp; <span className="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 bg-clip-text text-transparent">MeeSeva Services</span>
+              Government Help Desk &amp;{" "}
+              <span className="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 bg-clip-text text-transparent">
+                MeeSeva Services
+              </span>
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Aadhaar, Ration Cards, and official MeeSeva documents in one place. Keep these ready before applying for government support, agriculture, or housing schemes.
+              Aadhaar, Ration Cards, and official MeeSeva documents in one place. Keep these ready
+              before applying for government support, agriculture, or housing schemes.
             </p>
           </div>
           <Link
@@ -1339,7 +1371,9 @@ function Index() {
           {featured.length === 0 ? (
             <div className="rounded-2xl border-2 border-dashed border-border bg-card/50 p-8 text-center text-muted-foreground">
               No listings yet.{" "}
-              <Link to="/auth" className="font-semibold text-primary hover:underline">Sign in</Link>{" "}
+              <Link to="/auth" className="font-semibold text-primary hover:underline">
+                Sign in
+              </Link>{" "}
               to be the first to post.
             </div>
           ) : (
@@ -1378,7 +1412,9 @@ function Index() {
                           </span>
                         )}
                       </div>
-                      <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">{s.title}</h3>
+                      <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+                        {s.title}
+                      </h3>
                       {s.location && (
                         <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
                           <MapPin className="size-3 shrink-0" />
@@ -1387,7 +1423,9 @@ function Index() {
                       )}
                     </div>
                     <div className="mt-1.5 flex items-center justify-between gap-1">
-                      <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(s.createdAt)}</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {timeAgo(s.createdAt)}
+                      </span>
                       <a
                         href={`tel:${s.contact.replace(/\s|-/g, "")}`}
                         className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold text-primary-foreground transition hover:bg-secondary shrink-0"
@@ -1709,19 +1747,26 @@ function Index() {
               Bring your village online.
             </h2>
             <p className="mt-4 text-pretty text-zinc-200 sm:text-lg leading-relaxed font-semibold drop-shadow">
-              Whether you grow rice, fix motors, drive tractors, or run a small shop — there&apos;s a
-              place for you on ManaOoru. Free for every villager, forever.
+              Whether you grow rice, fix motors, drive tractors, or run a small shop — there&apos;s
+              a place for you on ManaOoru. Free for every villager, forever.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/30 rounded-2xl transition-all scale-100 hover:scale-[1.02]">
+              <Button
+                asChild
+                size="lg"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/30 rounded-2xl transition-all scale-100 hover:scale-[1.02]"
+              >
                 <Link to="/post-worker">
                   Create your profile <ArrowRight className="ml-2 size-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-white/30 bg-white/15 text-white hover:bg-white/25 hover:text-white px-8 py-6 text-base font-bold backdrop-blur-md rounded-2xl transition-all shadow-lg">
-                <Link to="/marketplace">
-                  Browse the village
-                </Link>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-white/30 bg-white/15 text-white hover:bg-white/25 hover:text-white px-8 py-6 text-base font-bold backdrop-blur-md rounded-2xl transition-all shadow-lg"
+              >
+                <Link to="/marketplace">Browse the village</Link>
               </Button>
             </div>
           </div>

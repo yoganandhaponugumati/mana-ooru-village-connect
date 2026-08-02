@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useEffect,
-  useState,
-  type ReactNode,
-} from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 import { useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,12 +14,7 @@ import {
 } from "@/lib/supabase/auth";
 import { type Language, saveVillageProfilePreference } from "@/lib/village-preferences";
 
-export type {
-  AccountType,
-  AppRole,
-  DealerStatus,
-  LegacyAccountType,
-};
+export type { AccountType, AppRole, DealerStatus, LegacyAccountType };
 
 /**
  * Represents the normalized profile of the currently logged-in user.
@@ -36,7 +24,7 @@ type AuthProfile = {
   account_type: LegacyAccountType;
   role: AppRole;
   username: string | null;
-  full_name: string |null;
+  full_name: string | null;
   photo_url: string | null;
   occupation: Occupation | null;
   state: string | null;
@@ -103,11 +91,7 @@ const PROFILE_COLUMNS =
  * user's session, profile, and authentication state (like loading and email verification).
  * It listens to Supabase's `onAuthStateChange` to automatically keep the UI in sync with the backend.
  */
-export function AuthProvider({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<AuthProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -146,12 +130,10 @@ export function AuthProvider({
             mandal: data.mandal,
             village: data.village,
             village_id: data.village_id,
-            preferred_language:
-              (data.preferred_language as Language) ?? "en",
+            preferred_language: (data.preferred_language as Language) ?? "en",
             profileCompletedAt: data.profile_completed_at,
 
-            dealer_status:
-              (data.dealer_status as DealerStatus | null) ?? null,
+            dealer_status: (data.dealer_status as DealerStatus | null) ?? null,
             dealer_category: data.dealer_category ?? null,
             shop_name: data.shop_name ?? null,
             shop_description: data.shop_description ?? null,
@@ -186,11 +168,9 @@ export function AuthProvider({
       setLoading(false);
     };
 
-    const { data: sub } = supabase.auth.onAuthStateChange(
-      (_event, s) => {
-        void syncSession(s);
-      },
-    );
+    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
+      void syncSession(s);
+    });
 
     supabase.auth.getSession().then(({ data }) => {
       void syncSession(data.session);
@@ -222,30 +202,19 @@ export function AuthProvider({
 
   const user = session?.user ?? null;
 
-  const needsProfileCompletion =
-    Boolean(user) &&
-    Boolean(profile) &&
-    !profile?.profileCompletedAt;
+  const needsProfileCompletion = Boolean(user) && Boolean(profile) && !profile?.profileCompletedAt;
 
   const hasPasswordIdentity = Boolean(
-    user?.identities?.some(
-      (identity) => identity.provider === "email",
-    ),
+    user?.identities?.some((identity) => identity.provider === "email"),
   );
 
-  const needsEmailVerification =
-    hasPasswordIdentity && !user?.email_confirmed_at;
+  const needsEmailVerification = hasPasswordIdentity && !user?.email_confirmed_at;
 
-  const isDealerApproved =
-    profile?.role === "dealer" &&
-    profile?.dealer_status === "approved";
+  const isDealerApproved = profile?.role === "dealer" && profile?.dealer_status === "approved";
 
-  const isDealerPending =
-    profile?.dealer_status === "pending";
+  const isDealerPending = profile?.dealer_status === "pending";
 
-  const isDealerSuspended =
-    profile?.role === "dealer" &&
-    profile?.dealer_status === "suspended";
+  const isDealerSuspended = profile?.role === "dealer" && profile?.dealer_status === "suspended";
 
   return (
     <Ctx.Provider

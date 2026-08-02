@@ -122,12 +122,14 @@ function SchemesPage() {
               <span className="inline-flex size-2 rounded-full bg-emerald-500" />
             </div>
             <p className="text-xs text-clay dark:text-zinc-300 font-semibold mt-0.5">
-              Live link to DBT-Bharat & State welfare database. Auto-updated every time the government publishes new schemes or criteria.
+              Live link to DBT-Bharat & State welfare database. Auto-updated every time the
+              government publishes new schemes or criteria.
             </p>
           </div>
         </div>
         <span className="rounded-full bg-emerald-100 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 px-3 py-1 text-[10px] font-black uppercase text-emerald-700 dark:text-emerald-400 tracking-wider shrink-0 self-start sm:self-center">
-          Last Check: Today, {new Date().toLocaleTimeString("en-IN", { hour: '2-digit', minute: '2-digit' })}
+          Last Check: Today,{" "}
+          {new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
         </span>
       </div>
 

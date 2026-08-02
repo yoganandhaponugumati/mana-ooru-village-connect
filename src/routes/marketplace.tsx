@@ -18,19 +18,15 @@ import {
 import { useState, type ComponentType } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
-import {
-  AppButton,
-  EmptyState,
-  FeatureIcon,
-  SurfaceCard,
-} from "@/components/design-system";
+import { AppButton, FeatureIcon, SurfaceCard } from "@/components/design-system";
+import { EmptyState } from "@/components/EmptyState";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings, timeAgo } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/marketplace")({
-  head: () => ({ meta: [{ title: "Village Marketplace & 0% Brokerage Trade — DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Village Marketplace & 0% Brokerage Trade — GramMitra" }] }),
   component: MarketPage,
 });
 
@@ -98,7 +94,7 @@ function MarketPage() {
 
   const contactWhatsApp = (phone: string, title: string, price: string) => {
     const cleanPhone = phone.replace(/\D/g, "");
-    const msg = `🙏 Namaste! I saw your DigiMitra listing:\n*Item:* ${title}\n*Price:* ${price || "As listed"}\n\nIs this currently available for immediate trade?`;
+    const msg = `🙏 Namaste! I saw your GramMitra listing:\n*Item:* ${title}\n*Price:* ${price || "As listed"}\n\nIs this currently available for immediate trade?`;
     window.open(
       `https://api.whatsapp.com/send?phone=91${cleanPhone}&text=${encodeURIComponent(msg)}`,
       "_blank",
@@ -135,8 +131,8 @@ function MarketPage() {
               Zero Middlemen · Zero Commission (`0% Brokerage`)
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5">
-              DigiMitra connects buyers and sellers directly. Call or WhatsApp the seller directly to
-              agree on price and pickup.
+              GramMitra connects buyers and sellers directly. Call or WhatsApp the seller directly
+              to agree on price and pickup.
             </p>
           </div>
         </div>
@@ -251,18 +247,13 @@ function MarketPage() {
 
       {filtered.length === 0 ? (
         <EmptyState
-          icon={<ShoppingBasket className="size-6" />}
+          icon={ShoppingBag}
           title="No items currently listed in this category"
-          description="List your harvest, equipment, or goods today and connect with local buyers directly."
-          action={
-            <AppButton
-              variant="primary"
-              icon={<Plus className="size-4" />}
-              onClick={handlePostClick}
-            >
-              Sell Something Now
-            </AppButton>
-          }
+          description="List your harvest, equipment, or goods today and connect with local buyers directly with zero brokerage."
+          actionLabel="Sell Something Now"
+          onActionClick={handlePostClick}
+          secondaryActionLabel="Clear Category Filter"
+          onSecondaryActionClick={() => { setCat("All"); setQ(""); }}
         />
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -303,7 +294,9 @@ function MarketPage() {
                   </span>
                 </div>
 
-                <h3 className="mt-3 break-words font-display text-lg font-bold text-clay">{i.title}</h3>
+                <h3 className="mt-3 break-words font-display text-lg font-bold text-clay">
+                  {i.title}
+                </h3>
                 {i.description && (
                   <p className="mt-2 text-sm leading-6 text-muted-foreground line-clamp-2">
                     {i.description}
@@ -311,7 +304,8 @@ function MarketPage() {
                 )}
                 {i.location && (
                   <p className="mt-2 text-xs font-semibold text-clay flex items-center gap-1 max-w-full">
-                    <MapPin className="size-3.5 text-emerald-600 shrink-0" /> <span className="truncate min-w-0 flex-1">Pickup: {i.location}</span>
+                    <MapPin className="size-3.5 text-emerald-600 shrink-0" />{" "}
+                    <span className="truncate min-w-0 flex-1">Pickup: {i.location}</span>
                   </p>
                 )}
               </div>

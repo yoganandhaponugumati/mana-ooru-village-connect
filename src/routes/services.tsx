@@ -22,12 +22,7 @@ import {
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingCard, ListingForm } from "@/components/ListingForm";
-import {
-  AppButton,
-  EmptyState,
-  FeatureIcon,
-  SurfaceCard,
-} from "@/components/design-system";
+import { AppButton, EmptyState, FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
@@ -37,7 +32,7 @@ export const Route = createFileRoute("/services")({
   validateSearch: (search: Record<string, unknown>) => ({
     kind: search.kind === "shops" ? "shops" : "services",
   }),
-  head: () => ({ meta: [{ title: "Local Services — DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Local Services — GramMitra" }] }),
   component: ServicesPage,
 });
 
@@ -110,7 +105,11 @@ function ServicesPage() {
             onClick={handlePostClick}
             className="rounded-2xl px-8 py-4 text-base font-extrabold shadow-xl shadow-primary/30 hover:scale-105 transition"
           >
-            {showForm ? "Hide Form" : mode === "shops" ? "⚡ Register Village Shop +" : "⚡ Offer Your Service +"}
+            {showForm
+              ? "Hide Form"
+              : mode === "shops"
+                ? "⚡ Register Village Shop +"
+                : "⚡ Offer Your Service +"}
           </AppButton>
         </div>
       }

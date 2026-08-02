@@ -5,20 +5,34 @@
 
 export const PROFANITY_WORDS = [
   // Add common english and telugu profanity words / spam markers
-  "spam", "scam", "click here", "free money", "lottery",
-  "fuck", "shit", "bitch", "asshole", "dick",
-  "lathkor", "lanja", "na kodaka", "erri", "puku",
+  "spam",
+  "scam",
+  "click here",
+  "free money",
+  "lottery",
+  "fuck",
+  "shit",
+  "bitch",
+  "asshole",
+  "dick",
+  "lathkor",
+  "lanja",
+  "na kodaka",
+  "erri",
+  "puku",
 ];
 
-export async function checkContentSafety(text: string): Promise<{ isSafe: boolean; reason?: string }> {
+export async function checkContentSafety(
+  text: string,
+): Promise<{ isSafe: boolean; reason?: string }> {
   if (!text || text.trim().length === 0) return { isSafe: true };
-  
+
   // 1. First run a local check (super fast and covers basic bad words)
   const normalized = text.toLowerCase().replace(/[^\w\s\u0C00-\u0C7F]/gi, ""); // Remove punctuation, keep english & telugu
   const words = normalized.split(/\s+/);
-  
+
   for (const word of words) {
-    if (PROFANITY_WORDS.some(bad => word.includes(bad) || normalized.includes(bad))) {
+    if (PROFANITY_WORDS.some((bad) => word.includes(bad) || normalized.includes(bad))) {
       return { isSafe: false, reason: "Inappropriate language or spam detected." };
     }
   }
@@ -48,8 +62,8 @@ export async function checkContentSafety(text: string): Promise<{ isSafe: boolea
           SEVERE_TOXICITY: {},
           PROFANITY: {},
           SPAM: {},
-        }
-      })
+        },
+      }),
     });
 
     if (!response.ok) {
@@ -65,9 +79,10 @@ export async function checkContentSafety(text: string): Promise<{ isSafe: boolea
     };
 
     // Thresholds (0 to 1, higher is worse)
-    if (scores.toxicity > 0.75) return { isSafe: false, reason: "Content flagged as toxic or harassing." };
-    if (scores.profanity > 0.70) return { isSafe: false, reason: "Content flagged for profanity." };
-    if (scores.spam > 0.70) return { isSafe: false, reason: "Content flagged as spam." };
+    if (scores.toxicity > 0.75)
+      return { isSafe: false, reason: "Content flagged as toxic or harassing." };
+    if (scores.profanity > 0.7) return { isSafe: false, reason: "Content flagged for profanity." };
+    if (scores.spam > 0.7) return { isSafe: false, reason: "Content flagged as spam." };
 
     return { isSafe: true };
   } catch (error) {
@@ -84,14 +99,14 @@ export function checkRateLimit(action: string, limitCount: number, timeWindowMs:
     const now = Date.now();
     const historyStr = localStorage.getItem(key);
     let history: number[] = historyStr ? JSON.parse(historyStr) : [];
-    
+
     // Filter history to only include timestamps within the timeWindowMs
-    history = history.filter(time => now - time < timeWindowMs);
-    
+    history = history.filter((time) => now - time < timeWindowMs);
+
     if (history.length >= limitCount) {
       return false; // Rate limit exceeded
     }
-    
+
     // Add current action timestamp
     history.push(now);
     localStorage.setItem(key, JSON.stringify(history));

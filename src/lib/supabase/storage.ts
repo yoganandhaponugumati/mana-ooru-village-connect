@@ -16,7 +16,6 @@ export async function uploadUserFile(bucket: StorageBucket, userId: string, file
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "-");
   const path = `${userId}/${crypto.randomUUID()}-${safeName}`;
 
-
   const { error } = await supabase.storage.from(bucket).upload(path, file, {
     cacheControl: "3600",
     upsert: false,
@@ -29,7 +28,6 @@ export async function uploadUserFile(bucket: StorageBucket, userId: string, file
 
   const url = getPublicStorageUrl(bucket, path);
 
-
   return {
     path,
     url,
@@ -37,11 +35,9 @@ export async function uploadUserFile(bucket: StorageBucket, userId: string, file
 }
 
 export async function deleteUserFile(bucket: StorageBucket, path: string) {
-
   const { error } = await supabase.storage.from(bucket).remove([path]);
   if (error) {
     console.error("[storage] delete:error", { bucket, path, error });
     throw new Error(`Uploaded image rollback failed: ${error.message}`);
   }
-
 }

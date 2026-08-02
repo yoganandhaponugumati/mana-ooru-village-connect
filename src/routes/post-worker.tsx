@@ -6,7 +6,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { SurfaceCard } from "@/components/design-system";
 
 export const Route = createFileRoute("/post-worker")({
-  head: () => ({ meta: [{ title: "Register as Worker — DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Register as Worker — GramMitra" }] }),
   component: () => (
     <ProtectedRoute>
       <PageLayout

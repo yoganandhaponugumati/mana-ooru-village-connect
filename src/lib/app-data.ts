@@ -134,7 +134,8 @@ export const fallbackListings: Listing[] = [
     location: "Kothur",
     price: "₹900/day",
     category: "Tractor Driver",
-    imageUrl: "https://images.unsplash.com/photo-1592982537447-6f2a6a0c7c18?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1592982537447-6f2a6a0c7c18?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 8,
   },
   {
@@ -146,7 +147,8 @@ export const fallbackListings: Listing[] = [
     location: "Kandukur",
     price: "₹500 visit",
     category: "Electrician",
-    imageUrl: "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 22,
   },
   {
@@ -158,7 +160,8 @@ export const fallbackListings: Listing[] = [
     location: "Dasarlapally",
     price: "₹18,000/season",
     category: "Lease",
-    imageUrl: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1500382017468-9049fed747ef?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 28,
   },
   {
@@ -170,7 +173,8 @@ export const fallbackListings: Listing[] = [
     location: "Kothur",
     price: "₹2,250/quintal",
     category: "Rice",
-    imageUrl: "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1586771107445-d3ca888129ff?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 34,
   },
   {
@@ -182,7 +186,8 @@ export const fallbackListings: Listing[] = [
     location: "Maheshwaram",
     price: "Call for rate",
     category: "Borewell",
-    imageUrl: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 44,
   },
   {
@@ -193,7 +198,8 @@ export const fallbackListings: Listing[] = [
     contact: "Village Secretary",
     location: "Kothur Panchayat",
     category: "Medical Camp",
-    imageUrl: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 52,
   },
   {
@@ -205,7 +211,8 @@ export const fallbackListings: Listing[] = [
     contact: "9876543210",
     location: "Kothur bus stop",
     category: "Drainage",
-    imageUrl: "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=800&q=80",
+    imageUrl:
+      "https://images.unsplash.com/photo-1541888946425-d0fbb186a5b3?auto=format&fit=crop&w=800&q=80",
     createdAt: Date.now() - 1000 * 60 * 60 * 3,
   },
 ];
@@ -215,7 +222,8 @@ export const schemes: SchemeInfo[] = [
     id: "scheme-pm-kisan",
     title: "PM-KISAN Samman Nidhi",
     category: "agriculture",
-    benefit: "Guaranteed ₹6,000 per year income support for farmers, transferred directly to bank accounts in 3 equal installments of ₹2,000.",
+    benefit:
+      "Guaranteed ₹6,000 per year income support for farmers, transferred directly to bank accounts in 3 equal installments of ₹2,000.",
     documents: ["Aadhaar Card", "Bank Account Passbook", "Pattadar Passbook / Land Records"],
     eligibility: "Small and marginal farmers who own cultivable land in their name.",
     apply: "https://pmkisan.gov.in/",
@@ -224,7 +232,8 @@ export const schemes: SchemeInfo[] = [
     id: "scheme-pm-fasal",
     title: "PM Fasal Bima Yojana",
     category: "agriculture",
-    benefit: "Low premium crop insurance (1.5% for Rabi, 2% for Kharif, 5% for commercial/horticulture crops) protecting against drought, flood, and unseasonal rains.",
+    benefit:
+      "Low premium crop insurance (1.5% for Rabi, 2% for Kharif, 5% for commercial/horticulture crops) protecting against drought, flood, and unseasonal rains.",
     documents: ["Aadhaar", "Land Record / Pahani", "Crop Sowing Certificate", "Bank Account"],
     eligibility: "All farmers including sharecroppers and tenant farmers growing notified crops.",
     apply: "https://pmfby.gov.in/",
@@ -233,16 +242,19 @@ export const schemes: SchemeInfo[] = [
     id: "scheme-pmayg",
     title: "PMAY-Gramin (Housing Loan & Subsidy)",
     category: "housing",
-    benefit: "₹1.2 Lakh direct subsidy for rural housing construction. Includes additional ₹12,000 for toilet construction and access to up to ₹70,000 bank loan at 3% interest subvention.",
+    benefit:
+      "₹1.2 Lakh direct subsidy for rural housing construction. Includes additional ₹12,000 for toilet construction and access to up to ₹70,000 bank loan at 3% interest subvention.",
     documents: ["Aadhaar", "Job Card / SECC 2011 Data", "Bank Account", "Land Ownership Proof"],
-    eligibility: "Houseless families or families living in zero, one or two room houses with kutcha walls and kutcha roof.",
+    eligibility:
+      "Houseless families or families living in zero, one or two room houses with kutcha walls and kutcha roof.",
     apply: "https://pmayg.nic.in/",
   },
   {
     id: "scheme-ayushman",
     title: "Ayushman Bharat PM-JAY",
     category: "health",
-    benefit: "Free health insurance coverage up to ₹5 Lakhs per family per year for secondary and tertiary care hospitalization.",
+    benefit:
+      "Free health insurance coverage up to ₹5 Lakhs per family per year for secondary and tertiary care hospitalization.",
     documents: ["Aadhaar", "Ration Card", "Active Mobile Number"],
     eligibility: "Families identified via the SECC 2011 database (deprivation criteria).",
     apply: "https://beneficiary.nha.gov.in/",
@@ -251,16 +263,19 @@ export const schemes: SchemeInfo[] = [
     id: "scheme-mudra",
     title: "PM MUDRA Yojana (Business Loans)",
     category: "women",
-    benefit: "Collateral-free micro-credit loans for non-farm enterprises. Shishu (up to ₹50K), Kishore (₹50K-₹5L), Tarun (₹5L-₹10L) with competitive interest rates starting at ~8.5%.",
+    benefit:
+      "Collateral-free micro-credit loans for non-farm enterprises. Shishu (up to ₹50K), Kishore (₹50K-₹5L), Tarun (₹5L-₹10L) with competitive interest rates starting at ~8.5%.",
     documents: ["Aadhaar", "Business Proof / Idea", "Bank Statement", "Category Proof"],
-    eligibility: "Any Indian citizen with a business plan for a non-farm sector income generating activity.",
+    eligibility:
+      "Any Indian citizen with a business plan for a non-farm sector income generating activity.",
     apply: "https://www.mudra.org.in/",
   },
   {
     id: "scheme-sukanya",
     title: "Sukanya Samriddhi Yojana (Girl Child)",
     category: "women",
-    benefit: "High-interest savings account (currently 8.2% p.a., tax-free) for the future education and marriage of a girl child. Minimum deposit ₹250/year.",
+    benefit:
+      "High-interest savings account (currently 8.2% p.a., tax-free) for the future education and marriage of a girl child. Minimum deposit ₹250/year.",
     documents: ["Girl's Birth Certificate", "Parent's Aadhaar", "Parent's PAN/Address Proof"],
     eligibility: "Parents or legal guardians of a girl child below 10 years of age.",
     apply: "https://www.indiapost.gov.in/",
@@ -269,7 +284,8 @@ export const schemes: SchemeInfo[] = [
     id: "scheme-pm-kusum",
     title: "PM-KUSUM Solar Pump Subsidy",
     category: "agriculture",
-    benefit: "Up to 60% subsidy on standalone solar agriculture pumps to reduce diesel costs and provide reliable daytime power.",
+    benefit:
+      "Up to 60% subsidy on standalone solar agriculture pumps to reduce diesel costs and provide reliable daytime power.",
     documents: ["Aadhaar", "Land Document", "Bank Account", "Current Electricity Bill (if any)"],
     eligibility: "Individual farmers, water user associations, and farmer producer organizations.",
     apply: "https://pmkusum.mnre.gov.in/",
@@ -278,7 +294,8 @@ export const schemes: SchemeInfo[] = [
     id: "scheme-mgnrega",
     title: "MGNREGA 100-Days Employment",
     category: "pension",
-    benefit: "Legal guarantee of 100 days of wage employment in a financial year at minimum statutory wages (approx ₹250-₹300/day depending on state).",
+    benefit:
+      "Legal guarantee of 100 days of wage employment in a financial year at minimum statutory wages (approx ₹250-₹300/day depending on state).",
     documents: ["Aadhaar", "Address Proof", "Bank/Post Office Account", "Passport Photo"],
     eligibility: "Any adult member of a rural household willing to do unskilled manual work.",
     apply: "https://nrega.nic.in/",
@@ -287,9 +304,11 @@ export const schemes: SchemeInfo[] = [
     id: "scheme-national-scholarship",
     title: "National Scholarship Portal",
     category: "education",
-    benefit: "Pre-matric and Post-matric financial scholarships for minority, SC/ST/OBC, and economically weaker students covering tuition and maintenance fees.",
+    benefit:
+      "Pre-matric and Post-matric financial scholarships for minority, SC/ST/OBC, and economically weaker students covering tuition and maintenance fees.",
     documents: ["Aadhaar", "Student ID", "Income Certificate", "Caste Certificate", "Bank Account"],
-    eligibility: "Students meeting scholarship-specific income (usually < ₹2.5L-₹8L/yr) and academic rules.",
+    eligibility:
+      "Students meeting scholarship-specific income (usually < ₹2.5L-₹8L/yr) and academic rules.",
     apply: "https://scholarships.gov.in/",
   },
 ];

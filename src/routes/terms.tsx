@@ -6,11 +6,11 @@ import { SectionHeader, SurfaceCard } from "@/components/design-system";
 export const Route = createFileRoute("/terms")({
   head: () => ({
     meta: [
-      { title: "Terms of Service & Community Guidelines — DigiMitra" },
+      { title: "Terms of Service & Community Guidelines — GramMitra" },
       {
         name: "description",
         content:
-          "Official Terms of Service, Zero-Brokerage rules, and Community Guidelines for the DigiMitra Digital Village Platform.",
+          "Official Terms of Service, Zero-Brokerage rules, and Community Guidelines for the GramMitra Digital Village Platform.",
       },
     ],
   }),
@@ -41,8 +41,8 @@ function TermsOfServicePage() {
           </div>
           <p className="mt-6 text-sm sm:text-base leading-7 text-muted-foreground">
             By creating an account (`/auth`) or accessing{" "}
-            <strong className="text-foreground">DigiMitra</strong> across our web portal or mobile
-            apps (`Android APK/AAB`), you agree to abide by these Terms of Service. DigiMitra is
+            <strong className="text-foreground">GramMitra</strong> across our web portal or mobile
+            apps (`Android APK/AAB`), you agree to abide by these Terms of Service. GramMitra is
             built to empower rural India with trustworthy, direct commerce. We treat every
             participant as a respected neighbour.
           </p>
@@ -55,7 +55,7 @@ function TermsOfServicePage() {
             <span>100% Zero-Brokerage (`0% Commission`) Disclaimer</span>
           </div>
           <p className="mt-3 text-sm sm:text-base leading-7 text-muted-foreground">
-            DigiMitra operates strictly as an open digital directory and communication portal.
+            GramMitra operates strictly as an open digital directory and communication portal.
             <br />
             <br />
             1. <strong className="text-foreground">No Intermediary Cuts:</strong> We never charge
@@ -64,8 +64,8 @@ function TermsOfServicePage() {
             <br />
             2. <strong className="text-foreground">Direct Peer-to-Peer Verification:</strong> All
             transactions, financial exchanges, crop quality inspections, and wage agreements occur
-            directly between the buyer and seller or citizen and service provider. DigiMitra does not
-            escrow funds or act as a financial guarantor.
+            directly between the buyer and seller or citizen and service provider. GramMitra does
+            not escrow funds or act as a financial guarantor.
           </p>
         </SurfaceCard>
 

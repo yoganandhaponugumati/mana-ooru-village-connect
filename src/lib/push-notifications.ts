@@ -91,8 +91,7 @@ export function useBrowserPushNotifications() {
       return;
     }
 
-    const shouldAsk =
-      window.localStorage.getItem(ASKED_KEY) !== "yes";
+    const shouldAsk = window.localStorage.getItem(ASKED_KEY) !== "yes";
 
     if (!shouldAsk && Notification.permission !== "granted") return;
 
@@ -146,35 +145,32 @@ export function useBrowserPushNotifications() {
               ? {
                   label: "Open",
                   onClick: () => {
-                    window.location.assign(
-                      notification.action_url ?? "/"
-                    );
+                    window.location.assign(notification.action_url ?? "/");
                   },
                 }
               : undefined,
           });
 
-          if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+          if (
+            typeof window !== "undefined" &&
+            "Notification" in window &&
+            Notification.permission === "granted"
+          ) {
             try {
               new Notification(notification.title, {
                 body: notification.body,
                 icon: "/site-icon.svg",
               });
             } catch {
-              navigator.serviceWorker
-                ?.getRegistration()
-                ?.then((registration) => {
-                  registration?.showNotification(
-                    notification.title ?? "DigiMitra • Village Alert",
-                    {
-                      body: notification.body,
-                      icon: "/site-icon.svg",
-                    } as any
-                  );
-                });
+              navigator.serviceWorker?.getRegistration()?.then((registration) => {
+                registration?.showNotification(notification.title ?? "GramMitra • Village Alert", {
+                  body: notification.body,
+                  icon: "/site-icon.svg",
+                } as any);
+              });
             }
           }
-        }
+        },
       )
       .subscribe();
 

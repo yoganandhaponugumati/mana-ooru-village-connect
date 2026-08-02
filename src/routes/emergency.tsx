@@ -7,7 +7,7 @@ import { logContact } from "@/lib/local-actions";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/emergency")({
-  head: () => ({ meta: [{ title: "Emergency Contacts - DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Emergency Contacts - GramMitra" }] }),
   component: EmergencyPage,
 });
 
@@ -30,7 +30,9 @@ function EmergencyPage() {
           <SurfaceCard
             key={item.id}
             className={`p-4 flex flex-row items-center gap-4 border-l-4 rounded-[1.25rem] shadow-sm hover:shadow-md transition ${
-              item.urgent ? "border-red-500 bg-red-50/80 dark:bg-red-950/20" : "border-primary bg-card/95"
+              item.urgent
+                ? "border-red-500 bg-red-50/80 dark:bg-red-950/20"
+                : "border-primary bg-card/95"
             }`}
           >
             <FeatureIcon
@@ -38,7 +40,9 @@ function EmergencyPage() {
               className={`shrink-0 ${item.urgent ? "bg-red-100 text-red-700 dark:bg-red-900/50 dark:text-red-300" : ""}`}
             />
             <div className="flex flex-col flex-1 min-w-0">
-              <h3 className="truncate font-display text-base font-bold text-clay leading-tight">{item.title}</h3>
+              <h3 className="truncate font-display text-base font-bold text-clay leading-tight">
+                {item.title}
+              </h3>
               <p className="mt-0.5 text-xs text-muted-foreground line-clamp-1">{item.role}</p>
             </div>
             <a

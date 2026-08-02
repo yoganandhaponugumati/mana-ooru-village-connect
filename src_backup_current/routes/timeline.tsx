@@ -598,7 +598,6 @@ function TimelinePage() {
         </AppButton>
       }
     >
-
       <div className="mb-8 grid gap-4 lg:grid-cols-[1fr_0.72fr]">
         <SurfaceCard className="overflow-hidden p-0">
           <div className="relative min-h-64 bg-[linear-gradient(135deg,#143120,#256b2b_45%,#18a999)] p-6 text-white sm:p-8">
@@ -894,10 +893,12 @@ function TimelineCard({
 
           <div className="mt-5 flex flex-wrap items-center gap-2 text-xs font-semibold text-muted-foreground">
             <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <MapPin className="size-3.5 shrink-0" /> <span className="truncate">{item.village}</span>
+              <MapPin className="size-3.5 shrink-0" />{" "}
+              <span className="truncate">{item.village}</span>
             </span>
             <span className="inline-flex max-w-full items-center gap-1.5 rounded-full bg-muted px-3 py-1.5">
-              <Users className="size-3.5 shrink-0" /> <span className="truncate">{item.author}</span>
+              <Users className="size-3.5 shrink-0" />{" "}
+              <span className="truncate">{item.author}</span>
             </span>
           </div>
 

@@ -60,7 +60,7 @@ function SearchableSelectField({
       try {
         const queryTerm = searchContext ? `${search}, ${searchContext}` : search;
         const res = await fetch(
-          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(queryTerm)}&count=10&countryCode=IN&language=en&format=json`
+          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(queryTerm)}&count=10&countryCode=IN&language=en&format=json`,
         );
         const data = await res.json();
         const results = (data?.results ?? []) as any[];
@@ -108,7 +108,11 @@ function SearchableSelectField({
     <div ref={containerRef} className={`relative block ${open ? "z-[100]" : "z-10"}`}>
       <span className="mb-1 block text-xs font-black uppercase tracking-wider text-primary/80 flex items-center justify-between">
         <span>{label}</span>
-        {loading && <span className="text-[10px] lowercase text-muted-foreground italic font-normal">searching...</span>}
+        {loading && (
+          <span className="text-[10px] lowercase text-muted-foreground italic font-normal">
+            searching...
+          </span>
+        )}
       </span>
       <div className="relative">
         <input
@@ -131,7 +135,9 @@ function SearchableSelectField({
           onClick={() => setOpen((v) => !v)}
           className="absolute right-3 top-1/2 -translate-y-1/2 grid size-7 place-items-center text-muted-foreground hover:text-primary transition"
         >
-          <ChevronDown className={`size-4 transition-transform duration-200 ${open ? "rotate-180 text-primary" : ""}`} />
+          <ChevronDown
+            className={`size-4 transition-transform duration-200 ${open ? "rotate-180 text-primary" : ""}`}
+          />
         </button>
       </div>
 
@@ -161,7 +167,9 @@ function SearchableSelectField({
             })
           ) : (
             <div className="p-3 text-center">
-              <p className="text-muted-foreground text-[11px] font-medium">No matching predefined option.</p>
+              <p className="text-muted-foreground text-[11px] font-medium">
+                No matching predefined option.
+              </p>
               {search.trim() && (
                 <button
                   key="custom-btn"

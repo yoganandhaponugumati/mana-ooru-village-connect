@@ -2,10 +2,7 @@ import { useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import {
-  sendLoginNotification,
-  sendTestPushNotification,
-} from "@/lib/api/notification.functions";
+import { sendLoginNotification, sendTestPushNotification } from "@/lib/api/notification.functions";
 import { requestFcmToken } from "@/lib/firebase-messaging";
 
 const ASKED_KEY = "manaooru.push.permission.asked.v1";
@@ -41,7 +38,9 @@ export async function subscribeToPush(source = "app") {
     return false;
   }
 
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const userId = session?.user?.id;
   if (!userId) {
     console.warn("[Push] No authenticated session found. Skipping subscription.");
@@ -60,25 +59,26 @@ export async function subscribeToPush(source = "app") {
     return false;
   }
 
+  console.log("========== SESSION ==========");
+  console.log(session);
+  console.log("Access Token:", session?.access_token);
+  console.log("User ID:", session?.user?.id);
+  console.log("=============================");
 
-console.log("========== SESSION ==========");
-console.log(session);
-console.log("Access Token:", session?.access_token);
-console.log("User ID:", session?.user?.id);
-console.log("=============================");
-
-if (session?.access_token) {
-  console.log("[Push] Sending test push notification...");
-  const testResult = await sendTestPushNotification();
-  console.log("[Push] Test push request complete:", testResult);
-} else {
-  console.warn("[Push] No authenticated session yet. Skipping test notification.");
-}
+  if (session?.access_token) {
+    console.log("[Push] Sending test push notification...");
+    const testResult = await sendTestPushNotification();
+    console.log("[Push] Test push request complete:", testResult);
+  } else {
+    console.warn("[Push] No authenticated session yet. Skipping test notification.");
+  }
   return true;
 }
 
 export async function unsubscribeFromPush() {
-  const { data: { session } } = await supabase.auth.getSession();
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
   const userId = session?.user?.id;
   if (!userId) return;
 
@@ -169,23 +169,25 @@ export function useBrowserPushNotifications() {
           });
 
           if (Notification.permission === "granted" && document.visibilityState !== "visible") {
-            navigator.serviceWorker.getRegistration("/firebase-messaging-sw.js").then((registration) => {
-              registration?.showNotification(notification.title ?? "ManaOoru • Village Alert", {
-                body: notification.body,
-                icon: "/site-icon.svg",
-                badge: "/notification-badge.svg",
-                tag: notification.dedupe_key ?? `manaooru-push-${Date.now()}`,
-                renotify: true,
-                vibrate: [200, 100, 200],
-                actions: [
-                  {
-                    action: "open",
-                    title: "👀 Tap to Open in ManaOoru",
-                  },
-                ],
-                data: { url: notification.action_url ?? "/" },
-              } as any);
-            });
+            navigator.serviceWorker
+              .getRegistration("/firebase-messaging-sw.js")
+              .then((registration) => {
+                registration?.showNotification(notification.title ?? "ManaOoru • Village Alert", {
+                  body: notification.body,
+                  icon: "/site-icon.svg",
+                  badge: "/notification-badge.svg",
+                  tag: notification.dedupe_key ?? `manaooru-push-${Date.now()}`,
+                  renotify: true,
+                  vibrate: [200, 100, 200],
+                  actions: [
+                    {
+                      action: "open",
+                      title: "👀 Tap to Open in ManaOoru",
+                    },
+                  ],
+                  data: { url: notification.action_url ?? "/" },
+                } as any);
+              });
           }
         },
       )

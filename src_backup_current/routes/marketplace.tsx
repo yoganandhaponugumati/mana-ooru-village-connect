@@ -18,12 +18,7 @@ import {
 import { useState, type ComponentType } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
-import {
-  AppButton,
-  EmptyState,
-  FeatureIcon,
-  SurfaceCard,
-} from "@/components/design-system";
+import { AppButton, EmptyState, FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings, timeAgo } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
@@ -303,7 +298,9 @@ function MarketPage() {
                   </span>
                 </div>
 
-                <h3 className="mt-3 break-words font-display text-lg font-bold text-clay">{i.title}</h3>
+                <h3 className="mt-3 break-words font-display text-lg font-bold text-clay">
+                  {i.title}
+                </h3>
                 {i.description && (
                   <p className="mt-2 text-sm leading-6 text-muted-foreground line-clamp-2">
                     {i.description}
@@ -311,7 +308,8 @@ function MarketPage() {
                 )}
                 {i.location && (
                   <p className="mt-2 text-xs font-semibold text-clay flex items-center gap-1 max-w-full">
-                    <MapPin className="size-3.5 text-emerald-600 shrink-0" /> <span className="truncate">Pickup: {i.location}</span>
+                    <MapPin className="size-3.5 text-emerald-600 shrink-0" />{" "}
+                    <span className="truncate">Pickup: {i.location}</span>
                   </p>
                 )}
               </div>

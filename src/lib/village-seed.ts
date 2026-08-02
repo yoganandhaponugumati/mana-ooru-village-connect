@@ -1,5 +1,5 @@
 /**
- * Client-Side Default Emergency Contacts & Seed Announcements for DigiMitra
+ * Client-Side Default Emergency Contacts & Seed Announcements for GramMitra
  * Ensures no village ever looks blank or broken.
  */
 
@@ -67,7 +67,7 @@ export function getVillageWelcomeAnnouncement(villageName: string) {
   const name = villageName && villageName !== "Smart Village" ? villageName : "your village";
   return {
     id: `welcome-${villageName}`,
-    title: `🎉 Welcome to DigiMitra ${name}!`,
+    title: `🎉 Welcome to GramMitra ${name}!`,
     body: `Namaste villagers of ${name}! Welcome to your digital village hub. Use this platform to hire local workers, check crop prices, report civic problems, connect with Sarpanch, and read Gram Panchayat notices.`,
     author: "Gram Panchayat Desk",
     authorRole: "Panchayat Admin",

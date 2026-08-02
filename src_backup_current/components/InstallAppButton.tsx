@@ -13,7 +13,10 @@ export function usePWAInstall() {
 
   useEffect(() => {
     // Check if already in standalone mode
-    if (window.matchMedia("(display-mode: standalone)").matches || (navigator as unknown as { standalone?: boolean }).standalone) {
+    if (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as unknown as { standalone?: boolean }).standalone
+    ) {
       setIsInstalled(true);
     }
 
@@ -173,13 +176,18 @@ export function InstallAppButton({
                       <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
                         1
                       </span>
-                      <span>Tap the <strong>Share</strong> button <Share className="inline size-3 text-blue-500" /> at bottom</span>
+                      <span>
+                        Tap the <strong>Share</strong> button{" "}
+                        <Share className="inline size-3 text-blue-500" /> at bottom
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
                         2
                       </span>
-                      <span>Scroll & tap <strong>Add to Home Screen</strong> (➕)</span>
+                      <span>
+                        Scroll & tap <strong>Add to Home Screen</strong> (➕)
+                      </span>
                     </div>
                   </>
                 ) : (
@@ -189,13 +197,17 @@ export function InstallAppButton({
                       <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
                         1
                       </span>
-                      <span>Tap browser menu (<strong>⋮</strong> or <strong>≡</strong>) top right</span>
+                      <span>
+                        Tap browser menu (<strong>⋮</strong> or <strong>≡</strong>) top right
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
                         2
                       </span>
-                      <span>Select <strong>Install App</strong> or <strong>Add to Home screen</strong></span>
+                      <span>
+                        Select <strong>Install App</strong> or <strong>Add to Home screen</strong>
+                      </span>
                     </div>
                   </>
                 )}

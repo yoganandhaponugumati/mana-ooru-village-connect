@@ -14,9 +14,9 @@ const firebaseConfig = {
 export function isFcmConfigured(): boolean {
   return Boolean(
     firebaseConfig.apiKey &&
-      firebaseConfig.projectId &&
-      firebaseConfig.messagingSenderId &&
-      firebaseConfig.appId
+    firebaseConfig.projectId &&
+    firebaseConfig.messagingSenderId &&
+    firebaseConfig.appId,
   );
 }
 
@@ -25,22 +25,26 @@ let messagingPromise: Promise<Messaging | null> | null = null;
 export async function getFcmMessaging(): Promise<Messaging | null> {
   if (typeof window === "undefined") return null;
   if (!isFcmConfigured()) {
-    console.info("[FCM] Firebase credentials not found in env. Set VITE_FIREBASE_* variables to enable FCM.");
+    console.info(
+      "[FCM] Firebase credentials not found in env. Set VITE_FIREBASE_* variables to enable FCM.",
+    );
     return null;
   }
 
   if (!messagingPromise) {
-    messagingPromise = isSupported().then((supported) => {
-      if (!supported) {
-        console.warn("[FCM] Messaging is not supported in this browser.");
+    messagingPromise = isSupported()
+      .then((supported) => {
+        if (!supported) {
+          console.warn("[FCM] Messaging is not supported in this browser.");
+          return null;
+        }
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+        return getMessaging(app);
+      })
+      .catch((err) => {
+        console.error("[FCM] Failed to initialize messaging:", err);
         return null;
-      }
-      const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-      return getMessaging(app);
-    }).catch((err) => {
-      console.error("[FCM] Failed to initialize messaging:", err);
-      return null;
-    });
+      });
   }
 
   return messagingPromise;
@@ -51,7 +55,8 @@ export async function cleanLegacyServiceWorkers() {
   try {
     const registrations = await navigator.serviceWorker.getRegistrations();
     for (const reg of registrations) {
-      const scriptURL = reg.active?.scriptURL || reg.installing?.scriptURL || reg.waiting?.scriptURL || "";
+      const scriptURL =
+        reg.active?.scriptURL || reg.installing?.scriptURL || reg.waiting?.scriptURL || "";
       if (scriptURL.includes("push-sw.js") || scriptURL.includes("?apiKey=")) {
         console.log(`[FCM] Unregistering legacy or mismatched service worker: ${scriptURL}`);
         await reg.unregister();
@@ -82,12 +87,11 @@ export async function requestFcmToken(userId?: string): Promise<string | null> {
     }
 
     const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY as string | undefined;
-    
+
     // 2. Register service worker normally (without query parameters)
-    const swRegistration = await navigator.serviceWorker.register(
-      "/firebase-messaging-sw.js",
-      { scope: "/" }
-    );
+    const swRegistration = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+      scope: "/",
+    });
 
     // 3. Retrieve token using the registration
     const token = await getToken(messaging, {
@@ -130,7 +134,11 @@ export async function requestFcmToken(userId?: string): Promise<string | null> {
 }
 
 export async function registerFcmForegroundListener(
-  onNotification: (payload: { title?: string; body?: string; data?: Record<string, unknown> }) => void
+  onNotification: (payload: {
+    title?: string;
+    body?: string;
+    data?: Record<string, unknown>;
+  }) => void,
 ) {
   const messaging = await getFcmMessaging();
   if (!messaging) return () => {};

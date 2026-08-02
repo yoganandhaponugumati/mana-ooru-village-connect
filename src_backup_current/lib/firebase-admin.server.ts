@@ -13,7 +13,9 @@ function initializeFirebaseAdmin() {
   if (serviceAccountJson) {
     try {
       const serviceAccount = JSON.parse(serviceAccountJson);
-      console.log("[FCM Server] Initializing Firebase Admin with FIREBASE_SERVICE_ACCOUNT JSON env");
+      console.log(
+        "[FCM Server] Initializing Firebase Admin with FIREBASE_SERVICE_ACCOUNT JSON env",
+      );
       return admin.initializeApp({
         credential: admin.credential.cert(serviceAccount),
       });
@@ -34,7 +36,10 @@ function initializeFirebaseAdmin() {
         }),
       });
     } catch (e) {
-      console.error("[FCM Server] Failed to initialize Firebase Admin with individual credentials:", e);
+      console.error(
+        "[FCM Server] Failed to initialize Firebase Admin with individual credentials:",
+        e,
+      );
     }
   }
 
@@ -44,7 +49,7 @@ function initializeFirebaseAdmin() {
     return admin.initializeApp();
   } catch (e) {
     console.warn(
-      "[FCM Server] Firebase Admin could not be initialized (missing FIREBASE_SERVICE_ACCOUNT or credentials). FCM push notifications will be disabled."
+      "[FCM Server] Firebase Admin could not be initialized (missing FIREBASE_SERVICE_ACCOUNT or credentials). FCM push notifications will be disabled.",
     );
     return null;
   }
@@ -58,7 +63,7 @@ export async function sendFcmNotification(
     url?: string;
     tag?: string;
     notificationId?: string;
-  }
+  },
 ) {
   console.log("[FCM Server] Preparing FCM push notification:", payload);
   console.log("[FCM Server] Token count:", tokens.length);
@@ -107,14 +112,17 @@ export async function sendFcmNotification(
     });
 
     console.log(
-      `[FCM Server] FCM delivery result: ${response.successCount} success, ${response.failureCount} failure`
+      `[FCM Server] FCM delivery result: ${response.successCount} success, ${response.failureCount} failure`,
     );
 
     const failedTokens: string[] = [];
     response.responses.forEach((resp, idx) => {
       if (!resp.success) {
         const error = resp.error;
-        console.error(`[FCM Server] Error sending to token index ${idx} (${cleanTokens[idx]}):`, error);
+        console.error(
+          `[FCM Server] Error sending to token index ${idx} (${cleanTokens[idx]}):`,
+          error,
+        );
         if (
           error &&
           (error.code === "messaging/invalid-registration-token" ||

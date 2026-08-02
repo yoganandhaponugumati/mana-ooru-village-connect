@@ -217,9 +217,7 @@ export async function signInWithOAuth(provider: Provider) {
   // Always use the current browser origin so Google OAuth works on any dev port,
   // not just the hardcoded VITE_AUTH_REDIRECT_URL in .env.
   const redirectTo =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/`
-      : getAuthRedirectUrl("/");
+    typeof window !== "undefined" ? `${window.location.origin}/` : getAuthRedirectUrl("/");
 
   return supabase.auth.signInWithOAuth({
     provider,

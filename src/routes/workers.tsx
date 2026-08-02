@@ -19,17 +19,13 @@ import {
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingCard } from "@/components/ListingForm";
-import {
-  AppLinkButton,
-  EmptyState,
-  FeatureIcon,
-  SurfaceCard,
-} from "@/components/design-system";
+import { AppLinkButton, FeatureIcon, SurfaceCard } from "@/components/design-system";
+import { EmptyState } from "@/components/EmptyState";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 
 export const Route = createFileRoute("/workers")({
-  head: () => ({ meta: [{ title: "Find Workers — DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Find Workers — GramMitra" }] }),
   component: WorkersPage,
 });
 
@@ -108,14 +104,13 @@ function WorkersPage() {
       </div>
       {filtered.length === 0 ? (
         <EmptyState
-          icon={<Users className="size-6" />}
-          title="No workers found"
-          description="Be the first to list your skills and help the village connect faster."
-          action={
-            <AppLinkButton to="/post-worker" icon={<Plus className="size-4" />} variant="primary">
-              Be the first
-            </AppLinkButton>
-          }
+          icon={Users}
+          title="No workers found matching search"
+          description="Be the first to list your skills or clear search filters to view all workers."
+          actionLabel="Register as Worker"
+          actionTo="/post-worker"
+          secondaryActionLabel="Clear Search"
+          onSecondaryActionClick={() => setQ("")}
         />
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

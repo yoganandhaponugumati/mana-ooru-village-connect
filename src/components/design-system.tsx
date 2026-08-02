@@ -475,3 +475,29 @@ export function SkeletonStories() {
   );
 }
 
+/**
+ * Listing Cards Skeleton Grid Loader
+ */
+export function ListingSkeletonGrid({ count = 4 }: { count?: number }) {
+  return (
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+      {Array.from({ length: count }).map((_, idx) => (
+        <div
+          key={idx}
+          className="rounded-3xl border border-border bg-card p-5 shadow-2xs animate-pulse space-y-4"
+        >
+          <div className="h-44 w-full rounded-2xl bg-muted" />
+          <div className="space-y-2">
+            <div className="h-5 w-3/4 rounded-lg bg-muted" />
+            <div className="h-4 w-1/2 rounded-md bg-muted/60" />
+          </div>
+          <div className="flex items-center justify-between pt-2">
+            <div className="h-6 w-20 rounded-full bg-muted" />
+            <div className="h-8 w-24 rounded-xl bg-muted" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+

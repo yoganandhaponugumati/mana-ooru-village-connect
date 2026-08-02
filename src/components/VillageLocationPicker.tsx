@@ -61,7 +61,7 @@ function SearchableSelectField({
       try {
         const queryTerm = searchContext ? `${search}, ${searchContext}` : search;
         const res = await fetch(
-          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(queryTerm)}&count=10&countryCode=IN&language=en&format=json`
+          `https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(queryTerm)}&count=10&countryCode=IN&language=en&format=json`,
         );
         const data = await res.json();
         const results = (data?.results ?? []) as any[];
@@ -109,7 +109,11 @@ function SearchableSelectField({
     <div ref={containerRef} className={`relative block ${open ? "z-[100]" : "z-10"}`}>
       <span className="mb-1 block text-xs font-black uppercase tracking-wider text-primary/80 flex items-center justify-between">
         <span>{label}</span>
-        {loading && <span className="text-[10px] lowercase text-muted-foreground italic font-normal">searching...</span>}
+        {loading && (
+          <span className="text-[10px] lowercase text-muted-foreground italic font-normal">
+            searching...
+          </span>
+        )}
       </span>
       <div className="relative">
         <input
@@ -132,7 +136,9 @@ function SearchableSelectField({
           onClick={() => setOpen((v) => !v)}
           className="absolute right-3 top-1/2 -translate-y-1/2 grid size-7 place-items-center text-muted-foreground hover:text-primary transition"
         >
-          <ChevronDown className={`size-4 transition-transform duration-200 ${open ? "rotate-180 text-primary" : ""}`} />
+          <ChevronDown
+            className={`size-4 transition-transform duration-200 ${open ? "rotate-180 text-primary" : ""}`}
+          />
         </button>
       </div>
 
@@ -162,7 +168,9 @@ function SearchableSelectField({
             })
           ) : (
             <div className="p-3 text-center">
-              <p className="text-muted-foreground text-[11px] font-medium">No matching predefined option.</p>
+              <p className="text-muted-foreground text-[11px] font-medium">
+                No matching predefined option.
+              </p>
               {search.trim() && (
                 <button
                   key="custom-btn"
@@ -212,12 +220,12 @@ export function VillageLocationPicker({
           const { latitude, longitude } = position.coords;
           const res = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=10&addressdetails=1`,
-            { headers: { "User-Agent": "DigiMitra-Village-App/1.0" } }
+            { headers: { "User-Agent": "GramMitra-Village-App/1.0" } },
           );
           if (!res.ok) throw new Error("Failed to fetch location data");
           const data = await res.json();
           const address = data.address || {};
-          
+
           const state = address.state || "";
           const district = address.state_district || address.county || "";
           const mandal = address.county || address.suburb || "";
@@ -228,7 +236,7 @@ export function VillageLocationPicker({
             state: state.replace(" State", ""),
             district: district.replace(" District", ""),
             mandal: mandal,
-            village: village
+            village: village,
           });
           toast.success("Location detected!");
         } catch (error) {
@@ -246,7 +254,7 @@ export function VillageLocationPicker({
           toast.error("Could not fetch location.");
         }
       },
-      { timeout: 10000, maximumAge: 60000 }
+      { timeout: 10000, maximumAge: 60000 },
     );
   };
 
@@ -264,37 +272,37 @@ export function VillageLocationPicker({
         </button>
       </div>
       <div className="grid gap-3 sm:grid-cols-2">
-      <SearchableSelectField
-        label="State"
-        value={value.state}
-        placeholder="Select or type State"
-        options={states}
-        onChange={(next) => onChange({ state: next, district: "", mandal: "", village: "" })}
-      />
-      <SearchableSelectField
-        label="District"
-        value={value.district}
-        placeholder="Select or type District"
-        options={districts}
-        searchContext={value.state}
-        onChange={(next) => onChange({ ...value, district: next, mandal: "", village: "" })}
-      />
-      <SearchableSelectField
-        label="Mandal / Tehsil"
-        value={value.mandal}
-        placeholder="Select or type Mandal"
-        options={mandals}
-        searchContext={[value.district, value.state].filter(Boolean).join(", ")}
-        onChange={(next) => onChange({ ...value, mandal: next, village: "" })}
-      />
-      <SearchableSelectField
-        label="Village"
-        value={value.village}
-        placeholder="Select or type Village"
-        options={villages}
-        searchContext={[value.mandal, value.district, value.state].filter(Boolean).join(", ")}
-        onChange={(next) => onChange({ ...value, village: next })}
-      />
+        <SearchableSelectField
+          label="State"
+          value={value.state}
+          placeholder="Select or type State"
+          options={states}
+          onChange={(next) => onChange({ state: next, district: "", mandal: "", village: "" })}
+        />
+        <SearchableSelectField
+          label="District"
+          value={value.district}
+          placeholder="Select or type District"
+          options={districts}
+          searchContext={value.state}
+          onChange={(next) => onChange({ ...value, district: next, mandal: "", village: "" })}
+        />
+        <SearchableSelectField
+          label="Mandal / Tehsil"
+          value={value.mandal}
+          placeholder="Select or type Mandal"
+          options={mandals}
+          searchContext={[value.district, value.state].filter(Boolean).join(", ")}
+          onChange={(next) => onChange({ ...value, mandal: next, village: "" })}
+        />
+        <SearchableSelectField
+          label="Village"
+          value={value.village}
+          placeholder="Select or type Village"
+          options={villages}
+          searchContext={[value.mandal, value.district, value.state].filter(Boolean).join(", ")}
+          onChange={(next) => onChange({ ...value, village: next })}
+        />
       </div>
     </div>
   );

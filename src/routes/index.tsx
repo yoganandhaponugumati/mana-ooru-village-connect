@@ -58,13 +58,13 @@ import workersImg from "@/assets/workers-premium.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "DigiMitra — A Digital Home for Every Village" },
+      { title: "GramMitra — A Digital Home for Every Village" },
       {
         name: "description",
         content:
           "Find workers, lease land, buy local produce, hire services, and stay updated with village announcements — all in one place.",
       },
-      { property: "og:title", content: "DigiMitra — A Digital Home for Every Village" },
+      { property: "og:title", content: "GramMitra — A Digital Home for Every Village" },
       {
         property: "og:description",
         content: "One platform for farmers, workers, services, and villagers. మా ఊరు, మన చేతుల్లో.",
@@ -371,7 +371,9 @@ function HeroFeatureCarousel() {
         >
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-2 mb-1">
-              <span className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${activeItem.accentBg}`}>
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${activeItem.accentBg}`}
+              >
                 {activeItem.badge}
               </span>
               <span className="text-[11px] font-semibold text-white/80">{activeItem.telugu}</span>
@@ -496,7 +498,9 @@ function HeroVillageOSCard({
               className="rounded-2xl border border-white/10 bg-white/5 p-3 text-center backdrop-blur-md transition hover:bg-white/10 hover:border-emerald-400/30 shadow"
             >
               <metric.icon className="mx-auto size-4 text-emerald-400 mb-1" />
-              <p className="font-display text-lg font-black text-white sm:text-xl">{metric.value}</p>
+              <p className="font-display text-lg font-black text-white sm:text-xl">
+                {metric.value}
+              </p>
               <p className="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400">
                 {metric.label}
               </p>
@@ -557,14 +561,13 @@ function Index() {
   const navigate = useNavigate();
   const { profile: authProfile } = useAuth();
   const { t, profile, weather } = useVillagePreferences();
-  
-  const villageName = (
+
+  const villageName =
     authProfile?.village?.trim() ||
     profile?.village?.trim() ||
     authProfile?.mandal?.trim() ||
     profile?.mandal?.trim() ||
-    "Smart Village"
-  );
+    "Smart Village";
 
   const { data: stats } = useListingStats({
     villageId: authProfile?.village_id,
@@ -594,7 +597,8 @@ function Index() {
       alert("Voice search is not supported in this browser.");
       return;
     }
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = "te-IN"; // Telugu
     recognition.interimResults = false;
@@ -644,7 +648,6 @@ function Index() {
         <div className="absolute inset-x-0 bottom-0 z-10 h-52 bg-gradient-to-t from-zinc-950 via-zinc-950/80 to-transparent" />
         <div className="pointer-events-none absolute left-0 top-28 z-10 h-px w-full bg-gradient-to-r from-transparent via-white/20 to-transparent" />
         <div className="hero-life-layer pointer-events-none absolute inset-0 z-10" />
-
 
         {/* Start Home Page Main Hero Grid (Title, Search Bar & Right Side HeroVillageOSCard) */}
         <div className="relative z-20 mx-auto grid min-h-[calc(100vh-8rem)] max-w-7xl items-center gap-10 px-4 pt-28 pb-12 sm:px-6 lg:grid-cols-[0.94fr_1.06fr] lg:items-center">
@@ -758,7 +761,12 @@ function Index() {
             )}
           </div>
 
-          <HeroVillageOSCard villageName={villageName} heroWeather={heroWeather} stats={stats} pinnedNotice={announcementItems[0] ?? null} />
+          <HeroVillageOSCard
+            villageName={villageName}
+            heroWeather={heroWeather}
+            stats={stats}
+            pinnedNotice={announcementItems[0] ?? null}
+          />
         </div>
 
         {/* FULL-WIDTH HERO SHOWCASE CARD SPANNING 100% CONTAINER WIDTH BELOW THE MAIN HERO FOLD */}
@@ -787,10 +795,11 @@ function Index() {
 
                 <div>
                   <h2 className="font-display text-2xl sm:text-3xl lg:text-4xl font-black text-white leading-tight">
-                    Learn How to Use <span className="text-emerald-400">DigiMitra</span>
+                    Learn How to Use <span className="text-emerald-400">GramMitra</span>
                   </h2>
                   <p className="mt-1.5 text-xs sm:text-sm font-semibold text-emerald-100/90 leading-relaxed">
-                    1 నిమిషంలో నేర్చుకోండి — రైతులు, కూలీలు, వ్యాపారులు మరియు గ్రామ ప్రజలందరి కోసం రూపొందించబడిన డిజిటల్ వేదిక!
+                    1 నిమిషంలో నేర్చుకోండి — రైతులు, కూలీలు, వ్యాపారులు మరియు గ్రామ ప్రజలందరి కోసం
+                    రూపొందించబడిన డిజిటల్ వేదిక!
                   </p>
                 </div>
 
@@ -870,11 +879,19 @@ function Index() {
 
         {/* Mobile Top Image Banner */}
         <div className="mb-6 mt-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
-          <img src="/village-life-bg.jpg" alt="Village" className="absolute inset-0 w-full h-full object-cover" />
+          <img
+            src="/village-life-bg.jpg"
+            alt="Village"
+            className="absolute inset-0 w-full h-full object-cover"
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <div className="absolute bottom-4 left-5 right-5 text-white">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow-sm">Welcome to</span>
-            <h2 className="font-display text-2xl font-bold truncate drop-shadow-md">{villageName || "Smart Village"}</h2>
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow-sm">
+              Welcome to
+            </span>
+            <h2 className="font-display text-2xl font-bold truncate drop-shadow-md">
+              {villageName || "Smart Village"}
+            </h2>
           </div>
         </div>
 
@@ -906,21 +923,30 @@ function Index() {
         {/* ════ 4-CORE ACTIVITY GRID ════ */}
         <div className="mb-8">
           <div className="grid grid-cols-2 gap-3">
-
             {/* Card 1 — Sarpanch / Contact */}
             <Link
               to="/emergency"
               className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-[#eab308]/90 mix-blend-multiply z-10" />
-              <img src="/village-life-bg.jpg" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700" alt="" />
+              <img
+                src="/village-life-bg.jpg"
+                className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700"
+                alt=""
+              />
               <div className="relative z-20 flex items-center gap-2 mb-1.5">
                 <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <UserRound className="size-4" />
                 </div>
-                <p className="font-display text-[15px] font-bold leading-tight">Sarpanch<br/>Connect</p>
+                <p className="font-display text-[15px] font-bold leading-tight">
+                  Sarpanch
+                  <br />
+                  Connect
+                </p>
               </div>
-              <p className="relative z-20 text-[10px] font-medium text-white/95">Direct contact, updates</p>
+              <p className="relative z-20 text-[10px] font-medium text-white/95">
+                Direct contact, updates
+              </p>
             </Link>
 
             {/* Card 2 — Report Problem */}
@@ -929,14 +955,24 @@ function Index() {
               className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-[#ef4444]/90 mix-blend-multiply z-10" />
-              <img src="/village-life-bg.jpg" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700" alt="" />
+              <img
+                src="/village-life-bg.jpg"
+                className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700"
+                alt=""
+              />
               <div className="relative z-20 flex items-center gap-2 mb-1.5">
                 <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <AlertTriangle className="size-4" />
                 </div>
-                <p className="font-display text-[15px] font-bold leading-tight">Report<br/>Problem</p>
+                <p className="font-display text-[15px] font-bold leading-tight">
+                  Report
+                  <br />
+                  Problem
+                </p>
               </div>
-              <p className="relative z-20 text-[10px] font-medium text-white/95">Civic issues, requests</p>
+              <p className="relative z-20 text-[10px] font-medium text-white/95">
+                Civic issues, requests
+              </p>
             </Link>
 
             {/* Card 3 — Government Schemes */}
@@ -945,14 +981,24 @@ function Index() {
               className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-[#065f46]/90 mix-blend-multiply z-10" />
-              <img src="/village-life-bg.jpg" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700" alt="" />
+              <img
+                src="/village-life-bg.jpg"
+                className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700"
+                alt=""
+              />
               <div className="relative z-20 flex items-center gap-2 mb-1.5">
                 <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <Landmark className="size-4" />
                 </div>
-                <p className="font-display text-[15px] font-bold leading-tight">Govt<br/>Schemes</p>
+                <p className="font-display text-[15px] font-bold leading-tight">
+                  Govt
+                  <br />
+                  Schemes
+                </p>
               </div>
-              <p className="relative z-20 text-[10px] font-medium text-white/95">Apply, details, benefits</p>
+              <p className="relative z-20 text-[10px] font-medium text-white/95">
+                Apply, details, benefits
+              </p>
             </Link>
 
             {/* Card 4 — Post Notice */}
@@ -961,16 +1007,25 @@ function Index() {
               className="group flex flex-col justify-center rounded-2xl p-4 text-white shadow-sm hover:shadow-md transition-all h-[90px] relative overflow-hidden"
             >
               <div className="absolute inset-0 bg-[#3b82f6]/90 mix-blend-multiply z-10" />
-              <img src="/village-life-bg.jpg" className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700" alt="" />
+              <img
+                src="/village-life-bg.jpg"
+                className="absolute inset-0 w-full h-full object-cover z-0 opacity-30 group-hover:scale-110 transition-transform duration-700"
+                alt=""
+              />
               <div className="relative z-20 flex items-center gap-2 mb-1.5">
                 <div className="grid size-7 shrink-0 place-items-center rounded-full bg-white/25 text-white backdrop-blur-sm">
                   <Megaphone className="size-4" />
                 </div>
-                <p className="font-display text-[15px] font-bold leading-tight">Post<br/>Notice</p>
+                <p className="font-display text-[15px] font-bold leading-tight">
+                  Post
+                  <br />
+                  Notice
+                </p>
               </div>
-              <p className="relative z-20 text-[10px] font-medium text-white/95">Share news, events</p>
+              <p className="relative z-20 text-[10px] font-medium text-white/95">
+                Share news, events
+              </p>
             </Link>
-
           </div>
         </div>
 
@@ -978,7 +1033,9 @@ function Index() {
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-3">
             <Sparkles className="size-5 text-amber-500" />
-            <h3 className="font-display text-lg font-extrabold text-clay dark:text-zinc-100">Village Assistance</h3>
+            <h3 className="font-display text-lg font-extrabold text-clay dark:text-zinc-100">
+              Village Assistance
+            </h3>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <Link
@@ -989,11 +1046,15 @@ function Index() {
                 <Bot className="size-5" />
               </div>
               <div>
-                <p className="font-display text-[13px] font-bold text-clay dark:text-zinc-100 leading-tight">DigiMitra AI</p>
-                <p className="text-[10px] font-medium text-muted-foreground mt-0.5">Crop & schemes help</p>
+                <p className="font-display text-[13px] font-bold text-clay dark:text-zinc-100 leading-tight">
+                  GramMitra AI
+                </p>
+                <p className="text-[10px] font-medium text-muted-foreground mt-0.5">
+                  Crop & schemes help
+                </p>
               </div>
             </Link>
-            
+
             <Link
               to="/weather"
               className="flex items-center gap-3 rounded-2xl border border-amber-200 bg-amber-50/50 p-4 shadow-sm hover:shadow-md transition-all dark:border-amber-900/50 dark:bg-amber-950/20"
@@ -1002,8 +1063,12 @@ function Index() {
                 <CloudSun className="size-5" />
               </div>
               <div>
-                <p className="font-display text-[13px] font-bold text-clay dark:text-zinc-100 leading-tight">Live Weather</p>
-                <p className="text-[10px] font-medium text-muted-foreground mt-0.5">{heroWeather.split("·")[0] || "Check forecast"}</p>
+                <p className="font-display text-[13px] font-bold text-clay dark:text-zinc-100 leading-tight">
+                  Live Weather
+                </p>
+                <p className="text-[10px] font-medium text-muted-foreground mt-0.5">
+                  {heroWeather.split("·")[0] || "Check forecast"}
+                </p>
               </div>
             </Link>
           </div>
@@ -1017,37 +1082,66 @@ function Index() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-600 opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-emerald-600" />
               </span>
-              <h3 className="font-display text-lg font-extrabold text-clay dark:text-zinc-100">Active Announcements</h3>
+              <h3 className="font-display text-lg font-extrabold text-clay dark:text-zinc-100">
+                Active Announcements
+              </h3>
             </div>
-            <Link to="/announcements" className="text-xs font-bold text-emerald-700 hover:underline">
+            <Link
+              to="/announcements"
+              className="text-xs font-bold text-emerald-700 hover:underline"
+            >
               View All →
             </Link>
           </div>
-          
+
           {/* Manual Horizontal Scrolling Cards */}
           <div className="relative flex overflow-x-auto w-full pb-4 hide-scrollbar snap-x snap-mandatory">
             <div className="flex gap-4">
-            {(announcementItems.length > 0 ? announcementItems : fallbackListings.filter(i => i.type === "announcement")).map((item, idx) => (
-              <div key={`${item.id}-${idx}`} className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border border-border bg-white shadow-sm overflow-hidden flex flex-col relative snap-center snap-always">
-                <div className="h-32 w-full relative overflow-hidden bg-muted">
-                  <img src={item.imageUrl || "/village-life-bg.jpg"} alt={item.title} className="h-full w-full object-cover transition-transform duration-700" />
-                </div>
-                <div className="p-4 flex flex-col flex-1">
-                  <h4 className="font-display text-base font-bold text-clay truncate">{item.title}</h4>
-                  <p className="text-xs text-muted-foreground mt-1 font-medium">
-                    {new Date(item.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric" })}, {new Date(item.createdAt).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" })}
-                  </p>
-                  <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
-                    {item.description || "Official panchayat announcement for the village. Please read for more details."}
-                  </p>
-                  <div className="mt-4 pt-1">
-                    <Link to="/announcements" className="inline-flex items-center justify-center rounded-full bg-[#065f46] px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition">
-                      Read More
-                    </Link>
+              {(announcementItems.length > 0
+                ? announcementItems
+                : fallbackListings.filter((i) => i.type === "announcement")
+              ).map((item, idx) => (
+                <div
+                  key={`${item.id}-${idx}`}
+                  className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border border-border bg-white shadow-sm overflow-hidden flex flex-col relative snap-center snap-always"
+                >
+                  <div className="h-32 w-full relative overflow-hidden bg-muted">
+                    <img
+                      src={item.imageUrl || "/village-life-bg.jpg"}
+                      alt={item.title}
+                      className="h-full w-full object-cover transition-transform duration-700"
+                    />
+                  </div>
+                  <div className="p-4 flex flex-col flex-1">
+                    <h4 className="font-display text-base font-bold text-clay truncate">
+                      {item.title}
+                    </h4>
+                    <p className="text-xs text-muted-foreground mt-1 font-medium">
+                      {new Date(item.createdAt).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                      ,{" "}
+                      {new Date(item.createdAt).toLocaleTimeString("en-US", {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                      })}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
+                      {item.description ||
+                        "Official panchayat announcement for the village. Please read for more details."}
+                    </p>
+                    <div className="mt-4 pt-1">
+                      <Link
+                        to="/announcements"
+                        className="inline-flex items-center justify-center rounded-full bg-[#065f46] px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition"
+                      >
+                        Read More
+                      </Link>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
             </div>
           </div>
         </div>
@@ -1060,33 +1154,49 @@ function Index() {
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-500 opacity-75" />
                 <span className="relative inline-flex size-2 rounded-full bg-red-500" />
               </span>
-              <h3 className="font-display text-base font-extrabold text-clay dark:text-zinc-100">Citizen Problems</h3>
+              <h3 className="font-display text-base font-extrabold text-clay dark:text-zinc-100">
+                Citizen Problems
+              </h3>
             </div>
             <Link to="/problems" className="text-xs font-bold text-red-600 hover:underline">
               View All →
             </Link>
           </div>
           <div className="space-y-3">
-            {(problemItems.length > 0 ? problemItems : fallbackListings.filter(i => i.type === "complaint").slice(0,3)).map((item) => (
+            {(problemItems.length > 0
+              ? problemItems
+              : fallbackListings.filter((i) => i.type === "complaint").slice(0, 3)
+            ).map((item) => (
               <Link
                 key={item.id}
                 to="/problems"
                 className="flex gap-3 rounded-2xl border border-border bg-white dark:bg-zinc-900 p-3 shadow-sm transition hover:border-red-300 hover:bg-red-50/40 dark:hover:bg-red-950/20"
               >
                 {item.imageUrl ? (
-                  <img src={item.imageUrl} alt={item.title} className="size-14 rounded-xl object-cover shrink-0" />
+                  <img
+                    src={item.imageUrl}
+                    alt={item.title}
+                    className="size-14 rounded-xl object-cover shrink-0"
+                  />
                 ) : (
                   <span className="grid size-14 shrink-0 place-items-center rounded-xl bg-red-100 dark:bg-red-950/50 text-red-600">
                     <AlertTriangle className="size-6" />
                   </span>
                 )}
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate font-bold text-clay dark:text-zinc-100 text-sm">{item.title}</span>
+                  <span className="block truncate font-bold text-clay dark:text-zinc-100 text-sm">
+                    {item.title}
+                  </span>
                   <span className="mt-0.5 block text-xs text-muted-foreground truncate">
-                    📍 {item.location || item.category || "Village issue"} · {timeAgo(item.createdAt)}
+                    📍 {item.location || item.category || "Village issue"} ·{" "}
+                    {timeAgo(item.createdAt)}
                   </span>
                   <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">
-                    {item.status === "completed" ? "✅ Resolved" : item.status === "in_progress" ? "🛠️ In Progress" : "⏳ Pending"}
+                    {item.status === "completed"
+                      ? "✅ Resolved"
+                      : item.status === "in_progress"
+                        ? "🛠️ In Progress"
+                        : "⏳ Pending"}
                   </span>
                 </span>
               </Link>
@@ -1099,7 +1209,6 @@ function Index() {
             </Link>
           </div>
         </div>
-
       </section>
 
       <ConceptShowcase />
@@ -1125,13 +1234,19 @@ function Index() {
                   className="premium-action-card group flex items-center gap-3 rounded-[18px] p-4 text-left"
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}>
+                  <div
+                    className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}
+                  >
                     <a.icon className="size-5" strokeWidth={1.9} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-display text-sm font-bold text-foreground leading-tight">{a.label}</p>
+                    <p className="font-display text-sm font-bold text-foreground leading-tight">
+                      {a.label}
+                    </p>
                     <p className="text-[10px] font-semibold text-primary truncate">{a.te}</p>
-                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">{a.description}</p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                      {a.description}
+                    </p>
                   </div>
                   <ArrowRight className="size-3.5 shrink-0 text-muted-foreground/50 group-hover:text-primary transition" />
                 </a>
@@ -1144,13 +1259,19 @@ function Index() {
                   className="premium-action-card group flex items-center gap-3 rounded-[18px] p-4 text-left"
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
-                  <div className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}>
+                  <div
+                    className={`premium-action-icon grid size-11 shrink-0 place-items-center rounded-xl transition-transform group-hover:scale-110 ${a.tint}`}
+                  >
                     <a.icon className="size-5" strokeWidth={1.9} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-display text-sm font-bold text-foreground leading-tight">{a.label}</p>
+                    <p className="font-display text-sm font-bold text-foreground leading-tight">
+                      {a.label}
+                    </p>
                     <p className="text-[10px] font-semibold text-primary truncate">{a.te}</p>
-                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">{a.description}</p>
+                    <p className="mt-0.5 text-[11px] leading-snug text-muted-foreground line-clamp-2">
+                      {a.description}
+                    </p>
                   </div>
                   <ArrowRight className="size-3.5 shrink-0 text-muted-foreground/50 group-hover:text-primary transition" />
                 </Link>
@@ -1175,10 +1296,14 @@ function Index() {
               </span>
             </div>
             <h2 className="font-display text-3xl sm:text-4xl font-black text-clay dark:text-zinc-100">
-              Government Help Desk &amp; <span className="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 bg-clip-text text-transparent">MeeSeva Services</span>
+              Government Help Desk &amp;{" "}
+              <span className="bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 bg-clip-text text-transparent">
+                MeeSeva Services
+              </span>
             </h2>
             <p className="mt-2 text-sm leading-relaxed text-muted-foreground sm:text-base">
-              Aadhaar, Ration Cards, and official MeeSeva documents in one place. Keep these ready before applying for government support, agriculture, or housing schemes.
+              Aadhaar, Ration Cards, and official MeeSeva documents in one place. Keep these ready
+              before applying for government support, agriculture, or housing schemes.
             </p>
           </div>
           <Link
@@ -1201,12 +1326,17 @@ function Index() {
                   className="group relative flex items-start gap-4 min-w-0 rounded-[24px] border border-transparent bg-white/60 p-4 transition-all hover:bg-white hover:shadow-xl hover:shadow-primary/5 dark:bg-zinc-900/50 dark:hover:bg-zinc-900"
                 >
                   <div className="grid size-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br from-primary/10 to-primary/5 text-primary shadow-inner">
-                    <Icon className="size-6 transition-transform group-hover:scale-110" strokeWidth={1.8} />
+                    <Icon
+                      className="size-6 transition-transform group-hover:scale-110"
+                      strokeWidth={1.8}
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-2">
-                       <p className="font-display text-base font-bold text-clay dark:text-zinc-100 truncate">{service.title}</p>
-                       <ArrowRight className="size-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
+                      <p className="font-display text-base font-bold text-clay dark:text-zinc-100 truncate">
+                        {service.title}
+                      </p>
+                      <ArrowRight className="size-4 shrink-0 text-muted-foreground/40 transition-transform group-hover:translate-x-1 group-hover:text-primary" />
                     </div>
                     <p className="mt-1 text-xs font-medium leading-relaxed text-muted-foreground line-clamp-2">
                       {service.description}
@@ -1294,7 +1424,7 @@ function Index() {
       <section className="mx-auto mt-20 max-w-7xl px-4 sm:mt-28 sm:px-6">
         <div className="mb-10 max-w-2xl">
           <span className="text-xs font-bold uppercase tracking-widest text-secondary">
-            How DigiMitra works
+            How GramMitra works
           </span>
           <h2 className="mt-2 font-display text-3xl font-semibold text-clay sm:text-4xl">
             Three simple steps. No paperwork, no middlemen.
@@ -1402,7 +1532,9 @@ function Index() {
           {featured.length === 0 ? (
             <div className="rounded-2xl border-2 border-dashed border-border bg-card/50 p-8 text-center text-muted-foreground">
               No listings yet.{" "}
-              <Link to="/auth" className="font-semibold text-primary hover:underline">Sign in</Link>{" "}
+              <Link to="/auth" className="font-semibold text-primary hover:underline">
+                Sign in
+              </Link>{" "}
               to be the first to post.
             </div>
           ) : (
@@ -1441,7 +1573,9 @@ function Index() {
                           </span>
                         )}
                       </div>
-                      <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">{s.title}</h3>
+                      <h3 className="font-bold text-sm text-foreground line-clamp-2 leading-snug">
+                        {s.title}
+                      </h3>
                       {s.location && (
                         <p className="mt-0.5 flex items-center gap-1 text-[10px] text-muted-foreground">
                           <MapPin className="size-3 shrink-0" />
@@ -1450,7 +1584,9 @@ function Index() {
                       )}
                     </div>
                     <div className="mt-1.5 flex items-center justify-between gap-1">
-                      <span className="text-[10px] text-muted-foreground shrink-0">{timeAgo(s.createdAt)}</span>
+                      <span className="text-[10px] text-muted-foreground shrink-0">
+                        {timeAgo(s.createdAt)}
+                      </span>
                       <a
                         href={`tel:${s.contact.replace(/\s|-/g, "")}`}
                         className="flex items-center gap-1 rounded-full bg-primary px-2.5 py-1 text-[10px] font-bold text-primary-foreground transition hover:bg-secondary shrink-0"
@@ -1705,7 +1841,7 @@ function Index() {
         <div className="grid gap-4 md:grid-cols-3">
           {[
             [
-              "Is DigiMitra free?",
+              "Is GramMitra free?",
               "Yes, villagers can browse and post local needs without commission.",
             ],
             [
@@ -1772,19 +1908,26 @@ function Index() {
               Bring your village online.
             </h2>
             <p className="mt-4 text-pretty text-zinc-200 sm:text-lg leading-relaxed font-semibold drop-shadow">
-              Whether you grow rice, fix motors, drive tractors, or run a small shop — there&apos;s a
-              place for you on DigiMitra. Free for every villager, forever.
+              Whether you grow rice, fix motors, drive tractors, or run a small shop — there&apos;s
+              a place for you on GramMitra. Free for every villager, forever.
             </p>
             <div className="mt-8 flex flex-wrap gap-4">
-              <Button asChild size="lg" className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/30 rounded-2xl transition-all scale-100 hover:scale-[1.02]">
+              <Button
+                asChild
+                size="lg"
+                className="bg-gradient-to-r from-amber-500 to-amber-600 text-zinc-950 hover:from-amber-400 hover:to-amber-500 px-8 py-6 text-base font-extrabold shadow-xl shadow-amber-500/30 rounded-2xl transition-all scale-100 hover:scale-[1.02]"
+              >
                 <Link to="/profile">
                   Create your profile <ArrowRight className="ml-2 size-5" />
                 </Link>
               </Button>
-              <Button asChild variant="outline" size="lg" className="border-white/30 bg-white/15 text-white hover:bg-white/25 hover:text-white px-8 py-6 text-base font-bold backdrop-blur-md rounded-2xl transition-all shadow-lg">
-                <Link to="/search">
-                  Browse the village
-                </Link>
+              <Button
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-white/30 bg-white/15 text-white hover:bg-white/25 hover:text-white px-8 py-6 text-base font-bold backdrop-blur-md rounded-2xl transition-all shadow-lg"
+              >
+                <Link to="/search">Browse the village</Link>
               </Button>
             </div>
           </div>
@@ -1798,10 +1941,10 @@ function Index() {
             <div className="grid size-7 place-items-center rounded-full bg-primary text-primary-foreground font-display italic">
               D
             </div>
-            <span className="font-display text-lg font-semibold text-clay">DigiMitra</span>
+            <span className="font-display text-lg font-semibold text-clay">GramMitra</span>
           </div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground text-center">
-            © {new Date().getFullYear()} DigiMitra · Built with care for our villages.
+            © {new Date().getFullYear()} GramMitra · Built with care for our villages.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-5 text-sm text-muted-foreground">
             <Link to="/announcements" className="transition hover:text-primary">

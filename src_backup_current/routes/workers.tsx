@@ -19,12 +19,7 @@ import {
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingCard } from "@/components/ListingForm";
-import {
-  AppLinkButton,
-  EmptyState,
-  FeatureIcon,
-  SurfaceCard,
-} from "@/components/design-system";
+import { AppLinkButton, EmptyState, FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 

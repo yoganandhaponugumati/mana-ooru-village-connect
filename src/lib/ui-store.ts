@@ -43,6 +43,6 @@ export const useUIStore = create<UIStore>()(
           document.documentElement.classList.add("dark");
         }
       },
-    }
-  )
+    },
+  ),
 );

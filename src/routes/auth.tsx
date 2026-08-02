@@ -30,7 +30,7 @@ type AuthSearch = {
 };
 
 export const Route = createFileRoute("/auth")({
-  head: () => ({ meta: [{ title: "Sign in — DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Sign in — GramMitra" }] }),
   validateSearch: (search: Record<string, unknown>): AuthSearch => {
     return {
       redirect: typeof search.redirect === "string" ? search.redirect : undefined,
@@ -47,14 +47,14 @@ const roleOptions: { id: AppRole; label: string; icon: typeof User }[] = [
 ];
 
 /**
- * The main Authentication Page for DigiMitra.
- * 
+ * The main Authentication Page for GramMitra.
+ *
  * Handles three primary workflows:
  * 1. Citizen / Admin Sign In (Email+Password or Phone OTP)
  * 2. Citizen Sign Up (Creates a profile and links to a village)
  * 3. Dealer Sign Up (Requires additional shop details and goes into 'pending' status)
- * 
- * Upon successful authentication, it redirects users to their appropriate dashboard 
+ *
+ * Upon successful authentication, it redirects users to their appropriate dashboard
  * based on their role (`getRoleDashboardPath`).
  */
 function AuthPage() {
@@ -71,7 +71,7 @@ function AuthPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [name, setName] = useState("");
-  
+
   // Auth methods
   const [authMethod, setAuthMethod] = useState<"password" | "phone">("password");
   const [otpToken, setOtpToken] = useState("");
@@ -149,22 +149,53 @@ function AuthPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      if (!email) { toast.error("Please enter your email address."); setBusy(false); return; }
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error("Please enter a valid email address."); setBusy(false); return; }
+      if (!email) {
+        toast.error("Please enter your email address.");
+        setBusy(false);
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        toast.error("Please enter a valid email address.");
+        setBusy(false);
+        return;
+      }
 
       if (mode === "signup") {
         const passwordError = getPasswordError(password);
-        if (passwordError) { toast.error(passwordError); setBusy(false); return; }
-        if (password !== confirmPassword) { toast.error("Passwords do not match."); setBusy(false); return; }
-        if (!villageProfile.village.trim()) { toast.error("Please select or type your village name."); setBusy(false); return; }
+        if (passwordError) {
+          toast.error(passwordError);
+          setBusy(false);
+          return;
+        }
+        if (password !== confirmPassword) {
+          toast.error("Passwords do not match.");
+          setBusy(false);
+          return;
+        }
+        if (!villageProfile.village.trim()) {
+          toast.error("Please select or type your village name.");
+          setBusy(false);
+          return;
+        }
         if (role === "dealer") {
-          if (!shopName.trim()) { toast.error("Shop Name is required."); setBusy(false); return; }
-          if (!shopAddress.trim()) { toast.error("Shop Address is required."); setBusy(false); return; }
+          if (!shopName.trim()) {
+            toast.error("Shop Name is required.");
+            setBusy(false);
+            return;
+          }
+          if (!shopAddress.trim()) {
+            toast.error("Shop Address is required.");
+            setBusy(false);
+            return;
+          }
         }
 
         const selectedProfile = normalizeProfile(villageProfile);
         const { data, error } = await signUpWithEmailPassword({
-          email, password, fullName: name, phone,
+          email,
+          password,
+          fullName: name,
+          phone,
           occupation: role === "dealer" ? "Business" : occupation,
           metadata: {
             state: selectedProfile.state,
@@ -196,12 +227,16 @@ function AuthPage() {
           setBusy(false);
           return;
         }
-        toast.success("Welcome to DigiMitra!");
+        toast.success("Welcome to GramMitra!");
         navigate({ to: redirect || getRoleDashboardPath("citizen") });
       } else {
         // Sign In
         if (authMethod === "phone") {
-          if (!phone) { toast.error("Please enter your phone number (+91...)."); setBusy(false); return; }
+          if (!phone) {
+            toast.error("Please enter your phone number (+91...).");
+            setBusy(false);
+            return;
+          }
           if (!otpSent) {
             const { error } = await signInWithOtp(phone);
             if (error) throw error;
@@ -213,18 +248,26 @@ function AuthPage() {
             const { data, error } = await verifyPhoneOtp(phone, otpToken);
             if (error) throw error;
             if (!data.session) {
-               toast.error("Invalid OTP");
-               setBusy(false);
-               return;
+              toast.error("Invalid OTP");
+              setBusy(false);
+              return;
             }
             // Proceed to session load
           }
         }
 
         if (authMethod === "password") {
-          if (!password) { toast.error("Please enter your password."); setBusy(false); return; }
+          if (!password) {
+            toast.error("Please enter your password.");
+            setBusy(false);
+            return;
+          }
           const passwordError = getPasswordError(password);
-          if (passwordError) { toast.error(passwordError); setBusy(false); return; }
+          if (passwordError) {
+            toast.error(passwordError);
+            setBusy(false);
+            return;
+          }
 
           const { error } = await signInWithEmailPassword(email, password);
           if (error) throw error;
@@ -232,15 +275,21 @@ function AuthPage() {
 
         const { data: sessionData } = await supabase.auth.getSession();
         if (!sessionData.session) {
-           setBusy(false);
-           return; // Waiting for phone OTP
+          setBusy(false);
+          return; // Waiting for phone OTP
         }
 
-        const signedInProfile = sessionData.session.user ? await loadSignedInProfile(sessionData.session.user.id) : null;
+        const signedInProfile = sessionData.session.user
+          ? await loadSignedInProfile(sessionData.session.user.id)
+          : null;
         const resolvedRole = normalizeRole(signedInProfile?.role ?? signedInProfile?.account_type);
 
         // Strict role validation
-        if (role === "village_admin" && resolvedRole !== "village_admin" && resolvedRole !== "super_admin") {
+        if (
+          role === "village_admin" &&
+          resolvedRole !== "village_admin" &&
+          resolvedRole !== "super_admin"
+        ) {
           await supabase.auth.signOut();
           toast.error("Access denied. You are not an Admin.");
           setBusy(false);
@@ -260,7 +309,11 @@ function AuthPage() {
         await refreshProfile();
 
         let targetPath = redirect || getRoleDashboardPath(resolvedRole);
-        if (role === "dealer" && resolvedRole !== "dealer" && signedInProfile?.dealer_status === "pending") {
+        if (
+          role === "dealer" &&
+          resolvedRole !== "dealer" &&
+          signedInProfile?.dealer_status === "pending"
+        ) {
           targetPath = "/dealer-registration";
         }
         navigate({ to: targetPath });
@@ -319,7 +372,8 @@ function AuthPage() {
             Signed in as {authProfile?.full_name || user.email?.split("@")[0]}
           </h2>
           <p className="mt-1 text-sm text-muted-foreground capitalize">
-            Role: {authProfile?.role?.replace("_", " ") || "citizen"} · Village: {authProfile?.village || "—"}
+            Role: {authProfile?.role?.replace("_", " ") || "citizen"} · Village:{" "}
+            {authProfile?.village || "—"}
           </p>
           <div className="mt-6 flex flex-col gap-3">
             <button
@@ -329,10 +383,10 @@ function AuthPage() {
               Go to Dashboard
             </button>
             <button
-              onClick={async () => { 
+              onClick={async () => {
                 localStorage.removeItem("manaooru-mock-session");
-                await supabase.auth.signOut(); 
-                toast.success("Signed out."); 
+                await supabase.auth.signOut();
+                toast.success("Signed out.");
                 window.location.reload();
               }}
               className="rounded-xl border border-border py-3 text-sm font-bold text-muted-foreground hover:bg-muted/50 transition"
@@ -363,7 +417,9 @@ function AuthPage() {
             >
               <ArrowLeft className="size-4 animate-pulse" /> Back to Home
             </button>
-            <span className="font-extrabold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">DigiMitra Village Connect</span>
+            <span className="font-extrabold text-lg bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+              GramMitra Village Connect
+            </span>
           </div>
 
           {message === "signin_to_post" && (
@@ -379,7 +435,11 @@ function AuthPage() {
                 <button
                   key={m}
                   type="button"
-                  onClick={() => { setMode(m); setAuthMethod("password"); setOtpSent(false); }}
+                  onClick={() => {
+                    setMode(m);
+                    setAuthMethod("password");
+                    setOtpSent(false);
+                  }}
                   className={`flex-1 py-2 text-sm font-bold rounded-xl transition ${
                     mode === m
                       ? "bg-primary text-primary-foreground shadow-sm"
@@ -393,8 +453,26 @@ function AuthPage() {
 
             {mode === "signin" && (
               <div className="mb-6 flex flex-wrap gap-2 justify-center">
-                <button type="button" onClick={() => { setAuthMethod("password"); setOtpSent(false); }} className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${authMethod === "password" ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground hover:bg-muted/50"}`}>Email + Password</button>
-                <button type="button" onClick={() => { setAuthMethod("phone"); setOtpSent(false); }} className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${authMethod === "phone" ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground hover:bg-muted/50"}`}>Phone OTP</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMethod("password");
+                    setOtpSent(false);
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${authMethod === "password" ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground hover:bg-muted/50"}`}
+                >
+                  Email + Password
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAuthMethod("phone");
+                    setOtpSent(false);
+                  }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold border ${authMethod === "phone" ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground hover:bg-muted/50"}`}
+                >
+                  Phone OTP
+                </button>
               </div>
             )}
 
@@ -425,7 +503,9 @@ function AuthPage() {
               {mode === "signup" && (
                 <>
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground mb-1">Full Name *</label>
+                    <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                      Full Name *
+                    </label>
                     <input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -437,20 +517,28 @@ function AuthPage() {
 
                   {role === "citizen" && (
                     <div>
-                      <label className="block text-xs font-semibold text-muted-foreground mb-1">Occupation</label>
+                      <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                        Occupation
+                      </label>
                       <select
                         value={occupation}
                         onChange={(e) => setOccupation(e.target.value as Occupation)}
                         className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
                       >
-                        {occupations.map((o) => <option key={o} value={o}>{o}</option>)}
+                        {occupations.map((o) => (
+                          <option key={o} value={o}>
+                            {o}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   )}
 
                   {/* Village picker */}
                   <div>
-                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Your Village Location *</label>
+                    <label className="block text-xs font-semibold text-muted-foreground mb-2">
+                      Your Village Location *
+                    </label>
                     <VillageLocationPicker
                       value={villageProfile}
                       onChange={setVillageProfile}
@@ -458,7 +546,10 @@ function AuthPage() {
                     />
                     {villageProfile.village && (
                       <p className="mt-2 text-xs text-primary font-semibold">
-                        ✓ {[villageProfile.village, villageProfile.mandal, villageProfile.district].filter(Boolean).join(", ")}
+                        ✓{" "}
+                        {[villageProfile.village, villageProfile.mandal, villageProfile.district]
+                          .filter(Boolean)
+                          .join(", ")}
                       </p>
                     )}
                   </div>
@@ -466,9 +557,13 @@ function AuthPage() {
                   {/* Dealer shop fields */}
                   {role === "dealer" && (
                     <div className="rounded-2xl border border-indigo-150 bg-indigo-50/50 dark:bg-indigo-950/20 p-4 space-y-3">
-                      <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400">🏪 Shop Details</p>
+                      <p className="text-xs font-bold text-indigo-700 dark:text-indigo-400">
+                        🏪 Shop Details
+                      </p>
                       <div>
-                        <label className="block text-xs font-semibold text-muted-foreground mb-1">Shop Name *</label>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                          Shop Name *
+                        </label>
                         <input
                           value={shopName}
                           onChange={(e) => setShopName(e.target.value)}
@@ -478,17 +573,25 @@ function AuthPage() {
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-muted-foreground mb-1">Category *</label>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                          Category *
+                        </label>
                         <select
                           value={shopCategory}
                           onChange={(e) => setShopCategory(e.target.value as DealerCategory)}
                           className="premium-input w-full rounded-xl px-3 py-2.5 text-sm bg-background/70 text-foreground"
                         >
-                          {dealerCategories.map((c) => <option key={c} value={c}>{c}</option>)}
+                          {dealerCategories.map((c) => (
+                            <option key={c} value={c}>
+                              {c}
+                            </option>
+                          ))}
                         </select>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-muted-foreground mb-1">Shop Address *</label>
+                        <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                          Shop Address *
+                        </label>
                         <input
                           value={shopAddress}
                           onChange={(e) => setShopAddress(e.target.value)}
@@ -505,7 +608,9 @@ function AuthPage() {
               {/* Email */}
               {(mode === "signup" || authMethod === "password") && (
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Email Address *</label>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Email Address *
+                  </label>
                   <input
                     type="email"
                     value={email}
@@ -520,7 +625,9 @@ function AuthPage() {
               {/* Phone */}
               {(mode === "signup" || authMethod === "phone") && (
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Phone Number {authMethod === "phone" && "*"}</label>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Phone Number {authMethod === "phone" && "*"}
+                  </label>
                   <input
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
@@ -533,7 +640,9 @@ function AuthPage() {
 
               {authMethod === "phone" && otpSent && (
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Enter OTP *</label>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Enter OTP *
+                  </label>
                   <input
                     value={otpToken}
                     onChange={(e) => setOtpToken(e.target.value)}
@@ -548,7 +657,10 @@ function AuthPage() {
               {(mode === "signup" || authMethod === "password") && (
                 <div>
                   <label className="block text-xs font-semibold text-muted-foreground mb-1">
-                    Password * {mode === "signup" && <span className="text-emerald-600">(min 4 characters)</span>}
+                    Password *{" "}
+                    {mode === "signup" && (
+                      <span className="text-emerald-600">(min 4 characters)</span>
+                    )}
                   </label>
                   <div className="relative">
                     <input
@@ -573,7 +685,9 @@ function AuthPage() {
               {/* Confirm password (signup only) */}
               {mode === "signup" && (
                 <div>
-                  <label className="block text-xs font-semibold text-muted-foreground mb-1">Confirm Password *</label>
+                  <label className="block text-xs font-semibold text-muted-foreground mb-1">
+                    Confirm Password *
+                  </label>
                   <input
                     type={showPassword ? "text" : "password"}
                     value={confirmPassword}
@@ -591,7 +705,13 @@ function AuthPage() {
                 disabled={busy}
                 className="w-full rounded-xl bg-primary py-3 text-sm font-bold text-primary-foreground shadow-md transition hover:brightness-110 active:scale-98 disabled:opacity-50 mt-2 cursor-pointer"
               >
-                {busy ? "Processing..." : mode === "signup" ? "Create Account" : (authMethod === "phone" && !otpSent ? "Send OTP" : "Sign In")}
+                {busy
+                  ? "Processing..."
+                  : mode === "signup"
+                    ? "Create Account"
+                    : authMethod === "phone" && !otpSent
+                      ? "Send OTP"
+                      : "Sign In"}
               </button>
 
               {/* Google */}
@@ -602,10 +722,22 @@ function AuthPage() {
                 className="w-full rounded-xl border-2 border-primary/20 bg-background py-2.5 text-sm font-bold text-foreground hover:bg-muted/50 transition flex items-center justify-center gap-2 cursor-pointer"
               >
                 <svg className="size-4" viewBox="0 0 24 24">
-                  <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09Z" />
-                  <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z" />
-                  <path fill="#FBBC05" d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.1V7.07H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.83Z" />
-                  <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38Z" />
+                  <path
+                    fill="#4285F4"
+                    d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09Z"
+                  />
+                  <path
+                    fill="#34A853"
+                    d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.99.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23Z"
+                  />
+                  <path
+                    fill="#FBBC05"
+                    d="M5.84 14.1A6.6 6.6 0 0 1 5.5 12c0-.73.13-1.44.34-2.1V7.07H2.18A11 11 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.83Z"
+                  />
+                  <path
+                    fill="#EA4335"
+                    d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.83C6.71 7.31 9.14 5.38 12 5.38Z"
+                  />
                 </svg>
                 Continue with Google
               </button>
@@ -633,10 +765,13 @@ function AuthPage() {
               ⚡ Digital Village OS
             </span>
             <h2 className="font-display text-4xl font-black text-clay leading-tight">
-              Connecting Villages,<br/>Empowering Citizens.
+              Connecting Villages,
+              <br />
+              Empowering Citizens.
             </h2>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Direct communication with Sarpanch, transparent public works, agricultural weather forecasts, and commission-free dealer marketplaces.
+              Direct communication with Sarpanch, transparent public works, agricultural weather
+              forecasts, and commission-free dealer marketplaces.
             </p>
           </div>
 
@@ -648,7 +783,9 @@ function AuthPage() {
                   <Sun className="size-5 animate-pulse" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Field weather</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                    Field weather
+                  </p>
                   <p className="text-sm font-bold text-clay truncate">31°C · Partly Cloudy</p>
                 </div>
               </div>
@@ -661,7 +798,9 @@ function AuthPage() {
                   <User className="size-5" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Workers Active</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                    Workers Active
+                  </p>
                   <p className="text-sm font-bold text-clay truncate">28 local profiles</p>
                 </div>
               </div>
@@ -674,8 +813,12 @@ function AuthPage() {
                   <ShieldCheck className="size-5 animate-pulse" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">Official notice</p>
-                  <p className="text-xs font-bold text-clay truncate">Gram Sabha Meeting at 10:00 AM</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-wider">
+                    Official notice
+                  </p>
+                  <p className="text-xs font-bold text-clay truncate">
+                    Gram Sabha Meeting at 10:00 AM
+                  </p>
                 </div>
               </div>
             </div>

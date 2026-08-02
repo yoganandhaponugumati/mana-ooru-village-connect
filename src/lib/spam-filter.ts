@@ -1,12 +1,38 @@
 /**
- * Moderation, Profanity, and Spam Detection Engine for DigiMitra
+ * Moderation, Profanity, and Spam Detection Engine for GramMitra
  */
 
 const BANNED_TERMS = [
-  "fuck", "shit", "bitch", "bastard", "asshole", "idiot", "stupid", "scam",
-  "dengu", "lanja", "pooku", "modda", "laddoke", "khoja", "gand", "madarchod",
-  "bhenchod", "chutiya", "harami", "raand", "kasai", "fraud", "scammer", "porn",
-  "sex", "gambling", "casino", "betting", "lottery winner", "free money"
+  "fuck",
+  "shit",
+  "bitch",
+  "bastard",
+  "asshole",
+  "idiot",
+  "stupid",
+  "scam",
+  "dengu",
+  "lanja",
+  "pooku",
+  "modda",
+  "laddoke",
+  "khoja",
+  "gand",
+  "madarchod",
+  "bhenchod",
+  "chutiya",
+  "harami",
+  "raand",
+  "kasai",
+  "fraud",
+  "scammer",
+  "porn",
+  "sex",
+  "gambling",
+  "casino",
+  "betting",
+  "lottery winner",
+  "free money",
 ];
 
 export interface ContentCheckResult {
@@ -56,12 +82,13 @@ export function isDuplicateSubmission(userId: string, content: string): boolean 
   const now = Date.now();
   const lastTime = recentSubmissions.get(key);
 
-  if (lastTime && now - lastTime < 10000) { // 10 seconds duplicate window
+  if (lastTime && now - lastTime < 10000) {
+    // 10 seconds duplicate window
     return true;
   }
 
   recentSubmissions.set(key, now);
-  
+
   if (recentSubmissions.size > 100) {
     const oldestKey = recentSubmissions.keys().next().value;
     if (oldestKey) recentSubmissions.delete(oldestKey);

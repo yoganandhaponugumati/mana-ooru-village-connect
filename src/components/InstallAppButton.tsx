@@ -13,7 +13,10 @@ export function usePWAInstall() {
 
   useEffect(() => {
     // Check if already in standalone mode
-    if (window.matchMedia("(display-mode: standalone)").matches || (navigator as unknown as { standalone?: boolean }).standalone) {
+    if (
+      window.matchMedia("(display-mode: standalone)").matches ||
+      (navigator as unknown as { standalone?: boolean }).standalone
+    ) {
       setIsInstalled(true);
     }
 
@@ -121,7 +124,7 @@ export function InstallAppButton({
           className={`inline-flex items-center gap-2 rounded-2xl bg-gradient-to-r from-emerald-600 to-primary px-6 py-3.5 text-sm font-extrabold text-white shadow-lg transition hover:-translate-y-0.5 hover:shadow-emerald-500/25 active:scale-95 ${className}`}
         >
           <Download className="size-4" />
-          <span>Install DigiMitra Mobile App</span>
+          <span>Install GramMitra Mobile App</span>
         </button>
       )}
 
@@ -159,7 +162,7 @@ export function InstallAppButton({
               </div>
 
               <h3 className="text-center font-display text-xl font-bold text-clay dark:text-white">
-                Install DigiMitra App
+                Install GramMitra App
               </h3>
               <p className="mt-1 text-center text-xs text-muted-foreground">
                 మా ఊరు యాప్ మీ ఫోన్‌లో ఇన్స్టాల్ చేసుకోండి
@@ -173,13 +176,18 @@ export function InstallAppButton({
                       <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
                         1
                       </span>
-                      <span>Tap the <strong>Share</strong> button <Share className="inline size-3 text-blue-500" /> at bottom</span>
+                      <span>
+                        Tap the <strong>Share</strong> button{" "}
+                        <Share className="inline size-3 text-blue-500" /> at bottom
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
                         2
                       </span>
-                      <span>Scroll & tap <strong>Add to Home Screen</strong> (➕)</span>
+                      <span>
+                        Scroll & tap <strong>Add to Home Screen</strong> (➕)
+                      </span>
                     </div>
                   </>
                 ) : (
@@ -189,13 +197,17 @@ export function InstallAppButton({
                       <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
                         1
                       </span>
-                      <span>Tap browser menu (<strong>⋮</strong> or <strong>≡</strong>) top right</span>
+                      <span>
+                        Tap browser menu (<strong>⋮</strong> or <strong>≡</strong>) top right
+                      </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
                         2
                       </span>
-                      <span>Select <strong>Install App</strong> or <strong>Add to Home screen</strong></span>
+                      <span>
+                        Select <strong>Install App</strong> or <strong>Add to Home screen</strong>
+                      </span>
                     </div>
                   </>
                 )}

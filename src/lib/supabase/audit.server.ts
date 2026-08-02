@@ -8,11 +8,11 @@ export async function logAdminAction(
   resourceId: string | null,
   oldValues: any,
   newValues: any,
-  reason: string
+  reason: string,
 ) {
   const { data: userResp } = await supabaseAdmin.auth.admin.getUserById(userId);
   const adminId = userResp.user?.id;
-  
+
   if (!adminId) {
     throw new Error("Admin user not found for audit log");
   }

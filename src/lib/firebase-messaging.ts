@@ -1,11 +1,5 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
-import {
-  getMessaging,
-  getToken,
-  onMessage,
-  isSupported,
-  type Messaging,
-} from "firebase/messaging";
+import { getMessaging, getToken, onMessage, isSupported, type Messaging } from "firebase/messaging";
 import { supabase } from "@/integrations/supabase/client";
 
 const firebaseConfig = {
@@ -20,9 +14,9 @@ const firebaseConfig = {
 export function isFcmConfigured(): boolean {
   return Boolean(
     firebaseConfig.apiKey &&
-      firebaseConfig.projectId &&
-      firebaseConfig.messagingSenderId &&
-      firebaseConfig.appId,
+    firebaseConfig.projectId &&
+    firebaseConfig.messagingSenderId &&
+    firebaseConfig.appId,
   );
 }
 
@@ -32,9 +26,7 @@ export async function getFcmMessaging(): Promise<Messaging | null> {
   if (typeof window === "undefined") return null;
 
   if (!isFcmConfigured()) {
-    console.warn(
-      "[FCM] Firebase credentials not found. Push notifications are disabled.",
-    );
+    console.warn("[FCM] Firebase credentials not found. Push notifications are disabled.");
     return null;
   }
 
@@ -46,10 +38,7 @@ export async function getFcmMessaging(): Promise<Messaging | null> {
           return null;
         }
 
-        const app =
-          getApps().length === 0
-            ? initializeApp(firebaseConfig)
-            : getApp();
+        const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
         return getMessaging(app);
       })
@@ -70,15 +59,9 @@ export async function cleanLegacyServiceWorkers() {
 
     for (const reg of registrations) {
       const scriptURL =
-        reg.active?.scriptURL ||
-        reg.installing?.scriptURL ||
-        reg.waiting?.scriptURL ||
-        "";
+        reg.active?.scriptURL || reg.installing?.scriptURL || reg.waiting?.scriptURL || "";
 
-      if (
-        scriptURL.includes("push-sw.js") ||
-        scriptURL.includes("?apiKey=")
-      ) {
+      if (scriptURL.includes("push-sw.js") || scriptURL.includes("?apiKey=")) {
         await reg.unregister();
       }
     }
@@ -87,9 +70,7 @@ export async function cleanLegacyServiceWorkers() {
   }
 }
 
-export async function requestFcmToken(
-  userId?: string,
-): Promise<string | null> {
+export async function requestFcmToken(userId?: string): Promise<string | null> {
   try {
     await cleanLegacyServiceWorkers();
 
@@ -108,15 +89,11 @@ export async function requestFcmToken(
       return null;
     }
 
-    const vapidKey = import.meta.env
-      .VITE_FIREBASE_VAPID_KEY as string | undefined;
+    const vapidKey = import.meta.env.VITE_FIREBASE_VAPID_KEY as string | undefined;
 
-    const swRegistration = await navigator.serviceWorker.register(
-      "/firebase-messaging-sw.js",
-      {
-        scope: "/",
-      },
-    );
+    const swRegistration = await navigator.serviceWorker.register("/firebase-messaging-sw.js", {
+      scope: "/",
+    });
 
     const token = await getToken(messaging, {
       vapidKey,
@@ -161,15 +138,9 @@ export async function registerFcmForegroundListener(
   if (!messaging) return () => {};
 
   return onMessage(messaging, (payload) => {
-    const title =
-      payload.notification?.title ||
-      payload.data?.title ||
-      "DigiMitra Notification";
+    const title = payload.notification?.title || payload.data?.title || "GramMitra Notification";
 
-    const body =
-      payload.notification?.body ||
-      payload.data?.body ||
-      "";
+    const body = payload.notification?.body || payload.data?.body || "";
 
     onNotification({
       title,

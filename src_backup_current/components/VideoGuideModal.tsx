@@ -1,14 +1,24 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Play, Pause, X, ChevronRight, ChevronLeft, Volume2, VolumeX, Megaphone, AlertTriangle, Landmark, PhoneCall, Sparkles, Maximize2, Minimize2, Radio } from "lucide-react";
+import {
+  Play,
+  Pause,
+  X,
+  ChevronRight,
+  ChevronLeft,
+  Volume2,
+  VolumeX,
+  Megaphone,
+  AlertTriangle,
+  Landmark,
+  PhoneCall,
+  Sparkles,
+  Maximize2,
+  Minimize2,
+  Radio,
+} from "lucide-react";
 
-export function VideoGuideModal({
-  isOpen,
-  onClose,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-}) {
+export function VideoGuideModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
   const [activeStep, setActiveStep] = useState(0);
   const [muted, setMuted] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -19,7 +29,9 @@ export function VideoGuideModal({
   // Soft Web Audio API Sound Chime when step changes
   const playChimeSound = () => {
     try {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioCtx =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (!AudioCtx) return;
       const ctx = new AudioCtx();
       const osc = ctx.createOscillator();
@@ -45,8 +57,10 @@ export function VideoGuideModal({
       title: "Why Should You Use ManaOoru?",
       titleTe: "1. మన ఊరు పరిచయం & మీ గ్రామాన్ని ఎంచుకోవడం",
       desc: "Complete digital home for your village. Access local workers, land, notices, and emergency contacts in 1 place.",
-      descTe: "మన గ్రామంలోని నోటీసులు, రోడ్ల సమస్యలు, ప్రభుత్వ పథకాలు మరియు పనివారి వివరాలు దళారులు లేకుండా ఉచితంగా తెలుసుకోవడానికి మన ఊరు ఉపయోగపడుతుంది.",
-      teluguSpeech: "నమస్కారం! మన ఊరు యాప్‌కి స్వాగతం. మొదట మీ జిల్లా, మండలం మరియు గ్రామాన్ని ఎంచుకోండి. దీనితో మీ గ్రామంలో ఉన్న పనివారు, పంట పొలాలు, పంచాయతీ నోటీసులు మరియు అత్యవసర సేవలు అన్నీ ఉచితంగా మీ ఫోన్‌లోనే చూడవచ్చు.",
+      descTe:
+        "మన గ్రామంలోని నోటీసులు, రోడ్ల సమస్యలు, ప్రభుత్వ పథకాలు మరియు పనివారి వివరాలు దళారులు లేకుండా ఉచితంగా తెలుసుకోవడానికి మన ఊరు ఉపయోగపడుతుంది.",
+      teluguSpeech:
+        "నమస్కారం! మన ఊరు యాప్‌కి స్వాగతం. మొదట మీ జిల్లా, మండలం మరియు గ్రామాన్ని ఎంచుకోండి. దీనితో మీ గ్రామంలో ఉన్న పనివారు, పంట పొలాలు, పంచాయతీ నోటీసులు మరియు అత్యవసర సేవలు అన్నీ ఉచితంగా మీ ఫోన్‌లోనే చూడవచ్చు.",
       icon: Sparkles,
       badge: "Feature 1 · మన ఊరు పరిచయం",
       bgGradient: "from-emerald-800 via-teal-900 to-emerald-950",
@@ -54,7 +68,9 @@ export function VideoGuideModal({
         <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-3">
           <div className="flex items-center justify-between text-xs font-bold text-emerald-300">
             <span>🏡 100% Free Village Platform</span>
-            <span className="rounded-full bg-emerald-500/30 px-2.5 py-0.5 text-emerald-200">Zero Middlemen</span>
+            <span className="rounded-full bg-emerald-500/30 px-2.5 py-0.5 text-emerald-200">
+              Zero Middlemen
+            </span>
           </div>
           <div className="rounded-xl bg-emerald-500/20 border border-emerald-400/40 p-3 text-sm font-black text-white">
             📍 Selected Village: Kothur, Rangareddy District
@@ -75,8 +91,10 @@ export function VideoGuideModal({
       title: "Check & Post Village Notices",
       titleTe: "2. గ్రామ నోటీసులు చూడడం & పోస్ట్ చేయడం",
       desc: "Panchayat announcements, power cuts, water supply notices, and medical health camps.",
-      descTe: "గ్రామ నోటీసులు విభాగానికి వెళ్లి పంచాయతీ ప్రచారాలు, కరెంట్ కోతలు, మరియు ఆరోగ్య శిబిరాల నోటీసులు చూడవచ్చు. మీరు కూడా గ్రామ సమాచారాన్ని పోస్ట్ చేయవచ్చు.",
-      teluguSpeech: "రెండవది, గ్రామ నోటీసులు. పంచాయతీ కార్యాలయ ప్రచారాలు, కరెంట్ కోతల సమాచారం, నీటి సరఫరా మరియు ఉచిత వైద్య శిబిరాల నోటీసులు ఇక్కడ చూడవచ్చు. అలాగే మీ గ్రామానికి చెందిన ఏ సమాచారాన్నైనా మీరు ఉచితంగా పోస్ట్ చేయవచ్చు.",
+      descTe:
+        "గ్రామ నోటీసులు విభాగానికి వెళ్లి పంచాయతీ ప్రచారాలు, కరెంట్ కోతలు, మరియు ఆరోగ్య శిబిరాల నోటీసులు చూడవచ్చు. మీరు కూడా గ్రామ సమాచారాన్ని పోస్ట్ చేయవచ్చు.",
+      teluguSpeech:
+        "రెండవది, గ్రామ నోటీసులు. పంచాయతీ కార్యాలయ ప్రచారాలు, కరెంట్ కోతల సమాచారం, నీటి సరఫరా మరియు ఉచిత వైద్య శిబిరాల నోటీసులు ఇక్కడ చూడవచ్చు. అలాగే మీ గ్రామానికి చెందిన ఏ సమాచారాన్నైనా మీరు ఉచితంగా పోస్ట్ చేయవచ్చు.",
       icon: Megaphone,
       badge: "Feature 2 · గ్రామ నోటీసులు",
       bgGradient: "from-teal-800 via-emerald-900 to-teal-950",
@@ -90,7 +108,9 @@ export function VideoGuideModal({
             📢 "Free Medical Health Camp this Sunday at Panchayat Office (9 AM - 1 PM)"
           </div>
           <div className="flex justify-end">
-            <span className="rounded-xl bg-white/20 px-3.5 py-1.5 text-xs font-black text-white">+ Post Village Notice</span>
+            <span className="rounded-xl bg-white/20 px-3.5 py-1.5 text-xs font-black text-white">
+              + Post Village Notice
+            </span>
           </div>
         </div>
       ),
@@ -100,8 +120,10 @@ export function VideoGuideModal({
       title: "Report Civic Problems with Photo Proof",
       titleTe: "3. రోడ్లు & కరెంట్ సమస్యలపై ఫొటో ప్రూఫ్‌తో ఫిర్యాదు",
       desc: "Report damaged CC roads, water leakage, or broken streetlights directly to Sarpanch with photo proof.",
-      descTe: "మీ గ్రామంలో పాడైపోయిన రోడ్లు, డ్రైనేజీ లేదా వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి ఫిర్యాదు చేయండి. పంచాయతీ అధికారులు చర్యలు తీసుకుంటారు.",
-      teluguSpeech: "మూడవది, గ్రామ సమస్యలపై ఫిర్యాదు. మీ ఊరిలో పాడైపోయిన సీసీ రోడ్లు, నీటి లీకేజీలు, లేదా విరిగిపోయిన వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి జతచేయండి. మీ ఫిర్యాదు నేరుగా గ్రామ పంచాయతీ అధికారుల దృష్టికి వెళ్తుంది.",
+      descTe:
+        "మీ గ్రామంలో పాడైపోయిన రోడ్లు, డ్రైనేజీ లేదా వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి ఫిర్యాదు చేయండి. పంచాయతీ అధికారులు చర్యలు తీసుకుంటారు.",
+      teluguSpeech:
+        "మూడవది, గ్రామ సమస్యలపై ఫిర్యాదు. మీ ఊరిలో పాడైపోయిన సీసీ రోడ్లు, నీటి లీకేజీలు, లేదా విరిగిపోయిన వీధిదీపాల సమస్యలు ఉంటే, ఒక ఫొటో తీసి జతచేయండి. మీ ఫిర్యాదు నేరుగా గ్రామ పంచాయతీ అధికారుల దృష్టికి వెళ్తుంది.",
       icon: AlertTriangle,
       badge: "Feature 3 · సమస్యలపై ఫిర్యాదు",
       bgGradient: "from-rose-800 via-red-900 to-rose-950",
@@ -109,7 +131,9 @@ export function VideoGuideModal({
         <div className="rounded-2xl border border-white/20 bg-black/50 p-4 backdrop-blur-md text-white space-y-2.5">
           <div className="flex items-center justify-between text-xs font-bold text-rose-300">
             <span>📸 Photo Proof Attached (Road Damage)</span>
-            <span className="rounded-full bg-rose-500/30 px-2.5 py-0.5 text-rose-200">Pending Action</span>
+            <span className="rounded-full bg-rose-500/30 px-2.5 py-0.5 text-rose-200">
+              Pending Action
+            </span>
           </div>
           <div className="rounded-xl bg-white/10 p-2.5 text-xs font-bold text-white">
             🚨 "CC Road cracked & drainage water near Bus Stop"
@@ -123,8 +147,10 @@ export function VideoGuideModal({
       title: "Government Schemes & Citizen Services",
       titleTe: "4. ప్రభుత్వ పథకాలు & సేవలు పొందే విధానం",
       desc: "Access PM-KISAN, Rythu Bharosa, crop insurance, pensions, and Aadhaar update services with direct official links.",
-      descTe: "రైతు భరోసా, పీఎం కిసాన్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలను పథకాల విభాగంలో ఉచితంగా తనిఖీ చేసి దరఖాస్తు చేసుకోవచ్చు.",
-      teluguSpeech: "నాల్గవది, ప్రభుత్వ పథకాలు. రైతు భరోసా, పీఎం కిసాన్, క్రాప్ ఇన్సూరెన్స్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలకు సంబంధించిన వివరాలు మరియు అధికారిక వెబ్‌సైట్ లింక్‌లు పథకాల విభాగంలో ఉచితంగా పొందవచ్చు.",
+      descTe:
+        "రైతు భరోసా, పీఎం కిసాన్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలను పథకాల విభాగంలో ఉచితంగా తనిఖీ చేసి దరఖాస్తు చేసుకోవచ్చు.",
+      teluguSpeech:
+        "నాల్గవది, ప్రభుత్వ పథకాలు. రైతు భరోసా, పీఎం కిసాన్, క్రాప్ ఇన్సూరెన్స్, ఆసరా పింఛన్లు మరియు ఆధార్ కార్డు సేవలకు సంబంధించిన వివరాలు మరియు అధికారిక వెబ్‌సైట్ లింక్‌లు పథకాల విభాగంలో ఉచితంగా పొందవచ్చు.",
       icon: Landmark,
       badge: "Feature 4 · ప్రభుత్వ పథకాలు",
       bgGradient: "from-amber-800 via-orange-900 to-amber-950",
@@ -148,8 +174,10 @@ export function VideoGuideModal({
       title: "Hire Workers, Farmland & Direct Phone Calls",
       titleTe: "5. పనివారు, పొలాలు కౌలు & నేరుగా మాట్లాడడం",
       desc: "Hire tractor drivers, daily wage farm helpers, or lease farmland without middleman commission fees.",
-      descTe: "కూలీలు, పొలాలు కౌలు లేదా మార్కెట్ ఉత్పత్తుల కోసం ఎలాంటి కమీషన్లు లేకుండా మీ గ్రామస్తులతో నేరుగా ఫోన్ చేసి మాట్లాడండి.",
-      teluguSpeech: "ఐదవది, నేరుగా మాట్లాడడం. వ్యవసాయ కూలీలు, ట్రాక్టర్ డ్రైవర్లు, లేదా పొలాలు కౌలుకు ఇవ్వడానికి ఎలాంటి దళారులు లేదా కమీషన్లు లేకుండా నేరుగా ఫోన్ చేసి మాట్లాడవచ్చు.",
+      descTe:
+        "కూలీలు, పొలాలు కౌలు లేదా మార్కెట్ ఉత్పత్తుల కోసం ఎలాంటి కమీషన్లు లేకుండా మీ గ్రామస్తులతో నేరుగా ఫోన్ చేసి మాట్లాడండి.",
+      teluguSpeech:
+        "ఐదవది, నేరుగా మాట్లాడడం. వ్యవసాయ కూలీలు, ట్రాక్టర్ డ్రైవర్లు, లేదా పొలాలు కౌలుకు ఇవ్వడానికి ఎలాంటి దళారులు లేదా కమీషన్లు లేకుండా నేరుగా ఫోన్ చేసి మాట్లాడవచ్చు.",
       icon: PhoneCall,
       badge: "Feature 5 · నేరుగా మాట్లాడండి",
       bgGradient: "from-indigo-800 via-purple-900 to-indigo-950",
@@ -158,7 +186,9 @@ export function VideoGuideModal({
           <div className="inline-flex items-center gap-2 rounded-full bg-emerald-500/30 px-3.5 py-1 text-xs font-bold text-emerald-300 border border-emerald-400/30">
             <PhoneCall className="size-4 animate-bounce" /> Direct Call Connected
           </div>
-          <p className="text-xs font-bold text-white">📞 Call Tractor Drivers & Land Owners Directly</p>
+          <p className="text-xs font-bold text-white">
+            📞 Call Tractor Drivers & Land Owners Directly
+          </p>
         </div>
       ),
     },
@@ -185,11 +215,9 @@ export function VideoGuideModal({
 
       const voices = window.speechSynthesis.getVoices();
       const teluguVoice = voices.find(
-        (v) => v.lang.includes("te") || v.name.toLowerCase().includes("telugu")
+        (v) => v.lang.includes("te") || v.name.toLowerCase().includes("telugu"),
       );
-      const indianVoice = voices.find(
-        (v) => v.lang.includes("in") || v.lang.includes("hi")
-      );
+      const indianVoice = voices.find((v) => v.lang.includes("in") || v.lang.includes("hi"));
       if (teluguVoice) utterance.voice = teluguVoice;
       else if (indianVoice) utterance.voice = indianVoice;
 
@@ -198,7 +226,7 @@ export function VideoGuideModal({
       utterance.pitch = 1.0;
 
       utterance.onstart = () => setIsSpeaking(true);
-      
+
       // CRITICAL: Advance to next step ONLY AFTER current speech has 100% FINISHED!
       utterance.onend = () => {
         setIsSpeaking(false);
@@ -260,7 +288,9 @@ export function VideoGuideModal({
 
   return (
     <AnimatePresence>
-      <div className={`fixed inset-0 z-[99999] grid place-items-center bg-black/95 p-2 sm:p-4 backdrop-blur-2xl animate-in fade-in duration-200 overflow-y-auto ${isFullscreen ? "p-0" : ""}`}>
+      <div
+        className={`fixed inset-0 z-[99999] grid place-items-center bg-black/95 p-2 sm:p-4 backdrop-blur-2xl animate-in fade-in duration-200 overflow-y-auto ${isFullscreen ? "p-0" : ""}`}
+      >
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -284,7 +314,8 @@ export function VideoGuideModal({
                   )}
                 </h3>
                 <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400">
-                  ఒక్కొక్క ఫీచర్ పూర్తిగా వివరించిన తర్వాత తరువాతి దానికి వెళ్తుంది (Complete Feature Walkthrough)
+                  ఒక్కొక్క ఫీచర్ పూర్తిగా వివరించిన తర్వాత తరువాతి దానికి వెళ్తుంది (Complete
+                  Feature Walkthrough)
                 </p>
               </div>
             </div>
@@ -299,7 +330,11 @@ export function VideoGuideModal({
                     : "border-emerald-500/40 bg-emerald-500/10 text-emerald-400"
                 }`}
               >
-                {muted ? <VolumeX className="size-4" /> : <Volume2 className="size-4 animate-pulse text-emerald-400" />}
+                {muted ? (
+                  <VolumeX className="size-4" />
+                ) : (
+                  <Volume2 className="size-4 animate-pulse text-emerald-400" />
+                )}
                 <span>{muted ? "Muted (మ్యూట్)" : "Telugu Audio (ఆడియో ON)"}</span>
               </button>
 
@@ -323,7 +358,9 @@ export function VideoGuideModal({
           </div>
 
           {/* Main Animated Cinema Stage */}
-          <div className={`relative bg-gradient-to-br ${current.bgGradient} p-6 sm:p-12 text-white flex-1 flex flex-col justify-between transition-colors duration-700 overflow-hidden`}>
+          <div
+            className={`relative bg-gradient-to-br ${current.bgGradient} p-6 sm:p-12 text-white flex-1 flex flex-col justify-between transition-colors duration-700 overflow-hidden`}
+          >
             {/* Background Glows */}
             <div className="pointer-events-none absolute -right-24 -top-24 size-96 rounded-full bg-white/10 blur-3xl" />
             <div className="pointer-events-none absolute -left-24 -bottom-24 size-96 rounded-full bg-black/40 blur-3xl" />
@@ -373,9 +410,7 @@ export function VideoGuideModal({
                 </div>
 
                 {/* Animated UI Mockup */}
-                <div className="relative">
-                  {current.animElements}
-                </div>
+                <div className="relative">{current.animElements}</div>
               </motion.div>
             </AnimatePresence>
 
@@ -388,7 +423,9 @@ export function VideoGuideModal({
                     type="button"
                     onClick={() => setActiveStep(idx)}
                     className={`h-3 rounded-full transition-all duration-500 ${
-                      idx === activeStep ? "w-12 bg-white shadow-xl" : "w-3 bg-white/40 hover:bg-white/60"
+                      idx === activeStep
+                        ? "w-12 bg-white shadow-xl"
+                        : "w-3 bg-white/40 hover:bg-white/60"
                     }`}
                   />
                 ))}
@@ -406,7 +443,9 @@ export function VideoGuideModal({
 
                 <button
                   type="button"
-                  onClick={() => setActiveStep((prev) => (prev - 1 + guideSteps.length) % guideSteps.length)}
+                  onClick={() =>
+                    setActiveStep((prev) => (prev - 1 + guideSteps.length) % guideSteps.length)
+                  }
                   className="grid size-10 place-items-center rounded-full bg-white/20 hover:bg-white/30 text-white transition"
                   aria-label="Previous feature"
                 >

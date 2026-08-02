@@ -67,7 +67,6 @@ export function useGovernmentWorks() {
         throw new Error("Please sign in before posting. Posts are saved only to Supabase.");
       }
 
-
       const uploadedPaths: string[] = [];
       const { data: work, error: workError } = await supabase
         .from("government_works")
@@ -92,15 +91,12 @@ export function useGovernmentWorks() {
       }
       const workId = (work as unknown as { id: string }).id;
 
-
       try {
         if (input.photos.length > 0) {
-
           const uploaded = await Promise.all(
             input.photos.map((photo) => uploadUserFile("government-works", user.id, photo)),
           );
           uploadedPaths.push(...uploaded.map((photo) => photo.path));
-
 
           const { error: imageError } = await supabase.from("government_work_images").insert(
             uploaded.map((photo) => ({
@@ -115,7 +111,6 @@ export function useGovernmentWorks() {
             console.error("[government-work] photos:db-insert:error", imageError);
             throw new Error(`Government work photos could not be saved: ${imageError.message}`);
           }
-
         }
       } catch (error) {
         console.error("[government-work] create:rollback:start", { workId, uploadedPaths, error });
@@ -142,7 +137,7 @@ export function useGovernmentWorks() {
       void sendVillagePushNotification({
         data: {
           villageId: profile?.village_id || null,
-          title: "DigiMitra • Gram Panchayat Work Progress",
+          title: "GramMitra • Gram Panchayat Work Progress",
           body: `Sarpanch updated progress: "${input.title}" (${input.status.replace("_", " ")}). Tap to open & view photos.`,
           url: "/official",
           tag: `work:${workId}`,

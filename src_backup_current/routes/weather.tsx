@@ -67,7 +67,8 @@ function WeatherPage() {
         description="A premium weather dashboard for farmers and village operations."
         actions={
           <div className="inline-flex max-w-full items-center gap-2 rounded-full border border-border bg-white px-4 py-2 text-sm font-semibold text-clay shadow-sm">
-            <MapPin className="size-4 text-primary shrink-0" /> <span className="truncate">{profile.village}</span>
+            <MapPin className="size-4 text-primary shrink-0" />{" "}
+            <span className="truncate">{profile.village}</span>
           </div>
         }
       />

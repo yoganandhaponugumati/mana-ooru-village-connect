@@ -59,11 +59,11 @@ export function AdminRoleManager() {
 
       // Log the action to audit_logs
       await (supabase as any).from("audit_logs").insert({
-          action: "ROLE_CHANGE",
-          actor_id: user?.id,
-          target_id: profile.id,
-          details: { old_role: profile.role || null, new_role: role, target_email: profile.email },
-        });
+        action: "ROLE_CHANGE",
+        actor_id: user?.id,
+        target_id: profile.id,
+        details: { old_role: profile.role || null, new_role: role, target_email: profile.email },
+      });
 
       toast.success(
         `${profile.display_name || profile.email || "User"} is now ${roleLabels[role]}`,
@@ -82,7 +82,11 @@ export function AdminRoleManager() {
       toast.error("Enter the user's email to delete");
       return;
     }
-    if (!window.confirm(`Are you sure you want to PERMANENTLY delete user ${trimmedEmail} and all their posts?`)) {
+    if (
+      !window.confirm(
+        `Are you sure you want to PERMANENTLY delete user ${trimmedEmail} and all their posts?`,
+      )
+    ) {
       return;
     }
 
@@ -117,7 +121,9 @@ export function AdminRoleManager() {
         details: { target_email: profile.email },
       });
 
-      toast.success(`User ${profile.full_name || profile.email} and all their posts deleted permanently.`);
+      toast.success(
+        `User ${profile.full_name || profile.email} and all their posts deleted permanently.`,
+      );
       setEmail("");
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Could not delete user.");
@@ -131,9 +137,12 @@ export function AdminRoleManager() {
       <div className="flex items-start gap-4">
         <FeatureIcon icon={<UserCog className="size-5" />} />
         <div>
-          <p className="font-display text-xl font-semibold text-clay">Manage Roles & Delete Users</p>
+          <p className="font-display text-xl font-semibold text-clay">
+            Manage Roles & Delete Users
+          </p>
           <p className="mt-1 text-sm leading-6 text-muted-foreground">
-            Assign admin roles (Sarpanch / Village Admin / Super Admin) or permanently delete spam accounts.
+            Assign admin roles (Sarpanch / Village Admin / Super Admin) or permanently delete spam
+            accounts.
           </p>
         </div>
       </div>

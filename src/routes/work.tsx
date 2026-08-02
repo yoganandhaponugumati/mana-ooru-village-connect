@@ -5,7 +5,7 @@ import { ListingCard } from "@/components/ListingForm";
 import { useListings } from "@/lib/store";
 
 export const Route = createFileRoute("/work")({
-  head: () => ({ meta: [{ title: "Available Jobs — DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Available Jobs — GramMitra" }] }),
   component: WorkPage,
 });
 

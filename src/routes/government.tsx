@@ -1,24 +1,74 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Building2, Megaphone, CheckCircle2, PhoneCall, ShieldCheck, FileText, Landmark, Users, Clock, ExternalLink } from "lucide-react";
+import {
+  Building2,
+  Megaphone,
+  CheckCircle2,
+  PhoneCall,
+  ShieldCheck,
+  FileText,
+  Landmark,
+  Users,
+  Clock,
+  ExternalLink,
+} from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { SurfaceCard } from "@/components/design-system";
+import { VillageBudgetDashboard } from "@/components/VillageBudgetDashboard";
 
 export const Route = createFileRoute("/government")({
-  head: () => ({ meta: [{ title: "Gram Panchayat & Govt Services - DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Gram Panchayat & Govt Services - GramMitra" }] }),
   component: GovernmentPage,
 });
 
 const PANCHAYAT_OFFICERS = [
-  { name: "Ponugumati Yoganandha", designation: "Sarpanch", phone: "0841-23456", office: "Gram Panchayat Building", hours: "10:00 AM - 5:00 PM" },
-  { name: "R. Venkatesh", designation: "Panchayat Secretary", phone: "9848011222", office: "Room 1, GP Office", hours: "9:30 AM - 5:30 PM" },
-  { name: "K. Satyanarayana", designation: "Village Revenue Officer (VRO)", phone: "9848033444", office: "Tahsil Office Desk", hours: "10:00 AM - 2:00 PM" },
+  {
+    name: "Ponugumati Yoganandha",
+    designation: "Sarpanch",
+    phone: "0841-23456",
+    office: "Gram Panchayat Building",
+    hours: "10:00 AM - 5:00 PM",
+  },
+  {
+    name: "R. Venkatesh",
+    designation: "Panchayat Secretary",
+    phone: "9848011222",
+    office: "Room 1, GP Office",
+    hours: "9:30 AM - 5:30 PM",
+  },
+  {
+    name: "K. Satyanarayana",
+    designation: "Village Revenue Officer (VRO)",
+    phone: "9848033444",
+    office: "Tahsil Office Desk",
+    hours: "10:00 AM - 2:00 PM",
+  },
 ];
 
 const MEESEVA_SERVICES = [
-  { title: "Caste Certificate (కుల ధృవీకరణ)", time: "3 Days", fee: "₹45", desc: "Required for scholarships, admissions & BC/SC/ST reservations." },
-  { title: "Income Certificate (ఆదాయ ధృవీకరణ)", time: "3 Days", fee: "₹45", desc: "Required for Rythu Bharosa, fee reimbursement & Aarogyasri." },
-  { title: "Residence Certificate (నివాస ధృవీకరణ)", time: "7 Days", fee: "₹45", desc: "Address proof for govt jobs and housing schemes." },
-  { title: "Pahani / Dharani 1B Copy", time: "Instant", fee: "₹25", desc: "Official land record extract & mutation history." },
+  {
+    title: "Caste Certificate (కుల ధృవీకరణ)",
+    time: "3 Days",
+    fee: "₹45",
+    desc: "Required for scholarships, admissions & BC/SC/ST reservations.",
+  },
+  {
+    title: "Income Certificate (ఆదాయ ధృవీకరణ)",
+    time: "3 Days",
+    fee: "₹45",
+    desc: "Required for Rythu Bharosa, fee reimbursement & Aarogyasri.",
+  },
+  {
+    title: "Residence Certificate (నివాస ధృవీకరణ)",
+    time: "7 Days",
+    fee: "₹45",
+    desc: "Address proof for govt jobs and housing schemes.",
+  },
+  {
+    title: "Pahani / Dharani 1B Copy",
+    time: "Instant",
+    fee: "₹25",
+    desc: "Official land record extract & mutation history.",
+  },
 ];
 
 function GovernmentPage() {
@@ -33,10 +83,15 @@ function GovernmentPage() {
         <SurfaceCard className="p-6 bg-gradient-to-br from-primary/10 via-emerald-500/5 to-transparent border-primary/20">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
             <div className="space-y-1">
-              <span className="text-xs font-black uppercase tracking-wider text-primary">Official Panchayat Workspace</span>
-              <h2 className="font-display text-xl font-bold text-foreground">Gram Panchayat Office (గ్రామ పంచాయతీ కార్యాలయం)</h2>
+              <span className="text-xs font-black uppercase tracking-wider text-primary">
+                Official Panchayat Workspace
+              </span>
+              <h2 className="font-display text-xl font-bold text-foreground">
+                Gram Panchayat Office (గ్రామ పంచాయతీ కార్యాలయం)
+              </h2>
               <p className="text-xs text-muted-foreground flex items-center gap-2">
-                <Clock className="size-3.5 text-primary" /> Working Hours: Monday to Saturday (10:00 AM - 5:00 PM)
+                <Clock className="size-3.5 text-primary" /> Working Hours: Monday to Saturday (10:00
+                AM - 5:00 PM)
               </p>
             </div>
             <Link
@@ -129,12 +184,17 @@ function GovernmentPage() {
                 <Landmark className="size-6" />
               </div>
               <div>
-                <h3 className="font-display text-lg font-bold text-foreground">Dharani Land Records Guide</h3>
-                <p className="text-xs text-muted-foreground">Pahani, Passbook & Mutation status online</p>
+                <h3 className="font-display text-lg font-bold text-foreground">
+                  Dharani Land Records Guide
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Pahani, Passbook & Mutation status online
+                </p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed mb-6">
-              Check your agricultural land survey numbers, encumbrance certificates (EC), and Rythu Bandhu transaction status directly through the official state land portal.
+              Check your agricultural land survey numbers, encumbrance certificates (EC), and Rythu
+              Bandhu transaction status directly through the official state land portal.
             </p>
             <a
               href="https://dharani.telangana.gov.in/"
@@ -152,12 +212,17 @@ function GovernmentPage() {
                 <CheckCircle2 className="size-6" />
               </div>
               <div>
-                <h3 className="font-display text-lg font-bold text-foreground">Government Welfare Schemes</h3>
-                <p className="text-xs text-muted-foreground">Explore housing, pension & health schemes</p>
+                <h3 className="font-display text-lg font-bold text-foreground">
+                  Government Welfare Schemes
+                </h3>
+                <p className="text-xs text-muted-foreground">
+                  Explore housing, pension & health schemes
+                </p>
               </div>
             </div>
             <p className="text-xs text-muted-foreground leading-relaxed mb-6">
-              Browse complete details and eligibility guidelines for Indiramma Indlu (Housing), Aasara Pensions, Kalyana Lakshmi, and Mahalakshmi Free Bus Pass scheme.
+              Browse complete details and eligibility guidelines for Indiramma Indlu (Housing),
+              Aasara Pensions, Kalyana Lakshmi, and Mahalakshmi Free Bus Pass scheme.
             </p>
             <Link
               to="/schemes"
@@ -167,6 +232,9 @@ function GovernmentPage() {
             </Link>
           </SurfaceCard>
         </div>
+
+        {/* Gram Panchayat Budget & Financial Transparency Dashboard */}
+        <VillageBudgetDashboard />
       </div>
     </PageLayout>
   );

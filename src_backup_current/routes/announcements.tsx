@@ -86,11 +86,14 @@ function AnnPage() {
       return;
     }
     setShowNoticeForm((v) => {
-        const next = !v;
-        if (next) {
-          setTimeout(() => noticeFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 100);
-        }
-        return next;
+      const next = !v;
+      if (next) {
+        setTimeout(
+          () => noticeFormRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }),
+          100,
+        );
+      }
+      return next;
     });
   };
 
@@ -186,7 +189,11 @@ function AnnPage() {
             className="inline-flex items-center justify-center gap-2 rounded-2xl border border-primary/20 bg-primary/10 px-6 py-4 text-sm font-bold text-primary shadow-sm transition hover:bg-primary/20"
           >
             <Shield className="size-4" />
-            <span>{canManageNotices ? "⚡ Add Sarpanch Work Progress +" : "View Sarpanch Pragati Tracker"}</span>
+            <span>
+              {canManageNotices
+                ? "⚡ Add Sarpanch Work Progress +"
+                : "View Sarpanch Pragati Tracker"}
+            </span>
           </button>
         </div>
       }
@@ -273,53 +280,53 @@ function AnnPage() {
           {showNoticeForm && (
             <div ref={noticeFormRef}>
               <SurfaceCard className="mb-8 p-6 sm:p-8 border-primary/20 ring-2 ring-primary/20">
-              <ListingForm
-                type="announcement"
-                title="Notice details"
-                redirectTo="/announcements"
-                photoLabel="Add notice photo / poster"
-                photoHint="Attach a circular, official letter, event flyer, or location photo when useful."
-                fields={[
-                  {
-                    name: "title",
-                    label: "Notice title",
-                    placeholder: "e.g. Water tank cleaning Sunday morning",
-                    required: true,
-                  },
-                  {
-                    name: "category",
-                    label: "Category",
-                    placeholder: "",
-                    options: [
-                      "Panchayat Alert",
-                      "Water Supply",
-                      "Power Schedule",
-                      "Gram Sabha",
-                      "Health Camp",
-                      "School Event",
-                      "Festival",
-                      "Emergency",
-                    ],
-                    required: true,
-                  },
-                  {
-                    name: "description",
-                    label: "Details",
-                    placeholder: "Exact date, timing, and instructions for villagers...",
-                    textarea: true,
-                    required: true,
-                  },
-                  { name: "location", label: "Location", placeholder: "Village / Ward / Street" },
-                  {
-                    name: "contact",
-                    label: "Official contact number",
-                    placeholder: "10-digit mobile",
-                    required: true,
-                  },
-                ]}
-              />
-            </SurfaceCard>
-          </div>
+                <ListingForm
+                  type="announcement"
+                  title="Notice details"
+                  redirectTo="/announcements"
+                  photoLabel="Add notice photo / poster"
+                  photoHint="Attach a circular, official letter, event flyer, or location photo when useful."
+                  fields={[
+                    {
+                      name: "title",
+                      label: "Notice title",
+                      placeholder: "e.g. Water tank cleaning Sunday morning",
+                      required: true,
+                    },
+                    {
+                      name: "category",
+                      label: "Category",
+                      placeholder: "",
+                      options: [
+                        "Panchayat Alert",
+                        "Water Supply",
+                        "Power Schedule",
+                        "Gram Sabha",
+                        "Health Camp",
+                        "School Event",
+                        "Festival",
+                        "Emergency",
+                      ],
+                      required: true,
+                    },
+                    {
+                      name: "description",
+                      label: "Details",
+                      placeholder: "Exact date, timing, and instructions for villagers...",
+                      textarea: true,
+                      required: true,
+                    },
+                    { name: "location", label: "Location", placeholder: "Village / Ward / Street" },
+                    {
+                      name: "contact",
+                      label: "Official contact number",
+                      placeholder: "10-digit mobile",
+                      required: true,
+                    },
+                  ]}
+                />
+              </SurfaceCard>
+            </div>
           )}
 
           {displayItems.length === 0 ? (

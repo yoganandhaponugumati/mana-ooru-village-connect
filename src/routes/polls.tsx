@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/polls")({
-  head: () => ({ meta: [{ title: "Gram Sabha Polls - DigiMitra" }] }),
+  head: () => ({ meta: [{ title: "Gram Sabha Polls - GramMitra" }] }),
   component: PollsPage,
 });
 
@@ -34,7 +34,7 @@ function PollsPage() {
   const { user, role, profile } = useAuth();
   const queryClient = useQueryClient();
   const [showForm, setShowForm] = useState(false);
-  
+
   // Form State
   const [question, setQuestion] = useState("");
   const [description, setDescription] = useState("");
@@ -53,11 +53,11 @@ function PollsPage() {
         .from("village_polls")
         .select("*")
         .order("created_at", { ascending: false });
-        
+
       if (!isAdmin && villageId) {
         q = q.eq("village_id", villageId);
       }
-      
+
       const { data, error } = await q;
       if (error) throw error;
       return (data || []) as Poll[];
@@ -94,7 +94,7 @@ function PollsPage() {
     mutationFn: async () => {
       if (!question.trim()) throw new Error("Question is required");
       if (options.length < 2) throw new Error("At least 2 options are required");
-      if (options.some(o => !o.label.trim())) throw new Error("All options must have text");
+      if (options.some((o) => !o.label.trim())) throw new Error("All options must have text");
 
       const { error } = await (supabase as any).from("village_polls").insert({
         question,
@@ -111,7 +111,10 @@ function PollsPage() {
       setShowForm(false);
       setQuestion("");
       setDescription("");
-      setOptions([{ id: "1", label: "Yes" }, { id: "2", label: "No" }]);
+      setOptions([
+        { id: "1", label: "Yes" },
+        { id: "2", label: "No" },
+      ]);
       queryClient.invalidateQueries({ queryKey: ["polls"] });
     },
     onError: (err: Error) => toast.error(err.message),
@@ -134,10 +137,13 @@ function PollsPage() {
     onError: (err: Error) => toast.error(err.message),
   });
 
-  const myVotes = new Set(votesQuery.data?.map(v => v.poll_id) || []);
+  const myVotes = new Set(votesQuery.data?.map((v) => v.poll_id) || []);
 
   const getVoteCount = (pollId: string, optionId: string) => {
-    return allVotesQuery.data?.filter((v: any) => v.poll_id === pollId && v.option_id === optionId).length || 0;
+    return (
+      allVotesQuery.data?.filter((v: any) => v.poll_id === pollId && v.option_id === optionId)
+        .length || 0
+    );
   };
 
   const getTotalVotes = (pollId: string) => {
@@ -166,7 +172,9 @@ function PollsPage() {
           <h3 className="font-display text-xl font-bold text-clay mb-6">Create Community Poll</h3>
           <div className="space-y-4">
             <div>
-              <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">Question</label>
+              <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                Question
+              </label>
               <input
                 value={question}
                 onChange={(e) => setQuestion(e.target.value)}
@@ -175,7 +183,9 @@ function PollsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">Description (Optional)</label>
+              <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                Description (Optional)
+              </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -185,7 +195,9 @@ function PollsPage() {
               />
             </div>
             <div>
-              <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">Options</label>
+              <label className="block text-xs font-bold uppercase text-muted-foreground mb-1">
+                Options
+              </label>
               <div className="space-y-2">
                 {options.map((opt, i) => (
                   <div key={opt.id} className="flex gap-2">
@@ -212,14 +224,19 @@ function PollsPage() {
               </div>
               <button
                 type="button"
-                onClick={() => setOptions([...options, { id: Math.random().toString(), label: "" }])}
+                onClick={() =>
+                  setOptions([...options, { id: Math.random().toString(), label: "" }])
+                }
                 className="mt-2 text-xs font-bold text-primary hover:underline"
               >
                 + Add Option
               </button>
             </div>
             <div className="pt-4 flex justify-end">
-              <AppButton onClick={() => createPollMutation.mutate()} loading={createPollMutation.isPending}>
+              <AppButton
+                onClick={() => createPollMutation.mutate()}
+                loading={createPollMutation.isPending}
+              >
                 Publish Poll
               </AppButton>
             </div>
@@ -228,7 +245,9 @@ function PollsPage() {
       )}
 
       {pollsQuery.isPending ? (
-        <div className="text-center py-12 text-muted-foreground font-semibold">Loading polls...</div>
+        <div className="text-center py-12 text-muted-foreground font-semibold">
+          Loading polls...
+        </div>
       ) : pollsQuery.data?.length === 0 ? (
         <EmptyState
           icon={<Vote className="size-6" />}
@@ -240,15 +259,19 @@ function PollsPage() {
           {pollsQuery.data?.map((poll) => {
             const hasVoted = myVotes.has(poll.id);
             const totalVotes = getTotalVotes(poll.id);
-            const myVote = votesQuery.data?.find(v => v.poll_id === poll.id)?.option_id;
+            const myVote = votesQuery.data?.find((v) => v.poll_id === poll.id)?.option_id;
 
             return (
               <SurfaceCard key={poll.id} className="p-6">
                 <div className="flex items-center gap-2 mb-3">
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-                    poll.status === 'open' ? 'bg-emerald-100 text-emerald-800' : 'bg-muted text-muted-foreground'
-                  }`}>
-                    {poll.status === 'open' ? 'Active Poll' : 'Closed'}
+                  <span
+                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                      poll.status === "open"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-muted text-muted-foreground"
+                    }`}
+                  >
+                    {poll.status === "open" ? "Active Poll" : "Closed"}
                   </span>
                   {hasVoted && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-blue-800">
@@ -259,8 +282,10 @@ function PollsPage() {
                     Total votes: {totalVotes}
                   </span>
                 </div>
-                
-                <h3 className="font-display text-xl font-bold text-clay leading-tight">{poll.question}</h3>
+
+                <h3 className="font-display text-xl font-bold text-clay leading-tight">
+                  {poll.question}
+                </h3>
                 {poll.description && (
                   <p className="mt-2 text-sm text-muted-foreground">{poll.description}</p>
                 )}
@@ -271,9 +296,12 @@ function PollsPage() {
                     const percentage = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
                     const isMyVote = myVote === opt.id;
 
-                    if (hasVoted || poll.status === 'closed') {
+                    if (hasVoted || poll.status === "closed") {
                       return (
-                        <div key={opt.id} className="relative overflow-hidden rounded-xl bg-muted/40 border border-border">
+                        <div
+                          key={opt.id}
+                          className="relative overflow-hidden rounded-xl bg-muted/40 border border-border"
+                        >
                           <div
                             className="absolute inset-y-0 left-0 bg-primary/10 transition-all duration-1000"
                             style={{ width: `${percentage}%` }}
@@ -283,7 +311,9 @@ function PollsPage() {
                               {opt.label}
                               {isMyVote && <CheckCircle2 className="size-4 text-emerald-600" />}
                             </span>
-                            <span className="text-muted-foreground">{percentage}% ({count})</span>
+                            <span className="text-muted-foreground">
+                              {percentage}% ({count})
+                            </span>
                           </div>
                         </div>
                       );

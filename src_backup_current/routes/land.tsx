@@ -3,12 +3,7 @@ import { Droplets, Map, Milestone, Plus, Sprout, SunMedium, Wheat } from "lucide
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingCard, ListingForm } from "@/components/ListingForm";
-import {
-  AppButton,
-  EmptyState,
-  FeatureIcon,
-  SurfaceCard,
-} from "@/components/design-system";
+import { AppButton, EmptyState, FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 import { useAuth } from "@/lib/auth";

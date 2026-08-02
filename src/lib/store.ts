@@ -122,7 +122,11 @@ export function useListings(type?: ListingType) {
   const query = useQuery({
     queryKey: ["listings", type ?? "all", profile?.village_id ?? "all"],
     queryFn: async () => {
-      let q = supabase.from("listings").select("*").order("created_at", { ascending: false }).limit(100);
+      let q = supabase
+        .from("listings")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(100);
       if (type) q = q.eq("type", type);
       if (profile?.village_id) q = q.eq("village_id", profile.village_id);
       const { data, error } = await q;
@@ -146,12 +150,11 @@ export function useListings(type?: ListingType) {
         throw new Error("Please sign in before posting. Posts are saved only to Supabase.");
       }
 
-
       if (typeof navigator !== "undefined" && !navigator.onLine) {
         const { useUIStore } = await import("./ui-store");
         useUIStore.getState().addToOfflineQueue(item);
         toast.info("Offline mode. Post saved locally, will sync when network returns.");
-        
+
         // Optimistically return a local version
         return {
           id: `local-sync-${Date.now()}`,
@@ -268,7 +271,10 @@ export function useListings(type?: ListingType) {
    * Sends a targeted push notification to the post owner when their issue status changes.
    */
   const update = useCallback(
-    async (id: string, patch: Partial<Pick<Listing, "isPinned" | "status" | "officialResponse">>) => {
+    async (
+      id: string,
+      patch: Partial<Pick<Listing, "isPinned" | "status" | "officialResponse">>,
+    ) => {
       if (id.startsWith("local-")) {
         toast.error("This legacy local post is not stored in Supabase and cannot be updated.");
         return;
@@ -323,7 +329,7 @@ export function useListings(type?: ListingType) {
             await (supabase as any).from("notifications").insert({
               recipient_id: item.owner_id,
               created_by: user?.id || null,
-              title: "DigiMitra • Civic Report Status Updated",
+              title: "GramMitra • Civic Report Status Updated",
               body: `Update: Your report "${item.title}" is marked: ${statusLabel}.${noteText}`,
               type: "status_update",
               action_url: "/problems",
@@ -335,7 +341,7 @@ export function useListings(type?: ListingType) {
           void sendDirectUserPushNotification({
             data: {
               targetUserId: item.owner_id,
-              title: "DigiMitra • Complaint Status Updated",
+              title: "GramMitra • Complaint Status Updated",
               body: `Update: Your civic report "${item.title}" is marked: ${statusLabel}.${noteText} Tap to open & verify.`,
               url: "/problems",
               tag: `complaint_status:${id}`,
@@ -357,10 +363,10 @@ export function useListings(type?: ListingType) {
 }
 
 /**
-   * Fetches real-time statistical counts of the village.
-   * If there isn't enough data in the DB yet, it gracefully falls back to baseline simulation data
-   * to ensure the dashboard always looks populated and inviting.
-   */
+ * Fetches real-time statistical counts of the village.
+ * If there isn't enough data in the DB yet, it gracefully falls back to baseline simulation data
+ * to ensure the dashboard always looks populated and inviting.
+ */
 export function useListingStats(filter?: {
   villageId?: string | null;
   villageName?: string | null;
@@ -416,7 +422,7 @@ export function useListingStats(filter?: {
       ]);
 
       const all = ((listings.data as { type: ListingType }[] | null) ?? []) as Listing[];
-      
+
       // Robust base statistics simulation offsets
       const baseVillagers = 1420;
       const baseWorkers = 28;
@@ -425,22 +431,31 @@ export function useListingStats(filter?: {
       const baseMarket = 15;
       const baseNotices = 9;
 
-      const byType = all.reduce<Record<string, number>>((acc, r) => {
-        acc[r.type] = (acc[r.type] ?? 0) + 1;
-        return acc;
-      }, {
-        complaint: baseComplaints,
-        market: baseMarket,
-        notice: baseNotices,
-        worker: baseWorkers,
-        land: baseLand,
-      });
+      const byType = all.reduce<Record<string, number>>(
+        (acc, r) => {
+          acc[r.type] = (acc[r.type] ?? 0) + 1;
+          return acc;
+        },
+        {
+          complaint: baseComplaints,
+          market: baseMarket,
+          notice: baseNotices,
+          worker: baseWorkers,
+          land: baseLand,
+        },
+      );
 
       return {
         villagers: (profiles.count ?? 0) + baseVillagers,
         workers: (workers.count ?? 0) + baseWorkers,
         land: (land.count ?? 0) + baseLand,
-        total: (listings.count ?? 0) + baseComplaints + baseMarket + baseNotices + baseWorkers + baseLand,
+        total:
+          (listings.count ?? 0) +
+          baseComplaints +
+          baseMarket +
+          baseNotices +
+          baseWorkers +
+          baseLand,
         byType,
         recent: [...((recent.data as Row[] | null) ?? []).map(toListing)].sort(
           (a, b) => b.createdAt - a.createdAt,

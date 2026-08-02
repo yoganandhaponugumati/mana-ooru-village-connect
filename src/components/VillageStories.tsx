@@ -1,7 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { AnimatePresence, motion } from "framer-motion";
-import { X, ShieldCheck, Plus, Upload, Trash2, ArrowLeft, MoreVertical, Eye, Flag, Volume2, VolumeX } from "lucide-react";
+import {
+  X,
+  ShieldCheck,
+  Plus,
+  Upload,
+  Trash2,
+  ArrowLeft,
+  MoreVertical,
+  Eye,
+  Flag,
+  Volume2,
+  VolumeX,
+} from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -32,14 +44,16 @@ const dummyStories = [
     caption: "New subsidized seeds available at the panchayat office.",
     timeAgo: "5h ago",
     isVerified: true,
-  }
+  },
 ];
 
 export function VillageStories() {
   const [stories, setStories] = useState<any[]>(dummyStories);
   const [activeStory, setActiveStory] = useState<any | null>(null);
   const [showMenu, setShowMenu] = useState(false);
-  const [reactions, setReactions] = useState<Record<string, { username: string; emoji: string }[]>>({});
+  const [reactions, setReactions] = useState<Record<string, { username: string; emoji: string }[]>>(
+    {},
+  );
   const [isPaused, setIsPaused] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [videoProgress, setVideoProgress] = useState(0);
@@ -73,8 +87,9 @@ export function VillageStories() {
   };
 
   const handleAddReaction = (storyId: string, emoji: string) => {
-    const currentUsername = profile?.full_name || profile?.username || user?.email?.split("@")[0] || "Villager";
-    
+    const currentUsername =
+      profile?.full_name || profile?.username || user?.email?.split("@")[0] || "Villager";
+
     setReactions((prev) => {
       const existing = prev[storyId] || [];
       const filtered = existing.filter((r) => r.username !== currentUsername);
@@ -95,7 +110,11 @@ export function VillageStories() {
           type: "story_reaction",
           action_url: "/",
         });
-        if (typeof window !== "undefined" && "Notification" in window && Notification.permission === "granted") {
+        if (
+          typeof window !== "undefined" &&
+          "Notification" in window &&
+          Notification.permission === "granted"
+        ) {
           new Notification("❤️ New Story Reaction", {
             body: `${currentUsername} reacted ${emoji} to your village story update!`,
             icon: "/site-icon.svg",
@@ -110,9 +129,9 @@ export function VillageStories() {
     triggerHaptic("light");
   };
 
-  const isAdmin = 
-    role === "village_admin" || 
-    role === "super_admin" || 
+  const isAdmin =
+    role === "village_admin" ||
+    role === "super_admin" ||
     (role as string) === "platform_admin" ||
     profile?.designation === "Sarpanch";
 
@@ -132,18 +151,29 @@ export function VillageStories() {
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext("2d");
-        if (!ctx) { resolve(file); return; }
+        if (!ctx) {
+          resolve(file);
+          return;
+        }
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
         canvas.toBlob(
           (blob) => {
-            if (!blob) { resolve(file); return; }
-            resolve(new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }));
+            if (!blob) {
+              resolve(file);
+              return;
+            }
+            resolve(
+              new File([blob], file.name.replace(/\.[^.]+$/, ".jpg"), { type: "image/jpeg" }),
+            );
           },
           "image/jpeg",
-          0.70
+          0.7,
         );
       };
-      img.onerror = () => { URL.revokeObjectURL(blobUrl); resolve(file); };
+      img.onerror = () => {
+        URL.revokeObjectURL(blobUrl);
+        resolve(file);
+      };
       img.src = blobUrl;
     });
 
@@ -152,7 +182,8 @@ export function VillageStories() {
       try {
         const { data, error } = await (supabase as any)
           .from("village_stories")
-          .select(`
+          .select(
+            `
             id,
             author_id,
             media_url,
@@ -166,7 +197,8 @@ export function VillageStories() {
               is_verified,
               designation
             )
-          `)
+          `,
+          )
           .gt("expires_at", new Date().toISOString())
           .order("created_at", { ascending: false });
 
@@ -207,9 +239,9 @@ export function VillageStories() {
   const handleDeleteStory = async (storyId: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
     if (!window.confirm("Are you sure you want to delete this story?")) return;
-    
+
     // Immediately remove from UI
-    setStories(s => s.filter(x => x.id !== storyId));
+    setStories((s) => s.filter((x) => x.id !== storyId));
     if (activeStory?.id === storyId) setActiveStory(null);
 
     // Also delete from database if it's not a static dummy story
@@ -233,7 +265,9 @@ export function VillageStories() {
 
     // 1. File size safeguards (Max 25MB for videos, Max 15MB for images)
     if (isVideo && file.size > 25 * 1024 * 1024) {
-      toast.error("Video file is too large (max 25MB for stories). Please select a shorter video clip.");
+      toast.error(
+        "Video file is too large (max 25MB for stories). Please select a shorter video clip.",
+      );
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -304,11 +338,11 @@ export function VillageStories() {
               () =>
                 reject(
                   new Error(
-                    "Upload network request timed out (connection slow or video file too large)."
-                  )
+                    "Upload network request timed out (connection slow or video file too large).",
+                  ),
                 ),
-              timeoutMs
-            )
+              timeoutMs,
+            ),
           );
 
           const uploaded = await Promise.race([uploadPromise, timeoutPromise]);
@@ -343,11 +377,7 @@ export function VillageStories() {
           // Swap temp ID with actual database row ID & public URL
           const realId = dbInsertData?.id || tempId;
           setStories((prev) =>
-            prev.map((s) =>
-              s.id === tempId
-                ? { ...s, id: realId, mediaUrl: uploaded.url }
-                : s
-            )
+            prev.map((s) => (s.id === tempId ? { ...s, id: realId, mediaUrl: uploaded.url } : s)),
           );
 
           // 6. Dispatch live notifications asynchronously in background without blocking UI
@@ -396,18 +426,16 @@ export function VillageStories() {
         success: "Story posted successfully! Live for 24 hours.",
         error: (err: any) =>
           `Upload Failed: ${err?.message || "Could not upload video. Try a smaller file."}`,
-      }
+      },
     );
 
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-
   return (
     <div className="w-full bg-transparent pb-4 pt-2">
       {/* Scrollable Avatars */}
       <div className="flex gap-4 overflow-x-auto px-4 sm:px-6 no-scrollbar snap-x items-start">
-        
         {/* Admin Post Button */}
         {isAdmin && (
           <div className="snap-start flex flex-col items-center gap-1 shrink-0">
@@ -421,10 +449,10 @@ export function VillageStories() {
               </div>
             </button>
             <span className="text-[10px] font-bold text-primary mt-1">Post Update</span>
-            <input 
-              type="file" 
-              accept="video/*,image/*" 
-              className="hidden" 
+            <input
+              type="file"
+              accept="video/*,image/*"
+              className="hidden"
               ref={fileInputRef}
               onChange={handleFileUpload}
             />
@@ -469,209 +497,219 @@ export function VillageStories() {
       </div>
 
       {/* Fullscreen WhatsApp Status Style Story Viewer via Portal to document.body */}
-      {typeof document !== "undefined" && createPortal(
-        <AnimatePresence>
-          {activeStory && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onPointerDown={handlePointerDown}
-              onPointerUp={handlePointerUp}
-              onPointerLeave={handlePointerUp}
-              className="fixed inset-0 z-[9999999] flex flex-col bg-black text-white overflow-hidden select-none"
-            >
-              {/* Top Bar: Progress Bar + User Info + 3-Dots Menu + Close/Back */}
-              <div className={`absolute top-0 inset-x-0 z-30 flex flex-col bg-gradient-to-b from-black/95 via-black/50 to-transparent pt-3 pb-8 px-4 transition-opacity duration-200 ${isPaused ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
-                
-                {/* Progress Segment */}
-                <div className="w-full bg-white/20 h-1 rounded-full mb-3 overflow-hidden">
+      {typeof document !== "undefined" &&
+        createPortal(
+          <AnimatePresence>
+            {activeStory && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onPointerDown={handlePointerDown}
+                onPointerUp={handlePointerUp}
+                onPointerLeave={handlePointerUp}
+                className="fixed inset-0 z-[9999999] flex flex-col bg-black text-white overflow-hidden select-none"
+              >
+                {/* Top Bar: Progress Bar + User Info + 3-Dots Menu + Close/Back */}
+                <div
+                  className={`absolute top-0 inset-x-0 z-30 flex flex-col bg-gradient-to-b from-black/95 via-black/50 to-transparent pt-3 pb-8 px-4 transition-opacity duration-200 ${isPaused ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                >
+                  {/* Progress Segment */}
+                  <div className="w-full bg-white/20 h-1 rounded-full mb-3 overflow-hidden">
+                    {activeStory.mediaType === "video" ? (
+                      <div
+                        className="bg-white h-full rounded-full transition-all duration-100 ease-linear"
+                        style={{ width: `${videoProgress}%` }}
+                      />
+                    ) : (
+                      <motion.div
+                        key={activeStory.id}
+                        initial={{ width: "0%" }}
+                        animate={{ width: isPaused ? undefined : "100%" }}
+                        transition={{ duration: storyDuration, ease: "linear" }}
+                        onAnimationComplete={() => {
+                          if (!isPaused) {
+                            closeStory();
+                          }
+                        }}
+                        className="bg-white h-full rounded-full"
+                      />
+                    )}
+                  </div>
+
+                  {/* Header Info */}
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      {/* Back Arrow Button */}
+                      <button
+                        onClick={closeStory}
+                        className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 active:scale-95 transition"
+                        aria-label="Back"
+                      >
+                        <ArrowLeft className="size-5" />
+                      </button>
+
+                      <img
+                        src={activeStory.avatarUrl}
+                        className="size-10 rounded-full border border-white/30 object-cover"
+                        alt={activeStory.author}
+                      />
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1.5 font-bold text-sm text-white drop-shadow">
+                          {activeStory.author}
+                          {activeStory.isVerified && (
+                            <ShieldCheck className="size-4 text-blue-400 fill-blue-500/20" />
+                          )}
+                        </div>
+                        <span className="text-white/70 text-xs">{activeStory.timeAgo}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2 relative">
+                      {/* Mute/Unmute Audio Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setIsMuted((prev) => !prev);
+                          if (videoRef.current) {
+                            videoRef.current.muted = !isMuted;
+                          }
+                        }}
+                        className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
+                        title={isMuted ? "Unmute Audio" : "Mute Audio"}
+                      >
+                        {isMuted ? (
+                          <VolumeX className="size-5 text-red-400" />
+                        ) : (
+                          <Volume2 className="size-5 text-emerald-400" />
+                        )}
+                      </button>
+
+                      {/* WhatsApp 3-Dots Menu Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowMenu((prev) => !prev);
+                        }}
+                        className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
+                        title="More Options"
+                      >
+                        <MoreVertical className="size-5" />
+                      </button>
+
+                      {/* WhatsApp Style 3-Dots Dropdown Menu */}
+                      {showMenu && (
+                        <div className="absolute top-11 right-0 w-44 rounded-2xl bg-zinc-900/95 border border-white/15 text-white shadow-2xl p-1.5 z-50 backdrop-blur-xl">
+                          {isAdmin && (
+                            <button
+                              onClick={(e) => {
+                                setShowMenu(false);
+                                handleDeleteStory(activeStory.id, e);
+                              }}
+                              className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/20 rounded-xl transition font-medium"
+                            >
+                              <Trash2 className="size-4" />
+                              Delete Update
+                            </button>
+                          )}
+                          <button
+                            onClick={() => {
+                              setShowMenu(false);
+                              toast.success("Story reported for review.");
+                            }}
+                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white/90 hover:bg-white/10 rounded-xl transition"
+                          >
+                            <Flag className="size-4" />
+                            Report Update
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Close Button */}
+                      <button
+                        onClick={closeStory}
+                        className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
+                      >
+                        <X className="size-5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Media Area (Full Screen Center) */}
+                <div className="relative flex-1 w-full h-full flex items-center justify-center bg-black">
                   {activeStory.mediaType === "video" ? (
-                    <div
-                      className="bg-white h-full rounded-full transition-all duration-100 ease-linear"
-                      style={{ width: `${videoProgress}%` }}
-                    />
-                  ) : (
-                    <motion.div
-                      key={activeStory.id}
-                      initial={{ width: "0%" }}
-                      animate={{ width: isPaused ? undefined : "100%" }}
-                      transition={{ duration: storyDuration, ease: "linear" }}
-                      onAnimationComplete={() => {
-                        if (!isPaused) {
-                          closeStory();
+                    <video
+                      ref={videoRef}
+                      src={activeStory.mediaUrl}
+                      autoPlay
+                      playsInline
+                      muted={isMuted}
+                      onTimeUpdate={(e) => {
+                        const v = e.currentTarget;
+                        if (v.duration && !isNaN(v.duration) && v.duration > 0) {
+                          setVideoProgress((v.currentTime / v.duration) * 100);
                         }
                       }}
-                      className="bg-white h-full rounded-full"
+                      onEnded={closeStory}
+                      className="w-full h-full object-contain max-h-screen"
+                    />
+                  ) : (
+                    <img
+                      src={activeStory.mediaUrl}
+                      alt={activeStory.caption}
+                      className="w-full h-full object-contain max-h-screen"
                     />
                   )}
                 </div>
 
-                {/* Header Info */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    {/* Back Arrow Button */}
-                    <button
-                      onClick={closeStory}
-                      className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 active:scale-95 transition"
-                      aria-label="Back"
-                    >
-                      <ArrowLeft className="size-5" />
-                    </button>
-
-                    <img
-                      src={activeStory.avatarUrl}
-                      className="size-10 rounded-full border border-white/30 object-cover"
-                      alt={activeStory.author}
-                    />
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-1.5 font-bold text-sm text-white drop-shadow">
-                        {activeStory.author}
-                        {activeStory.isVerified && <ShieldCheck className="size-4 text-blue-400 fill-blue-500/20" />}
-                      </div>
-                      <span className="text-white/70 text-xs">{activeStory.timeAgo}</span>
+                {/* Bottom Caption, Reactions & Who Reacted List (WhatsApp Status Style) */}
+                <div
+                  className={`absolute bottom-0 inset-x-0 z-30 flex flex-col items-center bg-gradient-to-t from-black/95 via-black/75 to-transparent pt-12 pb-6 px-4 gap-3 transition-opacity duration-200 ${isPaused ? "opacity-0 pointer-events-none" : "opacity-100"}`}
+                >
+                  {/* Caption Text - High Contrast & Large */}
+                  {activeStory.caption && (
+                    <div className="w-full max-w-lg bg-black/60 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl text-center shadow-xl">
+                      <p className="text-sm md:text-base font-semibold text-white leading-relaxed">
+                        {activeStory.caption}
+                      </p>
                     </div>
-                  </div>
+                  )}
 
-                  <div className="flex items-center gap-2 relative">
-                    {/* Mute/Unmute Audio Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsMuted((prev) => !prev);
-                        if (videoRef.current) {
-                          videoRef.current.muted = !isMuted;
-                        }
-                      }}
-                      className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
-                      title={isMuted ? "Unmute Audio" : "Mute Audio"}
-                    >
-                      {isMuted ? <VolumeX className="size-5 text-red-400" /> : <Volume2 className="size-5 text-emerald-400" />}
-                    </button>
+                  {/* Who Reacted Display with Usernames */}
+                  {(reactions[activeStory.id]?.length ?? 0) > 0 && (
+                    <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 text-xs text-white/90 shadow-md">
+                      <Eye className="size-3.5 text-emerald-400" />
+                      <span className="font-medium">
+                        Reacted:{" "}
+                        {reactions[activeStory.id]
+                          .map((r) => `${r.emoji} ${r.username}`)
+                          .join(", ")}
+                      </span>
+                    </div>
+                  )}
 
-                    {/* WhatsApp 3-Dots Menu Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setShowMenu((prev) => !prev);
-                      }}
-                      className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
-                      title="More Options"
-                    >
-                      <MoreVertical className="size-5" />
-                    </button>
-
-                    {/* WhatsApp Style 3-Dots Dropdown Menu */}
-                    {showMenu && (
-                      <div className="absolute top-11 right-0 w-44 rounded-2xl bg-zinc-900/95 border border-white/15 text-white shadow-2xl p-1.5 z-50 backdrop-blur-xl">
-                        {isAdmin && (
-                          <button
-                            onClick={(e) => {
-                              setShowMenu(false);
-                              handleDeleteStory(activeStory.id, e);
-                            }}
-                            className="w-full flex items-center gap-2 px-3 py-2 text-sm text-red-400 hover:bg-red-500/20 rounded-xl transition font-medium"
-                          >
-                            <Trash2 className="size-4" />
-                            Delete Update
-                          </button>
-                        )}
-                        <button
-                          onClick={() => {
-                            setShowMenu(false);
-                            toast.success("Story reported for review.");
-                          }}
-                          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white/90 hover:bg-white/10 rounded-xl transition"
-                        >
-                          <Flag className="size-4" />
-                          Report Update
-                        </button>
-                      </div>
-                    )}
-
-                    {/* Close Button */}
-                    <button
-                      onClick={closeStory}
-                      className="grid size-9 place-items-center rounded-full bg-white/15 text-white hover:bg-white/30 transition"
-                    >
-                      <X className="size-5" />
-                    </button>
+                  {/* WhatsApp Quick Emoji Reactions */}
+                  <div className="flex items-center justify-center gap-3 w-full max-w-sm pt-1">
+                    {["❤️", "🙏", "👏", "👍", "🔥", "😮"].map((emoji) => (
+                      <button
+                        key={emoji}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleAddReaction(activeStory.id, emoji);
+                        }}
+                        className="text-xl p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-125 transition backdrop-blur-sm shadow-md"
+                      >
+                        {emoji}
+                      </button>
+                    ))}
                   </div>
                 </div>
-              </div>
-
-              {/* Media Area (Full Screen Center) */}
-              <div className="relative flex-1 w-full h-full flex items-center justify-center bg-black">
-                {activeStory.mediaType === "video" ? (
-                  <video
-                    ref={videoRef}
-                    src={activeStory.mediaUrl}
-                    autoPlay
-                    playsInline
-                    muted={isMuted}
-                    onTimeUpdate={(e) => {
-                      const v = e.currentTarget;
-                      if (v.duration && !isNaN(v.duration) && v.duration > 0) {
-                        setVideoProgress((v.currentTime / v.duration) * 100);
-                      }
-                    }}
-                    onEnded={closeStory}
-                    className="w-full h-full object-contain max-h-screen"
-                  />
-                ) : (
-                  <img
-                    src={activeStory.mediaUrl}
-                    alt={activeStory.caption}
-                    className="w-full h-full object-contain max-h-screen"
-                  />
-                )}
-              </div>
-
-              {/* Bottom Caption, Reactions & Who Reacted List (WhatsApp Status Style) */}
-              <div className={`absolute bottom-0 inset-x-0 z-30 flex flex-col items-center bg-gradient-to-t from-black/95 via-black/75 to-transparent pt-12 pb-6 px-4 gap-3 transition-opacity duration-200 ${isPaused ? "opacity-0 pointer-events-none" : "opacity-100"}`}>
-                {/* Caption Text - High Contrast & Large */}
-                {activeStory.caption && (
-                  <div className="w-full max-w-lg bg-black/60 backdrop-blur-md border border-white/15 px-4 py-3 rounded-2xl text-center shadow-xl">
-                    <p className="text-sm md:text-base font-semibold text-white leading-relaxed">
-                      {activeStory.caption}
-                    </p>
-                  </div>
-                )}
-
-                {/* Who Reacted Display with Usernames */}
-                {(reactions[activeStory.id]?.length ?? 0) > 0 && (
-                  <div className="flex items-center gap-2 bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/15 text-xs text-white/90 shadow-md">
-                    <Eye className="size-3.5 text-emerald-400" />
-                    <span className="font-medium">
-                      Reacted:{" "}
-                      {reactions[activeStory.id]
-                        .map((r) => `${r.emoji} ${r.username}`)
-                        .join(", ")}
-                    </span>
-                  </div>
-                )}
-
-                {/* WhatsApp Quick Emoji Reactions */}
-                <div className="flex items-center justify-center gap-3 w-full max-w-sm pt-1">
-                  {["❤️", "🙏", "👏", "👍", "🔥", "😮"].map((emoji) => (
-                    <button
-                      key={emoji}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleAddReaction(activeStory.id, emoji);
-                      }}
-                      className="text-xl p-2 rounded-full bg-white/10 hover:bg-white/25 active:scale-125 transition backdrop-blur-sm shadow-md"
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>,
-        document.body
-      )}
+              </motion.div>
+            )}
+          </AnimatePresence>,
+          document.body,
+        )}
     </div>
   );
 }
