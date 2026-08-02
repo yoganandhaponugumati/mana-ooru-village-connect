@@ -141,18 +141,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         rel: "preload",
         as: "image",
         href: "/village-life-bg.webp",
-        // @ts-ignore
-        fetchpriority: "high",
         type: "image/webp",
       },
-      // Non-render-blocking font load: load as print, then swap to all
-      // This avoids the 650ms render-blocking penalty from Google Fonts
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap",
-        media: "print",
-        // @ts-ignore
-        onload: "this.media='all'",
       },
     ],
   }),
