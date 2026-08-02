@@ -150,9 +150,57 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <style>{`
+          #grammitra-initial-loader {
+            position: fixed;
+            inset: 0;
+            z-index: 999999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #0e2317;
+            color: #ffffff;
+            font-family: system-ui, -apple-system, sans-serif;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+          }
+          #grammitra-initial-loader.loaded {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+          }
+          .gm-pulse-logo {
+            width: 72px;
+            height: 72px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: grid;
+            place-items: center;
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
+            animation: gm-pulse 1.5s infinite ease-in-out;
+          }
+          @keyframes gm-pulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.06); opacity: 1; }
+          }
+        `}</style>
       </head>
-      <body className="overflow-x-hidden w-full antialiased">
+      <body className="overflow-x-hidden w-full antialiased bg-[#F9FAFB] dark:bg-zinc-950">
+        <div id="grammitra-initial-loader">
+          <div className="gm-pulse-logo">
+            <img src="/site-icon.svg" alt="GramMitra" className="size-10" />
+          </div>
+          <p style={{ marginTop: '16px', fontSize: '14px', fontWeight: 700, letterSpacing: '0.05em', color: '#10b981' }}>
+            GramMitra
+          </p>
+        </div>
         {children}
+        <script dangerouslySetInnerHTML={{ __html: `
+          window.addEventListener('DOMContentLoaded', function() {
+            var loader = document.getElementById('grammitra-initial-loader');
+            if (loader) setTimeout(function() { loader.classList.add('loaded'); }, 150);
+          });
+        ` }} />
         <Scripts />
       </body>
     </html>
@@ -166,9 +214,6 @@ function ProfileCompletionGate() {
 
   useEffect(() => {
     if (loading || !user || !needsProfileCompletion) return;
-    // Google OAuth and magic-link sign-ins land on a full page redirect (not a
-    // client-side route change), so they can arrive on any public page — this
-    // catches that case in addition to the per-page ProtectedRoute checks.
     if (location.pathname === "/complete-profile" || location.pathname === "/auth") return;
     navigate({ to: "/complete-profile", replace: true });
   }, [loading, user, needsProfileCompletion, location.pathname, navigate]);
@@ -185,30 +230,29 @@ function GlobalErrorListener() {
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    const logErrorToDB = async (
+    const logErrorToDB = (
       message: string,
       source?: string,
       lineno?: number,
       colno?: number,
       errorObj?: any,
     ) => {
-      try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
-        await (supabase as any).from("error_logs").insert({
-          message,
-          source,
-          lineno,
-          colno,
-          error_stack: errorObj?.stack || String(errorObj),
-          user_id: session?.user?.id || null,
-          user_agent: navigator.userAgent,
-          url: window.location.href,
-        });
-      } catch (err) {
-        console.error("Failed to log error to DB:", err);
-      }
+      // Non-blocking async error log
+      void (async () => {
+        try {
+          await (supabase as any).from("error_logs").insert({
+            message,
+            source,
+            lineno,
+            colno,
+            error_stack: errorObj?.stack || String(errorObj),
+            user_agent: navigator.userAgent,
+            url: window.location.href,
+          });
+        } catch {
+          // Ignore failure
+        }
+      })();
     };
 
     const handleGlobalError = (event: ErrorEvent) => {

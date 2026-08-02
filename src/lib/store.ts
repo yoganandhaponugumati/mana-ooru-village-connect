@@ -192,61 +192,62 @@ export function useListings(type?: ListingType) {
       qc.invalidateQueries({ queryKey: ["timeline-activities"] });
       const listing = toListing(data as Row);
 
-      // Dispatch live in-app notifications for all village members
-      try {
-        const villageId = item.villageId || profile?.village_id;
-        let notifQuery = (supabase as any).from("profiles").select("id");
-        if (villageId) notifQuery = notifQuery.eq("village_id", villageId);
-        const { data: villagers } = await notifQuery;
+      // Trigger instant push alert for user
+      const typeLabels: Record<string, string> = {
+        complaint: "🚨 New Problem Reported",
+        announcement: "📢 Official Announcement",
+        work: "💼 New Work Opportunity",
+        worker: "🛠️ New Worker Listing",
+        market: "🛍️ New Market Item",
+        service: "🚜 New Service",
+      };
+      const titleText = typeLabels[item.type] || `📌 New Post: ${item.title}`;
+      const actionUrl =
+        item.type === "complaint"
+          ? "/problems"
+          : item.type === "announcement"
+            ? "/announcements"
+            : "/timeline";
 
-        if (villagers && villagers.length > 0) {
-          const typeLabels: Record<string, string> = {
-            complaint: "🚨 New Problem Reported",
-            announcement: "📢 Official Announcement",
-            work: "💼 New Work Opportunity",
-            worker: "🛠️ New Worker Listing",
-            market: "🛍️ New Market Item",
-            service: "🚜 New Service",
-          };
-          const titleText = typeLabels[item.type] || `📌 New Post: ${item.title}`;
-          const actionUrl = item.type === "complaint" ? "/problems" : item.type === "announcement" ? "/announcements" : "/timeline";
-
-          // Insert notification for all villagers
-          const notifRows = (villagers || []).map((v: any) => ({
-            recipient_id: v.id,
-            created_by: user?.id || null,
-            village_id: villageId || null,
-            title: titleText,
-            body: `"${item.title}" - Tap to open and view details.`,
-            type: `post_${item.type}`,
-            action_url: actionUrl,
-          }));
-
-          if (notifRows.length > 0) {
-            await (supabase as any).from("notifications").insert(notifRows);
-          }
-
-          // Trigger immediate local HTML5 system push notification & toast
-          showInstantPushNotification({
-            title: titleText,
-            body: `Posted: "${item.title}". Tap to view in app.`,
-            actionUrl,
-          });
-        } else {
-          // Even if no other villagers registered yet, trigger instant notification for creator
-          showInstantPushNotification({
-            title: `📌 GramMitra Post Published`,
-            body: `Your post "${item.title}" is live!`,
-            actionUrl: item.type === "complaint" ? "/problems" : "/timeline",
-          });
-        }
-      } catch (notifErr) {
-        console.warn("[store] Post notification insert warning:", notifErr);
-      }
-
-      void sendNewPostPushNotifications({ data: { postId: listing.id } }).catch((err) => {
-        console.error("Could not send push notifications", err);
+      // Fire local push notification immediately
+      void showInstantPushNotification({
+        title: titleText,
+        body: `Posted: "${item.title}". Tap to view in app.`,
+        actionUrl,
       });
+
+      // Dispatch village database notifications & FCM push asynchronously in background
+      void (async () => {
+        try {
+          const villageId = item.villageId || profile?.village_id;
+          let notifQuery = (supabase as any).from("profiles").select("id");
+          if (villageId) notifQuery = notifQuery.eq("village_id", villageId);
+          const { data: villagers } = await notifQuery;
+
+          if (villagers && villagers.length > 0) {
+            const notifRows = villagers.map((v: any) => ({
+              recipient_id: v.id,
+              created_by: user?.id || null,
+              village_id: villageId || null,
+              title: titleText,
+              body: `"${item.title}" - Tap to open and view details.`,
+              type: `post_${item.type}`,
+              action_url: actionUrl,
+            }));
+
+            if (notifRows.length > 0) {
+              await (supabase as any).from("notifications").insert(notifRows);
+            }
+          }
+        } catch (notifErr) {
+          console.warn("[store] Background notification error:", notifErr);
+        }
+
+        void sendNewPostPushNotifications({ data: { postId: listing.id } }).catch((err) => {
+          console.error("Could not send push notifications", err);
+        });
+      })();
+
       return listing;
     },
     [user, profile?.village_id, qc],

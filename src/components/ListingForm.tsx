@@ -250,11 +250,10 @@ export function ListingForm({
       return;
     }
 
-    const titleSafety = await checkContentSafety(values.title || "");
-    const descSafety = await checkContentSafety(values.description || "");
+    const safetyCheck = await checkContentSafety(combinedText);
 
-    if (!titleSafety.isSafe || !descSafety.isSafe) {
-      toast.error(titleSafety.reason || descSafety.reason || "Content flagged by moderation.");
+    if (!safetyCheck.isSafe) {
+      toast.error(safetyCheck.reason || "Content flagged by moderation.");
       setSubmitting(false);
       return;
     }
