@@ -157,57 +157,9 @@ function RootShell({ children }: { children: ReactNode }) {
       <head>
         <HeadContent />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap" />
-        <style>{`
-          #grammitra-initial-loader {
-            position: fixed;
-            inset: 0;
-            z-index: 999999;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background-color: #0e2317;
-            color: #ffffff;
-            font-family: system-ui, -apple-system, sans-serif;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
-          }
-          #grammitra-initial-loader.loaded {
-            opacity: 0;
-            visibility: hidden;
-            pointer-events: none;
-          }
-          .gm-pulse-logo {
-            width: 72px;
-            height: 72px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, #10b981, #059669);
-            display: grid;
-            place-items: center;
-            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.4);
-            animation: gm-pulse 1.5s infinite ease-in-out;
-          }
-          @keyframes gm-pulse {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.06); opacity: 1; }
-          }
-        `}</style>
       </head>
       <body className="overflow-x-hidden w-full antialiased bg-[#F9FAFB] dark:bg-zinc-950">
-        <div id="grammitra-initial-loader">
-          <div className="gm-pulse-logo">
-            <img src="/site-icon.svg" alt="GramMitra" className="size-10" />
-          </div>
-          <p style={{ marginTop: '16px', fontSize: '14px', fontWeight: 700, letterSpacing: '0.05em', color: '#10b981' }}>
-            GramMitra
-          </p>
-        </div>
         {children}
-        <script dangerouslySetInnerHTML={{ __html: `
-          window.addEventListener('DOMContentLoaded', function() {
-            var loader = document.getElementById('grammitra-initial-loader');
-            if (loader) setTimeout(function() { loader.classList.add('loaded'); }, 150);
-          });
-        ` }} />
         <Scripts />
       </body>
     </html>
