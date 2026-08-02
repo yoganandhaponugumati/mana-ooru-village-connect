@@ -436,7 +436,7 @@ function HeroVillageOSCard({
   return (
     <div className="relative w-full max-w-md mx-auto lg:max-w-none lg:w-[420px] flex flex-col items-stretch gap-2">
       {/* Glow Backdrop */}
-      <div className="absolute -inset-4 bg-gradient-to-tr from-emerald-500/20 via-amber-500/15 to-teal-500/20 rounded-[40px] blur-2xl animate-pulse duration-[4000ms] pointer-events-none" />
+      <div className="absolute -inset-4 bg-gradient-to-tr from-emerald-500/10 via-amber-500/10 to-teal-500/10 rounded-[40px] pointer-events-none" />
 
       {/* Pinned Notice — top-right of VillageOS card */}
       {pinnedNotice && (
