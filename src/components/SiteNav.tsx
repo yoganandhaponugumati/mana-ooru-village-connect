@@ -414,6 +414,7 @@ export function SiteNav() {
               <div className="nav-menu-container relative">
                 <button
                   type="button"
+                  aria-label="User Profile menu"
                   onClick={() => {
                     setUserMenuOpen((v) => !v);
                     setLanguageOpen(false);
@@ -425,7 +426,7 @@ export function SiteNav() {
                     {authProfile?.photo_url ? (
                       <img
                         src={authProfile.photo_url}
-                        alt=""
+                        alt="Profile avatar"
                         className="size-8 rounded-full object-cover shrink-0"
                       />
                     ) : (
@@ -449,53 +450,44 @@ export function SiteNav() {
                       transition={{ duration: 0.14 }}
                       className="absolute right-0 top-12 z-[99999] w-48 overflow-hidden rounded-2xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 p-1 shadow-xl"
                     >
-                      <div className="px-3 py-2 border-b border-zinc-100 dark:border-zinc-800 mb-1">
-                        <p className="text-xs font-bold text-zinc-900 dark:text-zinc-100 truncate">
-                          {authProfile?.full_name || user.email?.split("@")[0]}
+                      {/* User details header */}
+                      <div className="border-b border-zinc-100 dark:border-zinc-800 px-3 py-2">
+                        <p className="font-bold text-sm text-foreground truncate">
+                          {authProfile?.full_name || "Villager"}
                         </p>
-                        <p className="text-[11px] text-zinc-500 truncate">
-                          {user.email || user.phone}
+                        <p className="text-xs text-muted-foreground truncate font-medium">
+                          {getRoleDisplayName(role)}
                         </p>
-                        <span className="mt-1 inline-block rounded-md bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary">
-                          {getRoleDisplayName(role || "citizen")}
-                        </span>
                       </div>
-                      <Link
-                        to="/profile"
-                        onClick={() => setUserMenuOpen(false)}
-                        className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition"
-                      >
-                        <UserRound className="size-3.5" /> Profile &amp; Role
-                      </Link>
-                      <InstallAppButton
-                        variant={"menuItem" as any}
-                        className="rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition"
-                      />
-                      {(role === "village_admin" || role === "super_admin") && (
+
+                      <div className="p-1 space-y-0.5">
                         <Link
                           to="/dashboard"
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-zinc-700 dark:text-zinc-200 hover:bg-primary/10 hover:text-primary transition"
+                          className="flex items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-semibold text-foreground hover:bg-primary/10 hover:text-primary transition"
                         >
-                          <LayoutDashboard className="size-3.5" /> Admin Dashboard
+                          <LayoutDashboard className="size-4 text-primary" />
+                          <span>My Workspace</span>
                         </Link>
-                      )}
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setUserMenuOpen(false);
-                          signOut();
-                        }}
-                        className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/30 transition mt-1"
-                      >
-                        <LogOut className="size-3.5" /> Sign out
-                      </button>
+
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setUserMenuOpen(false);
+                            void signOut();
+                          }}
+                          className="flex w-full items-center gap-2 rounded-xl px-2.5 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 dark:hover:bg-red-950/40 transition"
+                        >
+                          <LogOut className="size-4" />
+                          <span>Sign Out</span>
+                        </button>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
             ) : (
-              <div className="nav-menu-container relative">
+              <div className="flex items-center gap-2">
                 <Link
                   to="/auth"
                   className="hidden md:inline-flex h-8 items-center gap-1.5 rounded-full border border-primary/20 bg-primary/10 px-3 text-xs font-bold text-primary shadow-sm transition hover:bg-primary hover:text-white dark:bg-primary/20 dark:text-emerald-300"
@@ -505,6 +497,7 @@ export function SiteNav() {
                 {/* Mobile empty profile avatar (matching mockup) */}
                 <Link
                   to="/auth"
+                  aria-label="User Profile sign in"
                   className="flex md:hidden flex-col items-center gap-0.5 transition max-w-[80px]"
                 >
                   <div className="relative">
@@ -556,6 +549,7 @@ export function SiteNav() {
                       </div>
                       <button
                         onClick={() => setOpen(false)}
+                        aria-label="Close navigation menu"
                         className="grid size-8 place-items-center rounded-full border border-border text-muted-foreground hover:text-foreground"
                       >
                         <X className="size-4" />

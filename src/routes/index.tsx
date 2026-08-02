@@ -633,8 +633,7 @@ function Index() {
         <img
           src="/village-life-bg.jpg"
           alt="Beautiful Indian village with green fields at sunrise"
-          loading="eager"
-          fetchPriority="high"
+          loading="lazy"
           decoding="async"
           className="absolute inset-0 z-0 h-full w-full object-cover opacity-55 scale-105 animate-pulse-subtle"
         />
