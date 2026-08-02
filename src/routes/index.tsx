@@ -45,7 +45,6 @@ import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
-import workersImg from "@/assets/workers-premium.jpg";
 
 // Lazy-loaded heavy components — these pull in framer-motion (361KB) so they
 // must NOT be in the critical JS bundle that blocks the first paint.
@@ -648,6 +647,7 @@ function Index() {
           src="/village-life-bg.webp"
           alt="Beautiful Indian village with green fields at sunrise"
           decoding="async"
+          fetchPriority="high"
           className="absolute inset-0 z-0 h-full w-full object-cover opacity-55 scale-105 animate-pulse-subtle"
         />
 
@@ -883,6 +883,7 @@ function Index() {
             src="/village-life-bg.webp"
             alt="Village"
             decoding="async"
+            fetchPriority="high"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -1188,7 +1189,9 @@ function Index() {
         </div>
       </section>
 
-      <ConceptShowcase />
+      <Suspense fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
+        <ConceptShowcase />
+      </Suspense>
 
       {/* Quick Actions (Desktop only now) */}
       <section

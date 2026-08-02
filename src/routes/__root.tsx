@@ -143,10 +143,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
         href: "/village-life-bg.webp",
         type: "image/webp",
       },
-      {
-        rel: "stylesheet",
-        href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap",
-      },
     ],
   }),
   shellComponent: RootShell,
@@ -160,6 +156,11 @@ function RootShell({ children }: { children: ReactNode }) {
     <html lang="en">
       <head>
         <HeadContent />
+        <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap" as="style" />
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap" media="print" onLoad={(e) => { e.currentTarget.media = 'all'; }} />
+        <noscript>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap" />
+        </noscript>
         <style>{`
           #grammitra-initial-loader {
             position: fixed;
