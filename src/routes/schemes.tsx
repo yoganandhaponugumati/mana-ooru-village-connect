@@ -31,60 +31,60 @@ const PROFILE_CHIPS = [
     id: "all",
     label: "All Schemes",
     icon: Sparkles,
-    img: "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=200&q=70&auto=format&fit=crop",
+    img: "https://images.pexels.com/photos/158827/field-corn-air-frisch-158827.jpeg?auto=compress&cs=tinysrgb&w=200",
   },
   {
     id: "agriculture",
     label: "Farmers & Agriculture",
     icon: Tractor,
-    img: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=200&q=70&auto=format&fit=crop",
+    img: "https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg?auto=compress&cs=tinysrgb&w=200",
   },
   {
     id: "women",
     label: "Women & SHGs",
     icon: Heart,
-    img: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=200&q=70&auto=format&fit=crop",
+    img: "https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=200",
   },
   {
     id: "education",
     label: "Students & Youth",
     icon: GraduationCap,
-    img: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=200&q=70&auto=format&fit=crop",
+    img: "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=200",
   },
   {
     id: "housing",
     label: "Housing & Loans",
     icon: Home,
-    img: "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=200&q=70&auto=format&fit=crop",
+    img: "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=200",
   },
   {
     id: "pension",
     label: "Seniors & Pensions",
     icon: Users,
-    img: "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=200&q=70&auto=format&fit=crop",
+    img: "https://images.pexels.com/photos/3768114/pexels-photo-3768114.jpeg?auto=compress&cs=tinysrgb&w=200",
   },
 ] as const;
 
-// Map scheme category to a relevant Unsplash image
+// Map scheme category to a relevant image
 const SCHEME_CATEGORY_IMAGES: Record<string, string> = {
   agriculture:
-    "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg?auto=compress&cs=tinysrgb&w=400",
   farmers:
-    "https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/158827/field-corn-air-frisch-158827.jpeg?auto=compress&cs=tinysrgb&w=400",
   women:
-    "https://images.unsplash.com/photo-1594708767771-a7502209ff51?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/1181519/pexels-photo-1181519.jpeg?auto=compress&cs=tinysrgb&w=400",
   education:
-    "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/267885/pexels-photo-267885.jpeg?auto=compress&cs=tinysrgb&w=400",
   housing:
-    "https://images.unsplash.com/photo-1564013799919-ab600027ffc6?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/106399/pexels-photo-106399.jpeg?auto=compress&cs=tinysrgb&w=400",
   pension:
-    "https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/3768114/pexels-photo-3768114.jpeg?auto=compress&cs=tinysrgb&w=400",
   health:
-    "https://images.unsplash.com/photo-1588776814546-1ffbb043e5c8?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/40568/medical-appointment-doctor-healthcare-40568.jpeg?auto=compress&cs=tinysrgb&w=400",
   general:
-    "https://images.unsplash.com/photo-1545558014-8692077e9b5c?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/3184291/pexels-photo-3184291.jpeg?auto=compress&cs=tinysrgb&w=400",
   default:
-    "https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&q=70&auto=format&fit=crop",
+    "https://images.pexels.com/photos/3184325/pexels-photo-3184325.jpeg?auto=compress&cs=tinysrgb&w=400",
 };
 
 function getSchemeImage(category: string, title: string): string {

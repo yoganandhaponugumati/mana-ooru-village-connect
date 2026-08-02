@@ -39,7 +39,7 @@ const dummyStories = [
     id: "2",
     author: "Agri Officer",
     avatarUrl: "https://i.pravatar.cc/150?img=32",
-    mediaUrl: "https://images.unsplash.com/photo-1592982537447-6f2b6a0a6723?q=80&w=600",
+    mediaUrl: "https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg?auto=compress&cs=tinysrgb&w=600",
     mediaType: "image",
     caption: "New subsidized seeds available at the panchayat office.",
     timeAgo: "5h ago",

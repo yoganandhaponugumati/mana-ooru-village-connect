@@ -1551,7 +1551,8 @@ export function formatVillageProfile(profile: VillageProfile) {
 }
 
 export function useVillagePreferences() {
-  const [stored, setStored] = useState<StoredPreferences>(() => readStoredPreferences());
+  const initialPref: StoredPreferences = { language: "te", profile: defaultProfile, hasProfile: false };
+  const [stored, setStored] = useState<StoredPreferences>(initialPref);
   const { language, profile } = stored;
 
   useEffect(() => {
