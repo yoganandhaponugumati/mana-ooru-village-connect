@@ -109,7 +109,7 @@ export function useBrowserPushNotifications() {
         }
       })
       .catch((error) => {
-        console.error("[Push] Auto-subscription error on login:", error);
+        console.warn("[Push] Auto-subscription notification bypassed:", error?.message || error);
       });
   }, [user]);
 

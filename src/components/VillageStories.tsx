@@ -28,9 +28,9 @@ const dummyStories = [
   {
     id: "1",
     author: "Sarpanch",
-    avatarUrl: "https://i.pravatar.cc/150?img=11",
-    mediaUrl: "https://www.w3schools.com/html/mov_bbb.mp4",
-    mediaType: "video",
+    avatarUrl: "/village-life-bg.webp",
+    mediaUrl: "/village-life-bg.webp",
+    mediaType: "image",
     caption: "Road repairs starting in Ward 4. Please avoid the main junction today.",
     timeAgo: "2h ago",
     isVerified: true,
@@ -38,8 +38,8 @@ const dummyStories = [
   {
     id: "2",
     author: "Agri Officer",
-    avatarUrl: "https://i.pravatar.cc/150?img=32",
-    mediaUrl: "https://images.pexels.com/photos/2933243/pexels-photo-2933243.jpeg?auto=compress&cs=tinysrgb&w=600",
+    avatarUrl: "/village-life-bg.webp",
+    mediaUrl: "/village-life-bg.webp",
     mediaType: "image",
     caption: "New subsidized seeds available at the panchayat office.",
     timeAgo: "5h ago",
@@ -208,7 +208,7 @@ export function VillageStories() {
             return {
               id: s.id,
               author: p?.full_name || p?.designation || "Official",
-              avatarUrl: p?.photo_url || "https://i.pravatar.cc/150?img=11",
+              avatarUrl: p?.photo_url || "/village-life-bg.webp",
               mediaUrl: s.media_url,
               mediaType: s.media_type as "image" | "video",
               caption: s.caption || "",
