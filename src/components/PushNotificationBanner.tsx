@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
-import { Bell, BellRing, X, CheckCircle2 } from "lucide-react";
+import { BellRing, X } from "lucide-react";
 import { subscribeToPush, showInstantPushNotification } from "@/lib/push-notifications";
 import { useAuth } from "@/lib/auth";
+import { toast } from "sonner";
 
 export function PushNotificationBanner() {
   const { user } = useAuth();
@@ -23,23 +24,31 @@ export function PushNotificationBanner() {
   const handleEnable = async () => {
     setLoading(true);
     try {
-      const granted = await subscribeToPush("banner_click");
-      if (granted || Notification.permission === "granted") {
-        setPermissionState("granted");
-        setShowBanner(false);
-        window.localStorage.setItem("grammitra_push_banner_dismissed", "true");
+      if (typeof window !== "undefined" && "Notification" in window) {
+        const perm = await Notification.requestPermission();
+        setPermissionState(perm);
 
-        // Fire immediate confirmation push notification
-        await showInstantPushNotification({
-          title: "🎉 Mobile Push Notifications Active!",
-          body: "You will now receive instant alerts whenever someone posts in your village.",
-          actionUrl: "/timeline",
-        });
+        if (perm === "granted") {
+          if (user) {
+            void subscribeToPush("banner_click");
+          }
+          await showInstantPushNotification({
+            title: "🎉 Mobile Push Notifications Active!",
+            body: "You will now receive instant alerts whenever someone posts in your village.",
+            actionUrl: "/timeline",
+          });
+        } else {
+          toast.info("Notifications were blocked in your browser settings.");
+        }
       }
     } catch (err) {
-      console.error("Failed to enable push notifications", err);
+      console.error("[PushBanner] Error requesting permissions:", err);
     } finally {
       setLoading(false);
+      setShowBanner(false);
+      if (typeof window !== "undefined") {
+        window.localStorage.setItem("grammitra_push_banner_dismissed", "true");
+      }
     }
   };
 
@@ -53,44 +62,37 @@ export function PushNotificationBanner() {
   if (!showBanner || permissionState === "granted") return null;
 
   return (
-    <div className="relative z-[999] border-b border-amber-500/30 bg-gradient-to-r from-amber-500/15 via-emerald-500/10 to-primary/15 px-4 py-3 text-foreground backdrop-blur-md shadow-sm">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4">
+    <div className="fixed bottom-16 inset-x-3 sm:bottom-6 sm:inset-x-auto sm:right-6 z-[99999] max-w-md rounded-2xl border border-amber-500/40 bg-gradient-to-r from-amber-950/95 via-slate-900/95 to-emerald-950/95 p-3.5 text-white shadow-2xl backdrop-blur-xl transition-all animate-in fade-in slide-in-from-bottom-4 duration-300">
+      <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="grid size-9 shrink-0 place-items-center rounded-2xl bg-amber-500/20 text-amber-600 dark:text-amber-400">
+          <div className="grid size-9 shrink-0 place-items-center rounded-xl bg-amber-500/25 text-amber-400">
             <BellRing className="size-5 animate-bounce" />
           </div>
-          <div className="min-w-0 flex-1 text-xs sm:text-sm">
-            <span className="font-bold text-foreground">Enable Mobile Push Notifications</span>
-            <span className="hidden sm:inline text-muted-foreground ml-1.5">
-              • Get instant status-bar alerts when someone posts a job, crop, or Panchayat notice.
-            </span>
+          <div className="min-w-0 flex-1 text-xs">
+            <p className="font-extrabold text-amber-300">Turn On GramMitra Push Alerts</p>
+            <p className="text-slate-300 truncate">
+              Get instant alerts for jobs, land, market & Panchayat notices.
+            </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           <button
             type="button"
             onClick={handleEnable}
             disabled={loading}
-            className="inline-flex items-center gap-1.5 rounded-xl bg-amber-500 px-4 py-2 text-xs font-black text-slate-950 shadow-md transition hover:bg-amber-400 active:scale-95 disabled:opacity-50"
+            className="inline-flex items-center gap-1 rounded-xl bg-amber-500 px-3 py-1.5 text-xs font-black text-slate-950 shadow-md transition hover:bg-amber-400 active:scale-95 disabled:opacity-50 cursor-pointer"
           >
-            {loading ? (
-              <span>Connecting...</span>
-            ) : (
-              <>
-                <Bell className="size-3.5" />
-                <span>Turn On Push</span>
-              </>
-            )}
+            {loading ? "Enabling..." : "Turn On"}
           </button>
 
           <button
             type="button"
             onClick={handleDismiss}
             aria-label="Dismiss notification prompt"
-            className="grid size-8 place-items-center rounded-xl bg-background/50 text-muted-foreground hover:bg-background hover:text-foreground transition"
+            className="grid size-7 place-items-center rounded-lg bg-slate-800/80 text-slate-400 hover:bg-slate-700 hover:text-white transition cursor-pointer"
           >
-            <X className="size-4" />
+            <X className="size-3.5" />
           </button>
         </div>
       </div>

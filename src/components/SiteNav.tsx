@@ -156,8 +156,8 @@ export function SiteNav() {
   };
   return (
     <>
+      <PushNotificationBanner />
       <nav className="fixed inset-x-0 top-0 z-[9999] border-b border-[#dfeae2]/80 bg-[#f7fbf2]/95 text-foreground shadow-sm transition-all duration-300 backdrop-blur-2xl dark:bg-zinc-950/95 dark:border-zinc-800/80">
-        <PushNotificationBanner />
         <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-3 px-3 sm:px-5 lg:px-6 relative">
           {/* Left Side: Back Arrow (if not home) + Logo */}
           <div className="flex shrink-0 items-center gap-1.5 sm:gap-2 relative z-20">
