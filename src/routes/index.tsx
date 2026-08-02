@@ -45,6 +45,7 @@ import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
+import workersImg from "@/assets/workers-premium.jpg";
 
 // Lazy-loaded heavy components — these pull in framer-motion (361KB) so they
 // must NOT be in the critical JS bundle that blocks the first paint.
