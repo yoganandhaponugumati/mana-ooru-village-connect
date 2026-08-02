@@ -887,7 +887,7 @@ function Index() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
           <div className="absolute bottom-4 left-5 right-5 text-white">
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow-sm">
-              Welcome to
+              {((t as any).welcomeToVillage || "Welcome to {village}").replace("{village}", "")}
             </span>
             <h2 className="font-display text-2xl font-bold truncate drop-shadow-md">
               {villageName || "Smart Village"}
@@ -903,7 +903,7 @@ function Index() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search services, workers, notices..."
+              placeholder={(t as any).searchPlaceholder || "Search services, workers, notices..."}
               className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-muted-foreground"
             />
             <button
@@ -939,13 +939,13 @@ function Index() {
                   <UserRound className="size-4" />
                 </div>
                 <p className="font-display text-[15px] font-bold leading-tight">
-                  Sarpanch
+                  {((t as any).sarpanchConnect || "Sarpanch Connect").split(" ")[0]}
                   <br />
-                  Connect
+                  {((t as any).sarpanchConnect || "Sarpanch Connect").split(" ").slice(1).join(" ")}
                 </p>
               </div>
               <p className="relative z-20 text-[10px] font-medium text-white/95">
-                Direct contact, updates
+                {(t as any).sarpanchConnectDesc || "Direct contact, updates"}
               </p>
             </Link>
 
@@ -965,13 +965,13 @@ function Index() {
                   <AlertTriangle className="size-4" />
                 </div>
                 <p className="font-display text-[15px] font-bold leading-tight">
-                  Report
+                  {((t as any).reportProblem || "Report Problem").split(" ")[0]}
                   <br />
-                  Problem
+                  {((t as any).reportProblem || "Report Problem").split(" ").slice(1).join(" ")}
                 </p>
               </div>
               <p className="relative z-20 text-[10px] font-medium text-white/95">
-                Civic issues, requests
+                {(t as any).reportProblemDesc || "Civic issues, requests"}
               </p>
             </Link>
 
@@ -991,13 +991,13 @@ function Index() {
                   <Landmark className="size-4" />
                 </div>
                 <p className="font-display text-[15px] font-bold leading-tight">
-                  Govt
+                  {((t as any).govtSchemes || "Govt Schemes").split(" ")[0]}
                   <br />
-                  Schemes
+                  {((t as any).govtSchemes || "Govt Schemes").split(" ").slice(1).join(" ")}
                 </p>
               </div>
               <p className="relative z-20 text-[10px] font-medium text-white/95">
-                Apply, details, benefits
+                {(t as any).govtSchemesDesc || "Apply, details, benefits"}
               </p>
             </Link>
 
@@ -1017,13 +1017,13 @@ function Index() {
                   <Megaphone className="size-4" />
                 </div>
                 <p className="font-display text-[15px] font-bold leading-tight">
-                  Post
+                  {((t as any).postNotice || "Post Notice").split(" ")[0]}
                   <br />
-                  Notice
+                  {((t as any).postNotice || "Post Notice").split(" ").slice(1).join(" ")}
                 </p>
               </div>
               <p className="relative z-20 text-[10px] font-medium text-white/95">
-                Share news, events
+                {(t as any).postNoticeDesc || "Share news, events"}
               </p>
             </Link>
           </div>

@@ -798,6 +798,18 @@ const dictionary = {
     chooseDestination: "Choose your destination portal below.",
     selectIdentity: "Select your village identity type below.",
     backToWelcome: "Back to welcome screen",
+    sarpanchConnect: "Sarpanch Connect",
+    sarpanchConnectDesc: "Direct contact, updates",
+    reportProblem: "Report Problem",
+    reportProblemDesc: "Civic issues, requests",
+    govtSchemes: "Govt Schemes",
+    govtSchemesDesc: "Apply, details, benefits",
+    postNotice: "Post Notice",
+    postNoticeDesc: "Share news, events",
+    searchPlaceholder: "Search services, workers, notices...",
+    welcomeToVillage: "Welcome to {village}",
+    selectIdentity: "Select your village identity type below.",
+    backToWelcome: "Back to welcome screen",
     emailAddress: "Email Address",
     password: "Password",
     confirmPassword: "Confirm Password",
@@ -885,10 +897,20 @@ const dictionary = {
     createAccount: "ఖాతా సృష్టించండి",
     welcomeToGramMitra: "గ్రామమిత్రకి స్వాగతం",
     portalSignIn: "పోర్టల్ సైన్ ఇన్",
-    registerProfile: "ప్రొఫైల్ నమోదు",
-    chooseDestination: "క్రింద మీ పోర్టల్‌ని ఎంచుకోండి.",
-    selectIdentity: "క్రింద మీ గ్రామ గుర్తింపును ఎంచుకోండి.",
-    backToWelcome: "స్వాగత స్క్రీన్‌కి తిరిగి వెళ్లండి",
+    registerProfile: "ప్రొఫైల్ నమోదు చేయండి",
+    chooseDestination: "దిగువ మీ గమ్యస్థాన పోర్టల్‌ను ఎంచుకోండి.",
+    selectIdentity: "దిగువ మీ గ్రామ గుర్తింపు రకాన్ని ఎంచుకోండి.",
+    backToWelcome: "స్వాగత స్క్రీన్‌కు తిరిగి వెళ్లండి",
+    sarpanchConnect: "సర్పంచ్ కనెక్ట్",
+    sarpanchConnectDesc: "ప్రత్యక్ష పరిచయం, అప్‌డేట్‌లు",
+    reportProblem: "సమస్యను నివేదించండి",
+    reportProblemDesc: "పౌర సమస్యలు, అభ్యర్థనలు",
+    govtSchemes: "ప్రభుత్వ పథకాలు",
+    govtSchemesDesc: "దరఖాస్తు, వివరాలు, ప్రయోజనాలు",
+    postNotice: "ప్రకటన చేయండి",
+    postNoticeDesc: "వార్తలు, ఈవెంట్‌లను పంచుకోండి",
+    searchPlaceholder: "సేవలు, పనివారు, ప్రకటనలను వెతకండి...",
+    welcomeToVillage: "{village} కు స్వాగతం",
     emailAddress: "ఈమెయిల్ చిరునామా",
     password: "పాస్‌వర్డ్",
     confirmPassword: "పాస్‌వర్డ్ నిర్ధారించండి",
@@ -1610,20 +1632,23 @@ export function useVillagePreferences() {
     [profile.village],
   );
 
-  const [weather, setWeather] = useState<WeatherProfile>(() => {
+  const [weather, setWeather] = useState<WeatherProfile>(fallbackWeather);
+
+  useEffect(() => {
     if (canUseBrowserStorage()) {
       try {
         const saved = localStorage.getItem("manaooru-cached-weather");
         if (saved) {
           const parsed = JSON.parse(saved);
-          if (parsed && typeof parsed.temp === "number") return parsed;
+          if (parsed && typeof parsed.temp === "number") {
+            setWeather(parsed);
+          }
         }
       } catch {
         // Fallback to initial default
       }
     }
-    return fallbackWeather;
-  });
+  }, []);
 
   useEffect(() => {
     if (typeof fetch === "undefined") {
