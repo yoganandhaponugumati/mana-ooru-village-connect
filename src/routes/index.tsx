@@ -59,14 +59,59 @@ const ConceptShowcase = lazy(() =>
   import("@/components/ConceptShowcase").then((m) => ({ default: m.ConceptShowcase }))
 );
 
-function ClientOnly({ children, fallback = null }: { children: React.ReactNode; fallback?: React.ReactNode }) {
+function ClientOnly({
+  children,
+  fallback = null,
+  deferMs = 0,
+}: {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+  deferMs?: number;
+}) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    if (deferMs > 0) {
+      const t = setTimeout(() => setMounted(true), deferMs);
+      return () => clearTimeout(t);
+    }
     setMounted(true);
-  }, []);
+  }, [deferMs]);
 
   if (!mounted) return <>{fallback}</>;
   return <>{children}</>;
+}
+
+function LazyMount({
+  children,
+  fallback = null,
+  rootMargin = "200px",
+}: {
+  children: React.ReactNode;
+  fallback?: React.ReactNode;
+  rootMargin?: string;
+}) {
+  const [shouldRender, setShouldRender] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldRender(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [rootMargin]);
+
+  return <div ref={ref}>{shouldRender ? children : fallback}</div>;
 }
 
 /**
@@ -871,7 +916,7 @@ function Index() {
           📱 MOBILE HOME DASHBOARD — The new app-style section
       ════════════════════════════════════════════════════════════════════ */}
       <section className="relative z-30 mx-auto pt-20 max-w-7xl px-4 sm:px-6 md:hidden">
-        <ClientOnly fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
+        <ClientOnly deferMs={150} fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
           <Suspense fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
             <VillageStories />
           </Suspense>
@@ -1189,11 +1234,13 @@ function Index() {
         </div>
       </section>
 
-      <ClientOnly fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
-        <Suspense fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
-          <ConceptShowcase />
-        </Suspense>
-      </ClientOnly>
+      <LazyMount fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
+        <ClientOnly fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
+          <Suspense fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
+            <ConceptShowcase />
+          </Suspense>
+        </ClientOnly>
+      </LazyMount>
 
       {/* Quick Actions (Desktop only now) */}
       <section
