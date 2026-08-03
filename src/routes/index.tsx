@@ -449,12 +449,9 @@ function HeroVillageOSCard({
 
       {/* Pinned Notice — top-right of VillageOS card */}
       {pinnedNotice && (
-        <motion.div
-          initial={{ opacity: 0, x: 24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.04 }}
+        <div
           onClick={() => navigate({ to: "/announcements" })}
-          className="relative z-10 self-end inline-flex cursor-pointer items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-950/90 px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] backdrop-blur-md transition hover:border-emerald-300 hover:scale-[1.02] active:scale-95"
+          className="relative z-10 self-end inline-flex cursor-pointer items-center gap-2 rounded-full border border-emerald-400/40 bg-emerald-950/90 px-3.5 py-1.5 text-xs font-bold text-white shadow-[0_0_20px_rgba(16,185,129,0.35)] backdrop-blur-md transition hover:border-emerald-300 hover:scale-[1.02] active:scale-95 animate-fade-in"
         >
           <span className="relative flex size-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
@@ -467,15 +464,12 @@ function HeroVillageOSCard({
             {pinnedNotice.title}
           </span>
           <ArrowRight className="size-3 shrink-0 text-emerald-300" />
-        </motion.div>
+        </div>
       )}
 
       {/* Main Interactive Glass Card Stack (Compact, Clean, High-Contrast) */}
-      <motion.div
-        initial={{ opacity: 0, y: 20, scale: 0.96 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-        className="relative w-full rounded-[32px] border-2 border-white/20 bg-zinc-900/90 p-6 shadow-2xl backdrop-blur-2xl transition hover:border-emerald-400/40"
+      <div
+        className="relative w-full rounded-[32px] border-2 border-white/20 bg-zinc-900/90 p-6 shadow-2xl backdrop-blur-2xl transition hover:border-emerald-400/40 animate-fade-in"
       >
         {/* Top Header: Live Status & Village Name */}
         <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
@@ -501,10 +495,9 @@ function HeroVillageOSCard({
         {/* Live Metrics Row */}
         <div className="mt-4 grid grid-cols-3 gap-2.5">
           {heroMetrics.map((metric) => (
-            <motion.div
+            <div
               key={metric.label}
-              whileHover={{ scale: 1.04, translateY: -2 }}
-              className="rounded-2xl border border-white/10 bg-white/5 p-3 text-center backdrop-blur-md transition hover:bg-white/10 hover:border-emerald-400/30 shadow"
+              className="rounded-2xl border border-white/10 bg-white/5 p-3 text-center backdrop-blur-md transition hover:bg-white/10 hover:border-emerald-400/30 hover:scale-[1.04] shadow"
             >
               <metric.icon className="mx-auto size-4 text-emerald-400 mb-1" />
               <p className="font-display text-lg font-black text-white sm:text-xl">
@@ -513,7 +506,7 @@ function HeroVillageOSCard({
               <p className="text-[9px] font-extrabold uppercase tracking-widest text-zinc-400">
                 {metric.label}
               </p>
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -558,7 +551,7 @@ function HeroVillageOSCard({
             <span>100% Secure</span>
           </div>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

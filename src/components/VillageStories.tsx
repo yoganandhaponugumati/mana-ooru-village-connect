@@ -325,15 +325,15 @@ export function VillageStories() {
           // 3. Fast client-side image compression for photos
           const fileToUpload = isVideo ? file : await compressImage(file);
 
-          // 4. Upload to Supabase Storage with a strict timeout (30s for video, 15s for photo)
-          const timeoutMs = isVideo ? 30000 : 15000;
+          // 4. Upload to Supabase Storage with generous timeout for mobile networks (120s)
+          const timeoutMs = 120000;
           const uploadPromise = uploadUserFile("events", user.id, fileToUpload);
           const timeoutPromise = new Promise<never>((_, reject) =>
             setTimeout(
               () =>
                 reject(
                   new Error(
-                    "Upload network request timed out (connection slow or video file too large).",
+                    "Upload network request timed out. Please check your internet connection.",
                   ),
                 ),
               timeoutMs,
