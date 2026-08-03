@@ -45,7 +45,6 @@ import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
-import workersImg from "@/assets/workers-premium.jpg";
 
 import { VillageStories } from "@/components/VillageStories";
 import { VideoGuideModal } from "@/components/VideoGuideModal";

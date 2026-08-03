@@ -188,7 +188,7 @@ export function SiteNav() {
             )}
             <Link to="/" aria-label="GramMitra Home" className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5">
               <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
-                <img src="/logo.png" alt="GramMitra Emblem" className="size-full object-cover" />
+                <img src="/logo.webp" alt="GramMitra Emblem" className="size-full object-cover" width="34" height="34" decoding="async" />
               </div>
               <div className="flex flex-col leading-none">
                 <span className="font-display text-base font-bold tracking-tight text-clay dark:text-zinc-100 hidden sm:block">
@@ -830,7 +830,7 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <div className="flex items-center gap-2.5">
             <div className="size-8 rounded-full overflow-hidden border border-primary/30 shadow-sm shrink-0 bg-white">
-              <img src="/logo.png" alt="GramMitra Emblem" className="size-full object-cover" />
+              <img src="/logo.webp" alt="GramMitra Emblem" className="size-full object-cover" width="34" height="34" decoding="async" />
             </div>
             <span className="font-display text-base font-bold text-clay dark:text-zinc-100">
               GramMitra
