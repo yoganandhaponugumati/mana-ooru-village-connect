@@ -17,6 +17,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { useBrowserPushNotifications } from "@/lib/push-notifications";
 import { supabase } from "@/integrations/supabase/client";
+import { AppSplashScreen } from "@/components/AppSplashScreen";
 
 function NotFoundComponent() {
   return (
@@ -186,6 +187,7 @@ function RootShell({ children }: { children: ReactNode }) {
         />
       </head>
       <body className="overflow-x-hidden w-full antialiased bg-[#F9FAFB] dark:bg-zinc-950">
+        <AppSplashScreen />
         {children}
         <Scripts />
       </body>
