@@ -35,7 +35,7 @@ export const DEFAULT_POST_LIMIT: RateLimitConfig = {
 };
 
 export const DEFAULT_STORY_LIMIT: RateLimitConfig = {
-  maxRequests: 2,
+  maxRequests: 5,
   windowMs: 60 * 1000, // 1 minute
 };
 

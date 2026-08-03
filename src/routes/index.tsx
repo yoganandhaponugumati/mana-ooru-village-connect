@@ -47,17 +47,9 @@ import { Button } from "@/components/ui/button";
 import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
 
-// Lazy-loaded heavy components — these pull in framer-motion (361KB) so they
-// must NOT be in the critical JS bundle that blocks the first paint.
-const VillageStories = lazy(() =>
-  import("@/components/VillageStories").then((m) => ({ default: m.VillageStories }))
-);
-const VideoGuideModal = lazy(() =>
-  import("@/components/VideoGuideModal").then((m) => ({ default: m.VideoGuideModal }))
-);
-const ConceptShowcase = lazy(() =>
-  import("@/components/ConceptShowcase").then((m) => ({ default: m.ConceptShowcase }))
-);
+import { VillageStories } from "@/components/VillageStories";
+import { VideoGuideModal } from "@/components/VideoGuideModal";
+import { ConceptShowcase } from "@/components/ConceptShowcase";
 
 function ClientOnly({
   children,
@@ -677,11 +669,7 @@ function Index() {
   };
   return (
     <main id="main-content" className="village-site-bg min-h-screen text-foreground">
-      <ClientOnly>
-        <Suspense fallback={null}>
-          <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
-        </Suspense>
-      </ClientOnly>
+      <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
 
       {/* Desktop Hero - Hidden on mobile */}
       <header className="hidden md:block relative min-h-screen overflow-hidden bg-zinc-950 border-b border-emerald-500/30">
@@ -916,11 +904,7 @@ function Index() {
           📱 MOBILE HOME DASHBOARD — The new app-style section
       ════════════════════════════════════════════════════════════════════ */}
       <section className="relative z-30 mx-auto pt-20 max-w-7xl px-4 sm:px-6 md:hidden">
-        <ClientOnly deferMs={150} fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
-          <Suspense fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
-            <VillageStories />
-          </Suspense>
-        </ClientOnly>
+        <VillageStories />
 
         {/* Mobile Top Image Banner */}
         <div className="mb-6 mt-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
