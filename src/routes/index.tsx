@@ -58,7 +58,16 @@ const VideoGuideModal = lazy(() =>
 const ConceptShowcase = lazy(() =>
   import("@/components/ConceptShowcase").then((m) => ({ default: m.ConceptShowcase }))
 );
-// motion and AnimatePresence imported lazily inside components that need them
+
+function ClientOnly({ children, fallback = null }: { children: React.ReactNode; fallback?: React.ReactNode }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  if (!mounted) return <>{fallback}</>;
+  return <>{children}</>;
+}
 
 /**
  * Route definition for the Homepage (/).
@@ -629,9 +638,11 @@ function Index() {
   };
   return (
     <main id="main-content" className="village-site-bg min-h-screen text-foreground">
-      <Suspense fallback={null}>
-        <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
-      </Suspense>
+      <ClientOnly>
+        <Suspense fallback={null}>
+          <VideoGuideModal isOpen={showVideoModal} onClose={() => setShowVideoModal(false)} />
+        </Suspense>
+      </ClientOnly>
 
       {/* Desktop Hero - Hidden on mobile */}
       <header className="hidden md:block relative min-h-screen overflow-hidden bg-zinc-950 border-b border-emerald-500/30">
@@ -866,9 +877,11 @@ function Index() {
           📱 MOBILE HOME DASHBOARD — The new app-style section
       ════════════════════════════════════════════════════════════════════ */}
       <section className="relative z-30 mx-auto pt-20 max-w-7xl px-4 sm:px-6 md:hidden">
-        <Suspense fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
-          <VillageStories />
-        </Suspense>
+        <ClientOnly fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
+          <Suspense fallback={<div className="h-20 w-full animate-pulse rounded-2xl bg-muted/40" />}>
+            <VillageStories />
+          </Suspense>
+        </ClientOnly>
 
         {/* Mobile Top Image Banner */}
         <div className="mb-6 mt-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
@@ -1182,9 +1195,11 @@ function Index() {
         </div>
       </section>
 
-      <Suspense fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
-        <ConceptShowcase />
-      </Suspense>
+      <ClientOnly fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
+        <Suspense fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
+          <ConceptShowcase />
+        </Suspense>
+      </ClientOnly>
 
       {/* Quick Actions (Desktop only now) */}
       <section
