@@ -510,9 +510,6 @@ export function VillageStories() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                onPointerDown={handlePointerDown}
-                onPointerUp={handlePointerUp}
-                onPointerLeave={handlePointerUp}
                 className="fixed inset-0 z-[9999999] flex flex-col bg-black text-white overflow-hidden select-none"
               >
                 {/* Top Bar: Progress Bar + User Info + 3-Dots Menu + Close/Back */}
@@ -642,7 +639,12 @@ export function VillageStories() {
                 </div>
 
                 {/* Media Area (Full Screen Center) */}
-                <div className="relative flex-1 w-full h-full flex items-center justify-center bg-black">
+                <div
+                  onPointerDown={handlePointerDown}
+                  onPointerUp={handlePointerUp}
+                  onPointerLeave={handlePointerUp}
+                  className="relative flex-1 w-full h-full flex items-center justify-center bg-black cursor-pointer"
+                >
                   {activeStory.mediaType === "video" ? (
                     <video
                       ref={videoRef}

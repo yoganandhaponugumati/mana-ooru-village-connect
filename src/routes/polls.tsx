@@ -300,18 +300,24 @@ function PollsPage() {
                       return (
                         <div
                           key={opt.id}
-                          className="relative overflow-hidden rounded-xl bg-muted/40 border border-border"
+                          className={`relative overflow-hidden rounded-xl border ${
+                            isMyVote
+                              ? "bg-emerald-50/30 border-emerald-400 dark:bg-emerald-950/10 dark:border-emerald-800"
+                              : "bg-muted/40 border-border"
+                          }`}
                         >
                           <div
-                            className="absolute inset-y-0 left-0 bg-primary/10 transition-all duration-1000"
+                            className={`absolute inset-y-0 left-0 transition-all duration-1000 ${
+                              isMyVote ? "bg-emerald-500/10" : "bg-primary/10"
+                            }`}
                             style={{ width: `${percentage}%` }}
                           />
                           <div className="relative flex items-center justify-between p-3 text-sm font-semibold">
-                            <span className="flex items-center gap-2 text-clay">
+                            <span className="flex items-center gap-2 text-clay dark:text-zinc-100">
                               {opt.label}
-                              {isMyVote && <CheckCircle2 className="size-4 text-emerald-600" />}
+                              {isMyVote && <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />}
                             </span>
-                            <span className="text-muted-foreground">
+                            <span className={isMyVote ? "text-emerald-700 dark:text-emerald-400 font-bold" : "text-muted-foreground"}>
                               {percentage}% ({count})
                             </span>
                           </div>

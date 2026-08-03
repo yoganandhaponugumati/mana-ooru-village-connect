@@ -936,9 +936,9 @@ function Index() {
             <span className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-300 drop-shadow-sm">
               {((t as any).welcomeToVillage || "Welcome to {village}").replace("{village}", "")}
             </span>
-            <h2 className="font-display text-2xl font-bold truncate drop-shadow-md">
+            <h1 className="font-display text-2xl font-bold truncate drop-shadow-md">
               {villageName || "Smart Village"}
-            </h2>
+            </h1>
           </div>
         </div>
 

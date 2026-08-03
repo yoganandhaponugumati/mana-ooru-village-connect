@@ -2,11 +2,27 @@
  * Sliding Window Client & Action Rate Limiter for GramMitra
  */
 
-interface RateLimitTracker {
-  timestamps: number[];
+const LOCAL_STORAGE_KEY = "grammitra-rate-limits";
+
+function loadTrackers(): Record<string, number[]> {
+  if (typeof window === "undefined") return {};
+  const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
+  if (!saved) return {};
+  try {
+    return JSON.parse(saved);
+  } catch {
+    return {};
+  }
 }
 
-const actionTrackers = new Map<string, RateLimitTracker>();
+function saveTrackers(trackers: Record<string, number[]>) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(trackers));
+  } catch (e) {
+    console.error(e);
+  }
+}
 
 export interface RateLimitConfig {
   maxRequests: number; // e.g. 5
@@ -35,22 +51,21 @@ export function checkRateLimit(
   const key = `${userId}:${actionKey}`;
   const now = Date.now();
 
-  let tracker = actionTrackers.get(key);
-  if (!tracker) {
-    tracker = { timestamps: [] };
-    actionTrackers.set(key, tracker);
-  }
+  const trackers = loadTrackers();
+  let timestamps = trackers[key] || [];
 
   // Remove timestamps outside the sliding window
-  tracker.timestamps = tracker.timestamps.filter((time) => now - time < config.windowMs);
+  timestamps = timestamps.filter((time) => now - time < config.windowMs);
 
-  if (tracker.timestamps.length >= config.maxRequests) {
-    const oldest = tracker.timestamps[0];
+  if (timestamps.length >= config.maxRequests) {
+    const oldest = timestamps[0];
     const waitSeconds = Math.ceil((config.windowMs - (now - oldest)) / 1000);
     return { allowed: false, waitSeconds: Math.max(1, waitSeconds) };
   }
 
   // Record action
-  tracker.timestamps.push(now);
+  timestamps.push(now);
+  trackers[key] = timestamps;
+  saveTrackers(trackers);
   return { allowed: true };
 }

@@ -57,10 +57,24 @@ function ProblemsPage() {
     "all" | "pending" | "in_progress" | "completed" | "escalated"
   >("all");
   const [upvotes, setUpvotes] = useState<Record<string, number>>({});
+  const [votedItems, setVotedItems] = useState<string[]>([]);
   const [activeDeskId, setActiveDeskId] = useState<string | null>(null);
   const [deskStatus, setDeskStatus] = useState<string>("in_progress");
   const [deskNote, setDeskNote] = useState<string>("");
   const canManage = role === "village_admin" || role === "super_admin";
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("problems-upvoted");
+      if (saved) {
+        try {
+          setVotedItems(JSON.parse(saved));
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+  }, []);
 
   const handlePostClick = () => {
     if (!user) {
@@ -103,6 +117,14 @@ function ProblemsPage() {
   };
 
   const handleUpvote = (id: string) => {
+    if (votedItems.includes(id)) {
+      toast.info("You already supported this issue!");
+      return;
+    }
+    const nextVoted = [...votedItems, id];
+    setVotedItems(nextVoted);
+    localStorage.setItem("problems-upvoted", JSON.stringify(nextVoted));
+
     setUpvotes((prev) => {
       const cur = prev[id] || 0;
       toast.success("Community support verified! Added your voice to this report.");
@@ -413,9 +435,22 @@ function ProblemsPage() {
                         <button
                           type="button"
                           onClick={() => handleUpvote(item.id)}
-                          className="inline-flex items-center gap-1.5 rounded-full bg-primary text-primary-foreground px-3.5 py-1.5 text-xs font-bold shadow-sm hover:brightness-110 transition active:scale-95"
+                          disabled={votedItems.includes(item.id)}
+                          className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold shadow-sm transition ${
+                            votedItems.includes(item.id)
+                              ? "bg-emerald-600 border border-emerald-500 text-white cursor-default"
+                              : "bg-primary text-primary-foreground hover:brightness-110 active:scale-95"
+                          }`}
                         >
-                          <ThumbsUp className="size-3.5" /> I Face This Too (+1)
+                          {votedItems.includes(item.id) ? (
+                            <>
+                              <CheckCircle2 className="size-3.5" /> Supported ✓
+                            </>
+                          ) : (
+                            <>
+                              <ThumbsUp className="size-3.5" /> I Face This Too (+1)
+                            </>
+                          )}
                         </button>
                       </div>
 
