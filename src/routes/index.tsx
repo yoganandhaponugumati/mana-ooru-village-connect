@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { Link } from "@tanstack/react-router";
-import { useEffect, useState, lazy, Suspense, type FormEvent } from "react";
+import { useEffect, useState, useRef, lazy, Suspense, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { useListingStats, timeAgo } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
