@@ -157,11 +157,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 });
 
 function RootShell({ children }: { children: ReactNode }) {
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "GramMitra",
+    "alternateName": "Mana Ooru Village Connect",
+    "url": "https://grammitra-app.vercel.app/",
+    "description": "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and civic problem reporting.",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://grammitra-app.vercel.app/search?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <html lang="en">
       <head>
         <HeadContent />
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap" />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
       </head>
       <body className="overflow-x-hidden w-full antialiased bg-[#F9FAFB] dark:bg-zinc-950">
         {children}

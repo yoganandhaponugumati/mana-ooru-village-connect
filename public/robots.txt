@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /super-admin/
+Disallow: /official/
+
+Sitemap: https://grammitra-app.vercel.app/sitemap.xml
