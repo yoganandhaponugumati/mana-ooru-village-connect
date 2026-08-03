@@ -676,9 +676,12 @@ function Index() {
         {/* Full-Screen Animated Village Photo Background */}
         <img
           src="/village-life-bg.webp"
+          srcSet="/village-life-bg-mobile.webp 720w, /village-life-bg.webp 1200w"
+          sizes="(max-width: 640px) 100vw, 1200px"
           alt="Beautiful Indian village with green fields at sunrise"
           decoding="async"
           fetchPriority="high"
+          loading="eager"
           className="absolute inset-0 z-0 h-full w-full object-cover opacity-55 scale-105 animate-pulse-subtle"
         />
 
@@ -909,10 +912,13 @@ function Index() {
         {/* Mobile Top Image Banner */}
         <div className="mb-6 mt-6 relative h-[120px] rounded-[24px] overflow-hidden shadow-md border border-border">
           <img
-            src="/village-life-bg.webp"
+            src="/village-life-bg-mobile.webp"
             alt="Village"
             decoding="async"
             fetchPriority="high"
+            loading="eager"
+            width="360"
+            height="120"
             className="absolute inset-0 w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
