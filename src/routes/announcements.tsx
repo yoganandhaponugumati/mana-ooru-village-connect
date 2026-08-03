@@ -35,6 +35,7 @@ import { useAuth } from "@/lib/auth";
 import { useListings, timeAgo } from "@/lib/store";
 import { useGovernmentWorks, type GovernmentWorkInput } from "@/lib/government-works";
 import { toast } from "sonner";
+import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/announcements")({
   head: () => ({ meta: [{ title: "Village Notice Board & Sarpanch Pragati — GramMitra" }] }),

@@ -19,7 +19,7 @@ import {
   Award,
   ArrowRight,
 } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
 import { AppButton, EmptyState, FeatureIcon, SurfaceCard } from "@/components/design-system";
