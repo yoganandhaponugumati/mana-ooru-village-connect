@@ -130,6 +130,15 @@ export function VillageStories() {
   };
 
   const canPostStory = Boolean(user);
+  const isAdmin =
+    role === "village_admin" ||
+    role === "super_admin" ||
+    (role as string) === "platform_admin" ||
+    profile?.designation === "Sarpanch";
+
+  const canDeleteStory = (authorId?: string) => {
+    return isAdmin || (user && authorId && user.id === authorId);
+  };
 
   const compressImage = (file: File): Promise<File> =>
     new Promise((resolve) => {
@@ -475,7 +484,7 @@ export function VillageStories() {
                   <ShieldCheck className="size-3" />
                 </div>
               )}
-              {isAdmin && (
+              {canDeleteStory(story.authorId) && (
                 <button
                   onClick={(e) => handleDeleteStory(story.id, e)}
                   title="Delete Story"
@@ -596,7 +605,7 @@ export function VillageStories() {
                       {/* WhatsApp Style 3-Dots Dropdown Menu */}
                       {showMenu && (
                         <div className="absolute top-11 right-0 w-44 rounded-2xl bg-zinc-900/95 border border-white/15 text-white shadow-2xl p-1.5 z-50 backdrop-blur-xl">
-                          {isAdmin && (
+                          {canDeleteStory(activeStory?.authorId) && (
                             <button
                               onClick={(e) => {
                                 setShowMenu(false);
