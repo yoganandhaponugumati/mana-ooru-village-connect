@@ -377,36 +377,30 @@ function HeroFeatureCarousel() {
 
   return (
     <div className="relative overflow-hidden rounded-[24px] border border-white/25 bg-black/40 p-1.5 backdrop-blur-xl shadow-2xl w-full max-w-sm sm:max-w-md">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={currentIndex}
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          onClick={() => navigate({ to: activeItem.to })}
-          className={`cursor-pointer rounded-[20px] bg-gradient-to-r ${activeItem.gradient} p-4 text-white shadow-lg flex items-center justify-between gap-3 transition hover:scale-[1.01]`}
-        >
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2 mb-1">
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${activeItem.accentBg}`}
-              >
-                {activeItem.badge}
-              </span>
-              <span className="text-[11px] font-semibold text-white/80">{activeItem.telugu}</span>
-            </div>
-            <h4 className="font-display text-lg font-bold text-white flex items-center gap-1.5">
-              <activeItem.icon className="size-5 shrink-0" />
-              {activeItem.title}
-            </h4>
-            <p className="mt-1 text-xs text-white/90 truncate">{activeItem.desc}</p>
+      <div
+        key={currentIndex}
+        onClick={() => navigate({ to: activeItem.to })}
+        className={`cursor-pointer rounded-[20px] bg-gradient-to-r ${activeItem.gradient} p-4 text-white shadow-lg flex items-center justify-between gap-3 transition hover:scale-[1.01] animate-fade-in`}
+      >
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <span
+              className={`rounded-full px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider ${activeItem.accentBg}`}
+            >
+              {activeItem.badge}
+            </span>
+            <span className="text-[11px] font-semibold text-white/80">{activeItem.telugu}</span>
           </div>
-          <div className="grid size-9 shrink-0 place-items-center rounded-full bg-white/20 backdrop-blur-md">
-            <ArrowRight className="size-4 text-white" />
-          </div>
-        </motion.div>
-      </AnimatePresence>
+          <h4 className="font-display text-lg font-bold text-white flex items-center gap-1.5">
+            <activeItem.icon className="size-5 shrink-0" />
+            {activeItem.title}
+          </h4>
+          <p className="mt-1 text-xs text-white/90 truncate">{activeItem.desc}</p>
+        </div>
+        <div className="grid size-9 shrink-0 place-items-center rounded-full bg-white/20 backdrop-blur-md">
+          <ArrowRight className="size-4 text-white" />
+        </div>
+      </div>
       <div className="flex justify-center gap-1.5 pt-2 pb-0.5">
         {carouselItems.map((_, idx) => (
           <button
