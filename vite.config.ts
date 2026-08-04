@@ -120,6 +120,20 @@ export default defineConfig({
     server: { entry: "server" },
   },
   vite: {
+    build: {
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes("node_modules")) {
+              if (id.includes("lucide-react")) return "vendor-icons";
+              if (id.includes("framer-motion")) return "vendor-motion";
+              if (id.includes("@tanstack")) return "vendor-tanstack";
+              if (id.includes("@supabase")) return "vendor-supabase";
+            }
+          },
+        },
+      },
+    },
     plugins: [
       VitePWA({
         registerType: "autoUpdate",

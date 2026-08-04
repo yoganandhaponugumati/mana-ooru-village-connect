@@ -1,23 +1,22 @@
-import { createFileRoute, useSearch, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import {
   Building2,
   Cable,
-  Camera,
   Cake,
   Hammer,
   HeartPulse,
   Plus,
   Router,
   Store,
-  ShowerHead,
   Tractor,
   Truck,
-  Waves,
   Wrench,
   CupSoda,
   Leaf,
   Sprout,
   Milk,
+  Droplets,
+  Sparkles,
 } from "lucide-react";
 import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
@@ -74,7 +73,7 @@ function ServicesPage() {
   const displayItems =
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "service");
   const [showForm, setShowForm] = useState(false);
-  const [q, setQ] = useState("");
+  const [q] = useState("");
   const visibleCategories = mode === "shops" ? shopCategories : serviceCategories;
   const visibleOptions = (mode === "shops" ? shopOptions : serviceOptions) as string[];
   
@@ -102,8 +101,8 @@ function ServicesPage() {
 
   return (
     <PageLayout
-      title={t.servicesTitle}
-      subtitle={t.servicesSubtitle}
+      title={(t as any).servicesTitle || "Local Services & Village Shops"}
+      subtitle={(t as any).servicesSubtitle || "Find trusted electricians, mechanics, tractor services, and local village vendors."}
       icon={<Wrench className="size-6 text-primary" />}
       heroAction={
         <div className="flex flex-wrap items-center justify-center gap-3">
@@ -131,7 +130,7 @@ function ServicesPage() {
             key={value}
             type="button"
             onClick={() => {
-              setMode(value as "services" | "shops");
+              navigate({ search: { kind: value as "services" | "shops" } as any });
               setShowForm(false);
             }}
             className={`rounded-full px-5 py-2 text-sm font-semibold transition ${

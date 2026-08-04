@@ -125,8 +125,8 @@ function SchemesPage() {
 
   return (
     <PageLayout
-      title={t.schemesTitle}
-      subtitle={t.schemesSubtitle}
+      title={(t as any).schemesTitle || "Government Schemes & Subsidies"}
+      subtitle={(t as any).schemesSubtitle || "Explore central and state welfare schemes for farmers, women, youth, and workers."}
       icon={<Landmark className="size-7 text-primary" />}
     >
       {/* Live sync banner */}

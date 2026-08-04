@@ -57,8 +57,8 @@ function WeatherPage() {
 
   return (
     <PageLayout
-      title={t.weatherTitle}
-      subtitle={t.weatherSubtitle}
+      title={(t as any).weatherTitle || "Village Weather & Crop Advisory"}
+      subtitle={(t as any).weatherSubtitle || "Live temperature, rainfall forecasts, and agricultural alerts."}
       icon={<CloudSun className="size-7" />}
     >
       <SectionHeader

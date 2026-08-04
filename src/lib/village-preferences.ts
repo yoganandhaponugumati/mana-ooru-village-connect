@@ -808,8 +808,6 @@ const dictionary = {
     postNoticeDesc: "Share news, events",
     searchPlaceholder: "Search services, workers, notices...",
     welcomeToVillage: "Welcome to {village}",
-    selectIdentity: "Select your village identity type below.",
-    backToWelcome: "Back to welcome screen",
     emailAddress: "Email Address",
     password: "Password",
     confirmPassword: "Confirm Password",

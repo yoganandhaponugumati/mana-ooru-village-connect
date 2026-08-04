@@ -140,8 +140,8 @@ function ProblemsPage() {
 
   return (
     <PageLayout
-      title={t.problemsTitle}
-      subtitle={t.problemsSubtitle}
+      title={(t as any).problemsTitle || "Citizen Problems & Support"}
+      subtitle={(t as any).problemsSubtitle || "Report issues directly to your Gram Panchayat."}
       icon={<AlertTriangle className="size-6 text-red-600" />}
       heroAction={
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full">

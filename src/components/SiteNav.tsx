@@ -462,7 +462,7 @@ export function SiteNav() {
                           {authProfile?.full_name || "Villager"}
                         </p>
                         <p className="text-xs text-muted-foreground truncate font-medium">
-                          {getRoleDisplayName(role)}
+                          {getRoleDisplayName(role || "citizen")}
                         </p>
                       </div>
 

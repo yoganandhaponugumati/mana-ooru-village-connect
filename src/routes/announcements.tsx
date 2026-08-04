@@ -17,8 +17,13 @@ import {
   Share2,
   MapPin,
   BadgeIndianRupee,
+  X,
+  ExternalLink,
+  Printer,
+  ChevronDown,
+  ChevronUp,
 } from "lucide-react";
-import { useRef, useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
 import { showInstantPushNotification } from "@/lib/push-notifications";
@@ -38,12 +43,16 @@ import { toast } from "sonner";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
 export const Route = createFileRoute("/announcements")({
+  validateSearch: (search: Record<string, unknown>): { noticeId?: string } => ({
+    noticeId: typeof search.noticeId === "string" ? search.noticeId : undefined,
+  }),
   head: () => ({ meta: [{ title: "Village Notice Board & Sarpanch Pragati — GramMitra" }] }),
   component: AnnPage,
 });
 
 function AnnPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const noticeFormRef = useRef<HTMLDivElement>(null);
   const [activeTab, setActiveTab] = useState<"notices" | "sarpanch_works">("notices");
 
@@ -55,6 +64,27 @@ function AnnPage() {
     items.length > 0 ? items : fallbackListings.filter((item) => item.type === "announcement");
   const [showNoticeForm, setShowNoticeForm] = useState(false);
   const canManageNotices = role === "village_admin" || role === "super_admin";
+
+  // Read More & Detail Modal State
+  const [expandedNoticeIds, setExpandedNoticeIds] = useState<Record<string, boolean>>({});
+  const [selectedNotice, setSelectedNotice] = useState<any | null>(null);
+
+  useEffect(() => {
+    if (search.noticeId && displayItems.length > 0) {
+      const match = displayItems.find((n) => n.id === search.noticeId);
+      if (match) {
+        setSelectedNotice(match);
+      }
+    }
+  }, [search.noticeId, displayItems]);
+
+  const toggleNoticeExpand = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    setExpandedNoticeIds((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   // Sarpanch Works data
   const { works, loading: worksLoading, createWork } = useGovernmentWorks();
@@ -173,8 +203,8 @@ function AnnPage() {
 
   return (
     <PageLayout
-      title={t.noticesTitle}
-      subtitle={t.noticesSubtitle}
+      title={(t as any).noticesTitle || "Village Notice Board & Sarpanch Pragati"}
+      subtitle={(t as any).noticesSubtitle || "Official announcements, Gram Sabha schedules, water updates, and village progress."}
       icon={<Megaphone className="size-6 text-primary" />}
       heroAction={
         <div className="flex flex-wrap items-center justify-center gap-3">
@@ -488,12 +518,33 @@ function AnnPage() {
                               {a.title}
                             </h4>
                             <div className="mt-1 flex-1">
-                              <p className="text-[13px] leading-5 text-muted-foreground line-clamp-2">
+                              <p className={`text-[13px] leading-5 text-muted-foreground ${expandedNoticeIds[a.id] ? "" : "line-clamp-2"}`}>
                                 {a.description}
                               </p>
-                              <button className="text-[10px] font-bold text-primary mt-0.5 hover:underline flex items-center gap-0.5">
-                                Read full notice →
-                              </button>
+                              <div className="mt-1.5 flex items-center gap-3">
+                                <button
+                                  type="button"
+                                  onClick={(e) => toggleNoticeExpand(a.id, e)}
+                                  className="text-[11px] font-bold text-primary hover:underline inline-flex items-center gap-1"
+                                >
+                                  {expandedNoticeIds[a.id] ? (
+                                    <>
+                                      Show less <ChevronUp className="size-3" />
+                                    </>
+                                  ) : (
+                                    <>
+                                      Read full notice → <ChevronDown className="size-3" />
+                                    </>
+                                  )}
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => setSelectedNotice(a)}
+                                  className="text-[11px] font-extrabold text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2 py-0.5 rounded-md hover:bg-emerald-100 dark:hover:bg-emerald-900 transition inline-flex items-center gap-1"
+                                >
+                                  <ExternalLink className="size-3" /> Detail View
+                                </button>
+                              </div>
                             </div>
 
                             <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-border/60 pt-2.5">
@@ -779,6 +830,102 @@ function AnnPage() {
               ))}
             </div>
           )}
+        </div>
+      )}
+
+      {/* Notice Full Detail Modal Dialog */}
+      {selectedNotice && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-in fade-in duration-200">
+          <div
+            className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-3xl bg-card p-6 sm:p-8 shadow-2xl border border-border ring-1 ring-primary/20"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-4 border-b border-border pb-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-bold uppercase tracking-wider">
+                  <ShieldCheck className="size-3.5" /> {selectedNotice.category || "Official Notice"}
+                </span>
+                <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2.5 py-1 text-[11px] font-bold">
+                  Verified Panchayat Circular
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setSelectedNotice(null)}
+                className="grid size-9 place-items-center rounded-full bg-muted text-muted-foreground hover:bg-primary/20 hover:text-primary transition"
+                aria-label="Close"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="mt-5 space-y-4">
+              <div className="flex items-center justify-between text-xs text-muted-foreground">
+                <span>Published: {timeAgo(selectedNotice.createdAt)}</span>
+                {selectedNotice.location && (
+                  <span className="flex items-center gap-1 font-semibold text-primary">
+                    <MapPin className="size-3.5" /> {selectedNotice.location}
+                  </span>
+                )}
+              </div>
+
+              <h2 className="font-display text-2xl sm:text-3xl font-extrabold text-clay leading-tight">
+                {selectedNotice.title}
+              </h2>
+
+              {selectedNotice.imageUrl && (
+                <div className="overflow-hidden rounded-2xl border border-border bg-muted">
+                  <img
+                    src={selectedNotice.imageUrl}
+                    alt={selectedNotice.title}
+                    className="w-full max-h-[350px] object-cover"
+                  />
+                </div>
+              )}
+
+              <div className="rounded-2xl bg-muted/40 p-4 sm:p-5 border border-border/60">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">
+                  Official Details & Instructions
+                </h4>
+                <p className="text-sm sm:text-base leading-relaxed text-foreground whitespace-pre-line font-normal">
+                  {selectedNotice.description}
+                </p>
+              </div>
+
+              {/* Action & Contact Footer */}
+              <div className="mt-6 pt-4 border-t border-border flex flex-wrap items-center justify-between gap-3">
+                {selectedNotice.contact ? (
+                  <a
+                    href={`tel:${selectedNotice.contact}`}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-2.5 text-xs font-bold text-white hover:bg-emerald-700 transition shadow-md"
+                  >
+                    <Phone className="size-4" /> Call Contact ({selectedNotice.contact})
+                  </a>
+                ) : (
+                  <div />
+                )}
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => shareToWhatsApp(selectedNotice.title, selectedNotice.description || "")}
+                    className="inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-xs font-bold text-white hover:bg-primary/90 transition shadow-md"
+                  >
+                    <Share2 className="size-4" /> Share on WhatsApp
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => window.print()}
+                    className="inline-flex items-center gap-1.5 rounded-2xl border border-border bg-card px-3.5 py-2.5 text-xs font-bold text-foreground hover:bg-muted transition"
+                  >
+                    <Printer className="size-4" /> Print Circular
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </PageLayout>

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Shield, Clock, Search, Filter, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Shield, Clock, Search, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface AuditLog {
@@ -80,6 +80,7 @@ export function AuditLogsViewer() {
           <h3 className="font-display text-lg font-bold flex items-center gap-2 text-foreground">
             <Shield className="size-5 text-amber-500" />
             <span>Admin Action Audit Logs</span>
+            {loading && <span className="text-xs font-normal text-muted-foreground animate-pulse">(Refreshing...)</span>}
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             Transparent activity record for Sarpanch, Panchayat Ops & Platform Admins.

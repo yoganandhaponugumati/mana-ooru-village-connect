@@ -41,8 +41,8 @@ function LandPage() {
 
   return (
     <PageLayout
-      title={t.landTitle}
-      subtitle={t.landSubtitle}
+      title={(t as any).landTitle || "Agricultural Land & Leases"}
+      subtitle={(t as any).landSubtitle || "Buy, sell, or lease farmland directly within your village."}
       icon={<Wheat className="size-6 text-primary" />}
       heroAction={
         <AppButton

@@ -129,12 +129,24 @@ export function VillageStories() {
     triggerHaptic("light");
   };
 
-  const canPostStory = Boolean(user);
   const isAdmin =
     role === "village_admin" ||
     role === "super_admin" ||
     (role as string) === "platform_admin" ||
-    profile?.designation === "Sarpanch";
+    (role as string) === "app_admin" ||
+    profile?.role === "village_admin" ||
+    profile?.role === "super_admin" ||
+    (profile?.role as string) === "platform_admin" ||
+    (profile?.role as string) === "app_admin" ||
+    profile?.account_type === "village_admin" ||
+    profile?.account_type === "app_admin" ||
+    profile?.designation === "Sarpanch" ||
+    profile?.designation === "Panchayat Secretary" ||
+    profile?.designation === "VRO" ||
+    profile?.designation === "Panchayat Officer" ||
+    profile?.designation === "Ward Member";
+
+  const canPostStory = Boolean(user && isAdmin);
 
   const canDeleteStory = (authorId?: string) => {
     return isAdmin || (user && authorId && user.id === authorId);

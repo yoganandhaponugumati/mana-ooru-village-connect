@@ -85,8 +85,8 @@ function HealthPage() {
   const { t } = useVillagePreferences();
   return (
     <PageLayout
-      title={t.healthTitle}
-      subtitle={t.healthSubtitle}
+      title={(t as any).healthTitle || "Village Health & Emergency Services"}
+      subtitle={(t as any).healthSubtitle || "Find 24/7 doctors, ambulances, blood donors, and medical camps nearby."}
       icon={<HeartPulse className="size-7 text-red-500" />}
     >
       <div className="space-y-8">

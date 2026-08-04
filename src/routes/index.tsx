@@ -48,8 +48,8 @@ import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
 
 import { VillageStories } from "@/components/VillageStories";
-import { VideoGuideModal } from "@/components/VideoGuideModal";
-import { ConceptShowcase } from "@/components/ConceptShowcase";
+const VideoGuideModal = lazy(() => import("@/components/VideoGuideModal").then(m => ({ default: m.VideoGuideModal })));
+const ConceptShowcase = lazy(() => import("@/components/ConceptShowcase").then(m => ({ default: m.ConceptShowcase })));
 
 function ClientOnly({
   children,
@@ -1147,6 +1147,7 @@ function Index() {
                     <div className="mt-4 pt-1">
                       <Link
                         to="/announcements"
+                        search={{ noticeId: item.id }}
                         className="inline-flex items-center justify-center rounded-full bg-[#065f46] px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition"
                       >
                         Read More

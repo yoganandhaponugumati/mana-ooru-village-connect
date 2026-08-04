@@ -6,6 +6,7 @@ import {
   Plus,
   Shovel,
   ShoppingBasket,
+  ShoppingBag,
   Tractor,
   Trees,
   Wheat,
@@ -105,8 +106,8 @@ function MarketPage() {
 
   return (
     <PageLayout
-      title={t.marketplaceTitle}
-      subtitle={t.marketplaceSubtitle}
+      title={(t as any).marketplaceTitle || "Village Marketplace"}
+      subtitle={(t as any).marketplaceSubtitle || "Buy & sell local crops, cattle, machinery, and goods directly."}
       icon={<ShoppingBasket className="size-6 text-emerald-600" />}
       heroAction={
         <AppButton
@@ -255,7 +256,7 @@ function MarketPage() {
           actionLabel="Sell Something Now"
           onActionClick={handlePostClick}
           secondaryActionLabel="Clear Category Filter"
-          onSecondaryActionClick={() => { setCat("All"); setQ(""); }}
+          onSecondaryActionClick={() => setCat("All")}
         />
       ) : (
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

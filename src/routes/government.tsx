@@ -77,8 +77,8 @@ function GovernmentPage() {
   const { t } = useVillagePreferences();
   return (
     <PageLayout
-      title={t.governmentTitle}
-      subtitle={t.governmentSubtitle}
+      title={(t as any).governmentTitle || "Mana Panchayat Pragati"}
+      subtitle={(t as any).governmentSubtitle || "15th Finance Commission funds, NREGS project tracking, and Panchayat works."}
       icon={<Building2 className="size-7 text-primary" />}
     >
       <div className="space-y-8">
