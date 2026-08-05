@@ -40,6 +40,7 @@ import { toast } from "sonner";
 import { PageLayout } from "@/components/PageLayout";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppButton, EmptyState, SurfaceCard, SkeletonCard } from "@/components/design-system";
+import { checkRateLimit, DEFAULT_VOTE_LIMIT } from "@/lib/rate-limiter";
 import { supabase } from "@/integrations/supabase/client";
 import { fallbackListings } from "@/lib/app-data";
 import { useAuth } from "@/lib/auth";
@@ -392,7 +393,7 @@ function toTimelineActivity(row: TimelineRow, fallbackVillage: string): Timeline
 }
 
 function TimelinePage() {
-  const { role, profile: authProfile } = useAuth();
+  const { user, role, profile: authProfile } = useAuth();
   const { profile, weather } = useVillagePreferences();
   const { items } = useListings();
   const { works } = useGovernmentWorks();
@@ -404,6 +405,18 @@ function TimelinePage() {
   const [commentOpen, setCommentOpen] = useState<string | null>(null);
   const [comments, setComments] = useState<Record<string, string[]>>({});
   const [liked, setLiked] = useState<Record<string, boolean>>({});
+
+  const handleLikeItem = (itemId: string) => {
+    const userId = user?.id || "guest-liker";
+    const rateCheck = checkRateLimit(userId, "timeline_like", DEFAULT_VOTE_LIMIT);
+    if (!rateCheck.allowed) {
+      toast.warning(
+        `Action rate limit reached! Please wait ${rateCheck.waitSeconds}s before liking again.`,
+      );
+      return;
+    }
+    setLiked((prev) => ({ ...prev, [itemId]: !prev[itemId] }));
+  };
   const villageName = authProfile?.village || profile.village || "";
   const isAdmin =
     role === "village_admin" ||
@@ -760,7 +773,7 @@ function TimelinePage() {
                   saved={isSaved(item.id)}
                   comments={comments[item.id] || []}
                   commentOpen={commentOpen === item.id}
-                  onLike={() => setLiked((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}
+                  onLike={() => handleLikeItem(item.id)}
                   onSave={() => toggleSaved({ id: item.id, title: item.title })}
                   onShare={() =>
                     void navigator.clipboard
@@ -790,7 +803,7 @@ function TimelinePage() {
                     saved={isSaved(item.id)}
                     comments={comments[item.id] || []}
                     commentOpen={commentOpen === item.id}
-                    onLike={() => setLiked((prev) => ({ ...prev, [item.id]: !prev[item.id] }))}
+                    onLike={() => handleLikeItem(item.id)}
                     onSave={() => toggleSaved({ id: item.id, title: item.title })}
                     onShare={() =>
                       void navigator.clipboard

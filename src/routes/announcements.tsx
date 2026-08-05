@@ -494,10 +494,10 @@ function AnnPage() {
                         <SurfaceCard
                           key={a.id}
                           hover={false}
-                          className="rounded-[1.25rem] border-l-4 border-primary bg-card/95 p-4 flex flex-row gap-4 shadow-sm"
+                          className="rounded-[1.25rem] border-l-4 border-primary bg-card/95 p-4 flex flex-col sm:flex-row gap-4 shadow-sm"
                         >
                           {a.imageUrl && (
-                            <div className="relative size-24 shrink-0 overflow-hidden rounded-[14px] shadow-sm border border-border/80">
+                            <div className="relative w-full h-44 sm:size-24 shrink-0 overflow-hidden rounded-[14px] shadow-sm border border-border/80">
                               <img
                                 src={a.imageUrl}
                                 alt={a.title}

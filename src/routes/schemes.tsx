@@ -268,17 +268,17 @@ function SchemesPage() {
           .map((scheme) => (
             <SurfaceCard
               key={scheme.id}
-              className="p-4 flex flex-row gap-4 border-border/80 bg-card/95 shadow-sm hover:shadow-md transition-all rounded-[1.25rem] overflow-hidden items-start"
+              className="p-4 flex flex-col sm:flex-row gap-4 border-border/80 bg-card/95 shadow-sm hover:shadow-md transition-all rounded-[1.25rem] overflow-hidden items-stretch sm:items-start"
             >
               {/* Scheme header image (Thumbnail) */}
-              <div className="relative w-28 h-32 sm:w-36 sm:h-40 shrink-0 overflow-hidden rounded-[14px] shadow-sm border border-border/80">
+              <div className="relative w-full h-44 sm:w-36 sm:h-48 shrink-0 overflow-hidden rounded-[14px] shadow-sm border border-border/80">
                 <img
                   src={getSchemeImage(scheme.category, scheme.title)}
                   alt={scheme.title}
                   loading="lazy"
                   className="h-full w-full object-cover brightness-90"
                 />
-                <div className="absolute bottom-1 left-1 right-1 rounded-md bg-black/70 px-1 py-0.5 text-[9px] font-bold text-white flex items-center justify-center backdrop-blur-md min-w-0 overflow-hidden">
+                <div className="absolute bottom-2 left-2 right-2 sm:bottom-1 sm:left-1 sm:right-1 rounded-md bg-black/70 px-2 sm:px-1 py-1 sm:py-0.5 text-[10px] sm:text-[9px] font-bold text-white flex items-center justify-center backdrop-blur-md min-w-0 overflow-hidden">
                   <span className="truncate min-w-0">{scheme.category}</span>
                 </div>
               </div>

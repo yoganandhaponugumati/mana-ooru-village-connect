@@ -301,9 +301,9 @@ export function SiteNav() {
               </AnimatePresence>
             </div>
 
-            {/* Notifications — only when signed in, hidden on mobile */}
+            {/* Notifications — visible on mobile and desktop */}
             {user && (
-              <div className="nav-menu-container relative hidden md:block">
+              <div className="nav-menu-container relative flex items-center">
                 <button
                   type="button"
                   onClick={openNotifications}
@@ -564,6 +564,26 @@ export function SiteNav() {
 
                     {/* Nav links */}
                     <div className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+                      {user && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setOpen(false);
+                            openNotifications();
+                          }}
+                          className="flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-sm font-semibold text-foreground transition hover:bg-primary/10 hover:text-primary dark:text-zinc-200"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Bell className="size-4 shrink-0 text-primary" />
+                            <span>{(t as any).notifications || "Notifications"}</span>
+                          </div>
+                          {unreadCount > 0 && (
+                            <span className="rounded-full bg-red-500 px-2 py-0.5 text-[10px] font-extrabold text-white">
+                              {unreadCount}
+                            </span>
+                          )}
+                        </button>
+                      )}
                       {navLinks.map((l) => (
                         <Link
                           key={l.to}

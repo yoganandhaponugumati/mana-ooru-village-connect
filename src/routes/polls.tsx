@@ -8,6 +8,8 @@ import { AppButton, EmptyState, SurfaceCard } from "@/components/design-system";
 import { useAuth } from "@/lib/auth";
 import { supabase } from "@/integrations/supabase/client";
 
+import { checkRateLimit, DEFAULT_VOTE_LIMIT } from "@/lib/rate-limiter";
+
 export const Route = createFileRoute("/polls")({
   head: () => ({ meta: [{ title: "Gram Sabha Polls - GramMitra" }] }),
   component: PollsPage,
@@ -122,6 +124,15 @@ function PollsPage() {
 
   const voteMutation = useMutation({
     mutationFn: async ({ pollId, optionId }: { pollId: string; optionId: string }) => {
+      if (!user) {
+        throw new Error("You must be signed in to vote.");
+      }
+      const rateCheck = checkRateLimit(user.id, "poll_vote", DEFAULT_VOTE_LIMIT);
+      if (!rateCheck.allowed) {
+        throw new Error(
+          `Voting rate limit reached! Please wait ${rateCheck.waitSeconds}s before casting another vote.`,
+        );
+      }
       const { error } = await (supabase as any).from("poll_votes").insert({
         poll_id: pollId,
         option_id: optionId,

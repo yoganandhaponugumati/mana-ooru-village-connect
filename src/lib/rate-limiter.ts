@@ -39,6 +39,12 @@ export const DEFAULT_STORY_LIMIT: RateLimitConfig = {
   windowMs: 60 * 1000, // 1 minute
 };
 
+export const DEFAULT_VOTE_LIMIT: RateLimitConfig = {
+  maxRequests: 5,
+  windowMs: 60 * 1000, // 1 minute
+};
+
+
 /**
  * Checks whether an action for a user exceeds the rate limit.
  * Returns true if allowed, false if rate limited.

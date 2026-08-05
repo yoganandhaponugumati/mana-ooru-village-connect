@@ -25,6 +25,7 @@ import { ListingForm } from "@/components/ListingForm";
 import { AppButton, EmptyState, FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { fallbackListings } from "@/lib/app-data";
 import { useListings, timeAgo } from "@/lib/store";
+import { checkRateLimit, DEFAULT_VOTE_LIMIT } from "@/lib/rate-limiter";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -121,6 +122,16 @@ function ProblemsPage() {
       toast.info("You already supported this issue!");
       return;
     }
+
+    const userId = user?.id || "guest-upvoter";
+    const rateCheck = checkRateLimit(userId, "upvote_problem", DEFAULT_VOTE_LIMIT);
+    if (!rateCheck.allowed) {
+      toast.warning(
+        `Voting limit reached! Please wait ${rateCheck.waitSeconds}s before upvoting again.`,
+      );
+      return;
+    }
+
     const nextVoted = [...votedItems, id];
     setVotedItems(nextVoted);
     localStorage.setItem("problems-upvoted", JSON.stringify(nextVoted));

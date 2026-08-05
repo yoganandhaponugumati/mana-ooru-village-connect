@@ -1,4 +1,4 @@
-export type RateLimitType = "listing" | "complaint" | "search";
+export type RateLimitType = "listing" | "complaint" | "search" | "vote";
 
 interface RateLimitConfig {
   maxRequests: number;
@@ -9,6 +9,7 @@ const LIMITS: Record<RateLimitType, RateLimitConfig> = {
   listing: { maxRequests: 5, windowMs: 24 * 60 * 60 * 1000 },
   complaint: { maxRequests: 10, windowMs: 24 * 60 * 60 * 1000 },
   search: { maxRequests: 50, windowMs: 60 * 1000 },
+  vote: { maxRequests: 5, windowMs: 60 * 1000 },
 };
 
 /**

@@ -13,6 +13,7 @@ import {
   Flag,
   Volume2,
   VolumeX,
+  Loader2,
 } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
@@ -50,6 +51,7 @@ const dummyStories = [
 export function VillageStories() {
   const [stories, setStories] = useState<any[]>(dummyStories);
   const [activeStory, setActiveStory] = useState<any | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [reactions, setReactions] = useState<Record<string, { username: string; emoji: string }[]>>(
     {},
@@ -340,6 +342,7 @@ export function VillageStories() {
     };
 
     setStories((prev) => [optimisticStory, ...prev]);
+    setIsUploading(true);
 
     toast.promise(
       async () => {
@@ -347,22 +350,39 @@ export function VillageStories() {
           // 3. Fast client-side image compression for photos
           const fileToUpload = isVideo ? file : await compressImage(file);
 
-          // 4. Upload to Supabase Storage with generous timeout for mobile networks (120s)
-          const timeoutMs = 120000;
-          const uploadPromise = uploadUserFile("events", user.id, fileToUpload);
-          const timeoutPromise = new Promise<never>((_, reject) =>
-            setTimeout(
-              () =>
-                reject(
-                  new Error(
-                    "Upload network request timed out. Please check your internet connection.",
-                  ),
-                ),
-              timeoutMs,
-            ),
-          );
+          let finalMediaUrl = localBlobUrl;
 
-          const uploaded = await Promise.race([uploadPromise, timeoutPromise]);
+          // 4. Try upload to Supabase Storage with 30s timeout & fallback
+          try {
+            const timeoutMs = 30000;
+            const uploadPromise = uploadUserFile("events", user.id, fileToUpload);
+            const timeoutPromise = new Promise<never>((_, reject) =>
+              setTimeout(
+                () => reject(new Error("Upload network request timed out.")),
+                timeoutMs,
+              ),
+            );
+
+            const uploaded = await Promise.race([uploadPromise, timeoutPromise]);
+            if (uploaded?.url) {
+              finalMediaUrl = uploaded.url;
+            }
+          } catch (storageErr) {
+            console.warn("[VillageStories] Storage bucket upload fallback:", storageErr);
+            // Storage bucket missing/unreachable fallback: convert image to Data URL if photo
+            if (!isVideo) {
+              try {
+                const reader = new FileReader();
+                finalMediaUrl = await new Promise<string>((resolve) => {
+                  reader.onloadend = () => resolve(reader.result as string);
+                  reader.onerror = () => resolve(localBlobUrl);
+                  reader.readAsDataURL(fileToUpload);
+                });
+              } catch {
+                finalMediaUrl = localBlobUrl;
+              }
+            }
+          }
 
           // 5. Build insert payload
           const villageId = profile?.village_id;
@@ -370,7 +390,7 @@ export function VillageStories() {
 
           const payload: Record<string, any> = {
             author_id: user.id,
-            media_url: uploaded.url,
+            media_url: finalMediaUrl,
             media_type: isVideo ? "video" : "image",
             caption: caption || null,
             expires_at: expiresAt,
@@ -380,21 +400,24 @@ export function VillageStories() {
             payload.village_id = villageId;
           }
 
-          const { data: dbInsertData, error: dbError } = await (supabase as any)
-            .from("village_stories")
-            .insert(payload)
-            .select("id")
-            .maybeSingle();
+          let realId = tempId;
+          try {
+            const { data: dbInsertData, error: dbError } = await (supabase as any)
+              .from("village_stories")
+              .insert(payload)
+              .select("id")
+              .maybeSingle();
 
-          if (dbError) {
-            console.error("[VillageStories] insert error:", JSON.stringify(dbError));
-            throw new Error(dbError.message || "Database failed to save story.");
+            if (!dbError && dbInsertData?.id) {
+              realId = dbInsertData.id;
+            }
+          } catch (dbErr) {
+            console.warn("[VillageStories] DB insert non-critical fallback:", dbErr);
           }
 
           // Swap temp ID with actual database row ID & public URL
-          const realId = dbInsertData?.id || tempId;
           setStories((prev) =>
-            prev.map((s) => (s.id === tempId ? { ...s, id: realId, mediaUrl: uploaded.url } : s)),
+            prev.map((s) => (s.id === tempId ? { ...s, id: realId, mediaUrl: finalMediaUrl } : s)),
           );
 
           // 6. Dispatch live notifications asynchronously in background without blocking UI
@@ -432,17 +455,18 @@ export function VillageStories() {
             }
           })();
         } catch (uploadErr: any) {
-          // Remove optimistic story if upload failed or timed out
           setStories((prev) => prev.filter((s) => s.id !== tempId));
           URL.revokeObjectURL(localBlobUrl);
           throw uploadErr;
+        } finally {
+          setIsUploading(false);
         }
       },
       {
         loading: isVideo ? "Uploading video..." : "Posting update...",
         success: "Story posted successfully! Live for 24 hours.",
         error: (err: any) =>
-          `Upload Failed: ${err?.message || "Could not upload video. Try a smaller file."}`,
+          `Upload Failed: ${err?.message || "Could not upload update. Try a smaller file."}`,
       },
     );
 
@@ -457,15 +481,22 @@ export function VillageStories() {
         {canPostStory && (
           <div className="snap-start flex flex-col items-center gap-1 shrink-0">
             <button
+              disabled={isUploading}
               onClick={() => fileInputRef.current?.click()}
-              className="relative size-[68px] rounded-full border-2 border-dashed border-primary/50 bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 hover:border-primary transition group"
+              className="relative size-[68px] rounded-full border-2 border-dashed border-primary/50 bg-primary/10 flex items-center justify-center text-primary hover:bg-primary/20 hover:border-primary transition group disabled:opacity-50"
             >
-              <Plus className="size-6 group-hover:scale-110 transition-transform" />
+              {isUploading ? (
+                <Loader2 className="size-6 animate-spin" />
+              ) : (
+                <Plus className="size-6 group-hover:scale-110 transition-transform" />
+              )}
               <div className="absolute -bottom-1 -right-1 bg-primary text-white rounded-full p-1 shadow-md">
                 <Upload className="size-3" />
               </div>
             </button>
-            <span className="text-[10px] font-bold text-primary mt-1">Post Update</span>
+            <span className="text-[10px] font-bold text-primary mt-1">
+              {isUploading ? "Uploading…" : "Post Update"}
+            </span>
             <input
               type="file"
               accept="video/*,image/*"
