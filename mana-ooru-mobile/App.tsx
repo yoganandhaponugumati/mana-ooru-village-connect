@@ -14,6 +14,7 @@ import {
 import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { WebView, WebViewNavigation, WebViewMessageEvent } from "react-native-webview";
 import * as WebBrowser from "expo-web-browser";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createClient } from "@supabase/supabase-js";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -23,10 +24,12 @@ const SUPABASE_URL = "https://ytggaoaehejskxtxjfkz.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_qNqC7EJ4YndEO1H9nSycGA_RHkEnMo5";
 const AUTH_CALLBACK_SCHEME = "grammitra://auth-callback";
 
+// Native Supabase client configured with persistent AsyncStorage and auto-refresh
 const supabaseNative = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
   auth: {
-    persistSession: false,
-    autoRefreshToken: false,
+    storage: AsyncStorage,
+    persistSession: true,
+    autoRefreshToken: true,
     detectSessionInUrl: false,
   },
 });
@@ -75,6 +78,30 @@ function MainScreen() {
     setTimeout(() => setRefreshing(false), 1200);
   }, [handleReload]);
 
+  // Sync native session to WebView if available on initial page load
+  const syncNativeSessionToWebView = async () => {
+    try {
+      const { data } = await supabaseNative.auth.getSession();
+      if (data?.session?.access_token && data?.session?.refresh_token && webViewRef.current) {
+        const tokenPayload = JSON.stringify({
+          access_token: data.session.access_token,
+          refresh_token: data.session.refresh_token,
+        });
+        const bridgeScript = `
+          (function() {
+            if (typeof window.__handleNativeAuthSession === 'function') {
+              window.__handleNativeAuthSession(${tokenPayload});
+            }
+          })();
+          true;
+        `;
+        webViewRef.current.injectJavaScript(bridgeScript);
+      }
+    } catch {
+      // Non-blocking background session check
+    }
+  };
+
   // Handle Native Google OAuth via Chrome Custom Tabs
   const handleNativeGoogleAuth = async () => {
     try {
@@ -87,7 +114,6 @@ function MainScreen() {
       });
 
       if (error || !data?.url) {
-        console.warn("Could not generate Google OAuth URL:", error);
         return;
       }
 
@@ -128,37 +154,45 @@ function MainScreen() {
           }
         }
 
-        if (accessToken && refreshToken && webViewRef.current) {
-          const tokenPayload = JSON.stringify({
+        // Persist session to native client if tokens extracted from hash
+        if (accessToken && refreshToken) {
+          await supabaseNative.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken,
           });
 
-          // Inject into trusted web application handler
-          const bridgeScript = `
-            (function() {
-              if (typeof window.__handleNativeAuthSession === 'function') {
-                window.__handleNativeAuthSession(${tokenPayload}).then(function(success) {
-                  if (success && window.location.pathname === '/auth') {
-                    window.location.href = '/';
-                  }
-                });
-              }
-            })();
-            true;
-          `;
-          webViewRef.current.injectJavaScript(bridgeScript);
+          if (webViewRef.current) {
+            const tokenPayload = JSON.stringify({
+              access_token: accessToken,
+              refresh_token: refreshToken,
+            });
+
+            // Inject into trusted web application handler
+            const bridgeScript = `
+              (function() {
+                if (typeof window.__handleNativeAuthSession === 'function') {
+                  window.__handleNativeAuthSession(${tokenPayload}).then(function(success) {
+                    if (success && window.location.pathname === '/auth') {
+                      window.location.href = '/';
+                    }
+                  });
+                }
+              })();
+              true;
+            `;
+            webViewRef.current.injectJavaScript(bridgeScript);
+          }
         }
       }
-    } catch (err) {
-      console.error("Native Google OAuth flow error:", err);
+    } catch {
+      // Non-blocking OAuth error handler
     }
   };
 
   // Safe message listener between WebView and Native shell
   const handleWebViewMessage = (event: WebViewMessageEvent) => {
     try {
-      // Validate trusted origin
+      // Validate trusted origin strictly
       const originUrl = event.nativeEvent.url || "";
       const isTrusted =
         originUrl.startsWith("https://grammitra-app.vercel.app") ||
@@ -233,6 +267,7 @@ function MainScreen() {
               </View>
             )}
             onNavigationStateChange={handleNavigationStateChange}
+            onLoadEnd={syncNativeSessionToWebView}
             onMessage={handleWebViewMessage}
             onError={(syntheticEvent) => {
               const { nativeEvent } = syntheticEvent;
