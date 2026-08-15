@@ -16,6 +16,15 @@ import { type Language, saveVillageProfilePreference } from "@/lib/village-prefe
 
 export type { AccountType, AppRole, DealerStatus, LegacyAccountType };
 
+declare global {
+  interface Window {
+    __handleNativeAuthSession?: (tokens: {
+      access_token: string;
+      refresh_token: string;
+    }) => Promise<boolean>;
+  }
+}
+
 /**
  * Represents the normalized profile of the currently logged-in user.
  * This is fetched from the 'profiles' table after a successful session is established.
@@ -176,7 +185,39 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       void syncSession(data.session);
     });
 
-    return () => sub.subscription.unsubscribe();
+    if (typeof window !== "undefined") {
+      window.__handleNativeAuthSession = async (tokens: {
+        access_token: string;
+        refresh_token: string;
+      }) => {
+        try {
+          if (!tokens?.access_token || !tokens?.refresh_token) return false;
+          const { data, error } = await supabase.auth.setSession({
+            access_token: tokens.access_token,
+            refresh_token: tokens.refresh_token,
+          });
+          if (error) {
+            console.error("Native auth session bridge failed:", error.message);
+            return false;
+          }
+          if (data.session) {
+            await syncSession(data.session);
+            return true;
+          }
+          return false;
+        } catch (err) {
+          console.error("Native auth session bridge error:", err);
+          return false;
+        }
+      };
+    }
+
+    return () => {
+      sub.subscription.unsubscribe();
+      if (typeof window !== "undefined") {
+        delete window.__handleNativeAuthSession;
+      }
+    };
   }, [loadProfile]);
 
   /**

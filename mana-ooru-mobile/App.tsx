@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   StyleSheet,
-  SafeAreaView,
   StatusBar,
   View,
   Text,
@@ -12,12 +11,29 @@ import {
   RefreshControl,
   ScrollView,
 } from "react-native";
-import { WebView, WebViewNavigation } from "react-native-webview";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
+import { WebView, WebViewNavigation, WebViewMessageEvent } from "react-native-webview";
+import * as WebBrowser from "expo-web-browser";
+import { createClient } from "@supabase/supabase-js";
+
+WebBrowser.maybeCompleteAuthSession();
 
 const APP_URL = "https://grammitra-app.vercel.app";
+const SUPABASE_URL = "https://ytggaoaehejskxtxjfkz.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_qNqC7EJ4YndEO1H9nSycGA_RHkEnMo5";
+const AUTH_CALLBACK_SCHEME = "grammitra://auth-callback";
 
-export default function App() {
-  const webViewRef = useRef<WebView>(null);
+const supabaseNative = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  auth: {
+    persistSession: false,
+    autoRefreshToken: false,
+    detectSessionInUrl: false,
+  },
+});
+
+function MainScreen() {
+  const insets = useSafeAreaInsets();
+  const webViewRef = useRef<any>(null);
   const [canGoBack, setCanGoBack] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
@@ -59,14 +75,131 @@ export default function App() {
     setTimeout(() => setRefreshing(false), 1200);
   }, [handleReload]);
 
+  // Handle Native Google OAuth via Chrome Custom Tabs
+  const handleNativeGoogleAuth = async () => {
+    try {
+      const { data, error } = await supabaseNative.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: AUTH_CALLBACK_SCHEME,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error || !data?.url) {
+        console.warn("Could not generate Google OAuth URL:", error);
+        return;
+      }
+
+      // Open Chrome Custom Tabs (shares device Google Account)
+      const authResult = await WebBrowser.openAuthSessionAsync(
+        data.url,
+        AUTH_CALLBACK_SCHEME,
+      );
+
+      if (authResult.type === "success" && authResult.url) {
+        const callbackUrl = authResult.url;
+        let accessToken: string | null = null;
+        let refreshToken: string | null = null;
+
+        // Parse hash fragment: grammitra://auth-callback#access_token=...&refresh_token=...
+        if (callbackUrl.includes("#")) {
+          const hashPart = callbackUrl.split("#")[1];
+          const params = new URLSearchParams(hashPart);
+          accessToken = params.get("access_token");
+          refreshToken = params.get("refresh_token");
+        }
+
+        // Parse query params: grammitra://auth-callback?code=...
+        if (!accessToken && callbackUrl.includes("?")) {
+          const queryPart = callbackUrl.split("?")[1];
+          const params = new URLSearchParams(queryPart);
+          accessToken = params.get("access_token");
+          refreshToken = params.get("refresh_token");
+
+          const code = params.get("code");
+          if (code && !accessToken) {
+            const { data: codeData, error: codeError } =
+              await supabaseNative.auth.exchangeCodeForSession(code);
+            if (!codeError && codeData?.session) {
+              accessToken = codeData.session.access_token;
+              refreshToken = codeData.session.refresh_token;
+            }
+          }
+        }
+
+        if (accessToken && refreshToken && webViewRef.current) {
+          const tokenPayload = JSON.stringify({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+
+          // Inject into trusted web application handler
+          const bridgeScript = `
+            (function() {
+              if (typeof window.__handleNativeAuthSession === 'function') {
+                window.__handleNativeAuthSession(${tokenPayload}).then(function(success) {
+                  if (success && window.location.pathname === '/auth') {
+                    window.location.href = '/';
+                  }
+                });
+              }
+            })();
+            true;
+          `;
+          webViewRef.current.injectJavaScript(bridgeScript);
+        }
+      }
+    } catch (err) {
+      console.error("Native Google OAuth flow error:", err);
+    }
+  };
+
+  // Safe message listener between WebView and Native shell
+  const handleWebViewMessage = (event: WebViewMessageEvent) => {
+    try {
+      // Validate trusted origin
+      const originUrl = event.nativeEvent.url || "";
+      const isTrusted =
+        originUrl.startsWith("https://grammitra-app.vercel.app") ||
+        originUrl.startsWith("http://localhost") ||
+        originUrl.startsWith("http://127.0.0.1");
+
+      if (!isTrusted) return;
+
+      const message = JSON.parse(event.nativeEvent.data);
+      if (message?.type === "START_GOOGLE_AUTH") {
+        void handleNativeGoogleAuth();
+      }
+    } catch {
+      // Ignore unparseable or irrelevant message frames
+    }
+  };
+
   return (
-    <SafeAreaView style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#0E2317" />
+    <View
+      style={[
+        styles.rootContainer,
+        {
+          paddingTop: insets.top,
+          paddingBottom: insets.bottom,
+          paddingLeft: insets.left,
+          paddingRight: insets.right,
+        },
+      ]}
+    >
+      <StatusBar barStyle="light-content" backgroundColor="#0E2317" translucent={true} />
 
       {hasError ? (
         <ScrollView
           contentContainerStyle={styles.errorContainer}
-          refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#0E2317"]} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={["#0E2317"]}
+            />
+          }
         >
           <View style={styles.errorCard}>
             <View style={styles.errorIconBg}>
@@ -74,16 +207,21 @@ export default function App() {
             </View>
             <Text style={styles.errorTitle}>Connection Problem</Text>
             <Text style={styles.errorDescription}>
-              Unable to connect to GramMitra. Please verify your mobile data or Wi-Fi connection and tap below to retry.
+              Unable to connect to GramMitra. Please verify your mobile data or Wi-Fi
+              connection and tap below to retry.
             </Text>
             {errorMessage ? <Text style={styles.errorDetail}>{errorMessage}</Text> : null}
-            <TouchableOpacity style={styles.retryButton} onPress={handleReload} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.retryButton}
+              onPress={handleReload}
+              activeOpacity={0.8}
+            >
               <Text style={styles.retryButtonText}>Retry Connection</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
       ) : (
-        <View style={styles.webviewContainer}>
+        <View style={styles.webviewWrapper}>
           <WebView
             ref={webViewRef}
             source={{ uri: APP_URL }}
@@ -95,6 +233,7 @@ export default function App() {
               </View>
             )}
             onNavigationStateChange={handleNavigationStateChange}
+            onMessage={handleWebViewMessage}
             onError={(syntheticEvent) => {
               const { nativeEvent } = syntheticEvent;
               setHasError(true);
@@ -109,6 +248,8 @@ export default function App() {
             }}
             javaScriptEnabled={true}
             domStorageEnabled={true}
+            thirdPartyCookiesEnabled={true}
+            sharedCookiesEnabled={true}
             geolocationEnabled={true}
             allowsInlineMediaPlayback={true}
             mediaPlaybackRequiresUserAction={false}
@@ -116,26 +257,36 @@ export default function App() {
             allowFileAccessFromFileURLs={true}
             allowUniversalAccessFromFileURLs={true}
             onPermissionRequest={(event) => {
-              // Automatically delegate web permission requests (Camera, Microphone, etc.) to Android native permission dialogs
               event.grant(event.resources);
             }}
             cacheEnabled={true}
+            cacheMode="LOAD_DEFAULT"
+            androidLayerType="hardware"
+            overScrollMode="never"
             mixedContentMode="compatibility"
             style={styles.webview}
             userAgent="GramMitraMobileApp/1.0.0 (Android; Mobile)"
           />
         </View>
       )}
-    </SafeAreaView>
+    </View>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <MainScreen />
+    </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  rootContainer: {
     flex: 1,
-    backgroundColor: "#0E2317",
+    backgroundColor: "#0E2317", // Matches GramMitra dark green brand color behind status and gesture bars
   },
-  webviewContainer: {
+  webviewWrapper: {
     flex: 1,
     backgroundColor: "#FFFFFF",
   },
@@ -143,7 +294,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   loadingOverlay: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: "#FFFDF9",
     alignItems: "center",
     justifyContent: "center",

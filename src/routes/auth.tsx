@@ -327,6 +327,19 @@ function AuthPage() {
   };
 
   const handleGoogle = async () => {
+    // If inside React Native WebView wrapper on mobile:
+    if (
+      typeof window !== "undefined" &&
+      (window as unknown as { ReactNativeWebView?: { postMessage: (msg: string) => void } })
+        .ReactNativeWebView
+    ) {
+      (
+        window as unknown as { ReactNativeWebView: { postMessage: (msg: string) => void } }
+      ).ReactNativeWebView.postMessage(JSON.stringify({ type: "START_GOOGLE_AUTH" }));
+      return;
+    }
+
+    // Standard Web Browser OAuth flow:
     setBusy(true);
     try {
       const { signInWithOAuth } = await import("@/lib/supabase/auth");
