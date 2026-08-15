@@ -17,6 +17,7 @@ import { AuthProvider, useAuth } from "@/lib/auth";
 import { useBrowserPushNotifications } from "@/lib/push-notifications";
 import { supabase } from "@/integrations/supabase/client";
 import { AppSplashScreen } from "@/components/AppSplashScreen";
+import { validateEnvironment } from "@/lib/env";
 
 function NotFoundComponent() {
   return (
@@ -61,6 +62,8 @@ function ErrorComponent({ error }: { error: Error; reset?: () => void }) {
     }
   }, [error]);
 
+  const isDev = typeof window !== "undefined" && window.location.hostname === "localhost";
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
       <div className="max-w-md text-center">
@@ -70,7 +73,7 @@ function ErrorComponent({ error }: { error: Error; reset?: () => void }) {
         <p className="mt-2 text-sm text-muted-foreground">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
-        {error?.message && (
+        {isDev && error?.message && (
           <p className="mt-3 text-xs font-mono text-red-600 dark:text-red-400 max-w-sm mx-auto bg-red-50 dark:bg-red-950/40 p-2.5 rounded-xl border border-red-200 dark:border-red-900/50 break-words">
             {error.message}
           </p>
@@ -109,7 +112,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       { name: "author", content: "GramMitra" },
       { property: "og:title", content: "GramMitra — Smart Village Ecosystem" },
-      { property: "og:description", content: "India's most complete digital village platform. Village Stories, Problem Reporting, Zero-Brokerage Marketplace, AI Assistant, and Panchayat Notices — all free." },
+      {
+        property: "og:description",
+        content:
+          "India's most complete digital village platform. Village Stories, Problem Reporting, Zero-Brokerage Marketplace, AI Assistant, and Panchayat Notices — all free.",
+      },
       { property: "og:type", content: "website" },
       { property: "og:url", content: "https://grammitra-app.vercel.app/" },
       { property: "og:image", content: "https://grammitra-app.vercel.app/village-life-bg.jpg" },
@@ -117,7 +124,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@GramMitra" },
       { name: "twitter:title", content: "GramMitra — Smart Village Ecosystem" },
-      { name: "twitter:description", content: "India's most complete digital village platform. Free for every villager." },
+      {
+        name: "twitter:description",
+        content: "India's most complete digital village platform. Free for every villager.",
+      },
       { name: "twitter:image", content: "https://grammitra-app.vercel.app/village-life-bg.jpg" },
       // PWA & Android
       { name: "application-name", content: "GramMitra" },
@@ -180,22 +190,26 @@ function RootShell({ children }: { children: ReactNode }) {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "GramMitra",
-    "alternateName": "Mana Ooru Village Connect",
-    "url": "https://grammitra-app.vercel.app/",
-    "description": "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and civic problem reporting.",
-    "potentialAction": {
+    name: "GramMitra",
+    alternateName: "Mana Ooru Village Connect",
+    url: "https://grammitra-app.vercel.app/",
+    description:
+      "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and civic problem reporting.",
+    potentialAction: {
       "@type": "SearchAction",
-      "target": "https://grammitra-app.vercel.app/search?q={search_term_string}",
-      "query-input": "required name=search_term_string"
-    }
+      target: "https://grammitra-app.vercel.app/search?q={search_term_string}",
+      "query-input": "required name=search_term_string",
+    },
   };
 
   return (
     <html lang="en">
       <head>
         <HeadContent />
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Outfit:wght@500;600;700;800&display=swap"
+        />
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
@@ -291,6 +305,10 @@ function GlobalErrorListener() {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+
+  useEffect(() => {
+    validateEnvironment();
+  }, []);
 
   return (
     <QueryClientProvider client={queryClient}>

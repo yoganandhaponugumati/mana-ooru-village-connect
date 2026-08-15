@@ -218,7 +218,10 @@ function AboutPage() {
               ["Privacy Email", "privacy@grammitra.org"],
               ["Website", "https://grammitra-app.vercel.app"],
             ].map(([key, val]) => (
-              <div key={key} className="flex items-start justify-between gap-4 py-2 border-b border-border/50 last:border-0">
+              <div
+                key={key}
+                className="flex items-start justify-between gap-4 py-2 border-b border-border/50 last:border-0"
+              >
                 <span className="font-semibold text-foreground shrink-0">{key}</span>
                 <span className="text-muted-foreground text-right">{val}</span>
               </div>

@@ -33,17 +33,47 @@ export const Route = createFileRoute("/ai-assistant")({
 
 const prompts = [
   { label: "Crop Suggestions", key: "crop", icon: Leaf, desc: "Best crops for soil & season" },
-  { label: "Disease & Pest Control", key: "pest", icon: Stethoscope, desc: "Pest identification & organic spray" },
-  { label: "Weather Forecast Advice", key: "weather", icon: CloudSun, desc: "Rain alerts & irrigation advice" },
-  { label: "Government Schemes", key: "schemes", icon: ShieldQuestion, desc: "Rythu Bharosa, PM-Kisan & Pensions" },
-  { label: "Nearby Workers & Equipment", key: "workers", icon: Users, desc: "Tractor, labor & electric services" },
-  { label: "Gram Panchayat Services", key: "services", icon: Brain, desc: "MeeSeva certificates & Dharani 1B" },
+  {
+    label: "Disease & Pest Control",
+    key: "pest",
+    icon: Stethoscope,
+    desc: "Pest identification & organic spray",
+  },
+  {
+    label: "Weather Forecast Advice",
+    key: "weather",
+    icon: CloudSun,
+    desc: "Rain alerts & irrigation advice",
+  },
+  {
+    label: "Government Schemes",
+    key: "schemes",
+    icon: ShieldQuestion,
+    desc: "Rythu Bharosa, PM-Kisan & Pensions",
+  },
+  {
+    label: "Nearby Workers & Equipment",
+    key: "workers",
+    icon: Users,
+    desc: "Tractor, labor & electric services",
+  },
+  {
+    label: "Gram Panchayat Services",
+    key: "services",
+    icon: Brain,
+    desc: "MeeSeva certificates & Dharani 1B",
+  },
 ];
 
 /**
  * High-speed local rural knowledge engine for instantaneous (<100ms) answers.
  */
-function getSmartLocalResponse(query: string, lang: string, village: string, weatherText: string): string {
+function getSmartLocalResponse(
+  query: string,
+  lang: string,
+  village: string,
+  weatherText: string,
+): string {
   const q = query.toLowerCase();
 
   // 1. Crop / Farming
@@ -69,7 +99,11 @@ function getSmartLocalResponse(query: string, lang: string, village: string, wea
   }
 
   // 3. Schemes
-  if (/scheme|pension|kisan|rythu|aasara|money|fund|subsid|పథకం|పెన్షన్|రైతు బంధు|योजना|पेंशन/i.test(q)) {
+  if (
+    /scheme|pension|kisan|rythu|aasara|money|fund|subsid|పథకం|పెన్షన్|రైతు బంధు|योजना|पेंशन/i.test(
+      q,
+    )
+  ) {
     if (lang === "te") {
       return `🏛️ **ముఖ్యమైన ప్రభుత్వ సంక్షేమ పథకాలు:**\n\n1. **రైతు బంధు / రైతు భరోసా:** సాగు పెట్టుబడి సాయం ఎకరానికి రూ.5,000 - రూ.7,500 direct bank transfer.\n2. **PM-Kisan:** ఏటా రూ.6,000 మూడు విడతల్లో జమ.\n3. **ఆసరా పెన్షన్లు:** వృద్ధులు, వితంతువులు, చేనేత మరియు దివ్యాంగులకు నెలవారీ ఆర్థిక చేయూత.\n4. **ఉపాధి హామీ (NREGS):** గ్రామాల్లో 100 రోజుల వేతన ఉపాధి.\n\n📄 **కావాల్సిన పత్రాలు:** ఆధార్ కార్డ్, పట్టాదార్ పాస్‌బుక్, బ్యాంక్ ఖాతా మరియు రేషన్ కార్డ్.`;
     }
@@ -102,7 +136,9 @@ function AiAssistantPage() {
   const [message, setMessage] = useState("");
   const [listening, setListening] = useState(false);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
-  const [chat, setChat] = useState<Array<{ role: "assistant" | "user"; text: string; time: string }>>([
+  const [chat, setChat] = useState<
+    Array<{ role: "assistant" | "user"; text: string; time: string }>
+  >([
     {
       role: "assistant",
       text:
@@ -188,13 +224,23 @@ CRITICAL RULES:
           if (responseText && responseText.trim()) {
             setChat((items) => [
               ...items,
-              { role: "assistant", text: responseText.trim(), time: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) },
+              {
+                role: "assistant",
+                text: responseText.trim(),
+                time: new Date().toLocaleTimeString("en-IN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+              },
             ]);
             setIsLoading(false);
             return;
           }
         } catch (geminiErr) {
-          console.warn("[AIAssistant] Gemini API error/timeout, attempting fast fallback:", geminiErr);
+          console.warn(
+            "[AIAssistant] Gemini API error/timeout, attempting fast fallback:",
+            geminiErr,
+          );
         }
       }
 
@@ -223,28 +269,46 @@ CRITICAL RULES:
           if (resText && resText.trim()) {
             setChat((items) => [
               ...items,
-              { role: "assistant", text: resText.trim(), time: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) },
+              {
+                role: "assistant",
+                text: resText.trim(),
+                time: new Date().toLocaleTimeString("en-IN", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }),
+              },
             ]);
             setIsLoading(false);
             return;
           }
         }
       } catch (proxyErr) {
-        console.warn("[AIAssistant] Remote proxy error/timeout, using Instant Local Engine:", proxyErr);
+        console.warn(
+          "[AIAssistant] Remote proxy error/timeout, using Instant Local Engine:",
+          proxyErr,
+        );
       }
 
       // 3. Instant Smart Local Engine (<100ms guaranteed fallback)
       const localResponse = getSmartLocalResponse(text, activeLang, activeVillage, weatherDetails);
       setChat((items) => [
         ...items,
-        { role: "assistant", text: localResponse, time: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) },
+        {
+          role: "assistant",
+          text: localResponse,
+          time: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
+        },
       ]);
     } catch (err) {
       console.error("[AIAssistant] Fatal error:", err);
       const fallbackText = getSmartLocalResponse(text, activeLang, activeVillage, weatherDetails);
       setChat((items) => [
         ...items,
-        { role: "assistant", text: fallbackText, time: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }) },
+        {
+          role: "assistant",
+          text: fallbackText,
+          time: new Date().toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" }),
+        },
       ]);
     } finally {
       setIsLoading(false);
@@ -296,7 +360,9 @@ CRITICAL RULES:
     };
     const RecognitionCtor = SpeechRecognition || webkitSpeechRecognition;
     if (!RecognitionCtor) {
-      toast.error("Voice speech recognition is not supported in this browser. Please type your query.");
+      toast.error(
+        "Voice speech recognition is not supported in this browser. Please type your query.",
+      );
       return;
     }
     const recognition = new RecognitionCtor();
@@ -304,7 +370,10 @@ CRITICAL RULES:
     recognition.interimResults = false;
     recognition.onstart = () => {
       setListening(true);
-      toast.info("Listening... Speak your question in " + (language === "te" ? "Telugu" : language === "hi" ? "Hindi" : "English"));
+      toast.info(
+        "Listening... Speak your question in " +
+          (language === "te" ? "Telugu" : language === "hi" ? "Hindi" : "English"),
+      );
     };
     recognition.onend = () => setListening(false);
     recognition.onerror = () => {
@@ -332,7 +401,9 @@ CRITICAL RULES:
             type="button"
             onClick={startVoice}
             className={`inline-flex items-center justify-center gap-2.5 rounded-2xl px-7 py-3.5 text-sm font-extrabold text-white shadow-xl transition-all active:scale-95 ${
-              listening ? "bg-red-600 animate-pulse ring-4 ring-red-400/40" : "bg-primary hover:brightness-110 shadow-primary/30"
+              listening
+                ? "bg-red-600 animate-pulse ring-4 ring-red-400/40"
+                : "bg-primary hover:brightness-110 shadow-primary/30"
             }`}
           >
             <Mic className={`size-5 ${listening ? "animate-bounce" : ""}`} />
@@ -380,7 +451,9 @@ CRITICAL RULES:
               <p className="font-extrabold uppercase tracking-wider text-primary flex items-center gap-1.5">
                 <CloudSun className="size-4" /> Live Village Weather Context
               </p>
-              <p className="mt-1 text-muted-foreground font-medium leading-relaxed">{weatherDetails}</p>
+              <p className="mt-1 text-muted-foreground font-medium leading-relaxed">
+                {weatherDetails}
+              </p>
             </div>
           </SurfaceCard>
 
@@ -393,7 +466,10 @@ CRITICAL RULES:
               {prompts.map((prompt) => {
                 const Icon = prompt.icon;
                 return (
-                  <SurfaceCard key={prompt.label} className="p-3.5 hover:border-primary/60 transition-all cursor-pointer">
+                  <SurfaceCard
+                    key={prompt.label}
+                    className="p-3.5 hover:border-primary/60 transition-all cursor-pointer"
+                  >
                     <button
                       type="button"
                       onClick={() => send(prompt.label)}
@@ -403,7 +479,9 @@ CRITICAL RULES:
                         <Icon className="size-5" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="font-bold text-sm text-clay group-hover:text-primary transition">{prompt.label}</p>
+                        <p className="font-bold text-sm text-clay group-hover:text-primary transition">
+                          {prompt.label}
+                        </p>
                         <p className="text-[11px] text-muted-foreground truncate">{prompt.desc}</p>
                       </div>
                     </button>
@@ -415,7 +493,10 @@ CRITICAL RULES:
         </div>
 
         {/* Right Main Chat Card */}
-        <SurfaceCard className="flex min-h-[600px] flex-col overflow-hidden p-0 border-2 border-primary/20 shadow-xl" hover={false}>
+        <SurfaceCard
+          className="flex min-h-[600px] flex-col overflow-hidden p-0 border-2 border-primary/20 shadow-xl"
+          hover={false}
+        >
           {/* Chat Header */}
           <div className="relative overflow-hidden border-b border-border bg-gradient-to-br from-[#123820] via-primary to-secondary p-5 text-primary-foreground shadow-md">
             <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(128deg,rgba(255,255,255,0.16),transparent_34%),linear-gradient(246deg,rgba(242,184,75,0.2),transparent_38%)]" />
@@ -431,7 +512,8 @@ CRITICAL RULES:
                         GramMitra AI
                       </p>
                       <span className="inline-flex items-center gap-1 rounded-full bg-emerald-400/30 px-2 py-0.5 text-[9px] font-bold text-emerald-200">
-                        <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" /> Live Engine
+                        <span className="size-1.5 rounded-full bg-emerald-400 animate-ping" /> Live
+                        Engine
                       </span>
                     </div>
                     <h2 className="font-display text-xl font-bold">Village Intelligence Chat</h2>
@@ -446,8 +528,13 @@ CRITICAL RULES:
                   ["Weather", weatherSummary],
                   ["Status", listening ? "Listening..." : isLoading ? "Thinking..." : "Ready"],
                 ].map(([label, value]) => (
-                  <div key={label} className="rounded-xl border border-white/15 bg-white/10 p-2.5 backdrop-blur-md">
-                    <p className="text-[9px] font-bold uppercase tracking-wider text-white/60">{label}</p>
+                  <div
+                    key={label}
+                    className="rounded-xl border border-white/15 bg-white/10 p-2.5 backdrop-blur-md"
+                  >
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-white/60">
+                      {label}
+                    </p>
                     <p className="mt-0.5 truncate text-xs font-bold text-white">{value}</p>
                   </div>
                 ))}
@@ -489,7 +576,11 @@ CRITICAL RULES:
                           onClick={() => copyMessage(item.text, index)}
                           className="inline-flex items-center gap-1 rounded-full border border-border bg-background px-2.5 py-1 text-[11px] font-semibold text-muted-foreground hover:border-primary hover:text-foreground transition"
                         >
-                          {copiedIndex === index ? <Check className="size-3 text-emerald-600" /> : <Copy className="size-3" />}
+                          {copiedIndex === index ? (
+                            <Check className="size-3 text-emerald-600" />
+                          ) : (
+                            <Copy className="size-3" />
+                          )}
                           <span>{copiedIndex === index ? "Copied!" : "Copy"}</span>
                         </button>
                         <button
@@ -501,7 +592,9 @@ CRITICAL RULES:
                         </button>
                       </div>
 
-                      <span className="text-[10px] font-semibold text-muted-foreground">{item.time}</span>
+                      <span className="text-[10px] font-semibold text-muted-foreground">
+                        {item.time}
+                      </span>
                     </div>
                   )}
 
@@ -537,7 +630,9 @@ CRITICAL RULES:
               <div className="flex justify-start animate-in fade-in duration-200">
                 <div className="rounded-[22px] rounded-bl-none border border-border/80 bg-white px-4 py-3 text-sm text-muted-foreground shadow-sm flex items-center gap-2.5">
                   <Loader2 className="size-4 animate-spin text-primary" />
-                  <span className="font-semibold text-xs text-primary">GramMitra AI is fetching agriculture & weather advice…</span>
+                  <span className="font-semibold text-xs text-primary">
+                    GramMitra AI is fetching agriculture & weather advice…
+                  </span>
                 </div>
               </div>
             )}
@@ -584,7 +679,11 @@ CRITICAL RULES:
                 disabled={!message.trim() || isLoading}
                 className="inline-flex h-10 items-center justify-center gap-1.5 rounded-full bg-primary px-5 text-xs font-bold text-primary-foreground shadow-md transition-all hover:brightness-110 active:scale-95 disabled:opacity-50 shrink-0"
               >
-                {isLoading ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+                {isLoading ? (
+                  <Loader2 className="size-4 animate-spin" />
+                ) : (
+                  <Send className="size-4" />
+                )}
                 <span className="hidden sm:inline">{isLoading ? "Thinking..." : "Send"}</span>
               </button>
             </form>

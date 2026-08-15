@@ -175,7 +175,8 @@ function SupportPage() {
               Want to delete your account?
             </p>
             <p className="mt-1 text-xs text-red-600/80 dark:text-red-400/80">
-              You can permanently delete your account and all data from our dedicated portal. No email required — instant deletion.
+              You can permanently delete your account and all data from our dedicated portal. No
+              email required — instant deletion.
             </p>
             <Link
               to="/delete-account"

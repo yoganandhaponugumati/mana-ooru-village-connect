@@ -39,3 +39,11 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Google Play & Cloud Credentials / Keystores
+google-play-service-account.json
+*service-account*.json
+*.keystore
+*.jks
+credentials.json
+

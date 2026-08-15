@@ -326,9 +326,17 @@ function PollsPage() {
                           <div className="relative flex items-center justify-between p-3 text-sm font-semibold">
                             <span className="flex items-center gap-2 text-clay dark:text-zinc-100">
                               {opt.label}
-                              {isMyVote && <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />}
+                              {isMyVote && (
+                                <CheckCircle2 className="size-4 text-emerald-600 dark:text-emerald-400" />
+                              )}
                             </span>
-                            <span className={isMyVote ? "text-emerald-700 dark:text-emerald-400 font-bold" : "text-muted-foreground"}>
+                            <span
+                              className={
+                                isMyVote
+                                  ? "text-emerald-700 dark:text-emerald-400 font-bold"
+                                  : "text-muted-foreground"
+                              }
+                            >
                               {percentage}% ({count})
                             </span>
                           </div>

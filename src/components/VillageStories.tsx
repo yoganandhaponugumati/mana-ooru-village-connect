@@ -338,10 +338,7 @@ export function VillageStories() {
             const timeoutMs = 30000;
             const uploadPromise = uploadUserFile("events", user.id, fileToUpload);
             const timeoutPromise = new Promise<never>((_, reject) =>
-              setTimeout(
-                () => reject(new Error("Upload network request timed out.")),
-                timeoutMs,
-              ),
+              setTimeout(() => reject(new Error("Upload network request timed out.")), timeoutMs),
             );
 
             const uploaded = await Promise.race([uploadPromise, timeoutPromise]);

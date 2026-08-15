@@ -70,7 +70,7 @@ export function AuditLogsViewer() {
       log.actor_email.toLowerCase().includes(search.toLowerCase()) ||
       log.action_type.toLowerCase().includes(search.toLowerCase()) ||
       log.target_resource.toLowerCase().includes(search.toLowerCase()) ||
-      log.details.toLowerCase().includes(search.toLowerCase())
+      log.details.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -80,7 +80,11 @@ export function AuditLogsViewer() {
           <h3 className="font-display text-lg font-bold flex items-center gap-2 text-foreground">
             <Shield className="size-5 text-amber-500" />
             <span>Admin Action Audit Logs</span>
-            {loading && <span className="text-xs font-normal text-muted-foreground animate-pulse">(Refreshing...)</span>}
+            {loading && (
+              <span className="text-xs font-normal text-muted-foreground animate-pulse">
+                (Refreshing...)
+              </span>
+            )}
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
             Transparent activity record for Sarpanch, Panchayat Ops & Platform Admins.
@@ -137,9 +141,7 @@ export function AuditLogsViewer() {
                       {log.action_type}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 font-medium">
-                    {log.target_resource}
-                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 font-medium">{log.target_resource}</td>
                   <td className="px-4 py-3 text-muted-foreground max-w-xs truncate">
                     {log.details}
                   </td>

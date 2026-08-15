@@ -60,7 +60,10 @@ const navLinks = [
 // Bottom dock tabs (kept for reference but rendered manually with FAB)
 // const dockTabs = [...] as const;
 
-const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: string; label: string }> = {
+const typeConfig: Record<
+  string,
+  { icon: React.ElementType; color: string; bg: string; label: string }
+> = {
   story: {
     icon: Camera,
     color: "text-purple-600 dark:text-purple-400",
@@ -94,12 +97,14 @@ const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: s
 };
 
 function getTypeConfig(type: string) {
-  return typeConfig[type] ?? {
-    icon: Info,
-    color: "text-zinc-500",
-    bg: "bg-zinc-100 dark:bg-zinc-800",
-    label: "Alert",
-  };
+  return (
+    typeConfig[type] ?? {
+      icon: Info,
+      color: "text-zinc-500",
+      bg: "bg-zinc-100 dark:bg-zinc-800",
+      label: "Alert",
+    }
+  );
 }
 
 export function SiteNav() {
@@ -232,9 +237,20 @@ export function SiteNav() {
                 <ArrowLeft className="size-4" />
               </button>
             )}
-            <Link to="/" aria-label="GramMitra Home" className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5">
+            <Link
+              to="/"
+              aria-label="GramMitra Home"
+              className="flex shrink-0 items-center gap-2 relative z-20 ml-0.5"
+            >
               <div className="grid size-8.5 place-items-center rounded-xl bg-white dark:bg-zinc-900 shadow-sm shrink-0 overflow-hidden border border-primary/25">
-                <img src="/logo.webp" alt="GramMitra Emblem" className="size-full object-cover" width="34" height="34" decoding="async" />
+                <img
+                  src="/logo.webp"
+                  alt="GramMitra Emblem"
+                  className="size-full object-cover"
+                  width="34"
+                  height="34"
+                  decoding="async"
+                />
               </div>
               <div className="flex flex-col leading-none">
                 <span className="font-display text-base font-bold tracking-tight text-clay dark:text-zinc-100 hidden sm:block">
@@ -246,7 +262,11 @@ export function SiteNav() {
 
           {/* Mobile Centered Weather (Matches Mockup exactly) */}
           <div className="absolute inset-x-0 flex justify-center pointer-events-none md:hidden">
-            <Link to="/weather" aria-label="Village Weather Forecast" className="flex flex-col items-center pointer-events-auto mt-1">
+            <Link
+              to="/weather"
+              aria-label="Village Weather Forecast"
+              className="flex flex-col items-center pointer-events-auto mt-1"
+            >
               <div className="flex items-center gap-1 font-bold text-sm text-foreground">
                 <CloudSun className="size-4 text-amber-500" />
                 <span>{weather.temp != null ? `${weather.temp}°C` : "28°C"}</span>
@@ -418,19 +438,25 @@ export function SiteNav() {
                               <div
                                 key={item.id}
                                 className={`group flex gap-2.5 rounded-xl p-2 transition hover:bg-primary/5 cursor-pointer relative ${
-                                  item.read_at ? "opacity-60 bg-transparent" : "bg-primary/5 dark:bg-primary/10 shadow-sm border border-primary/10"
+                                  item.read_at
+                                    ? "opacity-60 bg-transparent"
+                                    : "bg-primary/5 dark:bg-primary/10 shadow-sm border border-primary/10"
                                 }`}
                                 onClick={() => {
                                   markRead(item.id);
                                   if (item.action_url) window.location.assign(item.action_url);
                                 }}
                               >
-                                <div className={`grid size-8 shrink-0 place-items-center rounded-lg ${cfg.bg}`}>
+                                <div
+                                  className={`grid size-8 shrink-0 place-items-center rounded-lg ${cfg.bg}`}
+                                >
                                   <Icon className={`size-4.5 ${cfg.color}`} />
                                 </div>
                                 <div className="min-w-0 flex-1 text-left">
                                   <div className="flex items-center justify-between gap-1">
-                                    <span className={`text-[8px] font-black uppercase px-1 rounded ${cfg.bg} ${cfg.color}`}>
+                                    <span
+                                      className={`text-[8px] font-black uppercase px-1 rounded ${cfg.bg} ${cfg.color}`}
+                                    >
                                       {cfg.label}
                                     </span>
                                     <span className="text-[9px] text-muted-foreground">
@@ -580,7 +606,8 @@ export function SiteNav() {
         </div>
 
         {/* ── Mobile / Tablet Drawer (Portaled to document.body) ── */}
-        {isMounted && typeof document !== "undefined" &&
+        {isMounted &&
+          typeof document !== "undefined" &&
           createPortal(
             <AnimatePresence>
               {open && (
@@ -934,7 +961,14 @@ export function SiteFooter() {
         <div className="max-w-sm">
           <div className="flex items-center gap-2.5">
             <div className="size-8 rounded-full overflow-hidden border border-primary/30 shadow-sm shrink-0 bg-white">
-              <img src="/logo.webp" alt="GramMitra Emblem" className="size-full object-cover" width="34" height="34" decoding="async" />
+              <img
+                src="/logo.webp"
+                alt="GramMitra Emblem"
+                className="size-full object-cover"
+                width="34"
+                height="34"
+                decoding="async"
+              />
             </div>
             <span className="font-display text-base font-bold text-clay dark:text-zinc-100">
               GramMitra

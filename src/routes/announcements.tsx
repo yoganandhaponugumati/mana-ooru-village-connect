@@ -202,7 +202,10 @@ function AnnPage() {
   return (
     <PageLayout
       title={(t as any).noticesTitle || "Village Notice Board & Sarpanch Pragati"}
-      subtitle={(t as any).noticesSubtitle || "Official announcements, Gram Sabha schedules, water updates, and village progress."}
+      subtitle={
+        (t as any).noticesSubtitle ||
+        "Official announcements, Gram Sabha schedules, water updates, and village progress."
+      }
       icon={<Megaphone className="size-6 text-primary" />}
       heroAction={
         <div className="flex flex-wrap items-center justify-center gap-3">
@@ -516,7 +519,9 @@ function AnnPage() {
                               {a.title}
                             </h4>
                             <div className="mt-1 flex-1">
-                              <p className={`text-[13px] leading-5 text-muted-foreground ${expandedNoticeIds[a.id] ? "" : "line-clamp-2"}`}>
+                              <p
+                                className={`text-[13px] leading-5 text-muted-foreground ${expandedNoticeIds[a.id] ? "" : "line-clamp-2"}`}
+                              >
                                 {a.description}
                               </p>
                               <div className="mt-1.5 flex items-center gap-3">
@@ -842,7 +847,8 @@ function AnnPage() {
             <div className="flex items-start justify-between gap-4 border-b border-border pb-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-primary/10 text-primary px-3 py-1 text-xs font-bold uppercase tracking-wider">
-                  <ShieldCheck className="size-3.5" /> {selectedNotice.category || "Official Notice"}
+                  <ShieldCheck className="size-3.5" />{" "}
+                  {selectedNotice.category || "Official Notice"}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300 px-2.5 py-1 text-[11px] font-bold">
                   Verified Panchayat Circular
@@ -908,7 +914,9 @@ function AnnPage() {
                 <div className="flex flex-wrap items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => shareToWhatsApp(selectedNotice.title, selectedNotice.description || "")}
+                    onClick={() =>
+                      shareToWhatsApp(selectedNotice.title, selectedNotice.description || "")
+                    }
                     className="inline-flex items-center gap-2 rounded-2xl bg-primary px-4 py-2.5 text-xs font-bold text-white hover:bg-primary/90 transition shadow-md"
                   >
                     <Share2 className="size-4" /> Share on WhatsApp

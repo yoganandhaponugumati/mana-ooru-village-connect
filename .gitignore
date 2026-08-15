@@ -36,3 +36,10 @@ dist-ssr
 .env.local
 .env.production
 supabase/.temp/
+
+# Google Play & Cloud Credentials / Keystores
+google-play-service-account.json
+*service-account*.json
+*.keystore
+*.jks
+credentials.json

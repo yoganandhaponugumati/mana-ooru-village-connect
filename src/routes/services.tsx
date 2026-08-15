@@ -74,11 +74,14 @@ function ServicesPage() {
   const [q] = useState("");
   const visibleCategories = mode === "shops" ? shopCategories : serviceCategories;
   const visibleOptions = (mode === "shops" ? shopOptions : serviceOptions) as string[];
-  
+
   const filtered = displayItems.filter((i) =>
-    [i.title, i.description, i.location, i.category].join(" ").toLowerCase().includes(q.toLowerCase()),
+    [i.title, i.description, i.location, i.category]
+      .join(" ")
+      .toLowerCase()
+      .includes(q.toLowerCase()),
   );
-  
+
   const shownItems = filtered.filter((item) => visibleOptions.includes(item.category || ""));
   const hasShownItems = shownItems.length > 0;
 
@@ -100,7 +103,10 @@ function ServicesPage() {
   return (
     <PageLayout
       title={(t as any).servicesTitle || "Local Services & Village Shops"}
-      subtitle={(t as any).servicesSubtitle || "Find trusted electricians, mechanics, tractor services, and local village vendors."}
+      subtitle={
+        (t as any).servicesSubtitle ||
+        "Find trusted electricians, mechanics, tractor services, and local village vendors."
+      }
       icon={<Wrench className="size-6 text-primary" />}
       heroAction={
         <div className="flex flex-wrap items-center justify-center gap-3">

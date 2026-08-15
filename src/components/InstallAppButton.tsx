@@ -150,69 +150,69 @@ export function InstallAppButton({
               <X className="size-4" />
             </button>
 
-              <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary">
-                <Smartphone className="size-7" />
-              </div>
+            <div className="mx-auto mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+              <Smartphone className="size-7" />
+            </div>
 
-              <h3 className="text-center font-display text-xl font-bold text-clay dark:text-white">
-                Install GramMitra App
-              </h3>
-              <p className="mt-1 text-center text-xs text-muted-foreground">
-                మా ఊరు యాప్ మీ ఫోన్‌లో ఇన్స్టాల్ చేసుకోండి
-              </p>
+            <h3 className="text-center font-display text-xl font-bold text-clay dark:text-white">
+              Install GramMitra App
+            </h3>
+            <p className="mt-1 text-center text-xs text-muted-foreground">
+              మా ఊరు యాప్ మీ ఫోన్‌లో ఇన్స్టాల్ చేసుకోండి
+            </p>
 
-              <div className="mt-5 space-y-3 rounded-2xl border border-border bg-muted/30 p-4 text-xs font-medium">
-                {isIOS ? (
-                  <>
-                    <p className="font-bold text-primary">For iPhone / iPad (Safari):</p>
-                    <div className="flex items-center gap-2">
-                      <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
-                        1
-                      </span>
-                      <span>
-                        Tap the <strong>Share</strong> button{" "}
-                        <Share className="inline size-3 text-blue-500" /> at bottom
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
-                        2
-                      </span>
-                      <span>
-                        Scroll & tap <strong>Add to Home Screen</strong> (➕)
-                      </span>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <p className="font-bold text-primary">For Android & Desktop Browser:</p>
-                    <div className="flex items-center gap-2">
-                      <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
-                        1
-                      </span>
-                      <span>
-                        Tap browser menu (<strong>⋮</strong> or <strong>≡</strong>) top right
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
-                        2
-                      </span>
-                      <span>
-                        Select <strong>Install App</strong> or <strong>Add to Home screen</strong>
-                      </span>
-                    </div>
-                  </>
-                )}
-              </div>
+            <div className="mt-5 space-y-3 rounded-2xl border border-border bg-muted/30 p-4 text-xs font-medium">
+              {isIOS ? (
+                <>
+                  <p className="font-bold text-primary">For iPhone / iPad (Safari):</p>
+                  <div className="flex items-center gap-2">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
+                      1
+                    </span>
+                    <span>
+                      Tap the <strong>Share</strong> button{" "}
+                      <Share className="inline size-3 text-blue-500" /> at bottom
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
+                      2
+                    </span>
+                    <span>
+                      Scroll & tap <strong>Add to Home Screen</strong> (➕)
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p className="font-bold text-primary">For Android & Desktop Browser:</p>
+                  <div className="flex items-center gap-2">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
+                      1
+                    </span>
+                    <span>
+                      Tap browser menu (<strong>⋮</strong> or <strong>≡</strong>) top right
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-white font-bold text-[10px]">
+                      2
+                    </span>
+                    <span>
+                      Select <strong>Install App</strong> or <strong>Add to Home screen</strong>
+                    </span>
+                  </div>
+                </>
+              )}
+            </div>
 
-              <button
-                type="button"
-                onClick={() => setShowGuideModal(false)}
-                className="mt-6 w-full rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md transition hover:brightness-110"
-              >
-                Got It / సరే
-              </button>
+            <button
+              type="button"
+              onClick={() => setShowGuideModal(false)}
+              className="mt-6 w-full rounded-xl bg-primary py-3 text-xs font-bold text-primary-foreground shadow-md transition hover:brightness-110"
+            >
+              Got It / సరే
+            </button>
           </div>
         </div>
       )}

@@ -22,7 +22,11 @@ export const Route = createFileRoute("/notifications")({
   head: () => ({
     meta: [
       { title: "Notifications — GramMitra" },
-      { name: "description", content: "All your village notifications — stories, complaints, announcements, polls, and alerts." },
+      {
+        name: "description",
+        content:
+          "All your village notifications — stories, complaints, announcements, polls, and alerts.",
+      },
     ],
   }),
   component: NotificationsPage,
@@ -30,7 +34,10 @@ export const Route = createFileRoute("/notifications")({
 
 type NotifFilter = "all" | "story" | "complaint" | "announcement" | "poll" | "system";
 
-const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: string; label: string }> = {
+const typeConfig: Record<
+  string,
+  { icon: React.ElementType; color: string; bg: string; label: string }
+> = {
   story: {
     icon: Camera,
     color: "text-purple-600 dark:text-purple-400",
@@ -64,12 +71,14 @@ const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: s
 };
 
 function getTypeConfig(type: string) {
-  return typeConfig[type] ?? {
-    icon: Info,
-    color: "text-zinc-500",
-    bg: "bg-zinc-100 dark:bg-zinc-800",
-    label: "Alert",
-  };
+  return (
+    typeConfig[type] ?? {
+      icon: Info,
+      color: "text-zinc-500",
+      bg: "bg-zinc-100 dark:bg-zinc-800",
+      label: "Alert",
+    }
+  );
 }
 
 const filterTabs: { key: NotifFilter; label: string }[] = [
@@ -81,7 +90,11 @@ const filterTabs: { key: NotifFilter; label: string }[] = [
   { key: "system", label: "System" },
 ];
 
-function NotificationCard({ item, onMarkRead, onDelete }: {
+function NotificationCard({
+  item,
+  onMarkRead,
+  onDelete,
+}: {
   item: AppNotification;
   onMarkRead: (id: string) => void;
   onDelete: (id: string) => void;
@@ -122,7 +135,9 @@ function NotificationCard({ item, onMarkRead, onDelete }: {
       {/* Content */}
       <div className="min-w-0 flex-1 pr-4">
         <div className="flex items-start justify-between gap-2">
-          <span className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${cfg.bg} ${cfg.color}`}>
+          <span
+            className={`inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wider ${cfg.bg} ${cfg.color}`}
+          >
             {cfg.label}
           </span>
           <span className="shrink-0 text-[10px] font-semibold text-muted-foreground">
@@ -157,15 +172,20 @@ function NotificationCard({ item, onMarkRead, onDelete }: {
 
 function NotificationsPage() {
   const { user } = useAuth();
-  const { notifications, unreadCount, loading, markRead, markAllRead, deleteNotification, clearAll } =
-    useNotifications();
+  const {
+    notifications,
+    unreadCount,
+    loading,
+    markRead,
+    markAllRead,
+    deleteNotification,
+    clearAll,
+  } = useNotifications();
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState<NotifFilter>("all");
 
   const filtered =
-    activeFilter === "all"
-      ? notifications
-      : notifications.filter((n) => n.type === activeFilter);
+    activeFilter === "all" ? notifications : notifications.filter((n) => n.type === activeFilter);
 
   if (!user) {
     return (
@@ -256,11 +276,13 @@ function NotificationsPage() {
                 >
                   {tab.label}
                   {count > 0 && (
-                    <span className={`rounded-full px-1.5 text-[9px] font-black ${
-                      activeFilter === tab.key
-                        ? "bg-white/25 text-white"
-                        : "bg-border text-muted-foreground"
-                    }`}>
+                    <span
+                      className={`rounded-full px-1.5 text-[9px] font-black ${
+                        activeFilter === tab.key
+                          ? "bg-white/25 text-white"
+                          : "bg-border text-muted-foreground"
+                      }`}
+                    >
                       {count}
                     </span>
                   )}
@@ -290,7 +312,9 @@ function NotificationsPage() {
             </div>
             <div>
               <p className="font-display text-lg font-bold text-clay dark:text-zinc-100">
-                {activeFilter === "all" ? "No notifications yet" : `No ${activeFilter} notifications`}
+                {activeFilter === "all"
+                  ? "No notifications yet"
+                  : `No ${activeFilter} notifications`}
               </p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {activeFilter === "all"

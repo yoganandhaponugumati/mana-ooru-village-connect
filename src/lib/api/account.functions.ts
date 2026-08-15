@@ -19,7 +19,7 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
  */
 export const deleteMyAccount = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ password: z.string().min(1, "Current password is required.") }))
+  .validator(z.object({ password: z.string().min(1, "Current password is required.") }))
   .handler(async ({ context, data }) => {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const { createClient } = await import("@supabase/supabase-js");

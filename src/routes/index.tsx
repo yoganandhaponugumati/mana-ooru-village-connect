@@ -48,8 +48,12 @@ import { citizenServices, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
 
 import { VillageStories } from "@/components/VillageStories";
-const VideoGuideModal = lazy(() => import("@/components/VideoGuideModal").then(m => ({ default: m.VideoGuideModal })));
-const ConceptShowcase = lazy(() => import("@/components/ConceptShowcase").then(m => ({ default: m.ConceptShowcase })));
+const VideoGuideModal = lazy(() =>
+  import("@/components/VideoGuideModal").then((m) => ({ default: m.VideoGuideModal })),
+);
+const ConceptShowcase = lazy(() =>
+  import("@/components/ConceptShowcase").then((m) => ({ default: m.ConceptShowcase })),
+);
 
 function ClientOnly({
   children,
@@ -96,7 +100,7 @@ function LazyMount({
           observer.disconnect();
         }
       },
-      { rootMargin }
+      { rootMargin },
     );
 
     observer.observe(el);
@@ -458,9 +462,7 @@ function HeroVillageOSCard({
       )}
 
       {/* Main Interactive Glass Card Stack (Compact, Clean, High-Contrast) */}
-      <div
-        className="relative w-full rounded-[32px] border-2 border-white/20 bg-zinc-900/90 p-6 shadow-2xl backdrop-blur-2xl transition hover:border-emerald-400/40 animate-fade-in"
-      >
+      <div className="relative w-full rounded-[32px] border-2 border-white/20 bg-zinc-900/90 p-6 shadow-2xl backdrop-blur-2xl transition hover:border-emerald-400/40 animate-fade-in">
         {/* Top Header: Live Status & Village Name */}
         <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-4">
           <div>
@@ -586,7 +588,7 @@ function Index() {
     .slice(0, 3);
 
   const realTickers = [
-    ...problemItems.map(p => ({
+    ...problemItems.map((p) => ({
       type: "Problem Reported",
       icon: AlertTriangle,
       badgeColor: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30",
@@ -594,14 +596,14 @@ function Index() {
       desc: p.description || "Issue was reported to the village administration.",
       time: timeAgo(p.createdAt),
     })),
-    ...announcementItems.map(a => ({
+    ...announcementItems.map((a) => ({
       type: "Official Notice",
       icon: Megaphone,
       badgeColor: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30",
       title: a.title,
       desc: a.description || "Official village announcement.",
       time: timeAgo(a.createdAt),
-    }))
+    })),
   ];
 
   // Web Speech API for Telugu Voice Search
@@ -678,18 +680,14 @@ function Index() {
               )}
             </div>
 
-            <h1
-              className="max-w-4xl text-balance font-display text-2xl sm:text-5xl lg:text-6xl font-black leading-tight text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.58)] animate-[fadeInUp_0.55s_0.08s_both]"
-            >
+            <h1 className="max-w-4xl text-balance font-display text-2xl sm:text-5xl lg:text-6xl font-black leading-tight text-white drop-shadow-[0_16px_48px_rgba(0,0,0,0.58)] animate-[fadeInUp_0.55s_0.08s_both]">
               Smart{" "}
               <span className="bg-gradient-to-r from-emerald-400 via-teal-200 to-amber-300 bg-clip-text text-transparent">
                 Digital Village
               </span>
             </h1>
 
-            <p
-              className="mt-5 max-w-2xl text-pretty text-sm sm:text-lg font-semibold leading-relaxed text-zinc-200/90 animate-[fadeInUp_0.5s_0.16s_both]"
-            >
+            <p className="mt-5 max-w-2xl text-pretty text-sm sm:text-lg font-semibold leading-relaxed text-zinc-200/90 animate-[fadeInUp_0.5s_0.16s_both]">
               {heroSubtitle}
             </p>
 
@@ -746,9 +744,7 @@ function Index() {
               </div>
             </form>
 
-            <div
-              className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 animate-[fadeInUp_0.5s_0.32s_both]"
-            >
+            <div className="mt-8 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 animate-[fadeInUp_0.5s_0.32s_both]">
               <Link
                 to="/timeline"
                 className="inline-flex h-14 items-center justify-center gap-2 rounded-[20px] bg-primary px-7 text-base font-bold text-primary-foreground shadow-[var(--shadow-glow)] transition hover:-translate-y-1 hover:bg-secondary shrink-0"
@@ -775,9 +771,7 @@ function Index() {
 
         {/* FULL-WIDTH HERO SHOWCASE CARD SPANNING 100% CONTAINER WIDTH BELOW THE MAIN HERO FOLD */}
         <div className="relative z-20 mx-auto max-w-7xl px-4 pb-20 pt-4 sm:px-6">
-          <div
-            className="w-full rounded-3xl border-2 border-emerald-400/60 bg-gradient-to-br from-emerald-950/95 via-teal-950/90 to-emerald-900/95 p-6 sm:p-7 text-white shadow-[0_0_60px_rgba(16,185,129,0.35)] backdrop-blur-2xl ring-1 ring-emerald-400/30 overflow-hidden relative animate-[fadeInUp_0.5s_0.2s_both]"
-          >
+          <div className="w-full rounded-3xl border-2 border-emerald-400/60 bg-gradient-to-br from-emerald-950/95 via-teal-950/90 to-emerald-900/95 p-6 sm:p-7 text-white shadow-[0_0_60px_rgba(16,185,129,0.35)] backdrop-blur-2xl ring-1 ring-emerald-400/30 overflow-hidden relative animate-[fadeInUp_0.5s_0.2s_both]">
             {/* Glow Accents */}
             <div className="pointer-events-none absolute -right-12 -top-12 size-64 rounded-full bg-emerald-500/20 blur-3xl" />
             <div className="pointer-events-none absolute -left-12 -bottom-12 size-64 rounded-full bg-teal-500/20 blur-3xl" />
@@ -1079,55 +1073,60 @@ function Index() {
           {/* Manual Horizontal Scrolling Cards */}
           <div className="relative flex overflow-x-auto w-full pb-4 hide-scrollbar snap-x snap-mandatory">
             <div className="flex gap-4">
-              {announcementItems.length > 0 ? announcementItems.map((item, idx) => (
-                <div
-                  key={`${item.id}-${idx}`}
-                  className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border border-border bg-white shadow-sm overflow-hidden flex flex-col relative snap-center snap-always"
-                >
-                  <div className="h-32 w-full relative overflow-hidden bg-muted">
-                    <img
-                      src={item.imageUrl || "/village-life-bg.jpg"}
-                      alt={item.title}
-                      className="h-full w-full object-cover transition-transform duration-700"
-                    />
-                  </div>
-                  <div className="p-4 flex flex-col flex-1">
-                    <h4 className="font-display text-base font-bold text-clay truncate">
-                      {item.title}
-                    </h4>
-                    <p className="text-xs text-muted-foreground mt-1 font-medium">
-                      {new Date(item.createdAt).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                      ,{" "}
-                      {new Date(item.createdAt).toLocaleTimeString("en-US", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
-                      {item.description ||
-                        "Official panchayat announcement for the village. Please read for more details."}
-                    </p>
-                    <div className="mt-4 pt-1">
-                      <Link
-                        to="/announcements"
-                        search={{ noticeId: item.id }}
-                        className="inline-flex items-center justify-center rounded-full bg-[#065f46] px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition"
-                      >
-                        Read More
-                      </Link>
+              {announcementItems.length > 0 ? (
+                announcementItems.map((item, idx) => (
+                  <div
+                    key={`${item.id}-${idx}`}
+                    className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border border-border bg-white shadow-sm overflow-hidden flex flex-col relative snap-center snap-always"
+                  >
+                    <div className="h-32 w-full relative overflow-hidden bg-muted">
+                      <img
+                        src={item.imageUrl || "/village-life-bg.jpg"}
+                        alt={item.title}
+                        className="h-full w-full object-cover transition-transform duration-700"
+                      />
+                    </div>
+                    <div className="p-4 flex flex-col flex-1">
+                      <h4 className="font-display text-base font-bold text-clay truncate">
+                        {item.title}
+                      </h4>
+                      <p className="text-xs text-muted-foreground mt-1 font-medium">
+                        {new Date(item.createdAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                        ,{" "}
+                        {new Date(item.createdAt).toLocaleTimeString("en-US", {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2 leading-relaxed">
+                        {item.description ||
+                          "Official panchayat announcement for the village. Please read for more details."}
+                      </p>
+                      <div className="mt-4 pt-1">
+                        <Link
+                          to="/announcements"
+                          search={{ noticeId: item.id }}
+                          className="inline-flex items-center justify-center rounded-full bg-[#065f46] px-5 py-2 text-xs font-bold text-white hover:bg-emerald-800 transition"
+                        >
+                          Read More
+                        </Link>
+                      </div>
                     </div>
                   </div>
-                </div>
-              )) : (
+                ))
+              ) : (
                 <div className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border-2 border-dashed border-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/20 dark:border-emerald-800 flex flex-col items-center justify-center p-8 gap-3 snap-center">
                   <Megaphone className="size-10 text-emerald-400/60" />
                   <p className="text-sm font-semibold text-muted-foreground text-center">
                     No announcements yet.
                   </p>
-                  <Link to="/announcements" className="text-xs font-bold text-emerald-700 hover:underline">
+                  <Link
+                    to="/announcements"
+                    className="text-xs font-bold text-emerald-700 hover:underline"
+                  >
                     Post a Notice →
                   </Link>
                 </div>
@@ -1153,41 +1152,43 @@ function Index() {
             </Link>
           </div>
           <div className="space-y-3">
-            {problemItems.length > 0 ? problemItems.map((item) => (
-              <Link
-                key={item.id}
-                to="/problems"
-                className="flex gap-3 rounded-2xl border border-border bg-white dark:bg-zinc-900 p-3 shadow-sm transition hover:border-red-300 hover:bg-red-50/40 dark:hover:bg-red-950/20"
-              >
-                {item.imageUrl ? (
-                  <img
-                    src={item.imageUrl}
-                    alt={item.title}
-                    className="size-14 rounded-xl object-cover shrink-0"
-                  />
-                ) : (
-                  <span className="grid size-14 shrink-0 place-items-center rounded-xl bg-red-100 dark:bg-red-950/50 text-red-600">
-                    <AlertTriangle className="size-6" />
+            {problemItems.length > 0 ? (
+              problemItems.map((item) => (
+                <Link
+                  key={item.id}
+                  to="/problems"
+                  className="flex gap-3 rounded-2xl border border-border bg-white dark:bg-zinc-900 p-3 shadow-sm transition hover:border-red-300 hover:bg-red-50/40 dark:hover:bg-red-950/20"
+                >
+                  {item.imageUrl ? (
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title}
+                      className="size-14 rounded-xl object-cover shrink-0"
+                    />
+                  ) : (
+                    <span className="grid size-14 shrink-0 place-items-center rounded-xl bg-red-100 dark:bg-red-950/50 text-red-600">
+                      <AlertTriangle className="size-6" />
+                    </span>
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate font-bold text-clay dark:text-zinc-100 text-sm">
+                      {item.title}
+                    </span>
+                    <span className="mt-0.5 block text-xs text-muted-foreground truncate">
+                      📍 {item.location || item.category || "Village issue"} ·{" "}
+                      {timeAgo(item.createdAt)}
+                    </span>
+                    <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">
+                      {item.status === "completed"
+                        ? "✅ Resolved"
+                        : item.status === "in_progress"
+                          ? "🛠️ In Progress"
+                          : "⏳ Pending"}
+                    </span>
                   </span>
-                )}
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate font-bold text-clay dark:text-zinc-100 text-sm">
-                    {item.title}
-                  </span>
-                  <span className="mt-0.5 block text-xs text-muted-foreground truncate">
-                    📍 {item.location || item.category || "Village issue"} ·{" "}
-                    {timeAgo(item.createdAt)}
-                  </span>
-                  <span className="mt-1.5 inline-flex items-center gap-1 rounded-full bg-amber-100 dark:bg-amber-950/40 px-2.5 py-0.5 text-[10px] font-bold text-amber-800 dark:text-amber-300">
-                    {item.status === "completed"
-                      ? "✅ Resolved"
-                      : item.status === "in_progress"
-                        ? "🛠️ In Progress"
-                        : "⏳ Pending"}
-                  </span>
-                </span>
-              </Link>
-            )) : (
+                </Link>
+              ))
+            ) : (
               <p className="rounded-2xl border border-dashed border-red-200 bg-red-50/50 dark:bg-red-950/10 dark:border-red-900 p-6 text-center text-sm text-muted-foreground">
                 No problems reported yet.
               </p>
@@ -1202,9 +1203,15 @@ function Index() {
         </div>
       </section>
 
-      <LazyMount fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
-        <ClientOnly fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
-          <Suspense fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}>
+      <LazyMount
+        fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}
+      >
+        <ClientOnly
+          fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}
+        >
+          <Suspense
+            fallback={<div className="h-40 w-full animate-pulse rounded-2xl bg-muted/40 my-8" />}
+          >
             <ConceptShowcase />
           </Suspense>
         </ClientOnly>

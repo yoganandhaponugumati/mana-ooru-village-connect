@@ -43,7 +43,10 @@ export async function getFcmMessaging(): Promise<Messaging | null> {
         return getMessaging(app);
       })
       .catch((err) => {
-        console.warn("[FCM] Firebase Messaging unavailable in this browser environment:", err?.message || err);
+        console.warn(
+          "[FCM] Firebase Messaging unavailable in this browser environment:",
+          err?.message || err,
+        );
         return null;
       });
   }

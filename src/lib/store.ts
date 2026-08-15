@@ -440,13 +440,10 @@ export function useListingStats(filter?: {
 
       const all = ((listings.data as { type: ListingType }[] | null) ?? []) as Listing[];
 
-      const byType = all.reduce<Record<string, number>>(
-        (acc, r) => {
-          acc[r.type] = (acc[r.type] ?? 0) + 1;
-          return acc;
-        },
-        {}
-      );
+      const byType = all.reduce<Record<string, number>>((acc, r) => {
+        acc[r.type] = (acc[r.type] ?? 0) + 1;
+        return acc;
+      }, {});
 
       return {
         villagers: profiles.count ?? 0,

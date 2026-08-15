@@ -86,7 +86,10 @@ function HealthPage() {
   return (
     <PageLayout
       title={(t as any).healthTitle || "Village Health & Emergency Services"}
-      subtitle={(t as any).healthSubtitle || "Find 24/7 doctors, ambulances, blood donors, and medical camps nearby."}
+      subtitle={
+        (t as any).healthSubtitle ||
+        "Find 24/7 doctors, ambulances, blood donors, and medical camps nearby."
+      }
       icon={<HeartPulse className="size-7 text-red-500" />}
     >
       <div className="space-y-8">
@@ -247,27 +250,63 @@ function HealthPage() {
 }
 
 const BLOOD_DONORS = [
-  { name: "Ramesh Kumar", group: "O+", phone: "9848011223", location: "Main Bazar Ward 2", status: "Ready to donate", lastDonated: "3 months ago" },
-  { name: "K. Venkatesh", group: "A+", phone: "9848033445", location: "Station Road", status: "Ready to donate", lastDonated: "6 months ago" },
-  { name: "Suresh Reddy", group: "B+", phone: "9848055667", location: "Panchayat Office", status: "Emergency only", lastDonated: "2 months ago" },
-  { name: "B. Anitha", group: "O-", phone: "9848077889", location: "School Street Ward 4", status: "Universal Donor", lastDonated: "4 months ago" },
-  { name: "M. Rajesh", group: "AB+", phone: "9848099001", location: "Bus Stand Area", status: "Ready to donate", lastDonated: "5 months ago" },
+  {
+    name: "Ramesh Kumar",
+    group: "O+",
+    phone: "9848011223",
+    location: "Main Bazar Ward 2",
+    status: "Ready to donate",
+    lastDonated: "3 months ago",
+  },
+  {
+    name: "K. Venkatesh",
+    group: "A+",
+    phone: "9848033445",
+    location: "Station Road",
+    status: "Ready to donate",
+    lastDonated: "6 months ago",
+  },
+  {
+    name: "Suresh Reddy",
+    group: "B+",
+    phone: "9848055667",
+    location: "Panchayat Office",
+    status: "Emergency only",
+    lastDonated: "2 months ago",
+  },
+  {
+    name: "B. Anitha",
+    group: "O-",
+    phone: "9848077889",
+    location: "School Street Ward 4",
+    status: "Universal Donor",
+    lastDonated: "4 months ago",
+  },
+  {
+    name: "M. Rajesh",
+    group: "AB+",
+    phone: "9848099001",
+    location: "Bus Stand Area",
+    status: "Ready to donate",
+    lastDonated: "5 months ago",
+  },
 ];
 
 function BloodDonorsDirectory() {
   const [selectedGroup, setSelectedGroup] = useState<string>("ALL");
   const groups = ["ALL", "O+", "A+", "B+", "AB+", "O-", "A-", "B-", "AB-"];
 
-  const filteredDonors = selectedGroup === "ALL"
-    ? BLOOD_DONORS
-    : BLOOD_DONORS.filter((d) => d.group === selectedGroup);
+  const filteredDonors =
+    selectedGroup === "ALL" ? BLOOD_DONORS : BLOOD_DONORS.filter((d) => d.group === selectedGroup);
 
   return (
     <SurfaceCard className="p-6">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h3 className="font-display text-lg font-bold text-foreground flex items-center gap-2">
-            <span className="grid size-7 place-items-center rounded-lg bg-red-500/10 text-red-600 font-bold text-sm">🩸</span>
+            <span className="grid size-7 place-items-center rounded-lg bg-red-500/10 text-red-600 font-bold text-sm">
+              🩸
+            </span>
             <span>Emergency Blood Donors Directory</span>
           </h3>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -325,4 +364,3 @@ function BloodDonorsDirectory() {
     </SurfaceCard>
   );
 }
-

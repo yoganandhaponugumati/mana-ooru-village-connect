@@ -105,7 +105,10 @@ function MarketPage() {
   return (
     <PageLayout
       title={(t as any).marketplaceTitle || "Village Marketplace"}
-      subtitle={(t as any).marketplaceSubtitle || "Buy & sell local crops, cattle, machinery, and goods directly."}
+      subtitle={
+        (t as any).marketplaceSubtitle ||
+        "Buy & sell local crops, cattle, machinery, and goods directly."
+      }
       icon={<ShoppingBasket className="size-6 text-emerald-600" />}
       heroAction={
         <AppButton

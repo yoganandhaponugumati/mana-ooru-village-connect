@@ -121,6 +121,8 @@ export default defineConfig({
   },
   vite: {
     build: {
+      target: "es2022",
+      chunkSizeWarningLimit: 600,
       rollupOptions: {
         output: {
           manualChunks(id) {
@@ -129,6 +131,25 @@ export default defineConfig({
               if (id.includes("framer-motion")) return "vendor-motion";
               if (id.includes("@tanstack")) return "vendor-tanstack";
               if (id.includes("@supabase")) return "vendor-supabase";
+              if (id.includes("recharts") || id.includes("d3-") || id.includes("victory"))
+                return "vendor-charts";
+              if (id.includes("@google/generative-ai")) return "vendor-genai";
+              if (id.includes("firebase") || id.includes("@firebase")) return "vendor-firebase";
+              if (
+                id.includes("@radix-ui") ||
+                id.includes("cmdk") ||
+                id.includes("vaul") ||
+                id.includes("input-otp")
+              )
+                return "vendor-ui";
+              if (id.includes("date-fns") || id.includes("react-day-picker")) return "vendor-date";
+              if (
+                id.includes("zod") ||
+                id.includes("clsx") ||
+                id.includes("tailwind-merge") ||
+                id.includes("class-variance-authority")
+              )
+                return "vendor-utils";
             }
           },
         },
@@ -138,10 +159,15 @@ export default defineConfig({
       VitePWA({
         registerType: "autoUpdate",
         injectRegister: "auto",
+        strategies: "generateSW",
+        devOptions: {
+          enabled: false,
+        },
         workbox: {
-          globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,webp,json}"],
+          globPatterns: ["**/*.{js,css,html,ico,png,svg,jpg,webp,json,woff2}"],
           navigateFallback: "/offline.html",
-          navigateFallbackDenylist: [/^\/api/],
+          navigateFallbackDenylist: [/^\/api/, /^\/_server/],
+          cleanupOutdatedCaches: true,
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,
@@ -192,8 +218,8 @@ export default defineConfig({
           name: "GramMitra — Smart Village Ecosystem",
           short_name: "GramMitra",
           description: "Digital Village OS for rural communities",
-          theme_color: "#ffffff",
-          background_color: "#ffffff",
+          theme_color: "#0E2317",
+          background_color: "#FFFDF9",
           display: "standalone",
           orientation: "portrait",
           icons: [
@@ -201,6 +227,25 @@ export default defineConfig({
               src: "/site-icon.png",
               sizes: "512x512",
               type: "image/png",
+              purpose: "any",
+            },
+            {
+              src: "/pwa-192x192.png",
+              sizes: "192x192",
+              type: "image/png",
+              purpose: "any",
+            },
+            {
+              src: "/pwa-512x512.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "any",
+            },
+            {
+              src: "/grammitra_app_icon.png",
+              sizes: "512x512",
+              type: "image/png",
+              purpose: "maskable",
             },
           ],
         },

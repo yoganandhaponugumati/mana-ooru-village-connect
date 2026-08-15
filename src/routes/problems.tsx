@@ -401,7 +401,8 @@ function ProblemsPage() {
                       </span>
                       {!isResolved && (
                         <span className="inline-flex items-center gap-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider">
-                          ⏱️ {(() => {
+                          ⏱️{" "}
+                          {(() => {
                             const elapsed = Date.now() - new Date(item.createdAt).getTime();
                             const days = Math.floor(elapsed / (1000 * 60 * 60 * 24));
                             return days > 0 ? `${days}d elapsed` : "reported today";
@@ -425,7 +426,7 @@ function ProblemsPage() {
                     {isResolved ? (
                       <div className="mt-2.5 rounded-xl border border-emerald-500/30 bg-emerald-50/50 p-2 text-[10px] shadow-sm relative overflow-hidden text-left">
                         <div className="flex items-center gap-1 text-emerald-800 font-extrabold uppercase tracking-wider">
-                           <CheckCircle2 className="size-3 text-emerald-600" />
+                          <CheckCircle2 className="size-3 text-emerald-600" />
                           Official Resolution
                         </div>
                         <p className="mt-1 truncate text-clay font-bold">
@@ -449,9 +450,15 @@ function ProblemsPage() {
                     <div className="mt-3.5 bg-muted/40 dark:bg-zinc-800/20 rounded-2xl p-3 border border-border/40 relative overflow-hidden">
                       <div className="flex items-center justify-between text-[10px] font-bold text-muted-foreground mb-1 px-1">
                         <span>PANCHAYAT WORKFLOW TRACKER</span>
-                        <span className={`font-black ${
-                          isResolved ? "text-emerald-600" : isInProgress ? "text-blue-600" : "text-amber-600"
-                        }`}>
+                        <span
+                          className={`font-black ${
+                            isResolved
+                              ? "text-emerald-600"
+                              : isInProgress
+                                ? "text-blue-600"
+                                : "text-amber-600"
+                          }`}
+                        >
                           {status.toUpperCase().replace("_", " ")}
                         </span>
                       </div>
@@ -459,44 +466,60 @@ function ProblemsPage() {
                         {/* Connecting Line background */}
                         <div className="absolute left-6 right-6 top-1.5 h-1 bg-zinc-200 dark:bg-zinc-800 rounded -z-0" />
                         {/* Connecting Line progress fill */}
-                        <div 
-                          className="absolute left-6 top-1.5 h-1 bg-primary rounded transition-all duration-500 -z-0" 
-                          style={{ 
-                            width: isResolved ? "calc(100% - 3rem)" : isInProgress ? "calc(50% - 1.5rem)" : "0%" 
-                          }} 
+                        <div
+                          className="absolute left-6 top-1.5 h-1 bg-primary rounded transition-all duration-500 -z-0"
+                          style={{
+                            width: isResolved
+                              ? "calc(100% - 3rem)"
+                              : isInProgress
+                                ? "calc(50% - 1.5rem)"
+                                : "0%",
+                          }}
                         />
                         {/* Step 1: Reported */}
                         <div className="flex flex-col items-center z-10">
-                          <span className={`size-4.5 rounded-full border-2 flex items-center justify-center text-[9px] font-extrabold transition-all duration-300 ${
-                            status === "pending" || isInProgress || isResolved
-                              ? "bg-primary border-primary text-white shadow-sm"
-                              : "bg-background border-muted text-muted-foreground"
-                          }`}>
+                          <span
+                            className={`size-4.5 rounded-full border-2 flex items-center justify-center text-[9px] font-extrabold transition-all duration-300 ${
+                              status === "pending" || isInProgress || isResolved
+                                ? "bg-primary border-primary text-white shadow-sm"
+                                : "bg-background border-muted text-muted-foreground"
+                            }`}
+                          >
                             1
                           </span>
-                          <span className="text-[9px] mt-1 font-extrabold text-muted-foreground">Reported</span>
+                          <span className="text-[9px] mt-1 font-extrabold text-muted-foreground">
+                            Reported
+                          </span>
                         </div>
                         {/* Step 2: In Progress */}
                         <div className="flex flex-col items-center z-10">
-                          <span className={`size-4.5 rounded-full border-2 flex items-center justify-center text-[9px] font-extrabold transition-all duration-300 ${
-                            isInProgress || isResolved
-                              ? "bg-primary border-primary text-white shadow-sm"
-                              : "bg-background border-muted text-muted-foreground"
-                          }`}>
+                          <span
+                            className={`size-4.5 rounded-full border-2 flex items-center justify-center text-[9px] font-extrabold transition-all duration-300 ${
+                              isInProgress || isResolved
+                                ? "bg-primary border-primary text-white shadow-sm"
+                                : "bg-background border-muted text-muted-foreground"
+                            }`}
+                          >
                             2
                           </span>
-                          <span className="text-[9px] mt-1 font-extrabold text-muted-foreground">In Progress</span>
+                          <span className="text-[9px] mt-1 font-extrabold text-muted-foreground">
+                            In Progress
+                          </span>
                         </div>
                         {/* Step 3: Resolved */}
                         <div className="flex flex-col items-center z-10">
-                          <span className={`size-4.5 rounded-full border-2 flex items-center justify-center text-[9px] font-extrabold transition-all duration-300 ${
-                            isResolved
-                              ? "bg-emerald-600 border-emerald-600 text-white shadow-sm"
-                              : "bg-background border-muted text-muted-foreground"
-                          }`}>
+                          <span
+                            className={`size-4.5 rounded-full border-2 flex items-center justify-center text-[9px] font-extrabold transition-all duration-300 ${
+                              isResolved
+                                ? "bg-emerald-600 border-emerald-600 text-white shadow-sm"
+                                : "bg-background border-muted text-muted-foreground"
+                            }`}
+                          >
                             ✓
                           </span>
-                          <span className="text-[9px] mt-1 font-extrabold text-muted-foreground">Resolved</span>
+                          <span className="text-[9px] mt-1 font-extrabold text-muted-foreground">
+                            Resolved
+                          </span>
                         </div>
                       </div>
                     </div>

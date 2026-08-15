@@ -37,7 +37,7 @@ function applySecurityHeaders(response: Response): Response {
   // Restrict access to sensitive browser APIs
   headers.set(
     "Permissions-Policy",
-    "camera=(), microphone=(self), geolocation=(self), payment=(), usb=()"
+    "camera=(self), microphone=(self), geolocation=(self), payment=(), usb=()",
   );
 
   // Enable HSTS in production (enforces HTTPS)
@@ -58,7 +58,7 @@ function applySecurityHeaders(response: Response): Response {
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "form-action 'self'",
-    ].join("; ")
+    ].join("; "),
   );
 
   return new Response(response.body, {
@@ -103,4 +103,3 @@ export default {
     }
   },
 };
-

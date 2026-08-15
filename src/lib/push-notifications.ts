@@ -227,7 +227,9 @@ export async function showInstantPushNotification(options: {
           reg = await navigator.serviceWorker.getRegistration().catch(() => undefined);
         }
         if (!reg) {
-          reg = await navigator.serviceWorker.register("/firebase-messaging-sw.js", { scope: "/" }).catch(() => undefined);
+          reg = await navigator.serviceWorker
+            .register("/firebase-messaging-sw.js", { scope: "/" })
+            .catch(() => undefined);
         }
       }
 
@@ -273,5 +275,3 @@ export async function showInstantPushNotification(options: {
     }
   }
 }
-
-

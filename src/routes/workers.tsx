@@ -59,7 +59,10 @@ function WorkersPage() {
   return (
     <PageLayout
       title={(t as any).workersTitle || "Village Workers Directory"}
-      subtitle={(t as any).workersSubtitle || "Find daily wage workers, farm labor, electricians, mechanics, and skilled labor nearby."}
+      subtitle={
+        (t as any).workersSubtitle ||
+        "Find daily wage workers, farm labor, electricians, mechanics, and skilled labor nearby."
+      }
       icon={<Users className="size-6 text-primary" />}
       heroAction={
         <AppLinkButton
