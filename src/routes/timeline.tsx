@@ -42,7 +42,6 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AppButton, EmptyState, SurfaceCard, SkeletonCard } from "@/components/design-system";
 import { checkRateLimit, DEFAULT_VOTE_LIMIT } from "@/lib/rate-limiter";
 import { supabase } from "@/integrations/supabase/client";
-import { fallbackListings } from "@/lib/app-data";
 import { useAuth } from "@/lib/auth";
 import { useGovernmentWorks } from "@/lib/government-works";
 import { useSavedItems } from "@/lib/local-actions";
@@ -478,7 +477,7 @@ function TimelinePage() {
 
   const activities = useMemo<TimelineActivity[]>(() => {
     const officialActivities = timelineQuery.data ?? [];
-    const sourceListings = items.length > 0 ? items : fallbackListings;
+    const sourceListings = items;
     const listingActivities = sourceListings.map((item) => {
       const type = inferType(item);
       return {

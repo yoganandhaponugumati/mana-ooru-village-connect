@@ -2,7 +2,7 @@ import { Link, createFileRoute, useSearch } from "@tanstack/react-router";
 import { ArrowRight, Search, Sparkles } from "lucide-react";
 import { PageLayout } from "@/components/PageLayout";
 import { EmptyState, SectionHeader, SurfaceCard, StatusBadge } from "@/components/design-system";
-import { expandSearchQuery, fallbackListings, getSearchableItems } from "@/lib/app-data";
+import { expandSearchQuery, getSearchableItems } from "@/lib/app-data";
 import { useListings } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
@@ -20,7 +20,7 @@ function SearchPage() {
   const { q } = useSearch({ from: "/search" });
   const { items } = useListings();
   const { profile } = useVillagePreferences();
-  const allItems = getSearchableItems(items.length > 0 ? items : fallbackListings);
+  const allItems = getSearchableItems(items);
   const query = q || "";
   const normalized = query.trim().toLowerCase();
   const expandedQuery = expandSearchQuery(query);

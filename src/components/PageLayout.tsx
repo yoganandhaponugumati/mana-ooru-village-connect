@@ -8,6 +8,7 @@ export function PageLayout({
   icon,
   heroAction,
   hideFooter = false,
+  maxWidthClassName = "max-w-5xl",
 }: {
   children: ReactNode;
   title: string;
@@ -15,6 +16,7 @@ export function PageLayout({
   icon?: ReactNode;
   heroAction?: ReactNode;
   hideFooter?: boolean;
+  maxWidthClassName?: string;
 }) {
   return (
     <div className="flex min-h-[100dvh] flex-col bg-[#F9FAFB] dark:bg-zinc-950">
@@ -22,7 +24,7 @@ export function PageLayout({
       <SiteNav />
 
       {/* Main Content Area with perfect spacing to clear the fixed 56px Top Nav */}
-      <main id="main-content" className="flex-1 pb-24 pt-20 sm:pt-24 px-4 max-w-2xl mx-auto w-full">
+      <main id="main-content" className={`flex-1 pb-24 pt-20 sm:pt-24 px-4 sm:px-6 ${maxWidthClassName} mx-auto w-full`}>
         {/* Clean, Simple Header */}
         <div className="mb-6 sm:mb-8 mt-2">
           <h1 className="font-display text-[22px] sm:text-2xl font-extrabold text-clay dark:text-zinc-100 flex items-center gap-2.5 leading-tight">

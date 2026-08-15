@@ -35,7 +35,6 @@ import {
   StatusBadge,
   SurfaceCard,
 } from "@/components/design-system";
-import { fallbackListings } from "@/lib/app-data";
 import { useAuth } from "@/lib/auth";
 import { useListings, timeAgo } from "@/lib/store";
 import { useGovernmentWorks, type GovernmentWorkInput } from "@/lib/government-works";
@@ -60,8 +59,7 @@ function AnnPage() {
   const { t } = useVillagePreferences();
   const { items, remove, update } = useListings("announcement");
   const { user, role } = useAuth();
-  const displayItems =
-    items.length > 0 ? items : fallbackListings.filter((item) => item.type === "announcement");
+  const displayItems = items;
   const [showNoticeForm, setShowNoticeForm] = useState(false);
   const canManageNotices = role === "village_admin" || role === "super_admin";
 

@@ -21,7 +21,7 @@ import { PageLayout } from "@/components/PageLayout";
 import { ListingCard } from "@/components/ListingForm";
 import { AppLinkButton, FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { EmptyState } from "@/components/EmptyState";
-import { fallbackListings } from "@/lib/app-data";
+
 import { useListings } from "@/lib/store";
 import { useVillagePreferences } from "@/lib/village-preferences";
 
@@ -48,8 +48,7 @@ const workerCategories = [
 function WorkersPage() {
   const { t } = useVillagePreferences();
   const { items, remove } = useListings("worker");
-  const displayItems =
-    items.length > 0 ? items : fallbackListings.filter((item) => item.type === "worker");
+  const displayItems = items;
   const [q, setQ] = useState("");
   const filtered = displayItems.filter((i) =>
     [i.title, i.description, i.category, i.location]

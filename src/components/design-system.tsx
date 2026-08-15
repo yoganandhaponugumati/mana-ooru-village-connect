@@ -40,7 +40,7 @@ export function AppButton({
   return (
     <button
       className={clsx(
-        "inline-flex items-center justify-center gap-2 rounded-full font-semibold focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-95 disabled:pointer-events-none transition-transform duration-150",
+        "inline-flex items-center justify-center gap-2 rounded-full font-semibold whitespace-nowrap shrink-0 focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-primary/20 active:scale-95 disabled:pointer-events-none transition-transform duration-150",
         buttonStyles[variant],
         buttonSizes[size],
         loading && "cursor-progress opacity-80",
@@ -135,7 +135,7 @@ export function SectionHeader({
   return (
     <div
       className={clsx(
-        "mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between",
+        "mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between",
         compact && "mb-6",
         className,
       )}
@@ -146,14 +146,14 @@ export function SectionHeader({
             {eyebrow}
           </p>
         )}
-        <h2 className="mt-2 text-balance font-display text-3xl font-semibold text-clay sm:text-4xl">
+        <h2 className="mt-2 text-balance font-display text-2xl font-bold text-clay sm:text-3xl">
           {title}
         </h2>
         {description && (
           <p className="mt-2 text-sm leading-7 text-muted-foreground sm:text-base">{description}</p>
         )}
       </div>
-      {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
+      {actions && <div className="flex flex-wrap items-center gap-2 shrink-0">{actions}</div>}
     </div>
   );
 }

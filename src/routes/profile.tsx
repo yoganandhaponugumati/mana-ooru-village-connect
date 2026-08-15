@@ -25,7 +25,6 @@ import { SiteNav, SiteFooter } from "@/components/SiteNav";
 import { VillageLocationPicker } from "@/components/VillageLocationPicker";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/lib/auth";
-import { fallbackListings } from "@/lib/app-data";
 import {
   deleteMyAccount,
   getUsernameError,
@@ -83,7 +82,7 @@ function ProfilePage() {
   const myPosts = items.filter((item) => item.owner_id === user?.id);
   const allListings = useMemo(() => {
     const seen = new Set<string>();
-    return [...items, ...fallbackListings].filter((item) => {
+    return items.filter((item) => {
       if (seen.has(item.id)) return false;
       seen.add(item.id);
       return true;

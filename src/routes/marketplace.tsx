@@ -21,7 +21,6 @@ import { PageLayout } from "@/components/PageLayout";
 import { ListingForm } from "@/components/ListingForm";
 import { AppButton, FeatureIcon, SurfaceCard } from "@/components/design-system";
 import { EmptyState } from "@/components/EmptyState";
-import { fallbackListings } from "@/lib/app-data";
 import { useListings, timeAgo } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -64,8 +63,7 @@ function MarketPage() {
   const { user, role } = useAuth();
   const navigate = useNavigate();
   const { items, remove } = useListings("market");
-  const displayItems =
-    items.length > 0 ? items : fallbackListings.filter((item) => item.type === "market");
+  const displayItems = items;
   const [showForm, setShowForm] = useState(false);
   const [cat, setCat] = useState("All");
   const filtered =

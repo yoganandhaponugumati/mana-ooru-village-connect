@@ -4,7 +4,7 @@ import { useState } from "react";
 import { PageLayout } from "@/components/PageLayout";
 import { ListingCard, ListingForm } from "@/components/ListingForm";
 import { AppButton, EmptyState, FeatureIcon, SurfaceCard } from "@/components/design-system";
-import { fallbackListings } from "@/lib/app-data";
+
 import { useListings } from "@/lib/store";
 import { useAuth } from "@/lib/auth";
 import { toast } from "sonner";
@@ -20,8 +20,7 @@ function LandPage() {
   const { user } = useAuth();
   const navigate = useNavigate();
   const { items, remove } = useListings("land");
-  const displayItems =
-    items.length > 0 ? items : fallbackListings.filter((item) => item.type === "land");
+  const displayItems = items;
   const [showForm, setShowForm] = useState(false);
 
   const handlePostClick = () => {
