@@ -46,7 +46,7 @@ export function PrivacyPolicyPage() {
               </h2>
             </div>
             <p className="text-xs font-semibold text-muted-foreground">
-              Last Updated: July 16, 2026
+              Last Updated: August 15, 2026
             </p>
           </div>
           <p className="mt-6 text-sm sm:text-base leading-7 text-muted-foreground">

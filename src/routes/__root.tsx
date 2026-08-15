@@ -96,23 +96,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and AI support.",
       },
       { name: "author", content: "GramMitra" },
-      { property: "og:title", content: "GramMitra - Smart Village Ecosystem" },
-      { property: "og:description", content: "Everything your village needs. All in one place." },
+      { property: "og:title", content: "GramMitra — Smart Village Ecosystem" },
+      { property: "og:description", content: "India's most complete digital village platform. Village Stories, Problem Reporting, Zero-Brokerage Marketplace, AI Assistant, and Panchayat Notices — all free." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
+      { property: "og:url", content: "https://grammitra-app.vercel.app/" },
+      { property: "og:image", content: "https://grammitra-app.vercel.app/village-life-bg.jpg" },
+      { property: "og:site_name", content: "GramMitra" },
+      { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@GramMitra" },
-      { name: "twitter:title", content: "GramMitra" },
-      { name: "twitter:description", content: "Everything your village needs. All in one place." },
-      {
-        property: "og:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/6443d029-9210-477c-9cbc-a6f036717993",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/6443d029-9210-477c-9cbc-a6f036717993",
-      },
+      { name: "twitter:title", content: "GramMitra — Smart Village Ecosystem" },
+      { name: "twitter:description", content: "India's most complete digital village platform. Free for every villager." },
+      { name: "twitter:image", content: "https://grammitra-app.vercel.app/village-life-bg.jpg" },
+      // PWA & Android
+      { name: "application-name", content: "GramMitra" },
+      { name: "theme-color", content: "#0E2317" },
+      { name: "mobile-web-app-capable", content: "yes" },
+      // Apple PWA
+      { name: "apple-mobile-web-app-capable", content: "yes" },
+      { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
+      { name: "apple-mobile-web-app-title", content: "GramMitra" },
     ],
     links: [
       {
@@ -126,7 +128,12 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       },
       {
         rel: "apple-touch-icon",
-        href: "/site-icon.svg",
+        href: "/pwa-192x192.png",
+      },
+      {
+        rel: "apple-touch-icon",
+        sizes: "192x192",
+        href: "/pwa-192x192.png",
       },
       {
         rel: "icon",

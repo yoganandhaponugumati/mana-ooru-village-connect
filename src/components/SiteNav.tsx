@@ -29,6 +29,10 @@ import {
   CloudSun,
   ArrowLeft,
   CheckCircle2,
+  Camera,
+  Vote,
+  Zap,
+  Info,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
@@ -55,6 +59,48 @@ const navLinks = [
 
 // Bottom dock tabs (kept for reference but rendered manually with FAB)
 // const dockTabs = [...] as const;
+
+const typeConfig: Record<string, { icon: React.ElementType; color: string; bg: string; label: string }> = {
+  story: {
+    icon: Camera,
+    color: "text-purple-600 dark:text-purple-400",
+    bg: "bg-purple-100 dark:bg-purple-950/50",
+    label: "Story",
+  },
+  complaint: {
+    icon: AlertTriangle,
+    color: "text-red-600 dark:text-red-400",
+    bg: "bg-red-100 dark:bg-red-950/50",
+    label: "Problem",
+  },
+  announcement: {
+    icon: Megaphone,
+    color: "text-emerald-600 dark:text-emerald-400",
+    bg: "bg-emerald-100 dark:bg-emerald-950/50",
+    label: "Notice",
+  },
+  poll: {
+    icon: Vote,
+    color: "text-blue-600 dark:text-blue-400",
+    bg: "bg-blue-100 dark:bg-blue-950/50",
+    label: "Poll",
+  },
+  system: {
+    icon: Zap,
+    color: "text-amber-600 dark:text-amber-400",
+    bg: "bg-amber-100 dark:bg-amber-950/50",
+    label: "System",
+  },
+};
+
+function getTypeConfig(type: string) {
+  return typeConfig[type] ?? {
+    icon: Info,
+    color: "text-zinc-500",
+    bg: "bg-zinc-100 dark:bg-zinc-800",
+    label: "Alert",
+  };
+}
 
 export function SiteNav() {
   const [open, setOpen] = useState(false);
@@ -365,41 +411,52 @@ export function SiteNav() {
                             </p>
                           </div>
                         ) : (
-                          notifications.map((item) => (
-                            <div
-                              key={item.id}
-                              className={`group flex gap-2.5 rounded-xl p-2.5 transition hover:bg-primary/5 ${item.read_at ? "opacity-60" : "bg-primary/5"}`}
-                            >
-                              <span
-                                className={`mt-1.5 size-2 shrink-0 rounded-full ${item.read_at ? "bg-border" : "bg-red-500"}`}
-                              />
-                              <button
-                                type="button"
+                          notifications.map((item) => {
+                            const cfg = getTypeConfig(item.type);
+                            const Icon = cfg.icon;
+                            return (
+                              <div
+                                key={item.id}
+                                className={`group flex gap-2.5 rounded-xl p-2 transition hover:bg-primary/5 cursor-pointer relative ${
+                                  item.read_at ? "opacity-60 bg-transparent" : "bg-primary/5 dark:bg-primary/10 shadow-sm border border-primary/10"
+                                }`}
                                 onClick={() => {
                                   markRead(item.id);
                                   if (item.action_url) window.location.assign(item.action_url);
                                 }}
-                                className="min-w-0 flex-1 text-left"
                               >
-                                <span className="block truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
-                                  {item.title}
-                                </span>
-                                <span className="mt-0.5 line-clamp-2 block text-xs text-zinc-500">
-                                  {item.body}
-                                </span>
-                                <span className="mt-1 block text-[10px] font-bold uppercase tracking-wide text-primary/60">
-                                  {timeAgo(new Date(item.created_at).getTime())}
-                                </span>
-                              </button>
-                              <button
-                                type="button"
-                                onClick={() => deleteNotification(item.id)}
-                                className="grid size-7 shrink-0 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
-                              >
-                                <Trash2 className="size-3" />
-                              </button>
-                            </div>
-                          ))
+                                <div className={`grid size-8 shrink-0 place-items-center rounded-lg ${cfg.bg}`}>
+                                  <Icon className={`size-4.5 ${cfg.color}`} />
+                                </div>
+                                <div className="min-w-0 flex-1 text-left">
+                                  <div className="flex items-center justify-between gap-1">
+                                    <span className={`text-[8px] font-black uppercase px-1 rounded ${cfg.bg} ${cfg.color}`}>
+                                      {cfg.label}
+                                    </span>
+                                    <span className="text-[9px] text-muted-foreground">
+                                      {timeAgo(new Date(item.created_at).getTime())}
+                                    </span>
+                                  </div>
+                                  <span className="block truncate text-xs font-bold text-zinc-900 dark:text-zinc-100 mt-1">
+                                    {item.title}
+                                  </span>
+                                  <span className="mt-0.5 line-clamp-1 block text-[11px] text-zinc-500">
+                                    {item.body}
+                                  </span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    deleteNotification(item.id);
+                                  }}
+                                  className="grid size-6 shrink-0 place-items-center rounded-full text-muted-foreground opacity-0 transition hover:bg-destructive/10 hover:text-destructive group-hover:opacity-100"
+                                >
+                                  <Trash2 className="size-3" />
+                                </button>
+                              </div>
+                            );
+                          })
                         )}
                       </div>
                       <Link
@@ -440,8 +497,10 @@ export function SiteNav() {
                         <UserRound className="size-4" />
                       </div>
                     )}
-                    {/* Mockup shows a red dot notification on profile */}
-                    <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-red-500 border-2 border-white dark:border-zinc-950" />
+                    {/* Notification dot tied to real unread count */}
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 size-2.5 rounded-full bg-red-500 border-2 border-white dark:border-zinc-950" />
+                    )}
                   </div>
                   <span className="text-[10px] font-bold text-foreground truncate w-full">
                     {authProfile?.full_name?.split(" ")[0] || "Profile"}
@@ -747,17 +806,22 @@ export function SiteNav() {
               <span>Home</span>
             </Link>
 
-            {/* Explore Tab */}
+            {/* Alerts Tab — goes to full notifications page */}
             <Link
-              to="/search"
-              className="flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
+              to="/notifications"
+              className="relative flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-muted-foreground transition-colors border-t-2 border-transparent"
               activeProps={{
                 className:
-                  "flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary",
+                  "relative flex flex-col items-center gap-1 min-w-0 flex-1 px-1 pt-3 pb-1.5 text-[10px] font-bold text-primary transition-colors border-t-2 border-primary",
               }}
             >
-              <Search className="size-[22px]" />
-              <span>Explore</span>
+              <Bell className="size-[22px]" />
+              {unreadCount > 0 && (
+                <span className="absolute top-2 right-[calc(50%-18px)] min-w-[16px] rounded-full bg-red-500 px-1 text-[8px] font-black text-white text-center leading-4">
+                  {unreadCount > 9 ? "9+" : unreadCount}
+                </span>
+              )}
+              <span>Alerts</span>
             </Link>
 
             {/* Central POST FAB — explicitly labeled */}
@@ -790,6 +854,26 @@ export function SiteNav() {
                         <AlertTriangle className="size-4" />
                       </div>
                       Report Problem
+                    </Link>
+                    <Link
+                      to="/marketplace"
+                      onClick={() => setPostMenuOpen(false)}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors text-sm font-bold text-clay dark:text-zinc-100"
+                    >
+                      <div className="grid size-8 place-items-center rounded-full bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-400">
+                        <ShoppingBag className="size-4" />
+                      </div>
+                      Post to Market
+                    </Link>
+                    <Link
+                      to="/workers"
+                      onClick={() => setPostMenuOpen(false)}
+                      className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-muted transition-colors text-sm font-bold text-clay dark:text-zinc-100"
+                    >
+                      <div className="grid size-8 place-items-center rounded-full bg-purple-100 text-purple-600 dark:bg-purple-500/20 dark:text-purple-400">
+                        <Users className="size-4" />
+                      </div>
+                      Post Worker Need
                     </Link>
                   </motion.div>
                 )}
@@ -865,6 +949,16 @@ export function SiteFooter() {
           <p className="text-sm font-semibold text-clay dark:text-zinc-200">About &amp; Legal</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
             <li>
+              <Link to="/about" className="hover:text-primary transition">
+                About GramMitra
+              </Link>
+            </li>
+            <li>
+              <Link to="/support" className="hover:text-primary transition">
+                Help &amp; Support
+              </Link>
+            </li>
+            <li>
               <Link to="/privacy" className="hover:text-primary transition">
                 Privacy Policy
               </Link>
@@ -920,8 +1014,21 @@ export function SiteFooter() {
         <div>
           <p className="text-sm font-semibold text-clay dark:text-zinc-200">Contact</p>
           <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>privacy@grammitra.org</li>
-            <li>hello@grammitra.org</li>
+            <li>
+              <a href="mailto:privacy@grammitra.org" className="hover:text-primary transition">
+                privacy@grammitra.org
+              </a>
+            </li>
+            <li>
+              <a href="mailto:hello@grammitra.org" className="hover:text-primary transition">
+                hello@grammitra.org
+              </a>
+            </li>
+            <li>
+              <Link to="/support" className="hover:text-primary transition">
+                Help Centre
+              </Link>
+            </li>
           </ul>
         </div>
       </div>

@@ -44,7 +44,7 @@ import {
 import { SiteNav } from "@/components/SiteNav";
 import { Card3D } from "@/components/design-system";
 import { Button } from "@/components/ui/button";
-import { citizenServices, fallbackListings, schemes } from "@/lib/app-data";
+import { citizenServices, schemes } from "@/lib/app-data";
 import workersImg from "@/assets/workers-premium.jpg";
 
 import { VillageStories } from "@/components/VillageStories";
@@ -280,57 +280,7 @@ const steps = [
   },
 ];
 
-const proofTickers = [
-  {
-    type: "Problem Solved",
-    icon: CheckCircle2,
-    badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
-    title: "Drinking Water Pipeline Fixed",
-    desc: "Panchayat repaired the main valve leak in Ward 4 within 3 hours after photo verification.",
-    time: "2h ago",
-  },
-  {
-    type: "Official Notice",
-    icon: Megaphone,
-    badgeColor: "bg-amber-500/15 text-amber-600 dark:text-amber-400 border-amber-500/30",
-    title: "Kharif Crop Insurance Portal",
-    desc: "Last date for subsidized crop insurance enrollment under Rythu Bharosa is June 30.",
-    time: "4h ago",
-  },
-  {
-    type: "Problem Solved",
-    icon: CheckCircle2,
-    badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
-    title: "18 Solar Streetlights Installed",
-    desc: "New LED streetlights operational along Main Bazar & High School feeder roads.",
-    time: "Yesterday",
-  },
-  {
-    type: "Official Notice",
-    icon: Megaphone,
-    badgeColor: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30",
-    title: "Gram Sabha General Meeting",
-    desc: "Open village hall meeting to approve monsoon drainage budget this Friday at 10 AM.",
-    time: "1d ago",
-  },
-  {
-    type: "Problem Solved",
-    icon: CheckCircle2,
-    badgeColor: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border-emerald-500/30",
-    title: "Primary Canal De-siltation",
-    desc: "Irrigation department completed clearing 2.4 km of feeder canal before rain forecast.",
-    time: "2d ago",
-  },
-  {
-    type: "Official Notice",
-    icon: Megaphone,
-    badgeColor: "bg-purple-500/15 text-purple-600 dark:text-purple-400 border-purple-500/30",
-    title: "Free Veterinary Health Camp",
-    desc: "Livestock vaccination & free mineral mixture distribution at Mandal veterinary clinic.",
-    time: "3d ago",
-  },
-];
-
+// Removed hardcoded proofTickers
 const typeIcon: Record<string, typeof Briefcase> = {
   worker: Users,
   work: Briefcase,
@@ -473,11 +423,11 @@ function HeroVillageOSCard({
 }) {
   const navigate = useNavigate();
   const heroMetrics = [
-    { label: "Workers", value: stats?.workers ? `${stats.workers}+` : "12+", icon: Users },
-    { label: "Land", value: stats?.land ? `${stats.land}+` : "5+", icon: Wheat },
+    { label: "Workers", value: stats?.workers ? `${stats.workers}` : "0", icon: Users },
+    { label: "Land", value: stats?.land ? `${stats.land}` : "0", icon: Wheat },
     {
       label: "Services",
-      value: stats?.byType.service ? `${stats.byType.service}+` : "8+",
+      value: stats?.byType?.service ? `${stats.byType.service}` : "0",
       icon: Wrench,
     },
   ];
@@ -626,7 +576,7 @@ function Index() {
       ? `${weather.temp}°C · ${weather.condition}`
       : "Live weather unavailable"
     : "Select village for live weather";
-  const recentItems = stats?.recent && stats.recent.length > 0 ? stats.recent : fallbackListings;
+  const recentItems = stats?.recent && stats.recent.length > 0 ? stats.recent : [];
   const hasRealActivity = Boolean(stats && stats.total > 0);
   const liveActivity = recentItems.slice(0, 4);
   const announcementItems = recentItems.filter((r) => r.type === "announcement").slice(0, 3);
@@ -634,6 +584,25 @@ function Index() {
   const featured = recentItems
     .filter((r) => r.type !== "announcement" && r.type !== "complaint")
     .slice(0, 3);
+
+  const realTickers = [
+    ...problemItems.map(p => ({
+      type: "Problem Reported",
+      icon: AlertTriangle,
+      badgeColor: "bg-red-500/15 text-red-600 dark:text-red-400 border-red-500/30",
+      title: p.title,
+      desc: p.description || "Issue was reported to the village administration.",
+      time: timeAgo(p.createdAt),
+    })),
+    ...announcementItems.map(a => ({
+      type: "Official Notice",
+      icon: Megaphone,
+      badgeColor: "bg-blue-500/15 text-blue-600 dark:text-blue-400 border-blue-500/30",
+      title: a.title,
+      desc: a.description || "Official village announcement.",
+      time: timeAgo(a.createdAt),
+    }))
+  ];
 
   // Web Speech API for Telugu Voice Search
   const startVoiceSearch = () => {
@@ -1110,10 +1079,7 @@ function Index() {
           {/* Manual Horizontal Scrolling Cards */}
           <div className="relative flex overflow-x-auto w-full pb-4 hide-scrollbar snap-x snap-mandatory">
             <div className="flex gap-4">
-              {(announcementItems.length > 0
-                ? announcementItems
-                : fallbackListings.filter((i) => i.type === "announcement")
-              ).map((item, idx) => (
+              {announcementItems.length > 0 ? announcementItems.map((item, idx) => (
                 <div
                   key={`${item.id}-${idx}`}
                   className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border border-border bg-white shadow-sm overflow-hidden flex flex-col relative snap-center snap-always"
@@ -1155,7 +1121,17 @@ function Index() {
                     </div>
                   </div>
                 </div>
-              ))}
+              )) : (
+                <div className="w-[80vw] sm:w-[300px] shrink-0 rounded-[24px] border-2 border-dashed border-emerald-300 bg-emerald-50/50 dark:bg-emerald-950/20 dark:border-emerald-800 flex flex-col items-center justify-center p-8 gap-3 snap-center">
+                  <Megaphone className="size-10 text-emerald-400/60" />
+                  <p className="text-sm font-semibold text-muted-foreground text-center">
+                    No announcements yet.
+                  </p>
+                  <Link to="/announcements" className="text-xs font-bold text-emerald-700 hover:underline">
+                    Post a Notice →
+                  </Link>
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -1177,10 +1153,7 @@ function Index() {
             </Link>
           </div>
           <div className="space-y-3">
-            {(problemItems.length > 0
-              ? problemItems
-              : fallbackListings.filter((i) => i.type === "complaint").slice(0, 3)
-            ).map((item) => (
+            {problemItems.length > 0 ? problemItems.map((item) => (
               <Link
                 key={item.id}
                 to="/problems"
@@ -1214,7 +1187,11 @@ function Index() {
                   </span>
                 </span>
               </Link>
-            ))}
+            )) : (
+              <p className="rounded-2xl border border-dashed border-red-200 bg-red-50/50 dark:bg-red-950/10 dark:border-red-900 p-6 text-center text-sm text-muted-foreground">
+                No problems reported yet.
+              </p>
+            )}
             <Link
               to="/problems"
               className="flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-red-300 bg-red-50/50 dark:bg-red-950/20 py-3 text-sm font-bold text-red-600 hover:bg-red-100 dark:hover:bg-red-950/40 transition"
@@ -1232,6 +1209,23 @@ function Index() {
           </Suspense>
         </ClientOnly>
       </LazyMount>
+
+      {/* ════ VILLAGE STORIES — Full-Width Desktop Strip ════ */}
+      <section className="relative z-30 mx-auto mt-8 max-w-7xl px-4 sm:px-6 hidden md:block">
+        <div className="mb-3 flex items-center gap-2">
+          <span className="relative flex size-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+            <span className="relative inline-flex size-2 rounded-full bg-emerald-500" />
+          </span>
+          <h2 className="font-display text-xl font-extrabold text-clay dark:text-zinc-100">
+            Village Updates (24h Stories)
+          </h2>
+          <span className="ml-1 inline-flex items-center gap-1 rounded-full bg-emerald-100 dark:bg-emerald-950/50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
+            Live
+          </span>
+        </div>
+        <VillageStories />
+      </section>
 
       {/* Quick Actions (Desktop only now) */}
       <section
@@ -1648,9 +1642,9 @@ function Index() {
                 </p>
                 <div className="mt-7 grid grid-cols-3 gap-3">
                   {[
-                    ["4.9", "Avg rating"],
-                    ["18k+", "Trusted users"],
-                    ["24/7", "Village access"],
+                    [stats?.workers ? `${stats.workers}` : "0", "Local Workers"],
+                    [stats?.villagers ? `${stats.villagers}` : "0", "Trusted Users"],
+                    [stats?.byType?.service ? `${stats.byType.service}` : "0", "Services"],
                   ].map(([value, label]) => (
                     <div
                       key={label}
@@ -1672,37 +1666,48 @@ function Index() {
             <h2 className="mt-2 font-display text-3xl font-semibold text-clay dark:text-foreground sm:text-4xl">
               Proof of solved problems & official notices.
             </h2>
-            <div className="marquee-container mt-8 py-2 -mx-4 px-4 sm:-mx-6 sm:px-6">
-              <div className="marquee-track flex gap-4">
-                {[...proofTickers, ...proofTickers].map((item, idx) => {
-                  const Icon = item.icon;
-                  return (
-                    <div
-                      key={idx}
-                      className="w-[290px] sm:w-[320px] shrink-0 rounded-[22px] border border-border/80 bg-card/95 dark:bg-card/90 p-5 shadow-sm transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-md"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span
-                          className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider border ${item.badgeColor}`}
-                        >
-                          <Icon className="size-3.5" />
-                          {item.type}
-                        </span>
-                        <span className="text-[11px] font-semibold text-muted-foreground">
-                          {item.time}
-                        </span>
+            {realTickers.length > 0 ? (
+              <div className="marquee-container mt-8 py-2 -mx-4 px-4 sm:-mx-6 sm:px-6">
+                <div className="marquee-track flex gap-4">
+                  {[...realTickers, ...realTickers].map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                      <div
+                        key={idx}
+                        className="w-[290px] sm:w-[320px] shrink-0 rounded-[22px] border border-border/80 bg-card/95 dark:bg-card/90 p-5 shadow-sm transition hover:-translate-y-1 hover:border-primary/50 hover:shadow-md"
+                      >
+                        <div className="flex items-center justify-between gap-2">
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-bold uppercase tracking-wider border ${item.badgeColor}`}
+                          >
+                            <Icon className="size-3.5" />
+                            {item.type}
+                          </span>
+                          <span className="text-[11px] font-semibold text-muted-foreground">
+                            {item.time}
+                          </span>
+                        </div>
+                        <h3 className="mt-3.5 font-display text-base font-bold text-foreground line-clamp-2">
+                          {item.title}
+                        </h3>
+                        <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground line-clamp-3">
+                          {item.desc}
+                        </p>
                       </div>
-                      <h3 className="mt-3.5 font-display text-base font-bold text-foreground">
-                        {item.title}
-                      </h3>
-                      <p className="mt-1.5 text-xs leading-relaxed text-muted-foreground line-clamp-3">
-                        {item.desc}
-                      </p>
-                    </div>
-                  );
-                })}
+                    );
+                  })}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="mt-8 rounded-[24px] border border-dashed border-border p-8 text-center bg-card/50">
+                <p className="text-sm font-semibold text-muted-foreground">
+                  No official notices or solved problems yet.
+                </p>
+                <p className="mt-2 text-xs text-muted-foreground/80">
+                  Be the first to report an issue or post a village update.
+                </p>
+              </div>
+            )}
 
             <div className="mt-6 overflow-hidden rounded-[24px] border border-border/60 bg-gradient-to-br from-card to-muted/60 p-6 shadow-sm">
               <div className="mb-5 flex items-center justify-between">

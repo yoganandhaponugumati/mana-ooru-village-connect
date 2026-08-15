@@ -440,39 +440,19 @@ export function useListingStats(filter?: {
 
       const all = ((listings.data as { type: ListingType }[] | null) ?? []) as Listing[];
 
-      // Robust base statistics simulation offsets
-      const baseVillagers = 1420;
-      const baseWorkers = 28;
-      const baseLand = 12;
-      const baseComplaints = 19;
-      const baseMarket = 15;
-      const baseNotices = 9;
-
       const byType = all.reduce<Record<string, number>>(
         (acc, r) => {
           acc[r.type] = (acc[r.type] ?? 0) + 1;
           return acc;
         },
-        {
-          complaint: baseComplaints,
-          market: baseMarket,
-          notice: baseNotices,
-          worker: baseWorkers,
-          land: baseLand,
-        },
+        {}
       );
 
       return {
-        villagers: (profiles.count ?? 0) + baseVillagers,
-        workers: (workers.count ?? 0) + baseWorkers,
-        land: (land.count ?? 0) + baseLand,
-        total:
-          (listings.count ?? 0) +
-          baseComplaints +
-          baseMarket +
-          baseNotices +
-          baseWorkers +
-          baseLand,
+        villagers: profiles.count ?? 0,
+        workers: workers.count ?? 0,
+        land: land.count ?? 0,
+        total: listings.count ?? 0,
         byType,
         recent: [...((recent.data as Row[] | null) ?? []).map(toListing)].sort(
           (a, b) => b.createdAt - a.createdAt,

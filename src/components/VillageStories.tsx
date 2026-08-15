@@ -14,6 +14,7 @@ import {
   Volume2,
   VolumeX,
   Loader2,
+  ImagePlus,
 } from "lucide-react";
 import { useUIStore } from "@/lib/ui-store";
 import { useAuth } from "@/lib/auth";
@@ -25,31 +26,9 @@ import { checkContentSafety } from "@/lib/moderation";
 import { checkContentSpam } from "@/lib/spam-filter";
 import { checkRateLimit, DEFAULT_STORY_LIMIT } from "@/lib/rate-limiter";
 
-const dummyStories = [
-  {
-    id: "1",
-    author: "Sarpanch",
-    avatarUrl: "/village-life-bg.webp",
-    mediaUrl: "/village-life-bg.webp",
-    mediaType: "image",
-    caption: "Road repairs starting in Ward 4. Please avoid the main junction today.",
-    timeAgo: "2h ago",
-    isVerified: true,
-  },
-  {
-    id: "2",
-    author: "Agri Officer",
-    avatarUrl: "/village-life-bg.webp",
-    mediaUrl: "/village-life-bg.webp",
-    mediaType: "image",
-    caption: "New subsidized seeds available at the panchayat office.",
-    timeAgo: "5h ago",
-    isVerified: true,
-  },
-];
-
 export function VillageStories() {
-  const [stories, setStories] = useState<any[]>(dummyStories);
+  const [stories, setStories] = useState<any[]>([]);
+  const [storiesLoaded, setStoriesLoaded] = useState(false);
   const [activeStory, setActiveStory] = useState<any | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
@@ -236,10 +215,12 @@ export function VillageStories() {
               authorId: s.author_id,
             };
           });
-          setStories([...mapped, ...dummyStories]);
+          setStories(mapped);
         }
       } catch (err) {
         console.error("Failed to fetch stories:", err);
+      } finally {
+        setStoriesLoaded(true);
       }
     };
     fetchStories();
@@ -477,7 +458,7 @@ export function VillageStories() {
     <div className="w-full bg-transparent pb-4 pt-2">
       {/* Scrollable Avatars */}
       <div className="flex gap-4 overflow-x-auto px-4 sm:px-6 no-scrollbar snap-x items-start">
-        {/* Story Upload Button */}
+        {/* Story Upload Button — only visible to admins/officials */}
         {canPostStory && (
           <div className="snap-start flex flex-col items-center gap-1 shrink-0">
             <button
@@ -507,7 +488,19 @@ export function VillageStories() {
           </div>
         )}
 
-        {/* Admin Trash Icon overlay on story circle */}
+        {/* Empty State for Citizens — shown only after data has been fetched and there are no stories */}
+        {storiesLoaded && stories.length === 0 && !canPostStory && (
+          <div className="flex flex-col items-center justify-center gap-1.5 px-2 py-1 shrink-0 min-w-[200px]">
+            <div className="size-16 rounded-full border-2 border-dashed border-primary/30 bg-primary/5 flex items-center justify-center">
+              <ImagePlus className="size-7 text-primary/40" />
+            </div>
+            <p className="text-[10px] text-muted-foreground font-medium text-center leading-snug max-w-[140px]">
+              No village updates yet. Officials will post here.
+            </p>
+          </div>
+        )}
+
+        {/* Real Stories from database */}
         {stories.map((story) => (
           <div
             key={story.id}

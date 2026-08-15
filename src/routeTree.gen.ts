@@ -16,6 +16,7 @@ import { Route as UnauthorizedRouteImport } from './routes/unauthorized'
 import { Route as TransportRouteImport } from './routes/transport'
 import { Route as TimelineRouteImport } from './routes/timeline'
 import { Route as TermsRouteImport } from './routes/terms'
+import { Route as SupportRouteImport } from './routes/support'
 import { Route as ServicesRouteImport } from './routes/services'
 import { Route as SearchRouteImport } from './routes/search'
 import { Route as SchemesRouteImport } from './routes/schemes'
@@ -27,6 +28,7 @@ import { Route as PostWorkerRouteImport } from './routes/post-worker'
 import { Route as PostWorkRouteImport } from './routes/post-work'
 import { Route as PollsRouteImport } from './routes/polls'
 import { Route as OfficialRouteImport } from './routes/official'
+import { Route as NotificationsRouteImport } from './routes/notifications'
 import { Route as MarketplaceRouteImport } from './routes/marketplace'
 import { Route as LandRouteImport } from './routes/land'
 import { Route as HealthRouteImport } from './routes/health'
@@ -41,6 +43,7 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AnnouncementsRouteImport } from './routes/announcements'
 import { Route as AiAssistantRouteImport } from './routes/ai-assistant'
 import { Route as AgricultureRouteImport } from './routes/agriculture'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SuperAdminLoginRouteImport } from './routes/super-admin.login'
 
@@ -77,6 +80,11 @@ const TimelineRoute = TimelineRouteImport.update({
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SupportRoute = SupportRouteImport.update({
+  id: '/support',
+  path: '/support',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ServicesRoute = ServicesRouteImport.update({
@@ -132,6 +140,11 @@ const PollsRoute = PollsRouteImport.update({
 const OfficialRoute = OfficialRouteImport.update({
   id: '/official',
   path: '/official',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotificationsRoute = NotificationsRouteImport.update({
+  id: '/notifications',
+  path: '/notifications',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MarketplaceRoute = MarketplaceRouteImport.update({
@@ -204,6 +217,11 @@ const AgricultureRoute = AgricultureRouteImport.update({
   path: '/agriculture',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -217,6 +235,7 @@ const SuperAdminLoginRoute = SuperAdminLoginRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/agriculture': typeof AgricultureRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
@@ -231,6 +250,7 @@ export interface FileRoutesByFullPath {
   '/health': typeof HealthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
+  '/notifications': typeof NotificationsRoute
   '/official': typeof OfficialRoute
   '/polls': typeof PollsRoute
   '/post-work': typeof PostWorkRoute
@@ -242,6 +262,7 @@ export interface FileRoutesByFullPath {
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
@@ -253,6 +274,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/agriculture': typeof AgricultureRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
@@ -267,6 +289,7 @@ export interface FileRoutesByTo {
   '/health': typeof HealthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
+  '/notifications': typeof NotificationsRoute
   '/official': typeof OfficialRoute
   '/polls': typeof PollsRoute
   '/post-work': typeof PostWorkRoute
@@ -278,6 +301,7 @@ export interface FileRoutesByTo {
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
@@ -290,6 +314,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/agriculture': typeof AgricultureRoute
   '/ai-assistant': typeof AiAssistantRoute
   '/announcements': typeof AnnouncementsRoute
@@ -304,6 +329,7 @@ export interface FileRoutesById {
   '/health': typeof HealthRoute
   '/land': typeof LandRoute
   '/marketplace': typeof MarketplaceRoute
+  '/notifications': typeof NotificationsRoute
   '/official': typeof OfficialRoute
   '/polls': typeof PollsRoute
   '/post-work': typeof PostWorkRoute
@@ -315,6 +341,7 @@ export interface FileRoutesById {
   '/schemes': typeof SchemesRoute
   '/search': typeof SearchRoute
   '/services': typeof ServicesRoute
+  '/support': typeof SupportRoute
   '/terms': typeof TermsRoute
   '/timeline': typeof TimelineRoute
   '/transport': typeof TransportRoute
@@ -328,6 +355,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/agriculture'
     | '/ai-assistant'
     | '/announcements'
@@ -342,6 +370,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/land'
     | '/marketplace'
+    | '/notifications'
     | '/official'
     | '/polls'
     | '/post-work'
@@ -353,6 +382,7 @@ export interface FileRouteTypes {
     | '/schemes'
     | '/search'
     | '/services'
+    | '/support'
     | '/terms'
     | '/timeline'
     | '/transport'
@@ -364,6 +394,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/agriculture'
     | '/ai-assistant'
     | '/announcements'
@@ -378,6 +409,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/land'
     | '/marketplace'
+    | '/notifications'
     | '/official'
     | '/polls'
     | '/post-work'
@@ -389,6 +421,7 @@ export interface FileRouteTypes {
     | '/schemes'
     | '/search'
     | '/services'
+    | '/support'
     | '/terms'
     | '/timeline'
     | '/transport'
@@ -400,6 +433,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/about'
     | '/agriculture'
     | '/ai-assistant'
     | '/announcements'
@@ -414,6 +448,7 @@ export interface FileRouteTypes {
     | '/health'
     | '/land'
     | '/marketplace'
+    | '/notifications'
     | '/official'
     | '/polls'
     | '/post-work'
@@ -425,6 +460,7 @@ export interface FileRouteTypes {
     | '/schemes'
     | '/search'
     | '/services'
+    | '/support'
     | '/terms'
     | '/timeline'
     | '/transport'
@@ -437,6 +473,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
   AgricultureRoute: typeof AgricultureRoute
   AiAssistantRoute: typeof AiAssistantRoute
   AnnouncementsRoute: typeof AnnouncementsRoute
@@ -451,6 +488,7 @@ export interface RootRouteChildren {
   HealthRoute: typeof HealthRoute
   LandRoute: typeof LandRoute
   MarketplaceRoute: typeof MarketplaceRoute
+  NotificationsRoute: typeof NotificationsRoute
   OfficialRoute: typeof OfficialRoute
   PollsRoute: typeof PollsRoute
   PostWorkRoute: typeof PostWorkRoute
@@ -462,6 +500,7 @@ export interface RootRouteChildren {
   SchemesRoute: typeof SchemesRoute
   SearchRoute: typeof SearchRoute
   ServicesRoute: typeof ServicesRoute
+  SupportRoute: typeof SupportRoute
   TermsRoute: typeof TermsRoute
   TimelineRoute: typeof TimelineRoute
   TransportRoute: typeof TransportRoute
@@ -521,6 +560,13 @@ declare module '@tanstack/react-router' {
       path: '/terms'
       fullPath: '/terms'
       preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/support': {
+      id: '/support'
+      path: '/support'
+      fullPath: '/support'
+      preLoaderRoute: typeof SupportRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/services': {
@@ -598,6 +644,13 @@ declare module '@tanstack/react-router' {
       path: '/official'
       fullPath: '/official'
       preLoaderRoute: typeof OfficialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notifications': {
+      id: '/notifications'
+      path: '/notifications'
+      fullPath: '/notifications'
+      preLoaderRoute: typeof NotificationsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/marketplace': {
@@ -698,6 +751,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AgricultureRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -717,6 +777,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
   AgricultureRoute: AgricultureRoute,
   AiAssistantRoute: AiAssistantRoute,
   AnnouncementsRoute: AnnouncementsRoute,
@@ -731,6 +792,7 @@ const rootRouteChildren: RootRouteChildren = {
   HealthRoute: HealthRoute,
   LandRoute: LandRoute,
   MarketplaceRoute: MarketplaceRoute,
+  NotificationsRoute: NotificationsRoute,
   OfficialRoute: OfficialRoute,
   PollsRoute: PollsRoute,
   PostWorkRoute: PostWorkRoute,
@@ -742,6 +804,7 @@ const rootRouteChildren: RootRouteChildren = {
   SchemesRoute: SchemesRoute,
   SearchRoute: SearchRoute,
   ServicesRoute: ServicesRoute,
+  SupportRoute: SupportRoute,
   TermsRoute: TermsRoute,
   TimelineRoute: TimelineRoute,
   TransportRoute: TransportRoute,

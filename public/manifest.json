@@ -1,54 +1,101 @@
 {
   "name": "GramMitra — Smart Village Ecosystem",
   "short_name": "GramMitra",
-  "description": "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and AI support.",
+  "description": "A trusted digital village platform for workers, land, marketplace, services, notices, weather, and AI support. The only zero-brokerage, Panchayat-connected village app in India.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#FFFDF9",
   "theme_color": "#0E2317",
   "orientation": "portrait-primary",
+  "lang": "te",
+  "dir": "ltr",
+  "scope": "/",
+  "id": "grammitra-digital-village-os",
+  "prefer_related_applications": false,
   "icons": [
     {
-      "src": "/site-icon.svg",
-      "sizes": "192x192 512x512 any",
-      "type": "image/svg+xml",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/logo.png",
-      "sizes": "192x192 512x512 any",
+      "src": "/pwa-192x192.png",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/site-icon.png",
-      "sizes": "any",
+      "src": "/pwa-512x512.png",
+      "sizes": "512x512",
       "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/grammitra_app_icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/site-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
       "purpose": "any"
     }
   ],
   "categories": ["social", "productivity", "shopping", "lifestyle"],
+  "screenshots": [
+    {
+      "src": "/village-life-bg.jpg",
+      "sizes": "1200x628",
+      "type": "image/jpeg",
+      "label": "GramMitra Home — Digital Village Dashboard"
+    }
+  ],
   "shortcuts": [
+    {
+      "name": "Village Stories",
+      "short_name": "Stories",
+      "description": "View live 24h village updates from officials",
+      "url": "/",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
     {
       "name": "Marketplace",
       "short_name": "Market",
       "description": "Browse village trade listings",
       "url": "/marketplace",
-      "icons": [{ "src": "/site-icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
     },
     {
       "name": "Find Workers",
       "short_name": "Workers",
       "description": "Find local agricultural & skilled workers",
       "url": "/workers",
-      "icons": [{ "src": "/site-icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Report Problem",
+      "short_name": "Report",
+      "description": "Report civic issues with photo proof",
+      "url": "/problems",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
     },
     {
       "name": "Notices & Announcements",
       "short_name": "Notices",
       "description": "Read local Gram Panchayat announcements",
       "url": "/announcements",
-      "icons": [{ "src": "/site-icon.svg", "sizes": "any" }]
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Notifications & Alerts",
+      "short_name": "Alerts",
+      "description": "View all your village alerts and updates",
+      "url": "/notifications",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "AI Assistant",
+      "short_name": "AI Help",
+      "description": "Ask GramMitra AI about crops, schemes and more",
+      "url": "/ai-assistant",
+      "icons": [{ "src": "/pwa-192x192.png", "sizes": "192x192" }]
     }
   ]
 }
